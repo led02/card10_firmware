@@ -1,0 +1,38 @@
+var group__spixr__registers =
+[
+    [ "Register Offsets", "group__SPIXR__Register__Offsets.html", "group__SPIXR__Register__Offsets" ],
+    [ "SPIXR_DATA32", "group__SPIXR__DATA32.html", "group__SPIXR__DATA32" ],
+    [ "SPIXR_DATA16", "group__SPIXR__DATA16.html", "group__SPIXR__DATA16" ],
+    [ "SPIXR_DATA8", "group__SPIXR__DATA8.html", "group__SPIXR__DATA8" ],
+    [ "SPIXR_CTRL1", "group__SPIXR__CTRL1.html", "group__SPIXR__CTRL1" ],
+    [ "SPIXR_CTRL2", "group__SPIXR__CTRL2.html", "group__SPIXR__CTRL2" ],
+    [ "SPIXR_CTRL3", "group__SPIXR__CTRL3.html", "group__SPIXR__CTRL3" ],
+    [ "SPIXR_CTRL4", "group__SPIXR__CTRL4.html", "group__SPIXR__CTRL4" ],
+    [ "SPIXR_BRG_CTRL", "group__SPIXR__BRG__CTRL.html", "group__SPIXR__BRG__CTRL" ],
+    [ "SPIXR_I2S_CTRL", "group__SPIXR__I2S__CTRL.html", "group__SPIXR__I2S__CTRL" ],
+    [ "SPIXR_DMA", "group__SPIXR__DMA.html", "group__SPIXR__DMA" ],
+    [ "SPIXR_IRQ", "group__SPIXR__IRQ.html", "group__SPIXR__IRQ" ],
+    [ "SPIXR_IRQE", "group__SPIXR__IRQE.html", "group__SPIXR__IRQE" ],
+    [ "SPIXR_WAKE", "group__SPIXR__WAKE.html", "group__SPIXR__WAKE" ],
+    [ "SPIXR_WAKEE", "group__SPIXR__WAKEE.html", "group__SPIXR__WAKEE" ],
+    [ "SPIXR_STAT", "group__SPIXR__STAT.html", "group__SPIXR__STAT" ],
+    [ "SPIXR_XMEM_CTRL", "group__SPIXR__XMEM__CTRL.html", "group__SPIXR__XMEM__CTRL" ],
+    [ "mxc_spixr_regs_t", "structmxc__spixr__regs__t.html", [
+      [ "data32", "structmxc__spixr__regs__t.html#abf4598e6b6401e68b54614250834a231", null ],
+      [ "data16", "structmxc__spixr__regs__t.html#a3f2c53c0ee00b0486ed88ee3c1c45481", null ],
+      [ "data8", "structmxc__spixr__regs__t.html#a903143d87a5110b8d223a093ee28682c", null ],
+      [ "ctrl1", "structmxc__spixr__regs__t.html#a661e2879ea52ba18153757482845a8f0", null ],
+      [ "ctrl2", "structmxc__spixr__regs__t.html#a753c4fc439e94fa35b6d29a6075add3d", null ],
+      [ "ctrl3", "structmxc__spixr__regs__t.html#a36ae9d4c3d470f49dc519eed1a8ac02a", null ],
+      [ "ctrl4", "structmxc__spixr__regs__t.html#a6a681c5f9aa124a8105168e58539c1fa", null ],
+      [ "brg_ctrl", "structmxc__spixr__regs__t.html#a959af8bccf851f69ace9c85e4d16f930", null ],
+      [ "i2s_ctrl", "structmxc__spixr__regs__t.html#a90608b29b3f3212205facf083fc3864e", null ],
+      [ "dma", "structmxc__spixr__regs__t.html#a22c165cb4836264617f9ca7084933cba", null ],
+      [ "irq", "structmxc__spixr__regs__t.html#a0e2efcc6a2ea9a09315cd1bf411f1612", null ],
+      [ "irqe", "structmxc__spixr__regs__t.html#a694583dda0ca9d64b70e997c6ed41584", null ],
+      [ "wake", "structmxc__spixr__regs__t.html#a8be3ba10d6c326e1e6cf5fb74788032a", null ],
+      [ "wakee", "structmxc__spixr__regs__t.html#ad3be5055a12fdff0e232874b09de6cf8", null ],
+      [ "stat", "structmxc__spixr__regs__t.html#a483ed058b60736400e947a6abdec6c53", null ],
+      [ "xmem_ctrl", "structmxc__spixr__regs__t.html#a5ba44f6f49bfb1e8245abb85bba9a215", null ]
+    ] ]
+];

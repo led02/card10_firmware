@@ -1,0 +1,5 @@
+<map id="secEccMsg_t" name="secEccMsg_t">
+<area shape="rect" id="node2" href="$structsec_ecc_key__t.html" title="ECC Security public/private key pair. " alt="" coords="5,5,88,99"/>
+<area shape="rect" id="node3" href="$structwsf_msg_hdr__t.html" title="Common message structure passed to event handler. " alt="" coords="112,5,197,99"/>
+<area shape="rect" id="node4" href="$structsec_ecc_shared_sec__t.html" title="ECC security DH Key shared secret. " alt="" coords="221,17,339,87"/>
+</map>

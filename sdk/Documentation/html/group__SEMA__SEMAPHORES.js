@@ -1,0 +1,5 @@
+var group__SEMA__SEMAPHORES =
+[
+    [ "MXC_F_SEMA_SEMAPHORES_SEMA_POS", "group__SEMA__SEMAPHORES.html#ga2c1f336821b3f09821ff1959b3a2db1e", null ],
+    [ "MXC_F_SEMA_SEMAPHORES_SEMA", "group__SEMA__SEMAPHORES.html#ga55bf6d9b5198697bd0308db40c109f16", null ]
+];

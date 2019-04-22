@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['basinit',['BasInit',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#gabe703dcf908db450ff570fd88117957d',1,'bas_api.h']]],
+  ['basmeasbattstart',['BasMeasBattStart',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#ga66393bc47d9b93be503e1c24c91977ed',1,'bas_api.h']]],
+  ['basmeasbattstop',['BasMeasBattStop',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#ga342ebdcc1c55892ec592e956a49c649a',1,'bas_api.h']]],
+  ['basprocmsg',['BasProcMsg',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#ga9ce70804156987122988324dd2c7821b',1,'bas_api.h']]],
+  ['basreadcback',['BasReadCback',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#ga0b47065ee85a2365d595e17704e06411',1,'bas_api.h']]],
+  ['bassendbattlevel',['BasSendBattLevel',['../group___b_a_t_t_e_r_y___p_r_o_f_i_l_e.html#ga080e8827b70f644f4befe013f3cdac31',1,'bas_api.h']]],
+  ['bda2str',['Bda2Str',['../group___w_s_f___u_t_i_l___a_p_i.html#gaedd3c0341037f660eb8bc8750a5df5d3',1,'bda.h']]],
+  ['bda64tobstream',['Bda64ToBstream',['../group___w_s_f___u_t_i_l___a_p_i.html#ga116fe6347026b166e030630671231a1b',1,'bstream.h']]],
+  ['bdaclr',['BdaClr',['../group___w_s_f___u_t_i_l___a_p_i.html#ga78d9695662fa0f1b2afe9d04af22a32d',1,'bda.h']]],
+  ['bdacmp',['BdaCmp',['../group___w_s_f___u_t_i_l___a_p_i.html#ga447d9837de25a5ff808be73f42baddc1',1,'bda.h']]],
+  ['bdacpy',['BdaCpy',['../group___w_s_f___u_t_i_l___a_p_i.html#ga738f9ef30320ac9b7f89aa6a678d3f0c',1,'bda.h']]],
+  ['bdaiszeros',['BdaIsZeros',['../group___w_s_f___u_t_i_l___a_p_i.html#gaf58587fad180a4bf43c769dbee138427',1,'bda.h']]],
+  ['blpcbpsdiscover',['BlpcBpsDiscover',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gac6520e912ade0f2d84840f1997a3dd57',1,'blpc_api.h']]],
+  ['blpcbpsvalueupdate',['BlpcBpsValueUpdate',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga53a7ec27c6c86fa96b565e4725563d6e',1,'blpc_api.h']]],
+  ['blpsinit',['BlpsInit',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga68f2e71e2a9d8625e0a5fd9fdd06b601',1,'blps_api.h']]],
+  ['blpsmeascomplete',['BlpsMeasComplete',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gaac3d3fc144baed99009fde282bc8644e',1,'blps_api.h']]],
+  ['blpsmeasstart',['BlpsMeasStart',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga31bbeec2e51f93099717fe1340915041',1,'blps_api.h']]],
+  ['blpsmeasstop',['BlpsMeasStop',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga00aa40281b916314a4e3392b9c7becd6',1,'blps_api.h']]],
+  ['blpsprocmsg',['BlpsProcMsg',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga713a99669cb400c02164555004376e15',1,'blps_api.h']]],
+  ['blpssetbpmflags',['BlpsSetBpmFlags',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga09ecc10d72c5af95065455ca9b136d87',1,'blps_api.h']]],
+  ['blpsseticpflags',['BlpsSetIcpFlags',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#ga13a972db8dc40f248994da177311d654',1,'blps_api.h']]],
+  ['bstreamtobda64',['BstreamToBda64',['../group___w_s_f___u_t_i_l___a_p_i.html#ga4d4bafef08a51956c3674ff5e3c67bfd',1,'bstream.h']]],
+  ['bstreamtouint64',['BstreamToUint64',['../group___w_s_f___u_t_i_l___a_p_i.html#gadcbc56dbd2a12edbe54925fa6e0fb848',1,'bstream.h']]]
+];

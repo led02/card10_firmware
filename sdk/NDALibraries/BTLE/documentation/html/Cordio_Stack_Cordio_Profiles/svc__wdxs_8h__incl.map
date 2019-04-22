@@ -1,0 +1,18 @@
+<map id="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;profiles/sources/services/svc_wdxs.h" name="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;profiles/sources/services/svc_wdxs.h">
+<area shape="rect" id="node2" href="$bstream_8h.html" title="Byte stream to integer conversion macros. " alt="" coords="135,113,221,137"/>
+<area shape="rect" id="node4" href="$att__api_8h.html" title="Attribute protocol client and server API. " alt="" coords="349,113,412,137"/>
+<area shape="rect" id="node17" href="$wdx__defs_8h.html" title="Wireless Data Exchange Protocol Definitions. " alt="" coords="436,113,512,137"/>
+<area shape="rect" id="node3" href="$bda_8h.html" title="Bluetooth device address utilities. " alt="" coords="5,329,71,353"/>
+<area shape="rect" id="node5" href="$wsf__timer_8h.html" title="Timer service. " alt="" coords="526,185,603,209"/>
+<area shape="rect" id="node8" href="$att__defs_8h.html" title="Attribute protocol constants and definitions from the Bluetooth specification. " alt="" coords="454,257,523,281"/>
+<area shape="rect" id="node9" href="$att__uuid_8h.html" title="Attribute protocol UUIDs from the Bluetooth specification. " alt="" coords="382,185,451,209"/>
+<area shape="rect" id="node10" href="$dm__api_8h.html" title="Device Manager subsystem API. " alt="" coords="241,185,307,209"/>
+<area shape="rect" id="node14" href="$cfg__stack_8h.html" title="Stack configuration. " alt="" coords="355,257,430,281"/>
+<area shape="rect" id="node6" href="$wsf__os_8h.html" title="Software foundation OS API. " alt="" coords="411,329,475,353"/>
+<area shape="rect" id="node7" href="$wsf__queue_8h.html" title="General purpose queue service. " alt="" coords="402,401,485,425"/>
+<area shape="rect" id="node11" href="$hci__api_8h.html" title="HCI subsystem API. " alt="" coords="166,257,230,281"/>
+<area shape="rect" id="node15" href="$smp__defs_8h.html" title="Security manager constants and definitions from the Bluetooth specification. " alt="" coords="254,257,331,281"/>
+<area shape="rect" id="node16" href="$sec__api_8h.html" title="AES and random number security service API. " alt="" coords="75,257,142,281"/>
+<area shape="rect" id="node12" href="$wsf__types_8h.html" title="Platform&#45;independent data types. " alt="" coords="95,329,173,353"/>
+<area shape="rect" id="node13" href="$hci__defs_8h.html" title="HCI constants and definitions from the Bluetooth specification. " alt="" coords="197,329,268,353"/>
+</map>

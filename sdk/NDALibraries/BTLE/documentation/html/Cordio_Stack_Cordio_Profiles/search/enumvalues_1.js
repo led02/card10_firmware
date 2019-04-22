@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['batt_5flvl_5fch_5fccc_5fhdl',['BATT_LVL_CH_CCC_HDL',['../group___b_a_t_t_e_r_y___s_e_r_v_i_c_e.html#gga16af7b253440dadd46a80a4b9fddba4da1a59b0d390d326cde36366fb5d75f9cc',1,'svc_batt.h']]],
+  ['batt_5flvl_5fch_5fhdl',['BATT_LVL_CH_HDL',['../group___b_a_t_t_e_r_y___s_e_r_v_i_c_e.html#gga16af7b253440dadd46a80a4b9fddba4da74c707ec139aa852a42c16384182252c',1,'svc_batt.h']]],
+  ['batt_5flvl_5fhdl',['BATT_LVL_HDL',['../group___b_a_t_t_e_r_y___s_e_r_v_i_c_e.html#gga16af7b253440dadd46a80a4b9fddba4da02d2de256a56a433c259582951118967',1,'svc_batt.h']]],
+  ['batt_5fmax_5fhdl',['BATT_MAX_HDL',['../group___b_a_t_t_e_r_y___s_e_r_v_i_c_e.html#gga16af7b253440dadd46a80a4b9fddba4da304f66a488f24e8d9b0bedbe338a831e',1,'svc_batt.h']]],
+  ['batt_5fsvc_5fhdl',['BATT_SVC_HDL',['../group___b_a_t_t_e_r_y___s_e_r_v_i_c_e.html#gga16af7b253440dadd46a80a4b9fddba4dae28b958422ea17daf9e0d2f8f2a2bb4d',1,'svc_batt.h']]],
+  ['blpc_5fbps_5fbpf_5fhdl_5fidx',['BLPC_BPS_BPF_HDL_IDX',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462acd6f1919335bb9d3b2650bbe831caf26',1,'blpc_api.h']]],
+  ['blpc_5fbps_5fbpm_5fccc_5fhdl_5fidx',['BLPC_BPS_BPM_CCC_HDL_IDX',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462ae06d78a8d9181d512d772be571844f5e',1,'blpc_api.h']]],
+  ['blpc_5fbps_5fbpm_5fhdl_5fidx',['BLPC_BPS_BPM_HDL_IDX',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462a8b76f092b09a8fd500f7e28a06eb7969',1,'blpc_api.h']]],
+  ['blpc_5fbps_5fhdl_5flist_5flen',['BLPC_BPS_HDL_LIST_LEN',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462a311a94a43a783cf5e36dbd0a0829bcc9',1,'blpc_api.h']]],
+  ['blpc_5fbps_5ficp_5fccc_5fhdl_5fidx',['BLPC_BPS_ICP_CCC_HDL_IDX',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462ad754bb9cbf95b5f9807923440419701c',1,'blpc_api.h']]],
+  ['blpc_5fbps_5ficp_5fhdl_5fidx',['BLPC_BPS_ICP_HDL_IDX',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___p_r_o_f_i_l_e.html#gga16685eea158879e41b101ca3634de462aec2cb30dedf730eea59978e776902c06',1,'blpc_api.h']]],
+  ['bps_5fbpf_5fch_5fhdl',['BPS_BPF_CH_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25ad676fcebdb8c19151cee80902bb111f5',1,'svc_bps.h']]],
+  ['bps_5fbpf_5fhdl',['BPS_BPF_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a6aaae2a4e5d17820c9b604e64a46065a',1,'svc_bps.h']]],
+  ['bps_5fbpm_5fch_5fccc_5fhdl',['BPS_BPM_CH_CCC_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25aca75e05f88e287b6b5c3f71568938701',1,'svc_bps.h']]],
+  ['bps_5fbpm_5fch_5fhdl',['BPS_BPM_CH_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a729c9e3475e925bfa892bbce23705fc0',1,'svc_bps.h']]],
+  ['bps_5fbpm_5fhdl',['BPS_BPM_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a159a43b039658c5655cda0d0cf902477',1,'svc_bps.h']]],
+  ['bps_5ficp_5fch_5fccc_5fhdl',['BPS_ICP_CH_CCC_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a85ff9fb05e01d6c8ec01f8626021c124',1,'svc_bps.h']]],
+  ['bps_5ficp_5fch_5fhdl',['BPS_ICP_CH_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25ab56351d9c58bd6c042d24e2b213295c3',1,'svc_bps.h']]],
+  ['bps_5ficp_5fhdl',['BPS_ICP_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a544a3fbd3153c24b7dfa84437913980b',1,'svc_bps.h']]],
+  ['bps_5fmax_5fhdl',['BPS_MAX_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25a522b9345a44a162216ca8f681f15c222',1,'svc_bps.h']]],
+  ['bps_5fsvc_5fhdl',['BPS_SVC_HDL',['../group___b_l_o_o_d___p_r_e_s_s_u_r_e___s_e_r_v_i_c_e.html#ggaba01db17f4a2bfbc3db60dc172972a25af89afaa42cf968b6311e446763f1099e',1,'svc_bps.h']]]
+];

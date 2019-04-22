@@ -1,0 +1,39 @@
+<map id="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;host/sources/stack/cfg/cfg_stack.h" name="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;host/sources/stack/cfg/cfg_stack.h">
+<area shape="rect" id="node2" href="$dm__api_8h.html" title="Device Manager subsystem API. " alt="" coords="4715,113,4884,173"/>
+<area shape="rect" id="node3" href="$att__api_8h.html" title="Attribute protocol client and server API. " alt="" coords="3319,221,3488,281"/>
+<area shape="rect" id="node38" href="$hci__core_8h.html" title="HCI core interfaces. " alt="" coords="4908,113,5077,173"/>
+<area shape="rect" id="node4" href="$app__api_8h.html" title="Application framework API. " alt="" coords="6243,329,6425,389"/>
+<area shape="rect" id="node35" href="$l2c__api_8h.html" title="L2CAP subsystem API. " alt="" coords="4619,221,4788,281"/>
+<area shape="rect" id="node36" href="$smp__api_8h.html" title="SMP subsystem API. " alt="" coords="4812,221,4981,281"/>
+<area shape="rect" id="node37" href="$app__db_8h.html" title="Application framework device database. " alt="" coords="5559,221,5741,281"/>
+<area shape="rect" id="node5" href="$svc__cps_8h.html" title="Example Cycling Power Service Server implementation. " alt="" coords="5,329,188,389"/>
+<area shape="rect" id="node6" href="$svc__cscs_8h.html" title="Example Cycling Speed and Cadence Service Server implementation. " alt="" coords="212,329,395,389"/>
+<area shape="rect" id="node7" href="$svc__ipss_8h.html" title="Example Internet Profile Support Service implementation. " alt="" coords="419,329,601,389"/>
+<area shape="rect" id="node8" href="$svc__plxs_8h.html" title="Example Pulse Oximiter Service Server implementation. " alt="" coords="625,329,808,389"/>
+<area shape="rect" id="node9" href="$svc__px_8h.html" title="Example Proximity services implementation. " alt="" coords="832,329,1015,389"/>
+<area shape="rect" id="node10" href="$svc__rscs_8h.html" title="Example Running Speed and Cadence Service Server implementation. " alt="" coords="1039,329,1221,389"/>
+<area shape="rect" id="node11" href="$svc__wdxs_8h.html" title="Wireless Data Exchange service implementation. " alt="" coords="1245,329,1428,389"/>
+<area shape="rect" id="node12" href="$anpc__api_8h.html" title="Alert Notification profile client. " alt="" coords="1452,329,1635,389"/>
+<area shape="rect" id="node13" href="$bas__api_8h.html" title="Battery service server. " alt="" coords="1659,329,1841,389"/>
+<area shape="rect" id="node14" href="$blpc__api_8h.html" title="Blood Pressure profile client. " alt="" coords="1865,329,2048,389"/>
+<area shape="rect" id="node15" href="$blps__api_8h.html" title="Blood Pressure profile sensor. " alt="" coords="2072,329,2255,389"/>
+<area shape="rect" id="node16" href="$dis__api_8h.html" title="Device information service client. " alt="" coords="2279,329,2461,389"/>
+<area shape="rect" id="node17" href="$fmpl__api_8h.html" title="Find Me profile, locator role. " alt="" coords="2485,329,2668,389"/>
+<area shape="rect" id="node18" href="$gap__api_8h.html" title="GAP profile. " alt="" coords="2692,329,2875,389"/>
+<area shape="rect" id="node19" href="$gatt__api_8h.html" title="GATT profile. " alt="" coords="2899,329,3081,389"/>
+<area shape="rect" id="node20" href="$glpc__api_8h.html" title="Glucose profile collector. " alt="" coords="3105,329,3288,389"/>
+<area shape="rect" id="node21" href="$hrpc__api_8h.html" title="Heart Rate profile client. " alt="" coords="3312,329,3495,389"/>
+<area shape="rect" id="node22" href="$hrps__api_8h.html" title="Heart Rate profile sensor. " alt="" coords="3519,329,3701,389"/>
+<area shape="rect" id="node23" href="$htpc__api_8h.html" title="Health Thermometer profile client. " alt="" coords="3725,329,3908,389"/>
+<area shape="rect" id="node24" href="$htps__api_8h.html" title="Health Thermometer profile sensor. " alt="" coords="3932,329,4115,389"/>
+<area shape="rect" id="node25" href="$paspc__api_8h.html" title="Phone Alert Status profile client. " alt="" coords="4139,329,4329,389"/>
+<area shape="rect" id="node26" href="$plxpc__api_8h.html" title="Pulse Oximeter profile collector. " alt="" coords="4353,329,4536,389"/>
+<area shape="rect" id="node27" href="$scpps__api_8h.html" title="Scan Parameter Profile Server Application Interface. " alt="" coords="4560,329,4748,389"/>
+<area shape="rect" id="node28" href="$tipc__api_8h.html" title="Time profile client. " alt="" coords="4772,329,4955,389"/>
+<area shape="rect" id="node29" href="$udsc__api_8h.html" title="User Data Service Collector. " alt="" coords="4979,329,5161,389"/>
+<area shape="rect" id="node30" href="$uricfg__api_8h.html" title="UriBeacon configuration profile. " alt="" coords="5185,329,5392,389"/>
+<area shape="rect" id="node31" href="$wdxs__api_8h.html" title="Wireless Data Exchange profile application interface. " alt="" coords="5416,329,5599,389"/>
+<area shape="rect" id="node32" href="$wpc__api_8h.html" title="Arm Ltd. proprietary profile client. " alt="" coords="5623,329,5805,389"/>
+<area shape="rect" id="node33" href="$wspc__api_8h.html" title="Weight Scale profile client. " alt="" coords="5829,329,6012,389"/>
+<area shape="rect" id="node34" href="$wsps__api_8h.html" title="Weight Scale profile sensor. " alt="" coords="6036,329,6219,389"/>
+</map>

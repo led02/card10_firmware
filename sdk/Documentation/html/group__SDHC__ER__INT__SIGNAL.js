@@ -1,0 +1,27 @@
+var group__SDHC__ER__INT__SIGNAL =
+[
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_TO_POS", "group__SDHC__ER__INT__SIGNAL.html#ga39a14cecf8991114a882e2cd387f7490", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_TO", "group__SDHC__ER__INT__SIGNAL.html#ga04cfd4850a539171fff4c88a4e7998cb", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_CRC_POS", "group__SDHC__ER__INT__SIGNAL.html#ga9334e5681c13a50850ab4750f497b74f", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_CRC", "group__SDHC__ER__INT__SIGNAL.html#gacb95489a3d454a604840d8f494e122df", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_END_BIT_POS", "group__SDHC__ER__INT__SIGNAL.html#ga95584e96154aee576062bcff2f784206", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_END_BIT", "group__SDHC__ER__INT__SIGNAL.html#ga7fd8556bfee90d11f2202a4fa11c586f", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_IDX_POS", "group__SDHC__ER__INT__SIGNAL.html#ga5347deb5d2713ef766c977c2784cbd66", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CMD_IDX", "group__SDHC__ER__INT__SIGNAL.html#ga26531173828e530d12a41d69ab66bd92", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_TO_POS", "group__SDHC__ER__INT__SIGNAL.html#ga335a2077e3fa10fa0a4b7f80f5f2c4c8", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_TO", "group__SDHC__ER__INT__SIGNAL.html#ga1bc175131006abbc296aa52df1688c89", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_CRC_POS", "group__SDHC__ER__INT__SIGNAL.html#ga5d6e51d74e99d5d1c14afdc2e8f6cf01", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_CRC", "group__SDHC__ER__INT__SIGNAL.html#ga4b83785ea90f22bf2d1300ae089d117f", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_END_BIT_POS", "group__SDHC__ER__INT__SIGNAL.html#gaebe41bc26f911a3d11302efd355a6f3d", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_DATA_END_BIT", "group__SDHC__ER__INT__SIGNAL.html#gaf1c190c45d01108dfca2b85bac676b50", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CURR_LIM_POS", "group__SDHC__ER__INT__SIGNAL.html#ga0afc10c74da13dcf72c916bae5656bce", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_CURR_LIM", "group__SDHC__ER__INT__SIGNAL.html#gac6104745d4764f05024753107301d3d6", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_AUTO_CMD_POS", "group__SDHC__ER__INT__SIGNAL.html#gaa093e4a547b06ecea2c8439318f37d68", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_AUTO_CMD", "group__SDHC__ER__INT__SIGNAL.html#gaea5a4dbaef6a2105174434e3dacf6290", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_ADMA_POS", "group__SDHC__ER__INT__SIGNAL.html#gab98aa71bb5d97235783b7ef7e0877455", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_ADMA", "group__SDHC__ER__INT__SIGNAL.html#gaf864a7ac4a48885a5438d9999e4fdee9", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_TUNING_POS", "group__SDHC__ER__INT__SIGNAL.html#gad007cb2b09167ccd2854e78a7ecc30b3", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_TUNING", "group__SDHC__ER__INT__SIGNAL.html#gaf68b996141312ebb15eccf37d7767ff1", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_TAR_RESP_POS", "group__SDHC__ER__INT__SIGNAL.html#ga4c4b49cdb777b4e69df1b511e308d78d", null ],
+    [ "MXC_F_SDHC_ER_INT_SIGNAL_TAR_RESP", "group__SDHC__ER__INT__SIGNAL.html#ga0d1142dd5d29297aa69f7874fa66c641", null ]
+];

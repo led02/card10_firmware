@@ -1,0 +1,7 @@
+<map id="l2cCocEvt_t" name="l2cCocEvt_t">
+<area shape="rect" id="node2" href="$structl2c_coc_data_cnf__t.html" title="Connection oriented channel disconnect indication structure. " alt="" coords="60,171,163,240"/>
+<area shape="rect" id="node3" href="$structwsf_msg_hdr__t.html" title="Common message structure passed to event handler. " alt="" coords="204,5,289,99"/>
+<area shape="rect" id="node4" href="$structl2c_coc_connect_ind__t.html" title="Connection oriented channel connect indication structure. " alt="" coords="187,159,306,252"/>
+<area shape="rect" id="node5" href="$structl2c_coc_data_ind__t.html" title="Connection oriented channel data indication structure. " alt="" coords="330,159,432,252"/>
+<area shape="rect" id="node6" href="$structl2c_coc_disconnect_ind__t.html" title="Connection oriented channel disconnect indication structure. " alt="" coords="456,165,586,246"/>
+</map>

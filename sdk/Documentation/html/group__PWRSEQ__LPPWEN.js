@@ -1,0 +1,9 @@
+var group__PWRSEQ__LPPWEN =
+[
+    [ "MXC_F_PWRSEQ_LPPWEN_USBLSWKEN_POS", "group__PWRSEQ__LPPWEN.html#gae9803d372fbbdf493fc666ab3b23fe68", null ],
+    [ "MXC_F_PWRSEQ_LPPWEN_USBLSWKEN", "group__PWRSEQ__LPPWEN.html#ga6837c87d6fd0198b5d2585449ba889fd", null ],
+    [ "MXC_F_PWRSEQ_LPPWEN_USBVBUSWKEN_POS", "group__PWRSEQ__LPPWEN.html#ga3ee22c70d22ce81a62b98aa18a52216d", null ],
+    [ "MXC_F_PWRSEQ_LPPWEN_USBVBUSWKEN", "group__PWRSEQ__LPPWEN.html#gaee3102ee85cd6f169dcebb5b3c2fc5f1", null ],
+    [ "MXC_F_PWRSEQ_LPPWEN_SDMAWKEN_POS", "group__PWRSEQ__LPPWEN.html#ga703adc2738eadd76777396260c960b8d", null ],
+    [ "MXC_F_PWRSEQ_LPPWEN_SDMAWKEN", "group__PWRSEQ__LPPWEN.html#ga41f9b241dd49a5a0dede2a628c680c58", null ]
+];

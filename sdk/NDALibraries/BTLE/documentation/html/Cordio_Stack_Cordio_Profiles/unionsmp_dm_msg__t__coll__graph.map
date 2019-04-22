@@ -1,0 +1,7 @@
+<map id="smpDmMsg_t" name="smpDmMsg_t">
+<area shape="rect" id="node2" href="$structsmp_dm_keypress__t.html" title="Data type for SMP_MSG_API_USER_KEYPRESS. " alt="" coords="62,177,174,246"/>
+<area shape="rect" id="node3" href="$structwsf_msg_hdr__t.html" title="Common message structure passed to event handler. " alt="" coords="199,5,284,99"/>
+<area shape="rect" id="node4" href="$structsmp_dm_pair__t.html" title="Data type for SMP_MSG_API_PAIR_REQ and SMP_MSG_API_PAIR_RSP. " alt="" coords="198,159,285,264"/>
+<area shape="rect" id="node5" href="$structsmp_dm_auth_rsp__t.html" title="Data type for SMP_MSG_API_AUTH_RSP. " alt="" coords="310,171,419,252"/>
+<area shape="rect" id="node6" href="$structsmp_dm_security_req__t.html" title="Data type for SMP_MSG_API_SECURITY_REQ. " alt="" coords="444,177,570,246"/>
+</map>

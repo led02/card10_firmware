@@ -1,0 +1,54 @@
+<map id="hciEvt_t" name="hciEvt_t">
+<area shape="rect" id="node2" href="$structhci_hw_error_evt__t.html" title="Hardware error event. " alt="" coords="142,231,242,300"/>
+<area shape="rect" id="node3" href="$structwsf_msg_hdr__t.html" title="Common message structure passed to event handler. " alt="" coords="4354,5,4440,99"/>
+<area shape="rect" id="node4" href="$structhci_le_conn_update_cmpl_evt__t.html" title="LE connection update complete event. " alt="" coords="266,207,424,324"/>
+<area shape="rect" id="node5" href="$structhci_le_ext_adv_report_evt__t.html" title="LE extended advertising report. " alt="" coords="448,159,586,372"/>
+<area shape="rect" id="node6" href="$structhci_le_data_len_change_evt__t.html" title="LE data length change event. " alt="" coords="610,207,760,324"/>
+<area shape="rect" id="node7" href="$structhci_le_read_max_data_len_evt__t.html" title="LE read maximum data len command complete event. " alt="" coords="784,207,943,324"/>
+<area shape="rect" id="node8" href="$structhci_le_read_peer_res_addr_cmd_cmpl_evt__t.html" title="LE read peer resolving address command complete event. " alt="" coords="968,219,1154,312"/>
+<area shape="rect" id="node9" href="$structhci_le_ltk_req_neg_repl_cmd_cmpl_evt__t.html" title="LE LTK request negative reply command complete event. " alt="" coords="1178,219,1349,312"/>
+<area shape="rect" id="node10" href="$structhci_le_phy_update_evt__t.html" title="LE PHY update complete event. " alt="" coords="1374,213,1498,318"/>
+<area shape="rect" id="node11" href="$structhci_le_add_dev_to_res_list_cmd_cmpl_evt__t.html" title="LE add device to resolving list command complete event. " alt="" coords="1522,225,1704,306"/>
+<area shape="rect" id="node12" href="$structhci_le_adv_set_term_evt__t.html" title="LE advertising set terminated. " alt="" coords="1728,213,1858,318"/>
+<area shape="rect" id="node13" href="$structhci_le_read_local_res_addr_cmd_cmpl_evt__t.html" title="LE read local resolving address command complete event. " alt="" coords="1882,219,2045,312"/>
+<area shape="rect" id="node14" href="$structhci_le_rand_cmd_cmpl_evt__t.html" title="LE rand command complete event. " alt="" coords="2070,225,2215,306"/>
+<area shape="rect" id="node15" href="$structhci_le_scan_timeout_evt__t.html" title="LE scan timeout. " alt="" coords="2239,231,2374,300"/>
+<area shape="rect" id="node16" href="$structhci_le_clear_res_list_cmd_cmpl_evt__t.html" title="LE clear resolving list command complete event. " alt="" coords="2398,225,2554,306"/>
+<area shape="rect" id="node17" href="$structhci_le_ltk_req_repl_cmd_cmpl_evt__t.html" title="LE LTK request reply command complete event. " alt="" coords="2578,225,2752,306"/>
+<area shape="rect" id="node18" href="$structhci_read_rssi_cmd_cmpl_evt__t.html" title="Read RSSI command complete event. " alt="" coords="2776,219,2930,312"/>
+<area shape="rect" id="node19" href="$structhci_disconnect_cmpl_evt__t.html" title="Disconnect complete event. " alt="" coords="2953,219,3089,312"/>
+<area shape="rect" id="node20" href="$structhci_le_ltk_req_evt__t.html" title="LE LTK request event. " alt="" coords="3112,219,3218,312"/>
+<area shape="rect" id="node21" href="$structhci_le_read_def_data_len_evt__t.html" title="LE read suggested default data len command complete event. " alt="" coords="3241,219,3396,312"/>
+<area shape="rect" id="node22" href="$structhci_le_adv_report_evt__t.html" title="LE advertising report event. " alt="" coords="3420,189,3542,342"/>
+<area shape="rect" id="node23" href="$structhci_le_ch_sel_algo_evt__t.html" title="LE channel selection algorithm. " alt="" coords="3567,225,3688,306"/>
+<area shape="rect" id="node24" href="$structhci_auth_payload_to_expired_evt__t.html" title="Authenticated payload to expire event. " alt="" coords="3713,231,3881,300"/>
+<area shape="rect" id="node25" href="$structhci_le_write_def_data_len_evt__t.html" title="LE write suggested default data len command complete event. " alt="" coords="3905,231,4060,300"/>
+<area shape="rect" id="node26" href="$structhci_read_local_ver_info__t.html" title="Read local version information complete event. " alt="" coords="4084,201,4214,330"/>
+<area shape="rect" id="node27" href="$structhci_le_per_adv_sync_lost_evt__t.html" title="LE periodic advertising synch lost. " alt="" coords="4238,231,4388,300"/>
+<area shape="rect" id="node28" href="$structhci_le_per_adv_report_evt__t.html" title="LE periodic advertising report. " alt="" coords="4412,195,4550,336"/>
+<area shape="rect" id="node29" href="$structhci_le_gen_dh_key_evt__t.html" title="LE generate DH key command complete event. " alt="" coords="4574,225,4697,306"/>
+<area shape="rect" id="node30" href="$structhci_vendor_spec_cmd_cmpl_evt__t.html" title="Vendor specific command complete event. " alt="" coords="4722,225,4888,306"/>
+<area shape="rect" id="node31" href="$structhci_write_auth_payload_to_cmd_cmpl_evt__t.html" title="Write authenticated payload to command complete event. " alt="" coords="4912,219,5068,312"/>
+<area shape="rect" id="node32" href="$structhci_read_chan_map_cmd_cmpl_evt__t.html" title="LE Read channel map command complete event. " alt="" coords="5092,219,5272,312"/>
+<area shape="rect" id="node33" href="$structhci_le_rem_dev_from_res_list_cmd_cmpl_evt__t.html" title="LE remove device from resolving list command complete event. " alt="" coords="5297,225,5470,306"/>
+<area shape="rect" id="node34" href="$structhci_le_encrypt_cmd_cmpl_evt__t.html" title="LE encrypt command complete event. " alt="" coords="5494,225,5649,306"/>
+<area shape="rect" id="node35" href="$structhci_vendor_spec_cmd_status_evt__t.html" title="Vendor specific command status event. " alt="" coords="5673,231,5844,300"/>
+<area shape="rect" id="node36" href="$structhci_enc_key_refresh_cmpl__t.html" title="Encryption key refresh complete event. " alt="" coords="5868,225,6011,306"/>
+<area shape="rect" id="node37" href="$structhci_le_rem_conn_param_neg_rep_evt__t.html" title="LE remote connection parameter request negative reply command complete event. " alt="" coords="6036,225,6228,306"/>
+<area shape="rect" id="node38" href="$structhci_enc_change_evt__t.html" title="Encryption change event. " alt="" coords="6252,219,6366,312"/>
+<area shape="rect" id="node39" href="$structhci_read_remote_ver_info_cmpl_evt__t.html" title="Read remote version information complete event. " alt="" coords="6391,201,6550,330"/>
+<area shape="rect" id="node40" href="$structhci_read_tx_pwr_lvl_cmd_cmpl_evt__t.html" title="Read transmit power level command complete event. " alt="" coords="6574,219,6751,312"/>
+<area shape="rect" id="node41" href="$structhci_le_scan_req_rcvd_evt__t.html" title="LE scan request received. " alt="" coords="6776,219,6914,312"/>
+<area shape="rect" id="node42" href="$structhci_le_rem_conn_param_req_evt__t.html" title="LE remote connetion parameter request event. " alt="" coords="6939,207,7111,324"/>
+<area shape="rect" id="node43" href="$structhci_le_read_remote_feat_cmpl_evt__t.html" title="LE read remote features complete event. " alt="" coords="7135,219,7318,312"/>
+<area shape="rect" id="node44" href="$structhci_le_create_conn_cancel_cmd_cmpl_evt__t.html" title="LE create connection cancel command complete event. " alt="" coords="7342,225,7505,306"/>
+<area shape="rect" id="node45" href="$structhci_le_per_adv_sync_est_evt__t.html" title="LE periodic advertising sync established. " alt="" coords="7529,189,7673,342"/>
+<area shape="rect" id="node46" href="$structhci_le_set_def_phy_cmd_cmpl_evt__t.html" title="LE set default PHY command complete event. " alt="" coords="7697,231,7868,300"/>
+<area shape="rect" id="node47" href="$structhci_le_read_phy_cmd_cmpl_evt__t.html" title="LE read PHY command complete event. " alt="" coords="7892,213,8054,318"/>
+<area shape="rect" id="node48" href="$structhci_le_rem_conn_param_rep_evt__t.html" title="LE remote connection parameter request reply command complete event. " alt="" coords="8079,225,8251,306"/>
+<area shape="rect" id="node49" href="$structhci_vendor_spec_evt__t.html" title="Vendor specific event. " alt="" coords="8275,231,8394,300"/>
+<area shape="rect" id="node50" href="$structhci_le_conn_cmpl_evt__t.html" title="LE connection complete event. " alt="" coords="8418,171,8541,360"/>
+<area shape="rect" id="node51" href="$structhci_le_p256_cmpl_evt__t.html" title="LE local p256 ecc key command complete event. " alt="" coords="8566,225,8687,306"/>
+<area shape="rect" id="node52" href="$structhci_le_set_data_len_evt__t.html" title="LE set data len command complete event. " alt="" coords="8712,225,8840,306"/>
+<area shape="rect" id="node53" href="$structhci_le_set_addr_res_enable_cmd_cmpl_evt__t.html" title="LE set address resolving enable command complete event. " alt="" coords="8864,225,9026,306"/>
+</map>

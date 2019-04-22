@@ -1,0 +1,16 @@
+<map id="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;profiles/sources/profiles/glpc/glpc_api.h" name="/tmp/20897850.tmpdir/xml&#45;data/build&#45;dir/CORDIO&#45;GCPS4&#45;JOB1/master/ble&#45;profiles/sources/profiles/glpc/glpc_api.h">
+<area shape="rect" id="node2" href="$att__api_8h.html" title="Attribute protocol client and server API. " alt="" coords="161,113,223,137"/>
+<area shape="rect" id="node3" href="$wsf__timer_8h.html" title="Timer service. " alt="" coords="5,185,83,209"/>
+<area shape="rect" id="node6" href="$att__defs_8h.html" title="Attribute protocol constants and definitions from the Bluetooth specification. " alt="" coords="92,257,161,281"/>
+<area shape="rect" id="node7" href="$att__uuid_8h.html" title="Attribute protocol UUIDs from the Bluetooth specification. " alt="" coords="157,185,227,209"/>
+<area shape="rect" id="node8" href="$dm__api_8h.html" title="Device Manager subsystem API. " alt="" coords="301,185,368,209"/>
+<area shape="rect" id="node13" href="$cfg__stack_8h.html" title="Stack configuration. " alt="" coords="197,257,272,281"/>
+<area shape="rect" id="node4" href="$wsf__os_8h.html" title="Software foundation OS API. " alt="" coords="91,329,155,353"/>
+<area shape="rect" id="node5" href="$wsf__queue_8h.html" title="General purpose queue service. " alt="" coords="81,401,164,425"/>
+<area shape="rect" id="node9" href="$hci__api_8h.html" title="HCI subsystem API. " alt="" coords="296,257,360,281"/>
+<area shape="rect" id="node14" href="$smp__defs_8h.html" title="Security manager constants and definitions from the Bluetooth specification. " alt="" coords="384,257,461,281"/>
+<area shape="rect" id="node15" href="$sec__api_8h.html" title="AES and random number security service API. " alt="" coords="485,257,552,281"/>
+<area shape="rect" id="node10" href="$wsf__types_8h.html" title="Platform&#45;independent data types. " alt="" coords="455,329,534,353"/>
+<area shape="rect" id="node11" href="$hci__defs_8h.html" title="HCI constants and definitions from the Bluetooth specification. " alt="" coords="225,329,295,353"/>
+<area shape="rect" id="node12" href="$bda_8h.html" title="Bluetooth device address utilities. " alt="" coords="319,329,385,353"/>
+</map>

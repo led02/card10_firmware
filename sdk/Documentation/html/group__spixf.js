@@ -1,0 +1,45 @@
+var group__spixf =
+[
+    [ "SPIXF_Registers", "group__spixf__registers.html", "group__spixf__registers" ],
+    [ "spixf_req_t", "structspixf__req__t.html", [
+      [ "mode", "structspixf__req__t.html#a68def2e53474af77bc14499f0e7e9a9d", null ],
+      [ "sspol", "structspixf__req__t.html#a2a89c9e57b348596fa34e31ec8f23973", null ],
+      [ "baud", "structspixf__req__t.html#ace4adacc7ba4e8dff03aab538e3ae5f2", null ],
+      [ "ssact", "structspixf__req__t.html#a6f3ce1d6a48fa7a30e76e5ac1a1cf5e5", null ],
+      [ "ssiact", "structspixf__req__t.html#a46215d8a1f3ca21032137c0a611d959a", null ],
+      [ "cmdval", "structspixf__req__t.html#aa7b6b6751d91591a47ceb35d1470656e", null ],
+      [ "cmdwth", "structspixf__req__t.html#a2a03a5ac2c42c36b1f9860b9010d7284", null ],
+      [ "adrwth", "structspixf__req__t.html#ab583ae623003a596686eefb40a56bc61", null ],
+      [ "datwth", "structspixf__req__t.html#af61a5685e18ab76ba84b5c3702153ee7", null ],
+      [ "addr4", "structspixf__req__t.html#a6158dbfa017c09b5b26d29879c60d6e9", null ],
+      [ "mdclk", "structspixf__req__t.html#ab61e80fafcb73a9d8bf4332efc7dca8f", null ],
+      [ "nocmd", "structspixf__req__t.html#a961a58e9c06c5f592a7a40a56cf3abf6", null ],
+      [ "mddata", "structspixf__req__t.html#a9ee2db1c09774d4994c25e8177648735", null ],
+      [ "mdoe", "structspixf__req__t.html#a9270b9575dec8d3c522861160988e3b1", null ],
+      [ "fbmd", "structspixf__req__t.html#a92d2e7827ec02e319665e38f6791f868", null ],
+      [ "finv", "structspixf__req__t.html#a08b0e9acf2d8237e7c81679f4ec48597", null ],
+      [ "busidle", "structspixf__req__t.html#a7c65490887863c24c963164a34827518", null ]
+    ] ],
+    [ "spixf_cfg_mode_t", "group__spixf.html#gabc10b112c0d8e465b5bc4ea0a9c9bc56", null ],
+    [ "spixf_cfg_sspol_t", "group__spixf.html#gafc70f58c37fb440f6063cf90d86e840e", null ],
+    [ "spixf_cfg_ssact_t", "group__spixf.html#gacf8b4c30444e4ae8970d87779245d902", null ],
+    [ "spixf_cfg_ssiact_t", "group__spixf.html#ga010adfb744e153c1cd9962b9723aa432", [
+      [ "SYS_CLOCKS_1", "group__spixf.html#gga010adfb744e153c1cd9962b9723aa432a3e8206afe606d1beef96b1e3ab97e549", null ],
+      [ "SYS_CLOCKS_3", "group__spixf.html#gga010adfb744e153c1cd9962b9723aa432a7ca57cf66ffda91ebddc59bf0bd86a04", null ],
+      [ "SYS_CLOCKS_5", "group__spixf.html#gga010adfb744e153c1cd9962b9723aa432a2b21fe294fc1c70e148cc5fea76161ae", null ],
+      [ "SYS_CLOCKS_9", "group__spixf.html#gga010adfb744e153c1cd9962b9723aa432a5505b1a67fb53f471e9c559e3b552aac", null ]
+    ] ],
+    [ "spixf_fctl_cmdwth_t", "group__spixf.html#ga9b30ee9f22456151b805fa9a8627d765", null ],
+    [ "spixf_fctl_adrwth_t", "group__spixf.html#ga1be91008e482f1ce3a3246e04a6b0bdf", null ],
+    [ "spixf_fctl_datwth_t", "group__spixf.html#ga4b6a0246eed505970c5bdd0c3793b8c0", null ],
+    [ "spixf_fctl_addr4_t", "group__spixf.html#gacf0b5f83c14772c0d3d8c42dfb3a329a", null ],
+    [ "spixf_mctl_nocmd_t", "group__spixf.html#gae5685f7faa281b90b992ef52fa118011", null ],
+    [ "spixf_fctrl_fbmd_t", "group__spixf.html#gac9cf23bafadbbb3d19dec787385cd460", null ],
+    [ "spixf_fctrl_finv_t", "group__spixf.html#ga8ff57eb8cad638673beede7cf17647ae", null ],
+    [ "spixf_ioctl_sclk_t", "group__spixf.html#ga2c40425c387ee332498c49297223edde", null ],
+    [ "spixf_ioctl_ss_t", "group__spixf.html#ga682548fc6191526162680bb14290d29e", null ],
+    [ "spixf_ioctl_sdio_t", "group__spixf.html#gac8c2e9ed1b722e8e55c7c3a6cb73d854", null ],
+    [ "spixf_ioctl_pup_t", "group__spixf.html#gab29f8c1477ef1d18a9a087fc589b843a", null ],
+    [ "SPIXF_setup", "group__spixf.html#gaafea70e0dada7a720231d29e4992af11", null ],
+    [ "SPIXF_ioctrl", "group__spixf.html#gaf6c7f83876e7ce9c0731c5dc06ba2a25", null ]
+];

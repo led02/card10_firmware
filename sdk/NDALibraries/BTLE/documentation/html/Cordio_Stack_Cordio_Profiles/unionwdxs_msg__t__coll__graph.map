@@ -1,0 +1,55 @@
+<map id="wdxsMsg_t" name="wdxsMsg_t">
+<area shape="rect" id="node2" href="$structatts_ccc_evt__t.html" title="ATTS client characteristic configuration callback structure. " alt="" coords="7189,549,7270,643"/>
+<area shape="rect" id="node3" href="$structwsf_msg_hdr__t.html" title="Common message structure passed to event handler. " alt="" coords="3879,159,3964,252"/>
+<area shape="rect" id="node4" href="$uniondm_evt__t.html" title="Union of DM callback event data types. " alt="" coords="3851,667,3912,736"/>
+<area shape="rect" id="node5" href="$structhci_hw_error_evt__t.html" title="Hardware error event. " alt="" coords="3871,384,3971,453"/>
+<area shape="rect" id="node6" href="$structhci_le_conn_update_cmpl_evt__t.html" title="LE connection update complete event. " alt="" coords="4245,360,4403,477"/>
+<area shape="rect" id="node7" href="$structhci_le_ext_adv_report_evt__t.html" title="LE extended advertising report. " alt="" coords="4427,312,4565,525"/>
+<area shape="rect" id="node8" href="$structhci_le_data_len_change_evt__t.html" title="LE data length change event. " alt="" coords="4070,360,4221,477"/>
+<area shape="rect" id="node9" href="$structhci_le_read_peer_res_addr_cmd_cmpl_evt__t.html" title="LE read peer resolving address command complete event. " alt="" coords="4589,372,4776,465"/>
+<area shape="rect" id="node10" href="$structdm_sec_auth_req_ind_evt__t.html" title="Data type for DM_SEC_AUTH_REQ_IND. " alt="" coords="4800,378,4936,459"/>
+<area shape="rect" id="node11" href="$structhci_le_phy_update_evt__t.html" title="LE PHY update complete event. " alt="" coords="5319,366,5443,471"/>
+<area shape="rect" id="node12" href="$structhci_le_add_dev_to_res_list_cmd_cmpl_evt__t.html" title="LE add device to resolving list command complete event. " alt="" coords="4960,378,5141,459"/>
+<area shape="rect" id="node13" href="$structhci_le_adv_set_term_evt__t.html" title="LE advertising set terminated. " alt="" coords="5165,366,5296,471"/>
+<area shape="rect" id="node14" href="$structdm_adv_set_start_evt__t.html" title="Data structure for DM_ADV_SET_START_IND. " alt="" coords="5467,378,5586,459"/>
+<area shape="rect" id="node15" href="$structhci_le_read_local_res_addr_cmd_cmpl_evt__t.html" title="LE read local resolving address command complete event. " alt="" coords="5611,372,5773,465"/>
+<area shape="rect" id="node16" href="$structhci_le_clear_res_list_cmd_cmpl_evt__t.html" title="LE clear resolving list command complete event. " alt="" coords="6135,378,6291,459"/>
+<area shape="rect" id="node17" href="$structhci_read_rssi_cmd_cmpl_evt__t.html" title="Read RSSI command complete event. " alt="" coords="5798,372,5951,465"/>
+<area shape="rect" id="node18" href="$structhci_disconnect_cmpl_evt__t.html" title="Disconnect complete event. " alt="" coords="5975,372,6111,465"/>
+<area shape="rect" id="node19" href="$structsec_ecc_msg__t.html" title="ECC Security callback parameters structure. " alt="" coords="7349,384,7433,453"/>
+<area shape="rect" id="node22" href="$structhci_le_ltk_req_evt__t.html" title="LE LTK request event. " alt="" coords="6315,372,6421,465"/>
+<area shape="rect" id="node23" href="$structhci_le_adv_report_evt__t.html" title="LE advertising report event. " alt="" coords="6445,342,6568,495"/>
+<area shape="rect" id="node24" href="$structhci_auth_payload_to_expired_evt__t.html" title="Authenticated payload to expire event. " alt="" coords="6909,384,7077,453"/>
+<area shape="rect" id="node25" href="$structhci_read_local_ver_info__t.html" title="Read local version information complete event. " alt="" coords="6592,354,6723,483"/>
+<area shape="rect" id="node26" href="$structhci_le_per_adv_report_evt__t.html" title="LE periodic advertising report. " alt="" coords="6747,348,6885,489"/>
+<area shape="rect" id="node27" href="$structhci_le_per_adv_sync_lost_evt__t.html" title="LE periodic advertising synch lost. " alt="" coords="5,384,155,453"/>
+<area shape="rect" id="node28" href="$structdm_per_adv_set_stop_evt__t.html" title="Data structure for DM_PER_ADV_SET_STOP_IND. " alt="" coords="179,384,314,453"/>
+<area shape="rect" id="node29" href="$structdm_sec_pair_cmpl_ind_evt__t.html" title="Data type for DM_SEC_PAIR_CMPL_IND. " alt="" coords="339,384,477,453"/>
+<area shape="rect" id="node30" href="$structhci_write_auth_payload_to_cmd_cmpl_evt__t.html" title="Write authenticated payload to command complete event. " alt="" coords="502,372,658,465"/>
+<area shape="rect" id="node31" href="$structdm_sec_key_ind_evt__t.html" title="Data type for DM_SEC_KEY_IND. " alt="" coords="7101,372,7213,465"/>
+<area shape="rect" id="node36" href="$structdm_adv_new_addr_ind_evt__t.html" title="Data type for DM_ADV_NEW_ADDR_IND. " alt="" coords="683,378,821,459"/>
+<area shape="rect" id="node37" href="$structdm_sec_keypress_ind_evt__t.html" title="Data type for DM_SEC_KEYPRESS_IND. " alt="" coords="845,384,984,453"/>
+<area shape="rect" id="node38" href="$structdm_sec_encrypt_ind_evt__t.html" title="Data type for DM_SEC_ENCRYPT_IND. " alt="" coords="1008,384,1139,453"/>
+<area shape="rect" id="node39" href="$structhci_le_rem_dev_from_res_list_cmd_cmpl_evt__t.html" title="LE remove device from resolving list command complete event. " alt="" coords="1163,378,1336,459"/>
+<area shape="rect" id="node40" href="$structhci_read_remote_ver_info_cmpl_evt__t.html" title="Read remote version information complete event. " alt="" coords="1361,354,1519,483"/>
+<area shape="rect" id="node41" href="$structhci_le_read_remote_feat_cmpl_evt__t.html" title="LE read remote features complete event. " alt="" coords="1543,372,1726,465"/>
+<area shape="rect" id="node42" href="$structdm_per_adv_set_start_evt__t.html" title="Data structure for DM_PER_ADV_SET_START_IND. " alt="" coords="1750,384,1885,453"/>
+<area shape="rect" id="node43" href="$structhci_le_scan_req_rcvd_evt__t.html" title="LE scan request received. " alt="" coords="1909,372,2048,465"/>
+<area shape="rect" id="node44" href="$structhci_le_rem_conn_param_req_evt__t.html" title="LE remote connetion parameter request event. " alt="" coords="2073,360,2245,477"/>
+<area shape="rect" id="node45" href="$structdm_sec_cnf_ind_evt__t.html" title="Data type for DM_SEC_COMPARE_IND. " alt="" coords="2269,384,2379,453"/>
+<area shape="rect" id="node46" href="$structhci_vendor_spec_evt__t.html" title="Vendor specific event. " alt="" coords="2403,384,2522,453"/>
+<area shape="rect" id="node47" href="$structhci_le_per_adv_sync_est_evt__t.html" title="LE periodic advertising sync established. " alt="" coords="2547,342,2691,495"/>
+<area shape="rect" id="node48" href="$structhci_le_set_def_phy_cmd_cmpl_evt__t.html" title="LE set default PHY command complete event. " alt="" coords="2715,384,2885,453"/>
+<area shape="rect" id="node49" href="$structhci_le_read_phy_cmd_cmpl_evt__t.html" title="LE read PHY command complete event. " alt="" coords="2909,366,3072,471"/>
+<area shape="rect" id="node50" href="$structdm_sec_oob_calc_ind_evt__t.html" title="Data type for DM_SEC_CALC_OOB_IND. " alt="" coords="3097,378,3231,459"/>
+<area shape="rect" id="node51" href="$structdm_sec_pair_ind_evt__t.html" title="Data type for DM_SEC_PAIR_IND. " alt="" coords="3255,366,3369,471"/>
+<area shape="rect" id="node52" href="$structhci_le_conn_cmpl_evt__t.html" title="LE connection complete event. " alt="" coords="3393,324,3516,513"/>
+<area shape="rect" id="node53" href="$structhci_le_set_addr_res_enable_cmd_cmpl_evt__t.html" title="LE set address resolving enable command complete event. " alt="" coords="3541,378,3702,459"/>
+<area shape="rect" id="node54" href="$structdm_sec_slave_ind_evt__t.html" title="Data type for DM_SEC_SLAVE_REQ_IND. " alt="" coords="3727,384,3847,453"/>
+<area shape="rect" id="node20" href="$structsec_ecc_key__t.html" title="ECC Security public/private key pair. " alt="" coords="7360,159,7443,252"/>
+<area shape="rect" id="node21" href="$structsec_ecc_shared_sec__t.html" title="ECC security DH Key shared secret. " alt="" coords="7467,171,7584,240"/>
+<area shape="rect" id="node32" href="$uniondm_sec_key__t.html" title="Union of key types. " alt="" coords="7191,171,7273,240"/>
+<area shape="rect" id="node33" href="$structdm_sec_csrk__t.html" title="CSRK data type. " alt="" coords="7082,17,7169,87"/>
+<area shape="rect" id="node34" href="$structdm_sec_irk__t.html" title="IRK data type. " alt="" coords="7193,5,7271,99"/>
+<area shape="rect" id="node35" href="$structdm_sec_ltk__t.html" title="LTK data type. " alt="" coords="7295,5,7374,99"/>
+</map>

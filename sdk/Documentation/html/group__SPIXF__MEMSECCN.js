@@ -1,0 +1,5 @@
+var group__SPIXF__MEMSECCN =
+[
+    [ "MXC_F_SPIXF_MEMSECCN_DECEN_POS", "group__SPIXF__MEMSECCN.html#ga9e11706516d3d72a8ebe9878b9855de3", null ],
+    [ "MXC_F_SPIXF_MEMSECCN_DECEN", "group__SPIXF__MEMSECCN.html#ga76b351beb675241b60add0c8e284602a", null ]
+];

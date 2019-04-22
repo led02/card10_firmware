@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['paspcpasscontrol',['PaspcPassControl',['../group___p_h_o_n_e___a_l_e_r_t___s_t_a_t_u_s___p_r_o_f_i_l_e.html#gae568e5f110d2611d684b26a00f649ddd',1,'paspc_api.h']]],
+  ['paspcpassdiscover',['PaspcPassDiscover',['../group___p_h_o_n_e___a_l_e_r_t___s_t_a_t_u_s___p_r_o_f_i_l_e.html#gaf43f0e51ba28176a2a08bd30bf24da5c',1,'paspc_api.h']]],
+  ['paspcpassvalueupdate',['PaspcPassValueUpdate',['../group___p_h_o_n_e___a_l_e_r_t___s_t_a_t_u_s___p_r_o_f_i_l_e.html#gabcf576a0a6fc17fdb58169399e31b09c',1,'paspc_api.h']]],
+  ['plxpcplxsdiscover',['PlxpcPlxsDiscover',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga7e009bebdaf1709f8505aeeba139128a',1,'plxpc_api.h']]],
+  ['plxpcplxsracpsend',['PlxpcPlxsRacpSend',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga8fd9b012e39fa57d22ab76397b2ddb0d',1,'plxpc_api.h']]],
+  ['plxpcplxsvalueupdate',['PlxpcPlxsValueUpdate',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga80fdb4f415c2a84ba8b8b6cdcd3d2ad5',1,'plxpc_api.h']]],
+  ['plxpsbtn',['PlxpsBtn',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga2f1e6872b1813e5b773654b2103116fa',1,'plxps_api.h']]],
+  ['plxpsdbdeleterecords',['plxpsDbDeleteRecords',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga72633bacd58715bc4e456ccfad8bff16',1,'plxps_main.h']]],
+  ['plxpsdbgeneraterecord',['plxpsDbGenerateRecord',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga861834ff1e5df341625ee9b18b376dfc',1,'plxps_main.h']]],
+  ['plxpsdbgetnextrecord',['plxpsDbGetNextRecord',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga6c1163b1c440aa3a9eb9bb7e7431d19f',1,'plxps_main.h']]],
+  ['plxpsdbgetnumrecords',['plxpsDbGetNumRecords',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#gaf4407c6decb516c1a175a0d6b6a00796',1,'plxps_main.h']]],
+  ['plxpsdbinit',['plxpsDbInit',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga6086ac25148223cdb4c43ea32962d7f9',1,'plxps_main.h']]],
+  ['plxpsinit',['PlxpsInit',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga0fc2a5e35770ae91bfa0c9e0bd84b458',1,'plxps_api.h']]],
+  ['plxpsmeasstart',['PlxpsMeasStart',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga9abeeb6b1da73f7cb17d47ffd173d67c',1,'plxps_api.h']]],
+  ['plxpsmeasstop',['PlxpsMeasStop',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga385d67839afb373d059f370482a7886f',1,'plxps_api.h']]],
+  ['plxpsprocmsg',['PlxpsProcMsg',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga1dec00aa89e1b9dc62888bce80326287',1,'plxps_api.h']]],
+  ['plxpssendcontinuousmeas',['plxpsSendContinuousMeas',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga1e2036fffb9cec28d2c1fd52448837a3',1,'plxps_api.h']]],
+  ['plxpssendspotcheckmeas',['plxpsSendSpotCheckMeas',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga7ef91d4643b26767cb36b8c89545b49b',1,'plxps_api.h']]],
+  ['plxpssetcccidx',['PlxpsSetCccIdx',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga3dc65e0458b86c7b659edc0c1dbc4fd2',1,'plxps_api.h']]],
+  ['plxpssetfeature',['PlxpsSetFeature',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga08a0a2946b680fc9a1f898d8dd405dc9',1,'plxps_api.h']]],
+  ['plxpswritecback',['PlxpsWriteCback',['../group___p_u_l_s_e___o_x_i_m_e_t_e_r___p_r_o_f_i_l_e.html#ga72c0a85b64a1ec149289dad06e5c01f2',1,'plxps_api.h']]],
+  ['printvsn',['PrintVsn',['../group___w_s_f___u_t_i_l___a_p_i.html#ga89a3ebff54ff0d880b1f6d6781458d1a',1,'print.h']]]
+];

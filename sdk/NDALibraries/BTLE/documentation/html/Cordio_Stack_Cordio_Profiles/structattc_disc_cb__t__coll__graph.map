@@ -1,0 +1,4 @@
+<map id="attcDiscCb_t" name="attcDiscCb_t">
+<area shape="rect" id="node2" href="$structattc_disc_cfg__t.html" title="ATT client structure for characteristic and descriptor configuration. " alt="" coords="5,5,91,99"/>
+<area shape="rect" id="node3" href="$structattc_disc_char__t.html" title="ATT client structure for characteristic and descriptor discovery. " alt="" coords="115,11,207,93"/>
+</map>
