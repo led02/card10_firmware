@@ -34,68 +34,23 @@
  *
  *******************************************************************************
  */
-
+ 
 /**
- * @file    mscmem.h
- * @brief   Memory routines used by the USB Mass Storage Class example.
- *          See the msc_mem_t structure in msc.h for function details.
- * @details Functions are provided for using the internal RAM of the
- *          device or the external SPI flash memory.  Use the SPIXF_DISK
- *          and RAM_DISK defines to select the desired memory at compile
- *          time.
+ * @file    mx25.h
+ * @brief   External flash access, adapted from USB MSC example
  */
+ 
+#ifndef __MX25_H__
+#define __MX25_H__
 
-#include "mscmem.h"
-#include <string.h>
-#include <stdio.h>
-#include "mx25lba.h"
+#include <stdint.h>
 
-/***** Definitions *****/
+int mx25_init(void);
+int mx25_start(void);
+int mx25_stop(void);
+uint32_t mx25_size(void);
+int mx25_read(uint32_t lba, uint8_t* buffer);
+int mx25_write(uint32_t lba, uint8_t* buffer);
+int mx25_ready(void);
 
-/***** Global Data *****/
-
-/***** File Scope Variables *****/
-
-//static int initialized = 0;
-//static int running = 0;
-
-/******************************************************************************/
-int mscmem_init()
-{
-	return mx25_init();
-}
-/******************************************************************************/
-uint32_t mscmem_size(void)
-{
-	return mx25_size();
-}
-
-/******************************************************************************/
-int mscmem_read(uint32_t lba, uint8_t* buffer)
-{
-	return mx25_read(lba, buffer);
-}
-
-/******************************************************************************/
-int mscmem_write(uint32_t lba, uint8_t* buffer)
-{
-    return mx25_write(lba, buffer);
-}
-
-/******************************************************************************/
-int mscmem_start()
-{
-    return mx25_start();
-}
-
-/******************************************************************************/
-int mscmem_stop()
-{
-    return mx25_stop();
-}
-
-/******************************************************************************/
-int mscmem_ready()
-{
-    return mx25_ready();
-}
+#endif  /* __MX25_H__ */

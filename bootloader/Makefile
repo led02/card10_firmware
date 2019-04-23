@@ -67,12 +67,16 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
 SRCS += mscmem.c
+SRCS += ../lib/card10/mx25lba.c
 
 # Where to find source files for this test
-VPATH = .
+VPATH = . 
 
 # Where to find header files for this test
 IPATH = .
+
+IPATH += ../lib/card10
+VPATH += ../lib/card10
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE

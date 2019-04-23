@@ -10,9 +10,14 @@
 #include "diskio.h"     /* FatFs lower layer API */
 
 /* Definitions of physical drive number for each drive */
-#define DEV_FLASH	0   /* Example: Map MMC/SD card to physical drive 1 */
+#define DEV_FLASH       0   /* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_SD          1   /* Example: Map MMC/SD card to physical drive 1 */
 
+#define SDHC            0
+
+#define SECTOR_SIZE     512UL
+
+#if SDHC
 /* # of times to check for a card, should be > 1 to detect both SD and MMC */
 #define INIT_CARD_RETRIES 10
 
@@ -24,6 +29,15 @@ static DRESULT mmc_get_csd(void *buff);
 
 /* Globals */
 unsigned int init_done = 0;
+#endif
+
+extern int mx25_init(void);
+extern int mx25_start(void);
+extern int mx25_stop(void);
+extern uint32_t mx25_size(void);
+extern int mx25_read(uint32_t lba, uint8_t* buffer);
+extern int mx25_write(uint32_t lba, uint8_t* buffer);
+extern int mx25_sync(void);
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -33,11 +47,23 @@ DSTATUS disk_status (
     BYTE pdrv       /* Physical drive nmuber to identify the drive */
 )
 {
-    DSTATUS status = 0;
 #if 0
-    if (!SDHC_Card_Inserted()) {
-        init_done = 0;
-        status = STA_NOINIT | STA_NODISK;
+    #define STA_NOINIT		0x01	/* Drive not initialized */
+    #define STA_NODISK		0x02	/* No medium in the drive */
+    #define STA_PROTECT		0x04	/* Write protected */
+#endif
+
+    DSTATUS status = 0;
+    if(pdrv == 0) {
+        return STA_NOINIT;
+    }
+
+#if SDHC
+    if(pdrv == 1) {
+        if (!SDHC_Card_Inserted()) {
+            init_done = 0;
+            status = STA_NOINIT | STA_NODISK;
+        }
     }
 #endif
     return status;
@@ -70,13 +96,21 @@ DSTATUS disk_initialize (
     }
 #endif
 
-#if 0
-    if (SDHC_Card_Inserted() && (SDHC_Lib_InitCard(INIT_CARD_RETRIES) == E_NO_ERROR)) {
-        /* Card initialized and ready for work */
-        init_done = 1;
-        status = 0;
-    } else {
-        status = STA_NOINIT;
+    if(pdrv == 0) {
+        if(mx25_start()) {
+            status = RES_OK;
+        }
+    }
+
+#if SDHC
+    if(pdrv == 1) {
+        if (SDHC_Card_Inserted() && (SDHC_Lib_InitCard(INIT_CARD_RETRIES) == E_NO_ERROR)) {
+            /* Card initialized and ready for work */
+            init_done = 1;
+            status = 0;
+        } else {
+            status = STA_NOINIT;
+        }
     }
 #endif
 
@@ -98,11 +132,21 @@ DRESULT disk_read (
 {
     DRESULT status = RES_ERROR;
 
-#if 0
-    if (SDHC_Lib_Read(buff, sector, count, SDHC_LIB_SINGLE_DATA) != E_NO_ERROR) {
-        status = RES_ERROR;
-    } else {
+    if(pdrv == 0) {
+        int sector_offset;
         status = RES_OK;
+        for(sector_offset = 0; sector_offset < count; sector_offset++) {
+            if(mx25_read(sector + sector_offset, (uint8_t*)buff + SECTOR_SIZE * sector_offset) == 1) {
+                status = RES_ERROR;
+                break;
+            }
+        }
+    }
+#if SDHC
+    if(pdrv == 1) {
+        if (SDHC_Lib_Read(buff, sector, count, SDHC_LIB_SINGLE_DATA) == E_NO_ERROR) {
+            status = RES_OK;
+        }
     }
 #endif
 
@@ -124,11 +168,24 @@ DRESULT disk_write (
 {
     DRESULT status = RES_ERROR;
 
-#if 0
-    if (SDHC_Lib_Write(sector, (void *)buff, count, SDHC_LIB_SINGLE_DATA) != E_NO_ERROR) {
-        status = RES_ERROR;
-    } else {
+    if(pdrv == 0) {
+        int sector_offset;
         status = RES_OK;
+        for(sector_offset = 0; sector_offset < count; sector_offset++) {
+            if(mx25_write(sector + sector_offset, (uint8_t*)buff + SECTOR_SIZE * sector_offset) == 1) {
+                status = RES_ERROR;
+                break;
+            }
+        }
+    }
+
+#if SDHC
+    if(pdrv == 1) {
+        if (SDHC_Lib_Write(sector, (void *)buff, count, SDHC_LIB_SINGLE_DATA) != E_NO_ERROR) {
+            status = RES_ERROR;
+        } else {
+            status = RES_OK;
+        }
     }
 #endif
 
@@ -147,30 +204,55 @@ DRESULT disk_ioctl (
     void *buff      /* Buffer to send/receive control data */
 )
 {
-    DRESULT status;
+    DRESULT status = RES_PARERR;
 
-    switch(cmd) {
-        case CTRL_SYNC:
-            /* Mandatory */
-            status = ctrl_sync(buff);
-            break;
-        case GET_SECTOR_COUNT:
-            /* Mandatory */
-            status = get_sector_count(buff);
-            break;
-        case GET_BLOCK_SIZE:
-            /* Mandatory */
-            status = get_block_size(buff);
-            break;
-        case MMC_GET_CSD:
-            /* Optional */
-            status = mmc_get_csd(buff);
-            break;
-        default:
-            status = RES_PARERR;
-            break;
+    if(pdrv == 0) {
+        switch(cmd) {
+            case CTRL_SYNC:
+                /* Mandatory */
+                status = mx25_sync();
+                break;
+            case GET_SECTOR_COUNT:
+                /* Mandatory */
+                *((DWORD *)buff) = mx25_size() / SECTOR_SIZE;
+                status = RES_OK;
+                break;
+            case GET_BLOCK_SIZE:
+                /* Mandatory */
+                *((DWORD *)buff) = SECTOR_SIZE;
+                status = RES_OK;
+                break;
+            default:
+                status = RES_PARERR;
+                break;
+        }
     }
 
+#if SDHC
+    if(pdrv == 1) {
+        switch(cmd) {
+            case CTRL_SYNC:
+                /* Mandatory */
+                status = ctrl_sync(buff);
+                break;
+            case GET_SECTOR_COUNT:
+                /* Mandatory */
+                status = get_sector_count(buff);
+                break;
+            case GET_BLOCK_SIZE:
+                /* Mandatory */
+                status = get_block_size(buff);
+                break;
+            case MMC_GET_CSD:
+                /* Optional */
+                status = mmc_get_csd(buff);
+                break;
+            default:
+                status = RES_PARERR;
+                break;
+        }
+    }
+#endif
     return status;
 }
 
@@ -216,6 +298,7 @@ DWORD get_fattime(void) {
     }
 }
 
+#if SDHC
 static DRESULT ctrl_sync(void *buff)
 {
     return RES_OK;
@@ -225,7 +308,6 @@ static DRESULT get_sector_count(void *buff)
 {
     DRESULT status = RES_ERROR;
 
-#if 0
     mxc_sdhc_csd_regs_t csd;
 
     if (init_done) {
@@ -236,7 +318,6 @@ static DRESULT get_sector_count(void *buff)
     } else {
         status = RES_NOTRDY;
     }
-#endif
 
     return status;
 }
@@ -245,7 +326,6 @@ static DRESULT get_block_size(void *buff)
 {
     DRESULT status = RES_ERROR;
 
-#if 0
     mxc_sdhc_csd_regs_t csd;
     if (init_done) {
             if (SDHC_Lib_GetCSD(&csd) == E_NO_ERROR) {
@@ -255,7 +335,6 @@ static DRESULT get_block_size(void *buff)
     } else {
         status = RES_NOTRDY;
     }
-#endif
 
     return status;
 }
@@ -264,7 +343,6 @@ static DRESULT mmc_get_csd(void *buff)
 {
     DRESULT status = RES_ERROR;
 
-#if 0
     if (init_done) {
             if (SDHC_Lib_GetCSD(buff) == E_NO_ERROR) {
             status = RES_OK;
@@ -272,7 +350,7 @@ static DRESULT mmc_get_csd(void *buff)
     } else {
         status = RES_NOTRDY;
     }
-#endif
 
     return status;
 }
+#endif
