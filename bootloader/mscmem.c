@@ -37,14 +37,14 @@
 
 /**
  * @file    mscmem.h
- * @brief   Memory routines used by the USB Mass Storage Class example.  
+ * @brief   Memory routines used by the USB Mass Storage Class example.
  *          See the msc_mem_t structure in msc.h for function details.
  * @details Functions are provided for using the internal RAM of the
  *          device or the external SPI flash memory.  Use the SPIXF_DISK
  *          and RAM_DISK defines to select the desired memory at compile
  *          time.
  */
- 
+
 #include "mscmem.h"
 #include <string.h>
 #include <stdio.h>
@@ -73,7 +73,7 @@ static int running = 0;
 #define MX25_SECTOR_SIZE_SHIFT      12          /* The shift value used to convert between addresses and block numbers */
 #define MX25_NUM_SECTORS            2048        /* Total number of sectors in the MX25 */
 
-#define LBA_PER_SECTOR              (MX25_SECTOR_SIZE >> LBA_SIZE_SHIFT)           
+#define LBA_PER_SECTOR              (MX25_SECTOR_SIZE >> LBA_SIZE_SHIFT)
 #define INVALID_SECTOR              MX25_NUM_SECTORS    /* Use a sector number past the end of memory to indicate invalid */
 
 /***** File Scope Variables *****/
@@ -119,7 +119,7 @@ static uint32_t getSector(uint32_t num)
                 sectorDirty = 0;
             }
         }
-    
+
         /* Requesting a new valid sector? */
         if(num != INVALID_SECTOR) {
             MX25_Read(num << MX25_SECTOR_SIZE_SHIFT, sector, MX25_SECTOR_SIZE, SPIXFC_WIDTH_4);
@@ -127,14 +127,14 @@ static uint32_t getSector(uint32_t num)
             sectorNum = num;
         }
     }
-        
+
     return 0;
 }
 
 /******************************************************************************/
 int mscmem_init()
 {
-   
+
     if(!initialized) {
         MX25_Init();
         MX25_Reset();
@@ -155,43 +155,43 @@ uint32_t mscmem_size(void)
 int mscmem_read(uint32_t lba, uint8_t* buffer)
 {
     uint32_t addr;
-    
+
     /* Convert to MX25 sector number. */
     uint32_t sNum = getSectorNum(lba);
-    
+
     if(getSector(sNum)) {
         /* Failed to write/read from MX25 */
         return 1;
     }
-    
+
     /* Get the offset into the current sector */
     addr = getSectorAddr(lba);
-    
+
     memcpy(buffer, sector + addr, LBA_SIZE);
-    
-    return 0;    
+
+    return 0;
 }
 
 /******************************************************************************/
 int mscmem_write(uint32_t lba, uint8_t* buffer)
 {
     uint32_t addr;
-    
+
     /* Convert to MX25 sector number. */
     uint32_t sNum = getSectorNum(lba);
-    
+
     if(getSector(sNum)) {
         /* Failed to write/read from MX25 */
         return 1;
     }
-    
+
     /* Get the offset into the current sector */
     addr = getSectorAddr(lba);
-    
+
     memcpy(sector + addr, buffer, LBA_SIZE);
     sectorDirty = 1;
-    
-    return 0;    
+
+    return 0;
 }
 
 /******************************************************************************/
@@ -201,12 +201,12 @@ int mscmem_start()
     if(!initialized) {
         mscmem_init();
     }
-    
+
     /* Check if the initialization succeeded. If it has, start running. */
     if(initialized) {
         running = 1;
     }
-    
+
     /* Start should return fail (non-zero) if the memory cannot be initialized. */
     return !initialized;
 }
@@ -215,12 +215,12 @@ int mscmem_start()
 int mscmem_stop()
 {
     /* TODO - could shut down XIPF interface here. */
-    
+
     /* Flush the currently cached sector if necessary. */
     if(getSector(INVALID_SECTOR)) {
         return 1;
     }
-    
+
     running = 0;
     return 0;
 }
@@ -251,7 +251,7 @@ int mscmem_init()
 /******************************************************************************/
 uint32_t mscmem_size(void)
 {
-    return NUM_PAGES; 
+    return NUM_PAGES;
 }
 
 /******************************************************************************/
@@ -260,9 +260,9 @@ int mscmem_read(uint32_t lba, uint8_t* buffer)
     if(lba >= NUM_PAGES) {
         return 1;
     }
-    
+
     memcpy(buffer, mem[lba], LBA_SIZE);
-    return 0;    
+    return 0;
 }
 
 /******************************************************************************/
@@ -271,7 +271,7 @@ int mscmem_write(uint32_t lba, uint8_t* buffer)
     if(lba >= NUM_PAGES) {
         return 1;
     }
-    
+
     memcpy(mem[lba], buffer, LBA_SIZE);
     return 0;
 }
@@ -283,12 +283,12 @@ int mscmem_start()
     if(!initialized) {
         mscmem_init();
     }
-    
+
     /* Check if the RAM has been initialized. If it has, start running. */
     if(initialized) {
         running = 1;
     }
-    
+
     /* Start should return fail (non-zero) if the memory cannot be initialized. */
     return !initialized;
 }
