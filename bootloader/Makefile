@@ -108,6 +108,10 @@ include $(BOARD_DIR)/board.mk
 PERIPH_DRIVER_DIR=$(LIBS_DIR)/$(TARGET_UC)PeriphDriver
 include $(PERIPH_DRIVER_DIR)/periphdriver.mk
 
+#include the FAT32 libraries
+FAT32_DRIVER_DIR=../lib/ff13
+include $(FAT32_DRIVER_DIR)/fat32.mk
+
 MAXUSB_DIR=$(LIBS_DIR)/MAXUSB
 include $(MAXUSB_DIR)/maxusb.mk
 
