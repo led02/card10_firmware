@@ -67,6 +67,7 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
 SRCS += mscmem.c
+SRCS += bootloader-usb.c
 SRCS += ../lib/card10/mx25lba.c
 
 # Where to find source files for this test

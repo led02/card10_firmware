@@ -17,6 +17,9 @@
 
 #define SECTOR_SIZE     512UL
 
+/*local vaiables*/
+static uint8_t rtc_en;
+
 #if SDHC
 /* # of times to check for a card, should be > 1 to detect both SD and MMC */
 #define INIT_CARD_RETRIES 10
@@ -38,6 +41,7 @@ extern uint32_t mx25_size(void);
 extern int mx25_read(uint32_t lba, uint8_t* buffer);
 extern int mx25_write(uint32_t lba, uint8_t* buffer);
 extern int mx25_sync(void);
+extern int mx25_ready(void);
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -55,7 +59,9 @@ DSTATUS disk_status (
 
     DSTATUS status = 0;
     if(pdrv == 0) {
-        return STA_NOINIT;
+        if(mx25_ready()) {
+            status = RES_OK;
+         }
     }
 
 #if SDHC
@@ -97,7 +103,7 @@ DSTATUS disk_initialize (
 #endif
 
     if(pdrv == 0) {
-        if(mx25_start()) {
+        if(mx25_start() == 0) {
             status = RES_OK;
         }
     }

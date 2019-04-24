@@ -20,9 +20,6 @@ extern "C" {
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
 
-/*local vaiables*/
-static uint8_t rtc_en;
-
 /* Results of Disk Functions */
 typedef enum {
 	RES_OK = 0,		/* 0: Successful */
