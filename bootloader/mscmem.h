@@ -34,20 +34,17 @@
  *
  *******************************************************************************
  */
- 
+
 /**
  * @file    mscmem.h
- * @brief   Memory routines used by the USB Mass Storage Class example.  
+ * @brief   Memory routines used by the USB Mass Storage Class example.
  *          See the msc_mem_t structure in msc.h for function details.
  */
- 
+
 #ifndef __MSC_MEM_H__
 #define __MSC_MEM_H__
 
 #include <stdint.h>
-
-#define ERASE_MEMORY_ON_INIT        1   /* Configuration option to clear the memory (to 0s) on initialization. */
-                                        /* Use 1 to clear or 0 to leave untouched. */
 
 int mscmem_init(void);
 int mscmem_start(void);

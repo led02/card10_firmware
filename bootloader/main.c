@@ -1,48 +1,3 @@
-/*******************************************************************************
- * Copyright (C) 2016 Maxim Integrated Products, Inc., All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
- * OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
- * Except as contained in this notice, the name of Maxim Integrated
- * Products, Inc. shall not be used except as stated in the Maxim Integrated
- * Products, Inc. Branding Policy.
- *
- * The mere transfer of this software does not imply any licenses
- * of trade secrets, proprietary technology, copyrights, patents,
- * trademarks, maskwork rights, or any other form of intellectual
- * property whatsoever. Maxim Integrated Products, Inc. retains all
- * ownership rights.
- *
- * $Id: main.c 31505 2017-10-20 21:16:29Z zach.metzinger $
- *
- *******************************************************************************
- */
-
-/**
- * @file    main.c
- * @brief   USB Mass Storage Class example
- * @details This project creates a mass storage device using either on-board RAM or 
- *          external SPI flash memory.  Load the project, connect a cable from the PC
- *          to the USB connector.  A new external drive should appear than can be read
- *          and written.
- */
-
 #include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -69,7 +24,8 @@
 //#define PARTITION_END (0x10000000 + 1024 * 1024 - 1)
 
 extern void run_usbmsc(void);
-DIR dir;                /* Directory object */
+
+DIR dir;
 FATFS FatFs;
 
 bool mount(void)
@@ -156,7 +112,6 @@ bool is_update_needed(void)
 
     f_close(&file);
 
-    //different = true;
     return different;
 }
 
@@ -203,30 +158,6 @@ void flash_partition(void)
 
     f_close(&file);
 }
-
-#if 0
-void test(void)
-{
-    FRESULT res;
-    FIL file;
-    UINT readbytes;
-    char *filename = "card10.bin";
-    int len = 512;
-    char data[512];
-
-    res=f_open(&file, filename, FA_OPEN_EXISTING|FA_READ);
-    if(res != FR_OK) printf("f_open error %d\n", res);
-
-    res = f_read(&file, data, len, &readbytes);
-    if(res != FR_OK) printf("f_read error %d\n", res);
-
-    f_close(&file);
-
-    data[readbytes] = 0;
-
-    printf("data: %s\n", data);
-}
-#endif
 
 static inline void boot(const void * vtable){
     SCB->VTOR = (uintptr_t) vtable;

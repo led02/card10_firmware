@@ -35,12 +35,7 @@
  */
 
 /**
- * @file    main.c
- * @brief   USB Mass Storage Class example
- * @details This project creates a mass storage device using either on-board RAM or 
- *          external SPI flash memory.  Load the project, connect a cable from the PC
- *          to the USB connector.  A new external drive should appear than can be read
- *          and written.
+ * @brief   USB Mass Storage Class
  */
 
 #include <stdio.h>
