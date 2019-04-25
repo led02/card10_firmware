@@ -57,6 +57,8 @@
 #include "board.h"
 #include "led.h"
 #include "ff.h"
+#include "crc16-ccitt.h"
+
 
 #define GPIO_PORT_IN                PORT_1
 #define GPIO_PIN_IN                 PIN_6
@@ -69,26 +71,6 @@
 extern void run_usbmsc(void);
 DIR dir;                /* Directory object */
 FATFS FatFs;
-
-static void crc_sw(uint32_t *crcval, uint8_t *data, uint8_t len, uint32_t polynomial)
-{
-	int i, j;
-	uint32_t temp;
-
-	for(i = 0; i < len; ++i) {
-		temp = (data[i] & 0xFF);
-		for(j = 0; j < 8; ++j) {
-			if((temp ^ *crcval) & 1) {
-				*crcval >>= 1;
-				*crcval ^= polynomial;
-			} else {
-				*crcval >>= 1;
-			}
-			temp >>= 1;
-		}
-	}
-}
-
 
 bool mount(void)
 {
@@ -122,7 +104,7 @@ bool check_integrity(void)
         return false;
     }
 
-    uint32_t crcval = 0;
+    uint16_t crcval = 0;
     do {
         res = f_read(&file, data, sizeof(data), &readbytes);
         if(res != FR_OK) {
@@ -130,7 +112,7 @@ bool check_integrity(void)
             crcval = 1; // Make sure to fail the test
             break;
         }
-        crc_sw(&crcval, data, readbytes, TPU_CRC_CCITT);
+        crcval = crc16_ccitt(crcval, data, readbytes);
     } while (readbytes == sizeof(data));
 
     f_close(&file);
@@ -139,7 +121,6 @@ bool check_integrity(void)
         return true;
     } else {
         printf("CRC check failed. Final CRC: %d\n", crcval);
-        return true;
         return false;
     }
 }

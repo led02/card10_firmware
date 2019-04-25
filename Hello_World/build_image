@@ -2,4 +2,4 @@ make clean
 make
 make build/max32665.bin
 cp build/max32665.bin card10.bin
-python ../bootloader/crc16.py card10.bin
+python ../bootloader/crc_patch.py card10.bin
