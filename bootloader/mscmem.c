@@ -19,14 +19,14 @@ uint32_t mscmem_size(void)
 /******************************************************************************/
 int mscmem_read(uint32_t lba, uint8_t* buffer)
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
 	return mx25_read(lba, buffer);
 }
 
 /******************************************************************************/
 int mscmem_write(uint32_t lba, uint8_t* buffer)
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
     return mx25_write(lba, buffer);
 }
 
@@ -47,6 +47,6 @@ int mscmem_stop()
 /******************************************************************************/
 int mscmem_ready()
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
     return mx25_ready();
 }

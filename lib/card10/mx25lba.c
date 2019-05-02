@@ -143,7 +143,7 @@ int mx25_init()
 /******************************************************************************/
 uint32_t mx25_size(void)
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
     /* Get number of 512 byte chunks the MX25 contains. */
     return (MX25_SECTOR_SIZE >> LBA_SIZE_SHIFT) * MX25_NUM_SECTORS;
 }
@@ -151,7 +151,7 @@ uint32_t mx25_size(void)
 /******************************************************************************/
 int mx25_read(uint32_t lba, uint8_t* buffer)
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
     uint32_t addr;
 
     /* Convert to MX25 sector number. */
@@ -173,7 +173,7 @@ int mx25_read(uint32_t lba, uint8_t* buffer)
 /******************************************************************************/
 int mx25_write(uint32_t lba, uint8_t* buffer)
 {
-    printf("%s\n", __func__);
+    //printf("%s\n", __func__);
     uint32_t addr;
 
     /* Convert to MX25 sector number. */
@@ -238,7 +238,7 @@ int mx25_sync()
 /******************************************************************************/
 int mx25_ready()
 {
-    printf("%s -> %d\n", __func__, running);
+    //printf("%s -> %d\n", __func__, running);
     return running;
 }
 

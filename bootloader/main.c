@@ -199,7 +199,9 @@ int main(void)
 
     if(mount()) {
         if(check_integrity()) {
+            printf("Found valid application image\n");
             if(is_update_needed()) {
+                printf("Trying to update application from external flash\n");
                 MXC_FLC0->clkdiv = 54;
                 erase_partition();
                 flash_partition();
@@ -209,6 +211,8 @@ int main(void)
         } else {
             printf("Integrity check failed\n");
         }
+    } else {
+        printf("Failed to mount the external flash\n");
     }
 
 
