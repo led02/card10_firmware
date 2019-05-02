@@ -49,6 +49,8 @@
 #include "spixfc.h"
 #include "mxc_errors.h"
 
+#define GD25 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,7 +67,11 @@ extern "C" {
 
 #define MX25_WIP_MASK               0x01        /**< Status Register                */
 #define MX25_WEL_MASK               0x02        /**< Write Enable Latch mask        */
+#if GD25
+#define MX25_QE_MASK                0x02        /**< Quad-SPI enable mask           */
+#else
 #define MX25_QE_MASK                0x40        /**< Quad-SPI enable mask           */
+#endif
 #define MX25_WP_MASK                0x80        /**< Write protect enable mask      */
 
 /**
@@ -85,10 +91,22 @@ extern "C" {
 #define MX25_CMD_HPM                0xA3        /**< Hardware Protection Mode       */
 
 #define MX25_CMD_READ_SR            0x05        /**< Read Status Register           */
+#if GD25
+#define MX25_CMD_READ_SR2           0x35        /**< Read Status Register           */
+#define MX25_CMD_READ_SR3           0x15        /**< Read Status Register           */
+#endif
 #define MX25_CMD_WRITE_SR           0x01        /**< Write Status Register          */
+#if GD25
+#define MX25_CMD_WRITE_SR2          0x31        /**< Write Status Register          */
+#define MX25_CMD_WRITE_SR3          0x11        /**< Write Status Register          */
+#endif
 
 #define MX25_CMD_PPROG              0x02    /**< Page Program                       */
+#if GD25
+#define MX25_CMD_QUAD_PROG          0X32    /**< Quad (4 x I/O) Page Program        */
+#else
 #define MX25_CMD_QUAD_PROG          0X38    /**< Quad (4 x I/O) Page Program        */
+#endif
 
 #define MX25_CMD_4K_ERASE           0x20        /**< Page Erase                     */
 #define MX25_CMD_32K_ERASE          0x52        /**< Sector Type 2 (32KB) Erase     */
@@ -192,12 +210,20 @@ int MX25_Erase(uint32_t address, MX25_Erase_t size);
  * @param      buf   Pointer to store the value of the status register.
  */
 int MX25_Read_SR(uint8_t* buf);
+#if GD25
+int MX25_Read_SR2(uint8_t* buf);
+int MX25_Read_SR3(uint8_t* buf);
+#endif
 
 /**
  * @brief      Write status register
  * @param      value  Value to write to the status register.
  */
 int MX25_Write_SR(uint8_t value);
+#if GD25
+int MX25_Write_SR2(uint8_t value);
+int MX25_Write_SR3(uint8_t value);
+#endif
 
 /**@} end of group mx25_driver */
 #ifdef __cplusplus

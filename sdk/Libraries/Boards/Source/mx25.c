@@ -189,7 +189,11 @@ int MX25_Quad(int enable)
     uint8_t post_buf;
     int err;
 
+#if GD25
+    MX25_Read_SR2(&pre_buf);
+#else
     MX25_Read_SR(&pre_buf);
+#endif
 
     if(enable) {
         pre_buf |= MX25_QE_MASK;
@@ -201,13 +205,21 @@ int MX25_Quad(int enable)
         return E_BAD_STATE;
     }
 
+#if GD25
+    if(MX25_Write_SR2(pre_buf) != E_NO_ERROR) {
+#else
     if(MX25_Write_SR(pre_buf) != E_NO_ERROR) {
+#endif
         return E_COMM_ERR;
     }
 
     while(flash_busy()) {}
 
+#if GD25
+    if(MX25_Read_SR2(&post_buf) != E_NO_ERROR) {
+#else
     if(MX25_Read_SR(&post_buf) != E_NO_ERROR) {
+#endif
         return E_COMM_ERR;
     }
 
@@ -377,7 +389,11 @@ int MX25_Program_Page(uint32_t address, const uint8_t *tx_buf, uint32_t tx_len,
             }
 
             // Send the address
+#if GD25
+			if(MX25_Board_Write(&cmd[1],3,0,SPIXFC_WIDTH_1) != 3) {
+#else
 			if(MX25_Board_Write(&cmd[1],3,0,width) != 3) {
+#endif
                 return E_COMM_ERR;
             }
         }
@@ -497,7 +513,20 @@ int MX25_Read_SR(uint8_t* buf)
 
     return read_reg(cmd, buf);
 }
+#if GD25
+int MX25_Read_SR2(uint8_t* buf)
+{
+    uint8_t cmd = MX25_CMD_READ_SR2;
 
+    return read_reg(cmd, buf);
+}
+int MX25_Read_SR3(uint8_t* buf)
+{
+    uint8_t cmd = MX25_CMD_READ_SR3;
+
+    return read_reg(cmd, buf);
+}
+#endif
 /* ************************************************************************* */
 int MX25_Write_SR(uint8_t value)
 {
@@ -505,4 +534,18 @@ int MX25_Write_SR(uint8_t value)
 
     return write_reg(cmd, 2);
 }
+#if GD25
+int MX25_Write_SR2(uint8_t value)
+{
+    uint8_t cmd[2] = {MX25_CMD_WRITE_SR2, value};
+
+    return write_reg(cmd, 2);
+}
+int MX25_Write_SR3(uint8_t value)
+{
+    uint8_t cmd[2] = {MX25_CMD_WRITE_SR3, value};
+
+    return write_reg(cmd, 2);
+}
+#endif
 /**@} end of ingroup mx25 */
