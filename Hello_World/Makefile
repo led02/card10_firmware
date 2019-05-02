@@ -90,6 +90,8 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 #PROJ_CFLAGS+=--specs=nano.specs
 #PROJ_LDFLAGS+=--specs=nano.specs
 
+PROJ_CFLAGS+=-std=c99
+
 # Point this variable to a startup file to override the default file
 #STARTUPFILE=start.S
 

@@ -47,19 +47,45 @@
 #include "led.h"
 #include "board.h"
 #include "tmr_utils.h"
+#include "i2c.h"
 
 /***** Definitions *****/
+
+#define I2C_DEVICE	    MXC_I2C0_BUS0
 
 /***** Globals *****/
 
 /***** Functions *****/
-
+#if 0
+void I2C0_IRQHandler(void)
+{
+    I2C_Handler(I2C_DEVICE);
+    return;
+}
+#endif
 // *****************************************************************************
 int main(void)
 {
     int count = 0;
 
     printf("Hello World!\n");
+
+    //Setup the I2CM
+    I2C_Shutdown(I2C_DEVICE);
+    I2C_Init(I2C_DEVICE, I2C_FAST_MODE, NULL);
+ #if 0
+    NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
+ #endif
+
+    uint8_t dummy[1] = {0};
+    // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
+    for (int addr = 0x8; addr < 0x78; ++addr) {
+        // A 0 byte write does not seem to work so always send a single byte.
+        int res = I2C_MasterWrite(I2C_DEVICE, addr << 1, dummy, 1, 0);
+        if(res == 1) {
+            printf("Found (7 bit) address 0x%02x\n", addr);
+        }
+    }
 
     while (1) {
         LED_On(0);
