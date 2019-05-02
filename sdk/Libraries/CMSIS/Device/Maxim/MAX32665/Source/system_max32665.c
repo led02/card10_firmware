@@ -159,11 +159,27 @@ __weak void SystemInit(void)
     // Set all GPIO to 25K pullup mode by default
     SYS_ClockEnable(SYS_PERIPH_CLOCK_GPIO0); 
     SYS_ClockEnable(SYS_PERIPH_CLOCK_GPIO1); 
-    MXC_GPIO0->vssel |= 0xFFFFFFFF;
+
+    // All GPIO on port 0 to 1.8 V first
+    MXC_GPIO0->vssel = 0;
+    MXC_GPIO0->vssel |= (1UL << 0) | (1UL << 1) | (1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5); // Flash
+    MXC_GPIO0->vssel |= (1UL << 6) | ( 1UL << 7); // USB I2C
+    MXC_GPIO0->vssel |= (1UL << 8); // Motor FET
+    MXC_GPIO0->vssel |= (1UL << 9) | (1UL << 10); // USB UART
+    MXC_GPIO0->vssel |= (1UL << 20) | (1UL << 21) | (1UL << 22) | (1UL << 29); // Wristband
+    MXC_GPIO0->vssel |= (1UL << 17) | (1UL << 23) | (1UL << 28); // GPIO to TOP
+    MXC_GPIO0->vssel |= (1UL << 31); // ECG Switch
+
     MXC_GPIO0->ps |= 0xFFFFFFFF;
     MXC_GPIO0->pad_cfg1 |= 0xFFFFFFFF;
     MXC_GPIO0->pad_cfg2 &= ~(0xFFFFFFFF);
-    MXC_GPIO1->vssel |= 0xFFFFFFFF;
+
+    // All GPIO on port 1 to 1.8 V first
+    MXC_GPIO1->vssel = 0;
+    MXC_GPIO0->vssel |= (1UL << 0) | (1UL << 1) | (1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5); // SDHC
+    MXC_GPIO1->vssel |= (1 << 6) | (1 << 7); // GPIO to TOP
+    MXC_GPIO1->vssel |= (1 << 14) | (1 << 15); // GPIO for RGB LEDs
+
     MXC_GPIO1->ps |= 0xFFFFFFFF;
     MXC_GPIO1->pad_cfg1 |= 0xFFFFFFFF;
     MXC_GPIO1->pad_cfg2 &= ~(0xFFFFFFFF);
