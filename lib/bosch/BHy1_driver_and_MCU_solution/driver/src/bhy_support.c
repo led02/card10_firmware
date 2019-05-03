@@ -56,21 +56,28 @@
 #include "bhy_support.h"
 #include "bhy_uc_driver_config.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include "i2c.h"
+#include "tmr_utils.h"
+#include <stdio.h>
 
 /********************************************************************************/
 /*                                STATIC VARIABLES                              */
 /********************************************************************************/
 static struct bhy_t bhy;
-static uint8_t *version = BHY_MCU_REFERENCE_VERSION;
+static char *version = BHY_MCU_REFERENCE_VERSION;
 
 /********************************************************************************/
 /*                         EXTERN FUNCTION DECLARATIONS                         */
 /********************************************************************************/
-extern int8_t sensor_i2c_write(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size);
-extern int8_t sensor_i2c_read(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size);
-extern void trace_log(const char *fmt, ...);
+static int8_t sensor_i2c_write(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
+{
+    return 0;
+}
+
+static int8_t sensor_i2c_read(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
+{
+    return 0;
+}
 
 /********************************************************************************/
 /*                             FUNCTION DECLARATIONS                            */
@@ -114,20 +121,20 @@ int8_t bhy_initialize_support(void)
 */
 void bhy_delay_msec(uint32_t msec)
 {
-    vTaskDelay(msec);
+    TMR_Delay(MXC_TMR0, MSEC(msec), 0);
 }
 /*!
  * @brief provides a print function to the bhy driver on DD2.0 platform
  */
 void bhy_printf(const u8 * string)
 {
-    trace_log("%s",string);
+    printf("%s",string);
 }
 /*!
  * @brief provides the mcu reference code version
  */
 uint8_t * bhy_get_version(void)
 {
-    return (version);
+    return (uint8_t *)version;
 }
 /** @}*/
