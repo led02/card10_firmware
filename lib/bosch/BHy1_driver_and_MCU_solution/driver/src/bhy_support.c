@@ -74,15 +74,22 @@ static char *version = BHY_MCU_REFERENCE_VERSION;
 static int8_t sensor_i2c_write(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
 {
     uint8_t buf[size + 1];
+
+    //printf("sensor_i2c_write 0x%02x %d\n", reg, size);
     buf[0] = reg;
     memcpy(buf + 1, p_buf, size);
+
     return I2C_MasterWrite(I2C_DEVICE, addr << 1, buf, size + 1, 0);
 }
 
 static int8_t sensor_i2c_read(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
 {
-    I2C_MasterWrite(I2C_DEVICE, addr << 1, &reg, 1, 1);
-    return I2C_MasterRead(I2C_DEVICE, addr << 1, p_buf, size, 0);
+    //printf("sensor_i2c_read 0x%02x %d\n", reg, size);
+    if(I2C_MasterWrite(I2C_DEVICE, addr << 1, &reg, 1, 1) == 1) {
+        return I2C_MasterRead(I2C_DEVICE, addr << 1, p_buf, size, 0);
+    }
+    // TODO: return error code
+    return 0;
 }
 
 /********************************************************************************/
