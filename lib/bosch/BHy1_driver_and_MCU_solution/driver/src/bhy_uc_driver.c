@@ -839,6 +839,7 @@ BHY_RETURN_FUNCTION_TYPE bhy_update_system_timestamp(bhy_data_scalar_u16_t *time
         default:
             return BHY_OUT_OF_RANGE;
     }
+    return BHY_SUCCESS;
 }
 
 /*!

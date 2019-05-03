@@ -1753,7 +1753,7 @@ u8 v_meta_parameter_request_u8)
             /* case for interrupt enable*/
             case BHY_META_INTR_ENABLE:
                 /* set the meta event 1, interrupt enable*/
-                v_meta_bytes_u8 = (read_buffer.parameter_1&(~(1 << 0))| v_input_data_u8);
+                v_meta_bytes_u8 = ((read_buffer.parameter_1&(~(1 << 0)))| v_input_data_u8);
                 bhy_assign_meta_event_byte0(v_meta_bytes_u8);
             break;
             default:

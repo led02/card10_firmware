@@ -52,7 +52,7 @@
 #ifndef BHY_UC_DRIVER_H_
 #define BHY_UC_DRIVER_H_
 
-#include "BHy_support.h"
+#include "bhy_support.h"
 #include "bhy_uc_driver_types.h"
 
 /****************************************************************************/
