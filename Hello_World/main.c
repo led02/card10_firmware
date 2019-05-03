@@ -125,7 +125,9 @@ int main(void)
 
     oledInit(0x3c, 0, 0);
     oledFill(0x00);
-    oledWriteString(0, 0, " card10", 1);
+    oledWriteString(0, 0, "Hello", 0);
+    oledWriteString(0, 2, "my name is", 0);
+    oledWriteString(0, 4, "card10", 1);
 
     if(bhy_driver_init(bhy1_fw)) {
         printf("Failed to init bhy\n");
