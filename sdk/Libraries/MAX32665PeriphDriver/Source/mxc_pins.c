@@ -71,7 +71,8 @@ const gpio_cfg_t gpio_cfg_i2c0 =   { PORT_0, (PIN_6 | PIN_7), GPIO_FUNC_ALT1, GP
 const gpio_cfg_t gpio_cfg_i2c1 =   { PORT_0, (PIN_14 | PIN_15), GPIO_FUNC_ALT1, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_i2c2 =   { PORT_1, (PIN_14 | PIN_15), GPIO_FUNC_ALT1, GPIO_PAD_NONE };
 
-const gpio_cfg_t gpio_cfg_spi17y0a =     { PORT_1, (PIN_9 | PIN_10 | PIN_11 | PIN_12 | PIN_13), GPIO_FUNC_ALT1, GPIO_PAD_NONE };
+//const gpio_cfg_t gpio_cfg_spi17y0a =     { PORT_1, (PIN_9 | PIN_10 | PIN_11 | PIN_12 | PIN_13), GPIO_FUNC_ALT1, GPIO_PAD_NONE }; // TODO: move out of SDK
+const gpio_cfg_t gpio_cfg_spi17y0a =     { PORT_1, (PIN_9 | PIN_10 | PIN_11), GPIO_FUNC_ALT1, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y0b =     { PORT_0, (PIN_9 | PIN_10 | PIN_11 | PIN_12 | PIN_13), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y0_ss0a = { PORT_1, (PIN_8), GPIO_FUNC_ALT1, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y0_ss0b = { PORT_0, (PIN_8), GPIO_FUNC_ALT2, GPIO_PAD_NONE };

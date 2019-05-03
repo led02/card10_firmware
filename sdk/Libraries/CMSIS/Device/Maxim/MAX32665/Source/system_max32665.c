@@ -176,9 +176,11 @@ __weak void SystemInit(void)
 
     // All GPIO on port 1 to 1.8 V first
     MXC_GPIO1->vssel = 0;
-    MXC_GPIO0->vssel |= (1UL << 0) | (1UL << 1) | (1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5); // SDHC
+    MXC_GPIO1->vssel |= (1UL << 0) | (1UL << 1) | (1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5); // SDHC
     MXC_GPIO1->vssel |= (1 << 6) | (1 << 7); // GPIO to TOP
     MXC_GPIO1->vssel |= (1 << 14) | (1 << 15); // GPIO for RGB LEDs
+
+    MXC_GPIO1->vssel |= (1 << 8) | (1 << 9) |  (1 << 10) | (1 << 11); // TODO: TMP for devboard
 
     MXC_GPIO1->ps |= 0xFFFFFFFF;
     MXC_GPIO1->pad_cfg1 |= 0xFFFFFFFF;

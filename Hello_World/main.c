@@ -49,10 +49,14 @@
 #include "tmr_utils.h"
 #include "i2c.h"
 #include "rtc.h"
+#include "spi.h"
 
 /***** Definitions *****/
 
 #define I2C_DEVICE	    MXC_I2C0_BUS0
+
+#define SPI SPI0
+#define SPI_SPEED       1000000  // Bit Rate
 
 /***** Globals *****/
 
@@ -64,6 +68,46 @@ void I2C0_IRQHandler(void)
     return;
 }
 #endif
+
+uint32_t ecg_read_reg(uint8_t reg)
+{
+    spi_req_t req;
+    uint8_t tx_data[] = {(reg << 1) | 1, 0, 0, 0};
+    uint8_t rx_data[] = {0, 0, 0, 0};
+    req.tx_data = tx_data;
+    req.rx_data = rx_data;
+    req.len = 4;
+    req.bits = 8;
+    req.width = SPI17Y_WIDTH_1;
+    req.ssel = 0;
+    req.deass = 1;
+    req.ssel_pol = SPI17Y_POL_LOW;
+    req.tx_num = 0;
+    req.rx_num = 0;
+
+    SPI_MasterTrans(SPI, &req);
+
+    return (rx_data[1] << 16) | (rx_data[2] << 8) | rx_data[3];
+}
+
+void ecg_write_reg(uint8_t reg, uint32_t data)
+{
+    spi_req_t req;
+    uint8_t tx_data[] = {(reg << 1) | 0, 0, 0, 0};
+    uint8_t rx_data[] = {0, data >> 16, (data >> 8 ) & 0xFF, data & 0xFF};
+    req.tx_data = tx_data;
+    req.rx_data = rx_data;
+    req.len = 4;
+    req.bits = 8;
+    req.width = SPI17Y_WIDTH_1;
+    req.ssel = 0;
+    req.deass = 1;
+    req.ssel_pol = SPI17Y_POL_LOW;
+    req.tx_num = 0;
+    req.rx_num = 0;
+
+    SPI_MasterTrans(SPI, &req);
+}
 // *****************************************************************************
 int main(void)
 {
@@ -91,6 +135,23 @@ int main(void)
     // Enable 32 kHz output
     RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
 
+    // Enable SPI
+    sys_cfg_spi_t spi17y_master_cfg;
+
+    spi17y_master_cfg.map = MAP_A;
+    spi17y_master_cfg.ss0 = Enable;
+    spi17y_master_cfg.ss1 = Disable;
+    spi17y_master_cfg.ss2 = Disable;
+
+    if (SPI_Init(SPI, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
+        printf("Error configuring SPI\n");
+        while (1);
+    }
+
+    for(int i=0; i<0x20; i++) {
+        uint32_t val = ecg_read_reg(i);
+        printf("%02x: 0x%06x\n", i, val);
+    }
 
     while (1) {
         LED_On(0);
