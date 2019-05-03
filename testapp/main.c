@@ -54,6 +54,7 @@
 #include "spi.h"
 #include "MAX30003.h"
 #include "oled96.h"
+#include "stdbool.h"
 
 /***** Definitions *****/
 
@@ -233,6 +234,11 @@ void add_sample(int16_t sample)
     }
 }
 
+volatile bool ecgFIFOIntFlag = false;
+void ecgFIFO_callback(void *data) {
+    ecgFIFOIntFlag = true;
+}
+
 // *****************************************************************************
 int main(void)
 {
@@ -300,22 +306,21 @@ int main(void)
     const int FIFO_VALID_SAMPLE_MASK =  0x0;
     const int FIFO_FAST_SAMPLE_MASK =  0x1;
     const int ETAG_BITS_MASK = 0x7;
-    uint8_t ecgFIFOIntFlag = 0;
 
     const gpio_cfg_t interrupt_pin = {PORT_1, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
     GPIO_Config(&interrupt_pin);
+    GPIO_RegisterCallback(&interrupt_pin, ecgFIFO_callback, NULL);
+    GPIO_IntConfig(&interrupt_pin, GPIO_INT_EDGE, GPIO_INT_FALLING);
+    GPIO_IntEnable(&interrupt_pin);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
+
 
     while(1) {
 
 #if 1
-        if(GPIO_InGet(&interrupt_pin) == 0) {
-            ecgFIFOIntFlag = 1;
-        }
-
         // Read back ECG samples from the FIFO
         if( ecgFIFOIntFlag ) {
-
-            ecgFIFOIntFlag = 0;
+            ecgFIFOIntFlag = false;
 
             //printf("Int\n");
             status = ecg_read_reg( STATUS );      // Read the STATUS register
