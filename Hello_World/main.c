@@ -43,6 +43,7 @@
 /***** Includes *****/
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
@@ -50,6 +51,7 @@
 #include "i2c.h"
 #include "rtc.h"
 #include "spi.h"
+#include "oled96.h"
 
 /***** Definitions *****/
 
@@ -113,6 +115,10 @@ int main(void)
             printf("Found (7 bit) address 0x%02x\n", addr);
         }
     }
+
+    oledInit(0x3c, 0, 0);
+    oledFill(0x00);
+    oledWriteString(0, 0, " card10", 1);
 
     // Enable 32 kHz output
     RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);

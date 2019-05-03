@@ -66,6 +66,8 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
+SRCS  += ../lib/card10/oled96.c
+SRCS  += ../lib/card10/fonts.c
 
 # Where to find source files for this test
 VPATH = .
