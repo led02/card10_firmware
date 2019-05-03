@@ -67,7 +67,7 @@
 static struct bhy_t bhy;
 static char *version = BHY_MCU_REFERENCE_VERSION;
 
-#define I2C_DEVICE	    MXC_I2C0_BUS0
+#define I2C_DEVICE	    MXC_I2C1_BUS0
 /********************************************************************************/
 /*                         EXTERN FUNCTION DECLARATIONS                         */
 /********************************************************************************/

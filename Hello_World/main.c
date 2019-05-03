@@ -52,6 +52,9 @@
 #include "rtc.h"
 #include "spi.h"
 #include "oled96.h"
+#include "bhy.h"
+#include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
+#include "bhy_uc_driver.h"
 
 /***** Definitions *****/
 
@@ -102,6 +105,10 @@ int main(void)
     //Setup the I2CM
     I2C_Shutdown(I2C_DEVICE);
     I2C_Init(I2C_DEVICE, I2C_FAST_MODE, NULL);
+
+    I2C_Shutdown(MXC_I2C1_BUS0);
+    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
  #if 0
     NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
  #endif
@@ -119,6 +126,11 @@ int main(void)
     oledInit(0x3c, 0, 0);
     oledFill(0x00);
     oledWriteString(0, 0, " card10", 1);
+
+    if(bhy_driver_init(bhy1_fw)) {
+        printf("Failed to init bhy\n");
+    }
+
 
     // Enable 32 kHz output
     RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);

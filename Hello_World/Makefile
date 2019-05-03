@@ -68,6 +68,7 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 SRCS  = main.c
 SRCS  += ../lib/card10/oled96.c
 SRCS  += ../lib/card10/fonts.c
+SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 
 # Where to find source files for this test
 VPATH = .
@@ -77,6 +78,10 @@ IPATH = .
 
 IPATH += ../lib/card10
 VPATH += ../lib/card10
+
+IPATH += ../lib/bosch/BHy1_driver_and_MCU_solution/driver/inc
+IPATH += ../lib/bosch/BHy1_driver_and_MCU_solution/examples/firmware/
+VPATH += ../lib/bosch/BHy1_driver_and_MCU_solution/driver/src
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
