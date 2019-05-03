@@ -90,24 +90,6 @@ uint32_t ecg_read_reg(uint8_t reg)
     return (rx_data[1] << 16) | (rx_data[2] << 8) | rx_data[3];
 }
 
-void ecg_write_reg(uint8_t reg, uint32_t data)
-{
-    spi_req_t req;
-    uint8_t tx_data[] = {(reg << 1) | 0, 0, 0, 0};
-    uint8_t rx_data[] = {0, data >> 16, (data >> 8 ) & 0xFF, data & 0xFF};
-    req.tx_data = tx_data;
-    req.rx_data = rx_data;
-    req.len = 4;
-    req.bits = 8;
-    req.width = SPI17Y_WIDTH_1;
-    req.ssel = 0;
-    req.deass = 1;
-    req.ssel_pol = SPI17Y_POL_LOW;
-    req.tx_num = 0;
-    req.rx_num = 0;
-
-    SPI_MasterTrans(SPI, &req);
-}
 // *****************************************************************************
 int main(void)
 {
