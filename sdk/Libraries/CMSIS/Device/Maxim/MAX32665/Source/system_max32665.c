@@ -180,7 +180,7 @@ __weak void SystemInit(void)
     MXC_GPIO1->vssel |= (1 << 6) | (1 << 7); // GPIO to TOP
     MXC_GPIO1->vssel |= (1 << 14) | (1 << 15); // GPIO for RGB LEDs
 
-    MXC_GPIO1->vssel |= (1 << 8) | (1 << 9) |  (1 << 10) | (1 << 11); // TODO: TMP for devboard
+    MXC_GPIO1->vssel |= (1 << 8) | (1 << 9) |  (1 << 10) | (1 << 11) | (1 << 12); // TODO: TMP for devboard
 
     MXC_GPIO1->ps |= 0xFFFFFFFF;
     MXC_GPIO1->pad_cfg1 |= 0xFFFFFFFF;
