@@ -48,6 +48,7 @@
 #include "board.h"
 #include "tmr_utils.h"
 #include "i2c.h"
+#include "rtc.h"
 
 /***** Definitions *****/
 
@@ -86,6 +87,10 @@ int main(void)
             printf("Found (7 bit) address 0x%02x\n", addr);
         }
     }
+
+    // Enable 32 kHz output
+    RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
+
 
     while (1) {
         LED_On(0);
