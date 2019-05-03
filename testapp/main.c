@@ -43,6 +43,8 @@
 /***** Includes *****/
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
@@ -51,6 +53,7 @@
 #include "rtc.h"
 #include "spi.h"
 #include "MAX30003.h"
+#include "oled96.h"
 
 /***** Definitions *****/
 
@@ -174,6 +177,62 @@ void ecg_config(void)
     return;
 }
 
+uint8_t content[1024];
+
+void clear(void)
+{
+    memset(content, 0x00, 1024);
+}
+
+
+void set(uint8_t index, int8_t val)
+{
+    uint8_t *p = &content[index];
+
+    if(val < -31) val = -31;
+    if(val > 32) val = 32;
+
+    int8_t pos = -val + 32;
+    p += (pos / 8) * 128;
+
+    *p |= (1 << (pos % 8));
+}
+
+int16_t samples[256];
+
+void update(void)
+{
+    clear();
+    int16_t scale = 0;
+    for(int i=0; i<256; i++) {
+        if(abs(samples[i]) > scale) {
+            scale = abs(samples[i]);
+        }
+    }
+
+    scale /= 32;
+
+    for(int i=0; i<128; i++) {
+        set(i, ((samples[i*2] + samples[i*2 + 1]) / scale) / 2);
+    }
+
+    oledset(content);
+}
+
+uint8_t sample_count = 0;
+
+void add_sample(int16_t sample)
+{
+    memmove(samples, samples + 1, sizeof(*samples) * 255);
+    samples[255] = sample;
+    sample_count++;
+
+    if(sample_count == 5) {
+        update();
+        sample_count = 0;
+    }
+}
+
 // *****************************************************************************
 int main(void)
 {
@@ -197,6 +256,12 @@ int main(void)
             printf("Found (7 bit) address 0x%02x\n", addr);
         }
     }
+
+    oledInit(0x3c, 0, 0);
+    oledFill(0x00);
+    oledWriteString(0, 0, " card10", 1);
+
+    TMR_Delay(MXC_TMR0, MSEC(1500), 0);
 
     // Enable 32 kHz output
     //RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
@@ -224,14 +289,6 @@ int main(void)
     for(int i=0; i<0x20; i++) {
         uint32_t val = ecg_read_reg(i);
         printf("%02x: 0x%06x\n", i, val);
-    }
-
-    while (0) {
-        LED_On(0);
-        TMR_Delay(MXC_TMR0, MSEC(500), 0);
-        LED_Off(0);
-        TMR_Delay(MXC_TMR0, MSEC(500), 0);
-        //printf("count = %d\n", count++);
     }
 
     ecg_write_reg(SYNCH, 0);
@@ -288,7 +345,8 @@ int main(void)
 
                 // Print results
                 for( idx = 0; idx < readECGSamples; idx++ ) {
-                    printf("%6d\r\n", ecgSample[idx]);
+                    //printf("%6d\r\n", ecgSample[idx]);
+                    add_sample(ecgSample[idx]);
                 }
 
             }
