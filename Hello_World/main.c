@@ -103,8 +103,8 @@ int main(void)
     printf("Hello World!\n");
 
     //Setup the I2CM
-    I2C_Shutdown(I2C_DEVICE);
-    I2C_Init(I2C_DEVICE, I2C_FAST_MODE, NULL);
+    I2C_Shutdown(MXC_I2C0_BUS0);
+    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
 
     I2C_Shutdown(MXC_I2C1_BUS0);
     I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
@@ -117,9 +117,14 @@ int main(void)
     // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
     for (int addr = 0x8; addr < 0x78; ++addr) {
         // A 0 byte write does not seem to work so always send a single byte.
-        int res = I2C_MasterWrite(I2C_DEVICE, addr << 1, dummy, 1, 0);
+        int res = I2C_MasterWrite(MXC_I2C0_BUS0, addr << 1, dummy, 1, 0);
         if(res == 1) {
-            printf("Found (7 bit) address 0x%02x\n", addr);
+            printf("Found (7 bit) address 0x%02x on I2C0\n", addr);
+        }
+
+        res = I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, dummy, 1, 0);
+        if(res == 1) {
+            printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
         }
     }
 
