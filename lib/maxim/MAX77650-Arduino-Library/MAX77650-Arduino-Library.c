@@ -35,8 +35,10 @@
 **********************************************************************/
 
 
-#include <MAX77650-Arduino-Library.h>
-
+#include "MAX77650-Arduino-Library.h"
+#include "i2c.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 
 /**********************************************************************
@@ -61,34 +63,29 @@
 *https://www.maximintegrated.com/en/app-notes/index.mvp/id/6428
 **********************************************************************/
 
-int MAX77650_read_register(int ADDR){
-#if 0
-    int retval = -1;
-    Wire.beginTransmission(MAX77650_ADDR);
-    Wire.write(ADDR);
-    Wire.endTransmission();
-    Wire.requestFrom(MAX77650_ADDR,1);
-    if (Wire.available()<=1)
-        retval = (Wire.read());
-#endif
+#define I2C_DEVICE	    MXC_I2C1_BUS0
+
+uint8_t MAX77650_read_register(uint8_t ADDR){
+    //printf("MAX77650_read_register 0x%02x\n", ADDR);
+    if(I2C_MasterWrite(I2C_DEVICE, MAX77650_ADDR << 1, &ADDR, 1, 1) == 1) {
+        uint8_t data;
+        I2C_MasterRead(I2C_DEVICE, MAX77650_ADDR << 1, &data, 1, 0);
+        return data;
+    }
+    return 0;
 }
 
-uint8_t MAX77650_write_register(int ADDR, int data){
-#if 0
-    int retval = -1;
-    Wire.beginTransmission(MAX77650_ADDR);
-    Wire.write(ADDR);
-    Wire.write(data);
-    Wire.endTransmission();
+uint8_t MAX77650_write_register(uint8_t ADDR, uint8_t data){
+    uint8_t buf[2];
 
-    Wire.beginTransmission(MAX77650_ADDR);
-    Wire.write(ADDR);
-    Wire.write(data);
-    Wire.endTransmission();
-#endif
+    //printf("MAX77650_write_register 0x%02x 0x%02x\n", ADDR, data);
+    buf[0] = ADDR;
+    buf[1] = data;
+
+    return I2C_MasterWrite(I2C_DEVICE, MAX77650_ADDR << 1, buf, 2, 0);
 }
 
-bool MAX77650_getDIDM(void){
+uint8_t MAX77650_getDIDM(void){
   return ((MAX77650_read_register(MAX77650_STAT_GLBL_ADDR) >> 6) & 0b00000011);
 }
 

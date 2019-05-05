@@ -46,6 +46,9 @@
 #ifndef MAX77650_H
 #define MAX77650_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 /**********************************************************************
 *@brief MAX77650 - The MAX77650/MAX77651 provide highly-integrated battery charging and
 *power supply solutions for low-power wearable applications where size and efficiency
@@ -117,12 +120,11 @@
 #define MAX77650_CNFG_LED_TOP_ADDR 0x46  //LED Configuration Register; Reset Value 0x0D; Read/Write
 //***** End MAX77650 Register Definitions *****
 
-bool MAX77650_init(void);
-int MAX77650_read_register(int);
-uint8_t MAX77650_write_register(int, int);
+uint8_t MAX77650_read_register(uint8_t);
+uint8_t MAX77650_write_register(uint8_t, uint8_t);
 
 //Status Register (STAT_GLBL) related reads
-bool MAX77650_getDIDM(void); //Returns Part Number; Return Value: 1=MAX77650; 2=MAX77651; -1=error reading DeviceID
+uint8_t MAX77650_getDIDM(void); //Returns Part Number; Return Value: 1=MAX77650; 2=MAX77651; -1=error reading DeviceID
 bool MAX77650_getLDO_DropoutDetector(void); //Returns whether the LDO is in Dropout or not; Return Value: 0=LDO is not in dropout; 1=LDO is in dropout
 bool MAX77650_getThermalAlarm1(void); //Returns Thermal Alarm (TJA1 limit); Return Value: 0=Tj<TJA1; 1=Tj>TJA1
 bool MAX77650_getThermalAlarm2(void); //Returns Therma2 Alarm (TJA2 limit); Return Value: 0=Tj<TJA2; 1=Tj>TJA2
