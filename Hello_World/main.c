@@ -51,6 +51,7 @@
 #include "i2c.h"
 #include "rtc.h"
 #include "spi.h"
+#include "gpio.h"
 #include "oled96.h"
 #include "bhy.h"
 #include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
@@ -65,6 +66,7 @@
 #define SPI_SPEED       1000000  // Bit Rate
 
 /***** Globals *****/
+static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
 #if 0
@@ -249,6 +251,12 @@ int main(void)
         set_led(2, 33);
         TMR_Delay(MXC_TMR0, MSEC(500), 0);
 
+        set_led(0, 0);
+        set_led(1, 0);
+        set_led(2, 0);
+        GPIO_OutSet(&motor_pin);
+        TMR_Delay(MXC_TMR0, MSEC(500), 0);
+        GPIO_OutClr(&motor_pin);
         printf("count = %d\n", count++);
     }
 }
