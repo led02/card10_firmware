@@ -51,14 +51,14 @@ mxc_uart_regs_t * ConsoleUart = MXC_UART_GET_UART(CONSOLE_UART);
 extern uint32_t SystemCoreClock;
 
 const gpio_cfg_t pb_pin[] = {
-    {PORT_1, PIN_6, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},
-    {PORT_1, PIN_7, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},
+    {PORT_0, PIN_23, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO3 / Button 1
+    {PORT_0, PIN_20, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // Wristband GPIO1
 };
 const unsigned int num_pbs = (sizeof(pb_pin) / sizeof(gpio_cfg_t));
 
 const gpio_cfg_t led_pin[] = {
-    {PORT_1, PIN_14, GPIO_FUNC_OUT, GPIO_PAD_NONE},
-    {PORT_1, PIN_15, GPIO_FUNC_OUT, GPIO_PAD_NONE},
+    {PORT_0, PIN_21, GPIO_FUNC_OUT, GPIO_PAD_NONE},     // Wristband GPIO2
+    {PORT_0, PIN_22, GPIO_FUNC_OUT, GPIO_PAD_NONE},     // Wristband GPIO3
 };
 const unsigned int num_leds = (sizeof(led_pin) / sizeof(gpio_cfg_t));
 
@@ -112,7 +112,7 @@ int Board_Init(void)
         MXC_ASSERT_FAIL();
         return err;
     }
-	
+
     return E_NO_ERROR;
 }
 
@@ -132,11 +132,11 @@ int Console_Init(void)
 int Console_Shutdown(void)
 {
     int err;
-    
+
     if ((err = UART_Shutdown(ConsoleUart)) != E_NO_ERROR) {
         return err;
     }
-    
+
     return E_NO_ERROR;
 }
 
@@ -159,16 +159,16 @@ int MX25_Board_Read(uint8_t* read, unsigned len, unsigned deassert, spixfc_width
 {
 
     spixfc_req_t req = {MX25_SSEL,deassert,0,NULL,read, width,len,0,0,NULL};
-	
+
     return SPIXFC_Trans(MX25_SPI, &req);
 }
 
 /******************************************************************************/
 int MX25_Board_Write(const uint8_t* write, unsigned len, unsigned deassert, spixfc_width_t width)
 {
-	
+
     spixfc_req_t req = {MX25_SSEL,deassert,0,write,NULL, width,len,0,0,NULL};
-	
+
     return SPIXFC_Trans(MX25_SPI, &req);
 }
 

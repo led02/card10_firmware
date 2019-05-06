@@ -51,19 +51,18 @@ extern "C" {
 #endif
 
 #ifndef CONSOLE_UART
-#define CONSOLE_UART    1      /// UART instance to use for console
+#define CONSOLE_UART    0      /// UART instance to use for console
 #endif
 
 #ifndef CONSOLE_BAUD
 #define CONSOLE_BAUD    115200  /// Console baud rate
 #endif
 
-#define LED_OFF         1       /// Inactive state of LEDs
-#define LED_ON          0       /// Active state of LEDs
+#define LED_OFF         0       /// Inactive state of LEDs
+#define LED_ON          1       /// Active state of LEDs
 
 #define MX25_SPI                    MXC_SPIXFC
 #define MX25_SSEL                   0
-// #define SPI_CHAR_BITS               8
 
 
 /**
