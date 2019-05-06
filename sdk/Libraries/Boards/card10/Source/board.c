@@ -98,6 +98,16 @@ int Board_Init(void)
 {
     int err;
 
+    const gpio_cfg_t pins[] = {
+        {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE},      // Motor
+        {PORT_0, PIN_31, GPIO_FUNC_OUT, GPIO_PAD_NONE},     // ECG switch
+    };
+    const unsigned int num_pins = (sizeof(pins) / sizeof(gpio_cfg_t));
+    for (int i = 0; i < num_pins; i++) {
+        GPIO_OutClr(&pins[i]);
+        GPIO_Config(&pins[i]);
+    }
+
     if ((err = Console_Init()) != E_NO_ERROR) {
         MXC_ASSERT_FAIL();
         return err;
