@@ -178,16 +178,9 @@ int main(void)
 {
 
     printf("\n\nBootloader\n");
-
-    gpio_cfg_t gpio_in;
-    gpio_in.port = GPIO_PORT_IN;
-    gpio_in.mask = GPIO_PIN_IN;
-    gpio_in.pad = GPIO_PAD_PULL_UP;
-    gpio_in.func = GPIO_FUNC_IN;
-    GPIO_Config(&gpio_in);
-
     // If the button is pressed, we go into MSC mode.
-    if (!GPIO_InGet(&gpio_in)) {
+    //if (!GPIO_InGet(&gpio_in)) {
+    if (PB_Get(0)) {
         run_usbmsc();
 
         // If we return, don't try to boot. Maybe rather trigger a software reset.
