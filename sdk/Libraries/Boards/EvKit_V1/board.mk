@@ -50,6 +50,8 @@ SRCS += mx25.c
 SRCS += pb.c
 
 
+PROJ_CFLAGS += -DBOARD_EVKIT=1
+
 # Where to find BSP source files
 VPATH += $(BOARD_DIR)/Source
 VPATH += $(BOARD_DIR)/../Source

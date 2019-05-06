@@ -49,6 +49,7 @@ SRCS += led.c
 SRCS += mx25.c
 SRCS += pb.c
 
+PROJ_CFLAGS += -DBOARD_CARD10=1
 
 # Where to find BSP source files
 VPATH += $(BOARD_DIR)/Source
