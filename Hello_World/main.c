@@ -104,6 +104,7 @@ int main(void)
     int count = 0;
 
     printf("Hello World!\n");
+    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
     //Setup the I2CM
     I2C_Shutdown(MXC_I2C0_BUS0);
