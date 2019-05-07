@@ -67,8 +67,10 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
+SRCS  += pmic.c
 SRCS  += ../lib/card10/oled96.c
 SRCS  += ../lib/card10/fonts.c
+SRCS  += MAX77650-Arduino-Library.c
 
 
 # Where to find source files for this test
@@ -79,6 +81,9 @@ IPATH = .
 
 IPATH += ../lib/card10
 VPATH += ../lib/card10
+
+IPATH += ../lib/maxim/MAX77650-Arduino-Library
+VPATH += ../lib/maxim/MAX77650-Arduino-Library
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE

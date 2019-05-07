@@ -54,7 +54,8 @@
 #include "spi.h"
 #include "MAX30003.h"
 #include "oled96.h"
-#include "stdbool.h"
+#include "pmic.h"
+#include <stdbool.h>
 
 /***** Definitions *****/
 
@@ -248,8 +249,12 @@ int main(void)
     TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
     //Setup the I2CM
-    I2C_Shutdown(I2C_DEVICE);
-    I2C_Init(I2C_DEVICE, I2C_FAST_MODE, NULL);
+    I2C_Shutdown(MXC_I2C0_BUS0);
+    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
+
+    I2C_Shutdown(MXC_I2C1_BUS0);
+    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
  #if 0
     NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
  #endif
@@ -258,11 +263,23 @@ int main(void)
     // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
     for (int addr = 0x8; addr < 0x78; ++addr) {
         // A 0 byte write does not seem to work so always send a single byte.
-        int res = I2C_MasterWrite(I2C_DEVICE, addr << 1, dummy, 1, 0);
+        int res = I2C_MasterWrite(MXC_I2C0_BUS0, addr << 1, dummy, 1, 0);
         if(res == 1) {
-            printf("Found (7 bit) address 0x%02x\n", addr);
+            printf("Found (7 bit) address 0x%02x on I2C0\n", addr);
+        }
+
+        res = I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, dummy, 1, 0);
+        if(res == 1) {
+            printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
         }
     }
+
+    pmic_init();
+    pmic_set_led(0, 0);
+    pmic_set_led(1, 0);
+    pmic_set_led(2, 0);
+
+    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
     oledInit(0x3c, 0, 0);
     oledFill(0x00);
@@ -345,8 +362,9 @@ int main(void)
                 if( ETAG[readECGSamples - 1] == FIFO_OVF_MASK ){
                     ecg_write_reg(FIFO_RST , 0); // Reset FIFO
                     //printf("OV\n");
-                    LED_On(0);
-                    //rLed = 1;//notifies the user that an over flow occured
+                    // notifies the user that an over flow occured
+                    //LED_On(0);
+                    pmic_set_led(0, 31);
                 }
 
                 // Print results
