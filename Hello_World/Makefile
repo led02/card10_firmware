@@ -69,6 +69,7 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 SRCS  = main.c
 SRCS  += ../lib/card10/oled96.c
 SRCS  += ../lib/card10/fonts.c
+SRCS  += ../lib/card10/pmic.c
 SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 SRCS  += MAX77650-Arduino-Library.c
 # Where to find source files for this test
