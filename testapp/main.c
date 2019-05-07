@@ -290,6 +290,14 @@ int main(void)
     // Enable 32 kHz output
     RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
 
+    const gpio_cfg_t interrupt_pin = {PORT_1, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
+    GPIO_Config(&interrupt_pin);
+    GPIO_RegisterCallback(&interrupt_pin, ecgFIFO_callback, NULL);
+    GPIO_IntConfig(&interrupt_pin, GPIO_INT_EDGE, GPIO_INT_FALLING);
+    GPIO_IntEnable(&interrupt_pin);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
+
+
     // Enable SPI
     sys_cfg_spi_t spi17y_master_cfg;
 
@@ -325,19 +333,12 @@ int main(void)
     const int FIFO_FAST_SAMPLE_MASK =  0x1;
     const int ETAG_BITS_MASK = 0x7;
 
-    const gpio_cfg_t interrupt_pin = {PORT_1, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
-    GPIO_Config(&interrupt_pin);
-    GPIO_RegisterCallback(&interrupt_pin, ecgFIFO_callback, NULL);
-    GPIO_IntConfig(&interrupt_pin, GPIO_INT_EDGE, GPIO_INT_FALLING);
-    GPIO_IntEnable(&interrupt_pin);
-    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
-
 
     while(1) {
 
 #if 1
         // Read back ECG samples from the FIFO
-        if( ecgFIFOIntFlag || GPIO_InGet(&interrupt_pin) == 0) {
+        if( ecgFIFOIntFlag ) {
             ecgFIFOIntFlag = false;
 
             //printf("Int\n");
