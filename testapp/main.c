@@ -288,7 +288,7 @@ int main(void)
     TMR_Delay(MXC_TMR0, MSEC(1500), 0);
 
     // Enable 32 kHz output
-    //RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
+    RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
 
     // Enable SPI
     sys_cfg_spi_t spi17y_master_cfg;
@@ -337,7 +337,7 @@ int main(void)
 
 #if 1
         // Read back ECG samples from the FIFO
-        if( ecgFIFOIntFlag ) {
+        if( ecgFIFOIntFlag || GPIO_InGet(&interrupt_pin) == 0) {
             ecgFIFOIntFlag = false;
 
             //printf("Int\n");
