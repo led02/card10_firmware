@@ -53,3 +53,13 @@ void card10_bosch_delay(uint32_t msec)
 {
     TMR_Delay(MXC_TMR0, MSEC(msec), 0);
 }
+
+int8_t card10_bosch_i2c_write_ex(void *_, uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
+{
+    return card10_bosch_i2c_write(addr, reg, p_buf, size);
+}
+
+int8_t card10_bosch_i2c_read_ex(void *_, uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
+{
+    return card10_bosch_i2c_read(addr, reg, p_buf, size);
+}
