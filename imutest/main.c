@@ -253,6 +253,21 @@ int main(void)
 
     while (!GPIO_InGet(&interrupt_pin));
 
+    /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
+    /* calculated in a correct coordinates system. */
+    int8_t                     bhy_mapping_matrix_config[3*3] = {0,-1,0,1,0,0,0,0,1};
+    int8_t                     mag_mapping_matrix_config[3*3] = {-1,0,0,0,1,0,0,0,-1};
+    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_ACC, bhy_mapping_matrix_config);
+    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_MAG, mag_mapping_matrix_config);
+    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_GYRO, bhy_mapping_matrix_config);
+
+    /* the sic matrix should be calculated for customer platform by logging uncalibrated magnetometer data. */
+    /* the sic matrix here is only an example array (identity matrix). Customer should generate their own matrix. */
+    /* This affects magnetometer fusion performance. */
+    float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    bhy_set_sic_matrix(sic_array);
+
+
 #if 0
     /* install the callback function for parse fifo data */
     if(bhy_install_sensor_callback(VS_TYPE_ROTATION_VECTOR, VS_WAKEUP, sensors_callback_rotation_vector))
