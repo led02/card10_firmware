@@ -63,44 +63,35 @@
 
 /***** Definitions *****/
 
-#define I2C_DEVICE	    MXC_I2C0_BUS0
-
-#define SPI SPI0
-#define SPI_SPEED       1000000  // Bit Rate
-
 /***** Globals *****/
-static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
-#if 0
-void I2C0_IRQHandler(void)
+void print_rslt(int8_t rslt)
 {
-    I2C_Handler(I2C_DEVICE);
-    return;
+    switch (rslt) {
+    case BMA400_OK:
+        /* Do nothing */
+        break;
+    case BMA400_E_NULL_PTR:
+        printf("Error [%d] : Null pointer\r\n", rslt);
+        break;
+    case BMA400_E_COM_FAIL:
+        printf("Error [%d] : Communication failure\r\n", rslt);
+        break;
+    case BMA400_E_DEV_NOT_FOUND:
+        printf("Error [%d] : Device not found\r\n", rslt);
+        break;
+    case BMA400_E_INVALID_CONFIG:
+        printf("Error [%d] : Invalid configuration\r\n", rslt);
+        break;
+    case BMA400_W_SELF_TEST_FAIL:
+        printf("Warning [%d] : Self test failed\r\n", rslt);
+        break;
+    default:
+        printf("Error [%d] : Unknown error code\r\n", rslt);
+        break;
+    }
 }
-#endif
-
-uint32_t ecg_read_reg(uint8_t reg)
-{
-    spi_req_t req;
-    uint8_t tx_data[] = {(reg << 1) | 1, 0, 0, 0};
-    uint8_t rx_data[] = {0, 0, 0, 0};
-    req.tx_data = tx_data;
-    req.rx_data = rx_data;
-    req.len = 4;
-    req.bits = 8;
-    req.width = SPI17Y_WIDTH_1;
-    req.ssel = 0;
-    req.deass = 1;
-    req.ssel_pol = SPI17Y_POL_LOW;
-    req.tx_num = 0;
-    req.rx_num = 0;
-
-    SPI_MasterTrans(SPI, &req);
-
-    return (rx_data[1] << 16) | (rx_data[2] << 8) | rx_data[3];
-}
-
 // *****************************************************************************
 int main(void)
 {
@@ -120,10 +111,6 @@ int main(void)
     pmic_set_led(1, 0);
     pmic_set_led(2, 0);
     TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
- #if 0
-    NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
- #endif
 
     uint8_t dummy[1] = {0};
     // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
@@ -146,26 +133,14 @@ int main(void)
     oledWriteString(0, 2, "my name is", 0);
     oledWriteString(0, 4, "card10", 1);
 
-    if(bhy_driver_init(bhy1_fw)) {
-        printf("Failed to init bhy\n");
-    }
-
-
-    struct bme680_dev gas_sensor;
-    gas_sensor.dev_id = BME680_I2C_ADDR_PRIMARY;
-    gas_sensor.intf = BME680_I2C_INTF;
-    gas_sensor.read = card10_bosch_i2c_read;
-    gas_sensor.write = card10_bosch_i2c_write;
-    gas_sensor.delay_ms = card10_bosch_delay;
-    gas_sensor.amb_temp = 25;
-
-    int8_t rslt = BME680_OK;
-    rslt = bme680_init(&gas_sensor);
-    if(rslt != BME680_OK) {
-        printf("Failed to init BME680\n");
-    }
-
     struct bma400_dev bma;
+    struct bma400_int_enable tap_int[2];
+    struct bma400_sensor_conf conf[2];
+    int8_t rslt;
+    uint32_t poll_period = 5, test_dur_ms = 30000;
+    uint16_t int_status;
+
+
     bma.intf_ptr = NULL; /* To attach your interface device reference */
     bma.delay_ms = card10_bosch_delay;
     bma.dev_id = BMA400_I2C_ADDRESS_SDO_LOW;
@@ -179,51 +154,66 @@ int main(void)
     }
 
 
-    // Enable 32 kHz output
-    RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
+    print_rslt(rslt);
 
-    // Enable SPI
-    sys_cfg_spi_t spi17y_master_cfg;
+    rslt = bma400_soft_reset(&bma);
+    print_rslt(rslt);
 
-    spi17y_master_cfg.map = MAP_A;
-    spi17y_master_cfg.ss0 = Enable;
-    spi17y_master_cfg.ss1 = Disable;
-    spi17y_master_cfg.ss2 = Disable;
+    conf[0].type = BMA400_ACCEL;
+    conf[1].type = BMA400_TAP_INT;
 
-    if (SPI_Init(SPI, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
-        printf("Error configuring SPI\n");
-        while (1);
-    }
+    rslt = bma400_get_sensor_conf(conf, 2, &bma);
+    print_rslt(rslt);
 
-    for(int i=0; i<0x20; i++) {
-        uint32_t val = ecg_read_reg(i);
-        printf("%02x: 0x%06x\n", i, val);
-    }
+    conf[0].param.accel.odr = BMA400_ODR_200HZ;
+    conf[0].param.accel.range = BMA400_4G_RANGE;
+    conf[0].param.accel.data_src = BMA400_DATA_SRC_ACCEL_FILT_1;
+    conf[0].param.accel.filt1_bw = BMA400_ACCEL_FILT1_BW_1;
 
+    conf[1].param.tap.int_chan = BMA400_UNMAP_INT_PIN;
+    conf[1].param.tap.axes_sel = BMA400_Z_AXIS_EN_TAP;
+    conf[1].param.tap.sensitivity = BMA400_TAP_SENSITIVITY_0;
 
-    while (1) {
-        pmic_set_led(0, 31);
-        pmic_set_led(1, 0);
-        pmic_set_led(2, 0);
-        TMR_Delay(MXC_TMR0, MSEC(200), 0);
+    rslt = bma400_set_sensor_conf(conf, 2, &bma);
+    print_rslt(rslt);
 
-        pmic_set_led(0, 0);
-        pmic_set_led(1, 31);
-        pmic_set_led(2, 0);
-        TMR_Delay(MXC_TMR0, MSEC(200), 0);
+    bma.delay_ms(100);
 
-        pmic_set_led(0, 0);
-        pmic_set_led(1, 0);
-        pmic_set_led(2, 31);
-        TMR_Delay(MXC_TMR0, MSEC(200), 0);
+    tap_int[0].type = BMA400_SINGLE_TAP_INT_EN;
+    tap_int[0].conf = BMA400_ENABLE;
 
-        pmic_set_led(0, 0);
-        pmic_set_led(1, 0);
-        pmic_set_led(2, 0);
-        GPIO_OutSet(&motor_pin);
-        TMR_Delay(MXC_TMR0, MSEC(500), 0);
-        GPIO_OutClr(&motor_pin);
-        TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-        printf("count = %d\n", count++);
+    tap_int[1].type = BMA400_DOUBLE_TAP_INT_EN;
+    tap_int[1].conf = BMA400_ENABLE;
+
+    rslt = bma400_enable_interrupt(tap_int, 2, &bma);
+    print_rslt(rslt);
+
+    bma.delay_ms(100);
+
+    rslt = bma400_set_power_mode(BMA400_NORMAL_MODE, &bma);
+    print_rslt(rslt);
+
+    bma.delay_ms(100);
+
+    if (rslt == BMA400_OK) {
+        printf("Tap configured.\r\n");
+
+        while (test_dur_ms) {
+            bma.delay_ms(poll_period);
+
+            rslt = bma400_get_interrupt_status(&int_status, &bma);
+            print_rslt(rslt);
+
+            if (int_status & BMA400_S_TAP_INT_ASSERTED) {
+                printf("Single tap detected!\r\n");
+            }
+
+            if (int_status & BMA400_D_TAP_INT_ASSERTED) {
+                printf("Double tap detected!\r\n");
+            }
+
+            test_dur_ms -= poll_period;
+        }
+
     }
 }
