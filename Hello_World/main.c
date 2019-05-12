@@ -57,6 +57,8 @@
 #include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
 #include "bhy_uc_driver.h"
 #include "pmic.h"
+#include "bme680.h"
+#include "bosch.h"
 
 /***** Definitions *****/
 
@@ -104,7 +106,6 @@ int main(void)
     int count = 0;
 
     printf("Hello World!\n");
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
     //Setup the I2CM
     I2C_Shutdown(MXC_I2C0_BUS0);
@@ -112,6 +113,12 @@ int main(void)
 
     I2C_Shutdown(MXC_I2C1_BUS0);
     I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+    pmic_init();
+    pmic_set_led(0, 0);
+    pmic_set_led(1, 0);
+    pmic_set_led(2, 0);
+    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
  #if 0
     NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
@@ -143,6 +150,21 @@ int main(void)
     }
 
 
+    struct bme680_dev gas_sensor;
+    gas_sensor.dev_id = BME680_I2C_ADDR_PRIMARY;
+    gas_sensor.intf = BME680_I2C_INTF;
+    gas_sensor.read = card10_bosch_i2c_read;
+    gas_sensor.write = card10_bosch_i2c_write;
+    gas_sensor.delay_ms = card10_bosch_delay;
+    gas_sensor.amb_temp = 25;
+
+    int8_t rslt = BME680_OK;
+    rslt = bme680_init(&gas_sensor);
+    if(rslt != BME680_OK) {
+        printf("Failed to init BME680\n");
+    }
+
+
     // Enable 32 kHz output
     RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
 
@@ -164,7 +186,6 @@ int main(void)
         printf("%02x: 0x%06x\n", i, val);
     }
 
-    pmic_init();
 
     while (1) {
         pmic_set_led(0, 31);

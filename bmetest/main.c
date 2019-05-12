@@ -49,61 +49,29 @@
 #include "board.h"
 #include "tmr_utils.h"
 #include "i2c.h"
-#include "rtc.h"
-#include "spi.h"
 #include "gpio.h"
 #include "oled96.h"
-#include "bhy.h"
-#include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
-#include "bhy_uc_driver.h"
 #include "pmic.h"
 #include "bme680.h"
+#include "bosch.h"
 
 /***** Definitions *****/
-
-void user_delay_ms(uint32_t period)
-{
-    TMR_Delay(MXC_TMR0, MSEC(period), 0);
-}
-
-void hexdump(uint8_t *data, uint8_t len);
-int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
-{
-    //printf("sensor_i2c_read 0x%02x %d\n", reg_addr, len);
-    if(I2C_MasterWrite(MXC_I2C1_BUS0, dev_id << 1, &reg_addr, 1, 1) == 1) {
-        //printf("setup read ok\n");
-        int l = I2C_MasterRead(MXC_I2C1_BUS0, dev_id << 1, reg_data, len, 0);
-        //printf("read:"); hexdump(reg_data, l);
-        return l == len ? 0 : -1;
-    }
-    return -1;
-}
-
-int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
-{
-    //printf("sensor_i2c_write 0x%02x:", reg_addr); hexdump(reg_data, len);
-    uint8_t buf[len + 1];
-    buf[0] = reg_addr;
-    memcpy(buf + 1, reg_data, len);
-    int l = I2C_MasterWrite(MXC_I2C1_BUS0, dev_id << 1, buf, len + 1, 0);
-    //printf("wrote: %d\n", l);
-    return l == len + 1 ? 0 : -1;
-}
-
 // *****************************************************************************
 int main(void)
 {
-    int count = 0;
-
     printf("Hello World!\n");
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
     //Setup the I2CM
     I2C_Shutdown(MXC_I2C0_BUS0);
     I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
 
     I2C_Shutdown(MXC_I2C1_BUS0);
     I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+    pmic_init();
+    pmic_set_led(0, 0);
+    pmic_set_led(1, 0);
+    pmic_set_led(2, 0);
+    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
  #if 0
     NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
@@ -124,13 +92,6 @@ int main(void)
         }
     }
 
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
     oledInit(0x3c, 0, 0);
     oledFill(0x00);
     oledWriteString(0, 0, "Hello", 0);
@@ -140,9 +101,9 @@ int main(void)
     struct bme680_dev gas_sensor;
     gas_sensor.dev_id = BME680_I2C_ADDR_PRIMARY;
     gas_sensor.intf = BME680_I2C_INTF;
-    gas_sensor.read = user_i2c_read;
-    gas_sensor.write = user_i2c_write;
-    gas_sensor.delay_ms = user_delay_ms;
+    gas_sensor.read = card10_bosch_i2c_read;
+    gas_sensor.write = card10_bosch_i2c_write;
+    gas_sensor.delay_ms = card10_bosch_delay;
     /* amb_temp can be set to 25 prior to configuring the gas sensor
      * or by performing a few temperature readings without operating the gas sensor.
      */

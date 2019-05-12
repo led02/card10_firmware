@@ -67,11 +67,13 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
-SRCS  += ../lib/card10/oled96.c
-SRCS  += ../lib/card10/fonts.c
-SRCS  += ../lib/card10/pmic.c
+SRCS  += oled96.c
+SRCS  += fonts.c
+SRCS  += pmic.c
+SRCS  += bosch.c
 SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 SRCS  += MAX77650-Arduino-Library.c
+SRCS  += bme680.h
 # Where to find source files for this test
 VPATH = .
 
@@ -87,6 +89,9 @@ VPATH += ../lib/bosch/BHy1_driver_and_MCU_solution/driver/src
 
 IPATH += ../lib/maxim/MAX77650-Arduino-Library
 VPATH += ../lib/maxim/MAX77650-Arduino-Library
+
+IPATH += ../lib/bosch/BME680_driver
+VPATH += ../lib/bosch/BME680_driver
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE

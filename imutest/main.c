@@ -89,27 +89,6 @@ void I2C0_IRQHandler(void)
 }
 #endif
 
-uint32_t ecg_read_reg(uint8_t reg)
-{
-    spi_req_t req;
-    uint8_t tx_data[] = {(reg << 1) | 1, 0, 0, 0};
-    uint8_t rx_data[] = {0, 0, 0, 0};
-    req.tx_data = tx_data;
-    req.rx_data = rx_data;
-    req.len = 4;
-    req.bits = 8;
-    req.width = SPI17Y_WIDTH_1;
-    req.ssel = 0;
-    req.deass = 1;
-    req.ssel_pol = SPI17Y_POL_LOW;
-    req.tx_num = 0;
-    req.rx_num = 0;
-
-    SPI_MasterTrans(SPI, &req);
-
-    return (rx_data[1] << 16) | (rx_data[2] << 8) | rx_data[3];
-}
-
 static void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
     printf("x=%d, y=%d, z=%d status=%d\n",
@@ -189,7 +168,6 @@ static void sensors_callback_rotation_vector(bhy_data_generic_t * sensor_data, b
 int main(void)
 {
     printf("Hello World!\n");
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
     //Setup the I2CM
     I2C_Shutdown(MXC_I2C0_BUS0);
@@ -197,6 +175,13 @@ int main(void)
 
     I2C_Shutdown(MXC_I2C1_BUS0);
     I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+    pmic_init();
+    pmic_set_led(0, 0);
+    pmic_set_led(1, 0);
+    pmic_set_led(2, 0);
+
+    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
  #if 0
     NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
@@ -216,13 +201,6 @@ int main(void)
             printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
         }
     }
-
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
 #if 0
     oledInit(0x3c, 0, 0);

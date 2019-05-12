@@ -55,9 +55,8 @@
 /********************************************************************************/
 #include "bhy_support.h"
 #include "bhy_uc_driver_config.h"
+#include "bosch.h"
 
-#include "i2c.h"
-#include "tmr_utils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -67,30 +66,17 @@
 static struct bhy_t bhy;
 static char *version = BHY_MCU_REFERENCE_VERSION;
 
-#define I2C_DEVICE	    MXC_I2C1_BUS0
 /********************************************************************************/
 /*                         EXTERN FUNCTION DECLARATIONS                         */
 /********************************************************************************/
 static int8_t sensor_i2c_write(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
 {
-    uint8_t buf[size + 1];
-
-    //printf("sensor_i2c_write 0x%02x %d\n", reg, size);
-    buf[0] = reg;
-    memcpy(buf + 1, p_buf, size);
-
-    int l = I2C_MasterWrite(I2C_DEVICE, addr << 1, buf, size + 1, 0);
-    return l == size + 1 ? BHY_SUCCESS : BHY_ERROR;
+    return card10_bosch_i2c_write(addr, reg, p_buf, size) == 0 ? BHY_SUCCESS : BHY_ERROR;
 }
 
 static int8_t sensor_i2c_read(uint8_t addr, uint8_t reg, uint8_t *p_buf, uint16_t size)
 {
-    //printf("sensor_i2c_read 0x%02x %d\n", reg, size);
-    if(I2C_MasterWrite(I2C_DEVICE, addr << 1, &reg, 1, 1) == 1) {
-        int l = I2C_MasterRead(I2C_DEVICE, addr << 1, p_buf, size, 0);
-        return l == size ? BHY_SUCCESS : BHY_ERROR;
-    }
-    return BHY_ERROR;
+    return card10_bosch_i2c_read(addr, reg, p_buf, size) == 0 ? BHY_SUCCESS : BHY_ERROR;
 }
 
 /********************************************************************************/
@@ -135,7 +121,7 @@ int8_t bhy_initialize_support(void)
 */
 void bhy_delay_msec(uint32_t msec)
 {
-    TMR_Delay(MXC_TMR0, MSEC(msec), 0);
+    card10_bosch_delay(msec);
 }
 /*!
  * @brief provides a print function to the bhy driver on DD2.0 platform
