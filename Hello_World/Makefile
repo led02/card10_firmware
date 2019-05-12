@@ -111,7 +111,9 @@ PROJ_CFLAGS+=-std=c99
 #MXC_OPTIMIZE_CFLAGS=-O1
 
 # Point this variable to a linker file to override the default file
+ifneq "$(APP)" ""
 LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC)_app.ld
+endif
 
 ################################################################################
 # Include external library makefiles here
