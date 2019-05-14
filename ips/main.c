@@ -68,24 +68,24 @@
 
 // Parameters for PWM output
 #define PORT_PWM   PORT_0  // port
-#define PIN_PWM    PIN_7   // pin
+#define PIN_PWM    PIN_21   // pin
 #define FREQ       200 // (Hz) 
 //#define DUTY_CYCLE 75  // (%)  
 #define DUTY_CYCLE 20  // (%)  
-#define PWM_TIMER  MXC_TMR1  // must change PORT_PWM and PIN_PWM if changed
+#define PWM_TIMER  MXC_TMR3  // must change PORT_PWM and PIN_PWM if changed
 
 
 /***** Definitions *****/
 
 #define I2C_DEVICE        MXC_I2C0_BUS0
 
-#define SPI SPI0
+#define SPI SPI2
 #define SPI_SPEED       1000000  // Bit Rate
 
 /***** Globals *****/
 static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-const gpio_cfg_t DEV_RST_PIN = {PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-const gpio_cfg_t DEV_DC_PIN = {PORT_1, PIN_7, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+const gpio_cfg_t DEV_RST_PIN = {PORT_0, PIN_28, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+const gpio_cfg_t DEV_DC_PIN = {PORT_0, PIN_23, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
 void PWM_Output()
@@ -146,7 +146,7 @@ int main(void)
 
     printf("Hello World!\n");
 
-#if 0
+#if 1
     //Setup the I2CM
     I2C_Shutdown(MXC_I2C0_BUS0);
     I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
@@ -183,8 +183,9 @@ int main(void)
     LCD_Clear(BLACK);
 
     Paint_NewImage(LCD_WIDTH, LCD_HEIGHT,0,WHITE);
+
     Paint_Clear(BLACK);
-    //Paint_SetRotate(180);
+    Paint_SetRotate(180);
     Paint_DrawString_EN(0, 0, "123", &Font24, 0x000f, 0xfff0);
     Paint_DrawString_EN(0, 23, "ABC", &Font24, BLUE, CYAN);
     Paint_DrawString_CN(20,42, "Î¢Ñ©µç×Ó",  &Font24CN, WHITE, RED);

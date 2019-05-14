@@ -84,7 +84,8 @@ const gpio_cfg_t gpio_cfg_spi17y1_ss0 =  { PORT_0, (PIN_16), GPIO_FUNC_ALT2, GPI
 const gpio_cfg_t gpio_cfg_spi17y1_ss1 =  { PORT_0, (PIN_22), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y1_ss2 =  { PORT_0, (PIN_23), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 
-const gpio_cfg_t gpio_cfg_spi17y2 =      { PORT_0, (PIN_25 | PIN_26 | PIN_27 | PIN_28 | PIN_29), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
+//const gpio_cfg_t gpio_cfg_spi17y2 =      { PORT_0, (PIN_25 | PIN_26 | PIN_27 | PIN_28 | PIN_29), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
+const gpio_cfg_t gpio_cfg_spi17y2 =      { PORT_0, (PIN_25 | PIN_26 | PIN_27), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y2_ss0 =  { PORT_0, (PIN_24), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y2_ss1 =  { PORT_0, (PIN_30), GPIO_FUNC_ALT2, GPIO_PAD_NONE };
 const gpio_cfg_t gpio_cfg_spi17y2_ss2 =  { PORT_0, (PIN_31), GPIO_FUNC_ALT2, GPIO_PAD_NONE };

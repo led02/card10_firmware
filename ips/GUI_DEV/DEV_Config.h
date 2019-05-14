@@ -48,8 +48,8 @@
 **/
 extern const gpio_cfg_t DEV_RST_PIN;
 extern const gpio_cfg_t DEV_DC_PIN;
-extern const gpio_cfg_t DEV_CS_PIN;
-extern const gpio_cfg_t DEV_BL_PIN;
+//extern const gpio_cfg_t DEV_CS_PIN;
+//extern const gpio_cfg_t DEV_BL_PIN;
 /**
  * GPIO read and write
 **/

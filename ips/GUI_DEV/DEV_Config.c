@@ -32,7 +32,7 @@
 #include "DEV_Config.h"
 #include "spi.h"
 
-#define SPI SPI0
+#define SPI SPI2
 
 //const gpio_cfg_t DEV_CS_PIN = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 //const gpio_cfg_t DEV_BL_PIN = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};

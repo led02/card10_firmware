@@ -168,6 +168,7 @@ __weak void SystemInit(void)
     MXC_GPIO0->vssel |= (1UL << 9) | (1UL << 10); // USB UART
     MXC_GPIO0->vssel |= (1UL << 20) | (1UL << 21) | (1UL << 22) | (1UL << 29); // Wristband
     MXC_GPIO0->vssel |= (1UL << 17) | (1UL << 23) | (1UL << 28); // GPIO to TOP
+    MXC_GPIO0->vssel |= (1UL << 24) | (1UL << 25) | (1UL << 26) | (1UL << 27); // SPI to TOP
     MXC_GPIO0->vssel |= (1UL << 31); // ECG Switch
 
     MXC_GPIO0->ps |= 0xFFFFFFFF;
