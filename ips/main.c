@@ -64,6 +64,15 @@
 #include "GUI_DEV/GUI_Paint.h"
 #include "Fonts/fonts.h"
 #include "image/image.h"
+#include "tmr.h"
+
+// Parameters for PWM output
+#define PORT_PWM   PORT_0  // port
+#define PIN_PWM    PIN_7   // pin
+#define FREQ       200 // (Hz) 
+//#define DUTY_CYCLE 75  // (%)  
+#define DUTY_CYCLE 20  // (%)  
+#define PWM_TIMER  MXC_TMR1  // must change PORT_PWM and PIN_PWM if changed
 
 
 /***** Definitions *****/
@@ -79,6 +88,56 @@ const gpio_cfg_t DEV_RST_PIN = {PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 const gpio_cfg_t DEV_DC_PIN = {PORT_1, PIN_7, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
+void PWM_Output()
+{
+    // Declare variables
+    gpio_cfg_t gpio_pwm;    // to configure GPIO
+    tmr_cfg_t tmr;          // to congigure timer
+    tmr_pwm_cfg_t tmr_pwm;  // for configure PWM
+    unsigned int period_ticks = PeripheralClock / FREQ;
+    unsigned int duty_ticks = period_ticks * DUTY_CYCLE / 100;
+    
+    // Congfigure GPIO port and pin for PWM
+    gpio_pwm.func = GPIO_FUNC_ALT4;
+    gpio_pwm.port = PORT_PWM;
+    gpio_pwm.mask = PIN_PWM; 
+    gpio_pwm.pad = GPIO_PAD_PULL_DOWN;
+    
+    if (GPIO_Config(&gpio_pwm) != E_NO_ERROR) {
+        printf("Failed GPIO_Config for pwm.\n");
+    }
+
+    /*    
+    Steps for configuring a timer for PWM mode:
+    1. Disable the timer
+    2. Set the prescale value
+    3. Configure the timer for PWM mode
+    4. Set polarity, pwm parameters
+    5. Enable Timer
+    */
+
+    TMR_Disable(PWM_TIMER); 
+    
+    TMR_Init(PWM_TIMER, TMR_PRES_1, 0);
+    
+    tmr.mode = TMR_MODE_PWM;
+    tmr.cmp_cnt = period_ticks;
+    tmr.pol = 0;
+    TMR_Config(PWM_TIMER, &tmr);
+    
+    tmr_pwm.pol = 1;
+    tmr_pwm.per_cnt = period_ticks;
+    tmr_pwm.duty_cnt = duty_ticks;
+    
+    if (TMR_PWMConfig(PWM_TIMER, &tmr_pwm) != E_NO_ERROR) {
+        printf("Failed TMR_PWMConfig.\n");
+    }
+    
+    TMR_Enable(PWM_TIMER);
+
+    printf("PWM started.\n");
+}
+
 
 // *****************************************************************************
 int main(void)
@@ -118,12 +177,13 @@ int main(void)
     GPIO_Config(&DEV_RST_PIN);
     GPIO_Config(&DEV_DC_PIN);
 
+    PWM_Output();
     LCD_SetBacklight(500);
     LCD_Init();
     LCD_Clear(BLACK);
 
     Paint_NewImage(LCD_WIDTH, LCD_HEIGHT,0,WHITE);
-    Paint_Clear(WHITE);
+    Paint_Clear(BLACK);
     //Paint_SetRotate(180);
     Paint_DrawString_EN(0, 0, "123", &Font24, 0x000f, 0xfff0);
     Paint_DrawString_EN(0, 23, "ABC", &Font24, BLUE, CYAN);
@@ -134,7 +194,7 @@ int main(void)
     Paint_DrawCircle(85,25, 22, GREEN, DRAW_FILL_EMPTY, DOT_PIXEL_2X2);
 
     Paint_DrawImage(gImage_40X40,120, 0,40, 40);
-    DEV_Delay_ms(2000);
+    DEV_Delay_ms(10000);
     Paint_DrawImage(gImage_160X80,0, 0, 160, 80);
 
     while (1) {
