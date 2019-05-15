@@ -53,6 +53,11 @@ void pmic_init(void)
     MAX77650_setD_LED2(0b1111);     //LED blue: LED duty-cycle
 
     MAX77650_setEN_LED_MSTR(true);  //LEDs Master enable
+
+    MAX77650_setCHG_CV(0b110000);   // 4.2 V target battery voltage
+    MAX77650_setICHGIN_LIM(1);      // 190 mA limit on USB
+    MAX77650_setCHG_CC(0b1011);     // 90 mA fast charge current
+    MAX77650_setCHG_EN(1);          // Turn on charger
 }
 
 void pmic_set_led(uint8_t led, uint8_t val)
