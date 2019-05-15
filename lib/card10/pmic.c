@@ -10,7 +10,8 @@ void pmic_init(void)
     uint8_t cid = MAX77650_getChipID();
     printf("MAX7765x DIDM: 0x%02x CID: 0x%02x\n", didm, cid);
 
-    //MAX77650_setIP_SBB0(0b11);  //Limit output of SBB0 to 500mA
+    MAX77650_setIP_SBB0(0b11);  //Limit switch current of SBB0 to 500mA for noise reduction
+    //MAX77650_setIP_SBB0(0b00);  //Limit switch current of SBB0 to 1000 mA
     MAX77650_setTV_SBB0(0b101000); //Set output Voltage of SBB0 to 1.8V
     MAX77650_setADE_SBB0(0b0); //Disable Active Discharge at SBB0 Output
     MAX77650_setEN_SBB0(0b110); //Enable SBB0 is on irrespective of FPS whenever the on/off controller is in its "On via Software" or "On via On/Off Controller" states
@@ -24,7 +25,7 @@ void pmic_init(void)
     MAX77650_setADE_SBB1(0b0); //Disable Active Discharge at SBB1 Output
     MAX77650_setEN_SBB1(0b110); //Enable SBB1 is on irrespective of FPS whenever the on/off controller is in its "On via Software" or "On via On/Off Controller" states
 
-    //MAX77650_setIP_SBB2(0b11);  //Limit output of SBB2 to 500mA
+    MAX77650_setIP_SBB2(0b11);  //Limit switch current of SBB2 to 500mA for noise reduction
 #if BOARD_EVKIT
     MAX77650_setTV_SBB2(0b110010); //Set output Voltage of SBB2 to 3.3V
 #else
