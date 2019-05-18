@@ -41,9 +41,6 @@
  */
 
 /***** Includes *****/
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
@@ -53,13 +50,14 @@
 #include "spi.h"
 #include "gpio.h"
 #include "oled96.h"
-#include "bhy.h"
-#include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
-#include "bhy_uc_driver.h"
-#include "pmic.h"
-#include "bme680.h"
 #include "bma400.h"
 #include "bosch.h"
+
+#include "card10.h"
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 
 /***** Definitions *****/
 
@@ -95,37 +93,8 @@ void print_rslt(int8_t rslt)
 // *****************************************************************************
 int main(void)
 {
-    int count = 0;
-
-    printf("Hello World!\n");
-
-    //Setup the I2CM
-    I2C_Shutdown(MXC_I2C0_BUS0);
-    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
-
-    I2C_Shutdown(MXC_I2C1_BUS0);
-    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
-
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
-    uint8_t dummy[1] = {0};
-    // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
-    for (int addr = 0x8; addr < 0x78; ++addr) {
-        // A 0 byte write does not seem to work so always send a single byte.
-        int res = I2C_MasterWrite(MXC_I2C0_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C0\n", addr);
-        }
-
-        res = I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
-        }
-    }
+    card10_init();
+    card10_diag();
 
     oledInit(0x3c, 0, 0);
     oledFill(0x00);

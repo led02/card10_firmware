@@ -73,6 +73,10 @@ SRCS  += pmic.c
 SRCS  += bosch.c
 SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 SRCS  += MAX77650-Arduino-Library.c
+SRCS  += bme680.h
+SRCS  += bma400.c
+SRCS  += card10.c
+
 # Where to find source files for this test
 VPATH = .
 
@@ -88,6 +92,12 @@ VPATH += ../lib/bosch/BHy1_driver_and_MCU_solution/driver/src
 
 IPATH += ../lib/maxim/MAX77650-Arduino-Library
 VPATH += ../lib/maxim/MAX77650-Arduino-Library
+
+IPATH += ../lib/bosch/BME680_driver
+VPATH += ../lib/bosch/BME680_driver
+
+IPATH += ../lib/bosch/BMA400-API
+VPATH += ../lib/bosch/BMA400-API
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE

@@ -41,9 +41,6 @@
  */
 
 /***** Includes *****/
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
@@ -52,19 +49,17 @@
 #include "rtc.h"
 #include "spi.h"
 #include "gpio.h"
-#include "oled96.h"
-#include "bhy.h"
-#include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
 #include "bhy_uc_driver.h"
 #include "pmic.h"
+
+#include "card10.h"
+
 #include <math.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 
 /***** Definitions *****/
-
-#define I2C_DEVICE	    MXC_I2C0_BUS0
-
-#define SPI SPI0
-#define SPI_SPEED       1000000  // Bit Rate
 
 /* should be greater or equal to 69 bytes, page size (50) + maximum packet size(18) + 1 */
 #define FIFO_SIZE                      300
@@ -74,30 +69,31 @@
 
 
 /***** Globals *****/
-static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 char out_buffer[OUT_BUFFER_SIZE] = " W: 0.999  X: 0.999  Y: 0.999  Z: 0.999   \r";
 uint8_t fifo[FIFO_SIZE];
 
 
-
 /***** Functions *****/
-#if 0
-void I2C0_IRQHandler(void)
-{
-    I2C_Handler(I2C_DEVICE);
-    return;
-}
-#endif
-
 static void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
-    printf("x=%d, y=%d, z=%d status=%d\n",
+    printf("x=%05d, y=%05d, z=%05d status=%d\n",
     sensor_data->data_vector.x,
     sensor_data->data_vector.y,
     sensor_data->data_vector.z,
     sensor_data->data_vector.status
     );
 }
+
+static void sensors_callback_vector_uncalib(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
+{
+    printf("x=%05d, y=%05d, z=%05d status=%d\n",
+    sensor_data->data_uncalib_vector.x,
+    sensor_data->data_uncalib_vector.y,
+    sensor_data->data_uncalib_vector.z,
+    sensor_data->data_uncalib_vector.status
+    );
+}
+
 
 /*!
  * @brief This function is  callback function for acquring sensor datas
@@ -167,49 +163,6 @@ static void sensors_callback_rotation_vector(bhy_data_generic_t * sensor_data, b
 // *****************************************************************************
 int main(void)
 {
-    printf("Hello World!\n");
-
-    //Setup the I2CM
-    I2C_Shutdown(MXC_I2C0_BUS0);
-    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
-
-    I2C_Shutdown(MXC_I2C1_BUS0);
-    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
-
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
- #if 0
-    NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
- #endif
-
-    uint8_t dummy[1] = {0};
-    // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
-    for (int addr = 0x8; addr < 0x78; ++addr) {
-        // A 0 byte write does not seem to work so always send a single byte.
-        int res = I2C_MasterWrite(MXC_I2C0_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C0\n", addr);
-        }
-
-        res = I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
-        }
-    }
-
-#if 0
-    oledInit(0x3c, 0, 0);
-    oledFill(0x00);
-    oledWriteString(0, 0, "Hello", 0);
-    oledWriteString(0, 2, "my name is", 0);
-    oledWriteString(0, 4, "card10", 1);
-#endif
-
     /* BHY Variable*/
     uint8_t                    *fifoptr           = NULL;
     uint8_t                    bytes_left_in_fifo = 0;
@@ -222,14 +175,13 @@ int main(void)
     const gpio_cfg_t interrupt_pin = {PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
     GPIO_Config(&interrupt_pin);
 
-    if(bhy_driver_init(bhy1_fw)) {
-        printf("Failed to init bhy\n");
-    }
-
+    card10_init();
     /* wait for the bhy trigger the interrupt pin go down and up again */
     while (GPIO_InGet(&interrupt_pin));
-
     while (!GPIO_InGet(&interrupt_pin));
+
+
+    card10_diag();
 
     /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
     /* calculated in a correct coordinates system. */
@@ -255,7 +207,9 @@ int main(void)
 #endif
 
     //if(bhy_install_sensor_callback(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, sensors_callback_vector))
-    if(bhy_install_sensor_callback(VS_TYPE_GRAVITY, VS_WAKEUP, sensors_callback_vector))
+    //if(bhy_install_sensor_callback(VS_TYPE_GRAVITY, VS_WAKEUP, sensors_callback_vector))
+    //if(bhy_install_sensor_callback(VS_TYPE_ACCELEROMETER, VS_WAKEUP, sensors_callback_vector))
+    if(bhy_install_sensor_callback(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, sensors_callback_vector_uncalib))
     {
         printf("Fail to install sensor callback\n");
     }
@@ -270,7 +224,9 @@ int main(void)
 
     /* enables the virtual sensor */
     //if(bhy_enable_virtual_sensor(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
-    if(bhy_enable_virtual_sensor(VS_TYPE_GRAVITY, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+    //if(bhy_enable_virtual_sensor(VS_TYPE_GRAVITY, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+    //if(bhy_enable_virtual_sensor(VS_TYPE_ACCELEROMETER, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+    if(bhy_enable_virtual_sensor(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
     {
         printf("Fail to enable sensor id=%d\n", VS_TYPE_GEOMAGNETIC_FIELD);
     }

@@ -75,6 +75,7 @@ SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 SRCS  += MAX77650-Arduino-Library.c
 SRCS  += bme680.h
 SRCS  += bma400.c
+SRCS  += card10.c
 
 # Where to find source files for this test
 VPATH = .

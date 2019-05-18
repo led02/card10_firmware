@@ -41,9 +41,6 @@
  */
 
 /***** Includes *****/
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
@@ -52,19 +49,17 @@
 #include "rtc.h"
 #include "spi.h"
 #include "gpio.h"
-#include "oled96.h"
-#include "bhy.h"
-#include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
-#include "bhy_uc_driver.h"
-#include "pmic.h"
-#include "bme680.h"
-#include "bma400.h"
-#include "bosch.h"
 #include "LCD/LCD_Driver.h"
 #include "GUI_DEV/GUI_Paint.h"
 #include "Fonts/fonts.h"
 #include "image/image.h"
 #include "tmr.h"
+
+#include "card10.h"
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 
 // Parameters for PWM output
 #define PORT_PWM   PORT_0  // port
@@ -144,35 +139,8 @@ int main(void)
 {
     int count = 0;
 
-    printf("Hello World!\n");
-
-#if 1
-    //Setup the I2CM
-    I2C_Shutdown(MXC_I2C0_BUS0);
-    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
-
-    I2C_Shutdown(MXC_I2C1_BUS0);
-    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
-
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-#endif
-
-    // Enable SPI
-    sys_cfg_spi_t spi17y_master_cfg;
-
-    spi17y_master_cfg.map = MAP_A;
-    spi17y_master_cfg.ss0 = Enable;
-    spi17y_master_cfg.ss1 = Disable;
-    spi17y_master_cfg.ss2 = Disable;
-
-    if (SPI_Init(SPI, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
-        printf("Error configuring SPI\n");
-        while (1);
-    }
+    card10_init();
+    card10_diag();
 
     //GPIO_Config(&DEV_RST_PIN);
     GPIO_Config(&DEV_DC_PIN);

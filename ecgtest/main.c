@@ -55,28 +55,15 @@
 #include "MAX30003.h"
 #include "oled96.h"
 #include "pmic.h"
+#include "card10.h"
 #include <stdbool.h>
 
 /***** Definitions *****/
 
-#define I2C_DEVICE	    MXC_I2C0_BUS0
-
-#define SPI SPI0
-#define SPI_SPEED       10000000  // Bit Rate
-
-
 /***** Globals *****/
 
 /***** Functions *****/
-#if 0
-void I2C0_IRQHandler(void)
-{
-    I2C_Handler(I2C_DEVICE);
-    return;
-}
-#endif
-
-uint32_t ecg_read_reg(uint8_t reg)
+static uint32_t ecg_read_reg(uint8_t reg)
 {
     spi_req_t req;
     uint8_t tx_data[] = {(reg << 1) | 1, 0, 0, 0};
@@ -92,12 +79,12 @@ uint32_t ecg_read_reg(uint8_t reg)
     req.tx_num = 0;
     req.rx_num = 0;
 
-    SPI_MasterTrans(SPI, &req);
+    SPI_MasterTrans(SPI0, &req);
 
     return (rx_data[1] << 16) | (rx_data[2] << 8) | rx_data[3];
 }
 
-void ecg_write_reg(uint8_t reg, uint32_t data)
+static void ecg_write_reg(uint8_t reg, uint32_t data)
 {
     printf("write %02x %06x\n", reg, data);
     spi_req_t req;
@@ -114,7 +101,7 @@ void ecg_write_reg(uint8_t reg, uint32_t data)
     req.tx_num = 0;
     req.rx_num = 0;
 
-    SPI_MasterTrans(SPI, &req);
+    SPI_MasterTrans(SPI0, &req);
 }
 
 void ecg_config(void)
@@ -243,52 +230,9 @@ void ecgFIFO_callback(void *data) {
 // *****************************************************************************
 int main(void)
 {
-    //int count = 0;
 
-    printf("Hello World!\n");
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
-    //Setup the I2CM
-    I2C_Shutdown(MXC_I2C0_BUS0);
-    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
-
-    I2C_Shutdown(MXC_I2C1_BUS0);
-    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
-
- #if 0
-    NVIC_EnableIRQ(I2C0_IRQn); // Not sure if we actually need this when not doing async requests
- #endif
-
-    uint8_t dummy[1] = {0};
-    // "7-bit addresses 0b0000xxx and 0b1111xxx are reserved"
-    for (int addr = 0x8; addr < 0x78; ++addr) {
-        // A 0 byte write does not seem to work so always send a single byte.
-        int res = I2C_MasterWrite(MXC_I2C0_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C0\n", addr);
-        }
-
-        res = I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, dummy, 1, 0);
-        if(res == 1) {
-            printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
-        }
-    }
-
-    pmic_init();
-    pmic_set_led(0, 0);
-    pmic_set_led(1, 0);
-    pmic_set_led(2, 0);
-
-    TMR_Delay(MXC_TMR0, MSEC(1000), 0);
-
-    oledInit(0x3c, 0, 0);
-    oledFill(0x00);
-    oledWriteString(0, 0, " card10", 1);
-
-    TMR_Delay(MXC_TMR0, MSEC(1500), 0);
-
-    // Enable 32 kHz output
-    RTC_SquareWave(MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL);
+    card10_init();
+    card10_diag();
 
     const gpio_cfg_t interrupt_pin = {PORT_1, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
     GPIO_Config(&interrupt_pin);
@@ -297,24 +241,6 @@ int main(void)
     GPIO_IntEnable(&interrupt_pin);
     NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
 
-
-    // Enable SPI
-    sys_cfg_spi_t spi17y_master_cfg;
-
-    spi17y_master_cfg.map = MAP_A;
-    spi17y_master_cfg.ss0 = Enable;
-    spi17y_master_cfg.ss1 = Disable;
-    spi17y_master_cfg.ss2 = Disable;
-
-    if (SPI_Init(SPI, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
-        printf("Error configuring SPI\n");
-        while (1);
-    }
-
-    for(int i=0; i<0x20; i++) {
-        uint32_t val = ecg_read_reg(i);
-        printf("%02x: 0x%06x\n", i, val);
-    }
 
     ecg_config();
 
