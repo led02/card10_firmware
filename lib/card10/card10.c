@@ -1,5 +1,6 @@
 #include "pmic.h"
 #include "bosch.h"
+#include "display.h"
 
 #include "bhy_uc_driver.h"
 #include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
@@ -21,7 +22,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#define SPI SPI0
 #define SPI_SPEED       1000000  // Bit Rate
 
 void card10_init(void)
@@ -52,14 +52,22 @@ void card10_init(void)
     spi17y_master_cfg.ss1 = Disable;
     spi17y_master_cfg.ss2 = Disable;
 
-    if (SPI_Init(SPI, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
+    if (SPI_Init(SPI0, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
         printf("Error configuring SPI\n");
         while (1);
     }
 
+    if (SPI_Init(SPI2, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
+        printf("Error configuring SPI\n");
+        while (1);
+    }
+
+
     if(bhy_driver_init(bhy1_fw)) {
         printf("Failed to init bhy\n");
     }
+
+    display_init();
 }
 
 static uint32_t ecg_read_reg(uint8_t reg)

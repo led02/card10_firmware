@@ -81,6 +81,7 @@ SRCS  += font24CN.c
 SRCS  += image.c
 SRCS  += image2.c
 SRCS  += card10.c
+SRCS  += display.c
 
 
 # Where to find source files for this test
@@ -105,13 +106,16 @@ VPATH += ../lib/bosch/BME680_driver
 IPATH += ../lib/bosch/BMA400-API
 VPATH += ../lib/bosch/BMA400-API
 
-IPATH += LCD
-IPATH += GUI_DEV
-IPATH += Fonts
+IPATH += ../lib/gfx
+IPATH += ../lib/gfx/LCD
+IPATH += ../lib/gfx/GUI_DEV
+IPATH += ../lib/gfx/Fonts
 
-VPATH += LCD
-VPATH += GUI_DEV
-VPATH += Fonts
+VPATH += ../lib/gfx
+VPATH += ../lib/gfx/LCD
+VPATH += ../lib/gfx/GUI_DEV
+VPATH += ../lib/gfx/Fonts
+
 VPATH += image
 
 # Enable assertion checking for development
