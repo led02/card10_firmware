@@ -230,8 +230,17 @@ uint8_t sample_count = 0;
 
 void add_sample(int16_t sample)
 {
+#if 1
     memmove(samples, samples + 1, sizeof(*samples) * (SIZE_X*2-1));
     samples[SIZE_X*2-1] = sample;
+#else
+    static index = 0;
+    samples[index] = sample;
+    index++;
+    if(index == SIZE_X*2) {
+        index = 0;
+    }
+#endif
     sample_count++;
 
     if(sample_count == 5) {
