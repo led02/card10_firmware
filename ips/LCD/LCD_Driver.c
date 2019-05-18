@@ -37,9 +37,9 @@ static void LCD_Reset(void)
 {
 	//DEV_Digital_Write(DEV_CS_PIN,0);
 	DEV_Delay_ms(20);
-	DEV_Digital_Write(DEV_RST_PIN,0);
+	//DEV_Digital_Write(DEV_RST_PIN,0);
 	DEV_Delay_ms(20);
-	DEV_Digital_Write(DEV_RST_PIN,1);
+	//DEV_Digital_Write(DEV_RST_PIN,1);
 	DEV_Delay_ms(20);
 }
 

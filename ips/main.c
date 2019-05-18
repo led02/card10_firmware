@@ -68,11 +68,11 @@
 
 // Parameters for PWM output
 #define PORT_PWM   PORT_0  // port
-#define PIN_PWM    PIN_21   // pin
+#define PIN_PWM    PIN_28   // pin
 #define FREQ       200 // (Hz) 
 //#define DUTY_CYCLE 75  // (%)  
 #define DUTY_CYCLE 20  // (%)  
-#define PWM_TIMER  MXC_TMR3  // must change PORT_PWM and PIN_PWM if changed
+#define PWM_TIMER  MXC_TMR4  // must change PORT_PWM and PIN_PWM if changed
 
 
 /***** Definitions *****/
@@ -84,8 +84,8 @@
 
 /***** Globals *****/
 static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-const gpio_cfg_t DEV_RST_PIN = {PORT_0, PIN_28, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-const gpio_cfg_t DEV_DC_PIN = {PORT_0, PIN_23, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+//const gpio_cfg_t DEV_RST_PIN = {PORT_0, PIN_28, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+const gpio_cfg_t DEV_DC_PIN = {PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
 void PWM_Output()
@@ -174,7 +174,7 @@ int main(void)
         while (1);
     }
 
-    GPIO_Config(&DEV_RST_PIN);
+    //GPIO_Config(&DEV_RST_PIN);
     GPIO_Config(&DEV_DC_PIN);
 
     PWM_Output();
