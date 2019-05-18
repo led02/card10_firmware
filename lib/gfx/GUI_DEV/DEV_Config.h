@@ -60,9 +60,9 @@ extern const gpio_cfg_t DEV_DC_PIN;
 /**
  * SPI
 **/
-void lcd_write(uint8_t data);
+void lcd_write(uint8_t* data, int size);
 //#define DEV_SPI_WRITE(_dat)  HAL_SPI_Transmit(&hspi1, (uint8_t *)&_dat, 1, 500);
-#define DEV_SPI_WRITE(_dat) lcd_write(_dat)
+#define DEV_SPI_WRITE(_dat) lcd_write(&_dat, 1)
 
 /**
  * delay x ms

@@ -53,7 +53,7 @@
 #include "rtc.h"
 #include "spi.h"
 #include "MAX30003.h"
-#include "oled96.h"
+#include "GUI_DEV/GUI_Paint.h"
 #include "pmic.h"
 #include "card10.h"
 #include <stdbool.h>
@@ -166,34 +166,52 @@ void ecg_config(void)
     return;
 }
 
-uint8_t content[1024];
+#define SIZE_X 160
+#define SIZE_Y 80
+
+uint16_t content[SIZE_X*SIZE_Y];
+uint8_t prev;
 
 void clear(void)
 {
-    memset(content, 0x00, 1024);
+    memset(content, 0x00, sizeof(content));
+    prev = 32;
 }
 
 
 void set(uint8_t index, int8_t val)
 {
-    uint8_t *p = &content[index];
 
     if(val < -31) val = -31;
     if(val > 32) val = 32;
 
-    int8_t pos = -val + 32;
-    p += (pos / 8) * 128;
+    int8_t pos = val + 32;
 
-    *p |= (1 << (pos % 8));
+    int min, max;
+    if(prev < pos) {
+        min = prev;
+        max = pos;
+    } else {
+        min = pos;
+        max = prev;
+    }
+
+    for(int i = min; i < max + 1; i++) {
+        uint16_t *p = content;
+        p += i * SIZE_X + (SIZE_X - index - 1);
+        *p = 0x00F8;
+    }
+
+    prev = pos;
 }
 
-int16_t samples[256];
+int16_t samples[SIZE_X*2];
 
 void update(void)
 {
     clear();
     int16_t scale = 0;
-    for(int i=0; i<256; i++) {
+    for(int i=0; i<SIZE_X*2; i++) {
         if(abs(samples[i]) > scale) {
             scale = abs(samples[i]);
         }
@@ -201,19 +219,19 @@ void update(void)
 
     scale /= 32;
 
-    for(int i=0; i<128; i++) {
+    for(int i=0; i<SIZE_X; i++) {
         set(i, ((samples[i*2] + samples[i*2 + 1]) / scale) / 2);
     }
 
-    oledset(content);
+    LCD_Set((uint8_t*)content, sizeof(content));
 }
 
 uint8_t sample_count = 0;
 
 void add_sample(int16_t sample)
 {
-    memmove(samples, samples + 1, sizeof(*samples) * 255);
-    samples[255] = sample;
+    memmove(samples, samples + 1, sizeof(*samples) * (SIZE_X*2-1));
+    samples[SIZE_X*2-1] = sample;
     sample_count++;
 
     if(sample_count == 5) {

@@ -72,7 +72,8 @@ void LCD_WriteData_Byte(UBYTE da)
 	//DEV_Digital_Write(DEV_CS_PIN,0);
 	DEV_Digital_Write(DEV_DC_PIN,1);
 	DEV_SPI_WRITE(i);
-	DEV_SPI_WRITE(da);
+    uint8_t tmp = da;
+	DEV_SPI_WRITE(tmp);
 	//DEV_Digital_Write(DEV_CS_PIN,1);
 }	  
 
@@ -281,4 +282,9 @@ void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
 } 
 
 
-
+void LCD_Set(uint8_t *data, int len)
+{
+	LCD_SetCursor(0,0,160-1,80-1);
+	DEV_Digital_Write(DEV_DC_PIN,1);
+    lcd_write(data, len);
+}

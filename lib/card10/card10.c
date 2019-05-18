@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define SPI_SPEED       1000000  // Bit Rate
+#define SPI_SPEED       (15 * 1000 * 1000 * 1)  // Bit Rate. Display has 15 MHz limit
 
 void card10_init(void)
 {

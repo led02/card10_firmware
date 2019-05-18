@@ -68,14 +68,19 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
 SRCS  += pmic.c
-SRCS  += ../lib/card10/oled96.c
-SRCS  += ../lib/card10/fonts.c
 SRCS  += bosch.c
 SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
 SRCS  += MAX77650-Arduino-Library.c
 SRCS  += bme680.h
 SRCS  += bma400.c
+SRCS  += LCD_Driver.c
+SRCS  += GUI_Paint.c
+SRCS  += DEV_Config.c
+SRCS  += font24.c
+SRCS  += font24CN.c
 SRCS  += card10.c
+SRCS  += display.c
+
 
 # Where to find source files for this test
 VPATH = .
@@ -98,6 +103,16 @@ VPATH += ../lib/bosch/BME680_driver
 
 IPATH += ../lib/bosch/BMA400-API
 VPATH += ../lib/bosch/BMA400-API
+
+IPATH += ../lib/gfx
+IPATH += ../lib/gfx/LCD
+IPATH += ../lib/gfx/GUI_DEV
+IPATH += ../lib/gfx/Fonts
+
+VPATH += ../lib/gfx
+VPATH += ../lib/gfx/LCD
+VPATH += ../lib/gfx/GUI_DEV
+VPATH += ../lib/gfx/Fonts
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
