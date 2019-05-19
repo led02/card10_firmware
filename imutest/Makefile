@@ -82,6 +82,7 @@ SRCS  += font24.c
 SRCS  += font24CN.c
 SRCS  += card10.c
 SRCS  += display.c
+SRCS  += leds.c
 
 
 # Where to find source files for this test

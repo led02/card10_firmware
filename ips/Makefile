@@ -82,6 +82,7 @@ SRCS  += image.c
 SRCS  += image2.c
 SRCS  += card10.c
 SRCS  += display.c
+SRCS  += leds.c
 
 
 # Where to find source files for this test

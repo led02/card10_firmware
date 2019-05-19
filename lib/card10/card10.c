@@ -7,9 +7,9 @@
 #include "bme680.h"
 #include "bma400.h"
 #include "bhy.h"
+#include "leds.h"
 
 #include "mxc_config.h"
-#include "led.h"
 #include "board.h"
 
 #include "tmr_utils.h"
@@ -68,6 +68,8 @@ void card10_init(void)
     }
 
     display_init();
+
+    leds_init();
 }
 
 static uint32_t ecg_read_reg(uint8_t reg)
@@ -136,9 +138,14 @@ void card10_diag(void)
         printf("BMA400 found with chip ID 0x%X\r\n", bma.chip_id);
     }
 
-
+#if 0
     for(int i=0; i<0x20; i++) {
         uint32_t val = ecg_read_reg(i);
         printf("ECG: %02x: 0x%06x\n", i, val);
     }
+#else
+    uint32_t val = ecg_read_reg(0xf);
+    printf("ECG: %02x: 0x%06x (should be 0x5139a0)\n", 0xf, val);
+#endif
+
 }
