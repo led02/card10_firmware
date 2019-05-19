@@ -42,7 +42,7 @@ void lcd_write(uint8_t *data, int size)
 {
     spi_req_t req;
     //uint8_t tx_data[] = {data};
-    uint8_t rx_data[] = {0};
+    //uint8_t rx_data[] = {0};
     //req.tx_data = tx_data;
     req.tx_data = data;
     //req.rx_data = rx_data;

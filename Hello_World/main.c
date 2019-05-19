@@ -53,7 +53,7 @@
 /***** Definitions *****/
 
 /***** Globals *****/
-//static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** Functions *****/
 // *****************************************************************************
