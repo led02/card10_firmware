@@ -1,44 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2016 Maxim Integrated Products, Inc., All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
- * OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
- * Except as contained in this notice, the name of Maxim Integrated
- * Products, Inc. shall not be used except as stated in the Maxim Integrated
- * Products, Inc. Branding Policy.
- *
- * The mere transfer of this software does not imply any licenses
- * of trade secrets, proprietary technology, copyrights, patents,
- * trademarks, maskwork rights, or any other form of intellectual
- * property whatsoever. Maxim Integrated Products, Inc. retains all
- * ownership rights.
- *
- * $Date: 2018-09-04 22:13:32 +0000 (Tue, 04 Sep 2018) $
- * $Revision: 37649 $
- *
+ * License: TBD
  ******************************************************************************/
-
-/**
- * @file    main.c
- * @brief   Hello World!
- * @details This example uses the UART to print to a terminal and flashes an LED.
- */
 
 /***** Includes *****/
 #include <stdio.h>
@@ -104,7 +66,7 @@ static void ecg_write_reg(uint8_t reg, uint32_t data)
     SPI_MasterTrans(SPI0, &req);
 }
 
-void ecg_config(void)
+static void ecg_config(void)
 {
     // Reset ECG to clear registers
     ecg_write_reg(SW_RST , 0);
@@ -169,17 +131,17 @@ void ecg_config(void)
 #define SIZE_X 160
 #define SIZE_Y 80
 
-uint16_t content[SIZE_X*SIZE_Y];
-uint8_t prev;
+static uint16_t content[SIZE_X*SIZE_Y];
+static uint8_t prev;
 
-void clear(void)
+static void clear(void)
 {
     memset(content, 0x00, sizeof(content));
     prev = 32;
 }
 
 
-void set(uint8_t index, int8_t val)
+static void set(uint8_t index, int8_t val)
 {
 
     if(val < -31) val = -31;
@@ -205,7 +167,7 @@ void set(uint8_t index, int8_t val)
     prev = pos;
 }
 
-int16_t samples[SIZE_X*2];
+static int16_t samples[SIZE_X*2];
 
 void update(void)
 {
@@ -226,9 +188,9 @@ void update(void)
     LCD_Set((uint8_t*)content, sizeof(content));
 }
 
-uint8_t sample_count = 0;
+static uint8_t sample_count = 0;
 
-void add_sample(int16_t sample)
+static void add_sample(int16_t sample)
 {
 #if 1
     memmove(samples, samples + 1, sizeof(*samples) * (SIZE_X*2-1));
@@ -249,8 +211,8 @@ void add_sample(int16_t sample)
     }
 }
 
-volatile bool ecgFIFOIntFlag = false;
-void ecgFIFO_callback(void *data) {
+static volatile bool ecgFIFOIntFlag = false;
+static void ecgFIFO_callback(void *data) {
     ecgFIFOIntFlag = true;
 }
 
@@ -288,8 +250,6 @@ int main(void)
 
 
     while(1) {
-
-#if 1
         // Read back ECG samples from the FIFO
         if( ecgFIFOIntFlag ) {
             ecgFIFOIntFlag = false;
@@ -329,6 +289,5 @@ int main(void)
 
             }
         }
-#endif
     }
 }
