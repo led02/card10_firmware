@@ -11,7 +11,6 @@
 #include "rtc.h"
 #include "spi.h"
 #include "gpio.h"
-#include "oled96.h"
 #include "bma400.h"
 #include "bosch.h"
 
@@ -57,12 +56,6 @@ int main(void)
 {
     card10_init();
     card10_diag();
-
-    oledInit(0x3c, 0, 0);
-    oledFill(0x00);
-    oledWriteString(0, 0, "Hello", 0);
-    oledWriteString(0, 2, "my name is", 0);
-    oledWriteString(0, 4, "card10", 1);
 
     struct bma400_dev bma;
     struct bma400_int_enable tap_int[2];
