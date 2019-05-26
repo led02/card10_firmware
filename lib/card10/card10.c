@@ -24,6 +24,8 @@
 
 #define SPI_SPEED       (15 * 1000 * 1000 * 1)  // Bit Rate. Display has 15 MHz limit
 
+const gpio_cfg_t bhi_interrupt_pin = {PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
+
 void card10_init(void)
 {
     printf("card10 init...\n");
@@ -63,13 +65,33 @@ void card10_init(void)
     }
 
 
-    if(bhy_driver_init(bhy1_fw)) {
-        printf("Failed to init bhy\n");
-    }
-
     display_init();
 
     leds_init();
+
+    GPIO_Config(&bhi_interrupt_pin);
+
+    if(bhy_driver_init(bhy1_fw)) {
+        printf("Failed to init bhy\n");
+    } else {
+        /* wait for the bhy trigger the interrupt pin go down and up again */
+        while (GPIO_InGet(&bhi_interrupt_pin));
+        while (!GPIO_InGet(&bhi_interrupt_pin));
+
+        /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
+        /* calculated in a correct coordinates system. */
+        int8_t                     bhy_mapping_matrix_config[3*3] = {0,-1,0,1,0,0,0,0,1};
+        int8_t                     mag_mapping_matrix_config[3*3] = {-1,0,0,0,1,0,0,0,-1};
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_ACC, bhy_mapping_matrix_config);
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_MAG, mag_mapping_matrix_config);
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_GYRO, bhy_mapping_matrix_config);
+
+        /* the sic matrix should be calculated for customer platform by logging uncalibrated magnetometer data. */
+        /* the sic matrix here is only an example array (identity matrix). Customer should generate their own matrix. */
+        /* This affects magnetometer fusion performance. */
+        float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+        bhy_set_sic_matrix(sic_array);
+    }
 }
 
 static uint32_t ecg_read_reg(uint8_t reg)

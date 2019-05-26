@@ -13,6 +13,7 @@
 #include "gpio.h"
 #include "bhy_uc_driver.h"
 #include "pmic.h"
+#include "GUI_DEV/GUI_Paint.h"
 
 #include "card10.h"
 
@@ -20,12 +21,14 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
+#define M_PI    3.1415
 /***** Definitions *****/
 
 /* should be greater or equal to 69 bytes, page size (50) + maximum packet size(18) + 1 */
 #define FIFO_SIZE                      300
-#define ROTATION_VECTOR_SAMPLE_RATE    100
+#define ROTATION_VECTOR_SAMPLE_RATE    10
 #define MAX_PACKET_LENGTH              18
 #define OUT_BUFFER_SIZE                60
 
@@ -34,8 +37,70 @@
 char out_buffer[OUT_BUFFER_SIZE] = " W: 0.999  X: 0.999  Y: 0.999  Z: 0.999   \r";
 uint8_t fifo[FIFO_SIZE];
 
+void draw_arrow(int angle, int color)
+{
+    float sin = sinf(angle * 2 * M_PI / 360.);
+    float cos = cosf(angle * 2 * M_PI / 360.);
+
+    int x1 = 160/2 + 30;
+    int y1 = 80/2;
+
+    int x2 = x1 - sin * 30;
+    int y2 = y1 - cos * 30;
+
+    Paint_DrawLine(x1, y1, x2, y2, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+
+    sin = sinf((angle - 140) * 2 * M_PI / 360.);
+    cos = cosf((angle - 140) * 2 * M_PI / 360.);
+
+    int x3 = x2 - sin * 10;
+    int y3 = y2 - cos * 10;
+
+    Paint_DrawLine(x2, y2, x3, y3, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+
+    sin = sinf((angle + 140) * 2 * M_PI / 360.);
+    cos = cosf((angle + 140) * 2 * M_PI / 360.);
+
+    int x4 = x2 - sin * 10;
+    int y4 = y2 - cos * 10;
+
+    Paint_DrawLine(x2, y2, x4, y4, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+}
 
 /***** Functions *****/
+static void sensors_callback_orientation(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
+{
+    static int prev = -1;
+    printf("azimuth=%05d, pitch=%05d, roll=%05d status=%d\n",
+    sensor_data->data_vector.x * 360 / 32768,
+    sensor_data->data_vector.y * 360 / 32768,
+    sensor_data->data_vector.z * 360 / 32768,
+    sensor_data->data_vector.status
+    );
+
+    int angle = sensor_data->data_vector.x * 360 / 32768;
+
+    if(angle != prev) {
+        Paint_Clear(BLACK);
+        int colors[] = {RED, YELLOW, YELLOW, GREEN};
+        int color = colors[sensor_data->data_vector.status];
+        draw_arrow(sensor_data->data_vector.x * 360 / 32768, color);
+
+        char buf[128];
+        //sprintf(buf, "Azimuth: %3d", angle);
+        //Paint_DrawString_EN(0, 0, buf, &Font12, BLACK, color);
+
+        sprintf(buf, "%3d", angle);
+        Paint_DrawString_EN(0, 30, buf, &Font24, BLACK, color);
+        Paint_DrawCircle(57,35, 4, color, DRAW_FILL_EMPTY, DOT_PIXEL_1X1);
+
+
+        LCD_Update();
+        prev = angle;
+    }
+}
+
+
 static void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
     printf("x=%05d, y=%05d, z=%05d status=%d\n",
@@ -134,31 +199,8 @@ int main(void)
     bhy_data_type_t            packet_type;
     BHY_RETURN_FUNCTION_TYPE   result;
 
-    const gpio_cfg_t interrupt_pin = {PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
-    GPIO_Config(&interrupt_pin);
-
     card10_init();
-    /* wait for the bhy trigger the interrupt pin go down and up again */
-    while (GPIO_InGet(&interrupt_pin));
-    while (!GPIO_InGet(&interrupt_pin));
-
-
     card10_diag();
-
-    /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
-    /* calculated in a correct coordinates system. */
-    int8_t                     bhy_mapping_matrix_config[3*3] = {0,-1,0,1,0,0,0,0,1};
-    int8_t                     mag_mapping_matrix_config[3*3] = {-1,0,0,0,1,0,0,0,-1};
-    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_ACC, bhy_mapping_matrix_config);
-    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_MAG, mag_mapping_matrix_config);
-    bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_GYRO, bhy_mapping_matrix_config);
-
-    /* the sic matrix should be calculated for customer platform by logging uncalibrated magnetometer data. */
-    /* the sic matrix here is only an example array (identity matrix). Customer should generate their own matrix. */
-    /* This affects magnetometer fusion performance. */
-    float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
-    bhy_set_sic_matrix(sic_array);
-
 
 #if 0
     /* install the callback function for parse fifo data */
@@ -171,7 +213,8 @@ int main(void)
     //if(bhy_install_sensor_callback(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, sensors_callback_vector))
     //if(bhy_install_sensor_callback(VS_TYPE_GRAVITY, VS_WAKEUP, sensors_callback_vector))
     //if(bhy_install_sensor_callback(VS_TYPE_ACCELEROMETER, VS_WAKEUP, sensors_callback_vector))
-    if(bhy_install_sensor_callback(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, sensors_callback_vector_uncalib))
+    //if(bhy_install_sensor_callback(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, sensors_callback_vector_uncalib))
+    if(bhy_install_sensor_callback(VS_TYPE_ORIENTATION, VS_WAKEUP, sensors_callback_orientation))
     {
         printf("Fail to install sensor callback\n");
     }
@@ -184,11 +227,13 @@ int main(void)
     }
 #endif
 
+
     /* enables the virtual sensor */
     //if(bhy_enable_virtual_sensor(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
     //if(bhy_enable_virtual_sensor(VS_TYPE_GRAVITY, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
     //if(bhy_enable_virtual_sensor(VS_TYPE_ACCELEROMETER, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
-    if(bhy_enable_virtual_sensor(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+    //if(bhy_enable_virtual_sensor(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+    if(bhy_enable_virtual_sensor(VS_TYPE_ORIENTATION, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
     {
         printf("Fail to enable sensor id=%d\n", VS_TYPE_GEOMAGNETIC_FIELD);
     }
@@ -198,7 +243,7 @@ int main(void)
     {
         /* wait until the interrupt fires */
         /* unless we already know there are bytes remaining in the fifo */
-        while (!GPIO_InGet(&interrupt_pin) && !bytes_remaining);
+        while (!GPIO_InGet(&bhi_interrupt_pin) && !bytes_remaining);
 
         bhy_read_fifo(fifo + bytes_left_in_fifo, FIFO_SIZE - bytes_left_in_fifo, &bytes_read, &bytes_remaining);
         bytes_read           += bytes_left_in_fifo;

@@ -78,6 +78,7 @@ SRCS  += GUI_Paint.c
 SRCS  += DEV_Config.c
 SRCS  += font24.c
 SRCS  += font24CN.c
+SRCS  += font12.c
 SRCS  += card10.c
 SRCS  += display.c
 SRCS  += leds.c
