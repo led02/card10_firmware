@@ -9,9 +9,10 @@
 #include "tmr_utils.h"
 #include "i2c.h"
 #include "gpio.h"
-#include "oled96.h"
 #include "bme680.h"
 #include "bosch.h"
+#include "GUI_DEV/GUI_Paint.h"
+#include "Fonts/fonts.h"
 
 #include "card10.h"
 
@@ -25,12 +26,6 @@ int main(void)
 {
     card10_init();
     card10_diag();
-
-    oledInit(0x3c, 0, 0);
-    oledFill(0x00);
-    oledWriteString(0, 0, "Hello", 0);
-    oledWriteString(0, 2, "my name is", 0);
-    oledWriteString(0, 4, "card10", 1);
 
     struct bme680_dev gas_sensor;
     gas_sensor.dev_id = BME680_I2C_ADDR_PRIMARY;
@@ -87,11 +82,26 @@ int main(void)
         printf("T: %.2f degC, P: %.2f hPa, H %.2f %%rH ", data.temperature / 100.0l,
             data.pressure / 100.0l, data.humidity / 1000.0l );
 
+        char buf[128];
+        sprintf(buf, "T: %.2f degC", data.temperature / 100.0l);
+        Paint_DrawString_EN(0, 0, buf, &Font16, 0x0000, 0xffff);
+
+        sprintf(buf, "P: %.2f hPa", data.pressure / 100.0l);
+        Paint_DrawString_EN(0, 16, buf, &Font16, 0x0000, 0xffff);
+
+        sprintf(buf, "H: %.2f %%rH", data.humidity / 1000.0l);
+        Paint_DrawString_EN(0, 32, buf, &Font16, 0x0000, 0xffff);
+
         //printf("%.2f,%.2f,%.2f\n", data.temperature / 100.0f,
         //    data.pressure / 100.0f, data.humidity / 1000.0f );
         /* Avoid using measurements from an unstable heating setup */
-        if(data.status & BME680_GASM_VALID_MSK)
+        if(data.status & BME680_GASM_VALID_MSK) {
             printf(", G: %d ohms", data.gas_resistance);
+            sprintf(buf, "G: %d ohms", data.gas_resistance);
+            Paint_DrawString_EN(0, 48, buf, &Font16, 0x0000, 0xffff);
+        }
+
+        LCD_Update();
 
         printf("\n");
 

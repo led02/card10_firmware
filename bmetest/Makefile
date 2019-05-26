@@ -67,8 +67,6 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
-SRCS  += oled96.c
-SRCS  += fonts.c
 SRCS  += pmic.c
 SRCS  += bosch.c
 SRCS  += bhy_support.c bhy_uc_driver.c bhy.c
@@ -79,6 +77,7 @@ SRCS  += LCD_Driver.c
 SRCS  += GUI_Paint.c
 SRCS  += DEV_Config.c
 SRCS  += font24.c
+SRCS  += font16.c
 SRCS  += font24CN.c
 SRCS  += card10.c
 SRCS  += display.c
