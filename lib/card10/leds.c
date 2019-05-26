@@ -3,10 +3,11 @@
 #include <stdint.h>
 #include <string.h>
 
+#define NUM_LEDS    15
+
 static const gpio_cfg_t rgb_dat_pin = {PORT_1, PIN_14, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 static const gpio_cfg_t rgb_clk_pin = {PORT_1, PIN_15, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-static uint8_t led_dim = 8;
-static uint8_t leds[15][3];
+static uint8_t leds[NUM_LEDS][4];
 
 /***** Functions *****/
 // *****************************************************************************
@@ -159,9 +160,9 @@ static void leds_stop(void)
     shift(0xFF); shift(0xFF); shift(0xFF); shift(0xFF);
 }
 
-void leds_set_dim(uint8_t dim)
+void leds_set_dim(uint8_t led, uint8_t dim)
 {
-    led_dim = dim;
+    leds[led][3] = dim;
 }
 
 void leds_set(uint8_t led, uint8_t r, uint8_t g, uint8_t b)
@@ -183,8 +184,8 @@ void leds_set_hsv(uint8_t led, float h, float s, float v)
 void leds_update(void)
 {
     leds_start();
-    for(int i=3; i>=0; i--) {
-        leds_shift(leds[i][0], leds[i][1], leds[i][2], led_dim);
+    for(int i=NUM_LEDS-1; i>=0; i--) {
+        leds_shift(leds[i][0], leds[i][1], leds[i][2], leds[i][3]);
     }
     leds_stop();
 }
@@ -198,7 +199,11 @@ void leds_init(void)
     GPIO_OutClr(&rgb_dat_pin);
 
     memset(leds, 0, sizeof(leds));
-    led_dim = 8;
+
+    for(int i=0; i<NUM_LEDS; i++) {
+        leds[i][3] = 8;
+    }
+
     leds_update();
 }
 
