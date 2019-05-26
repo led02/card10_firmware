@@ -34,8 +34,9 @@ int main(void)
     Paint_DrawCircle(85,25, 22, GREEN, DRAW_FILL_EMPTY, DOT_PIXEL_2X2);
 
     Paint_DrawImage(gImage_40X40,120, 0,40, 40);
-    DEV_Delay_ms(10000);
     Paint_DrawImage(gImage_160X80,0, 0, 160, 80);
+    LCD_Update();
+    DEV_Delay_ms(3000);
 
     while (1) {
         TMR_Delay(MXC_TMR0, MSEC(1000), 0);

@@ -29,6 +29,7 @@ int main(void)
     card10_diag();
 
     Paint_DrawImage(Heart, 0, 0, 160, 80);
+    LCD_Update();
 
     int h = 0;
     while (1) {

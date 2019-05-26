@@ -36,26 +36,13 @@
 
 //const gpio_cfg_t DEV_CS_PIN = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 //const gpio_cfg_t DEV_BL_PIN = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+static spi_req_t req = {.rx_data = NULL, .bits=8, .width = SPI17Y_WIDTH_1, .ssel = 0, .deass = 1, .ssel_pol = SPI17Y_POL_LOW, .tx_num = 0, .rx_num = 0};
 
 /********************************************************************************/
 void lcd_write(uint8_t *data, int size)
 {
-    spi_req_t req;
-    //uint8_t tx_data[] = {data};
-    //uint8_t rx_data[] = {0};
-    //req.tx_data = tx_data;
     req.tx_data = data;
-    //req.rx_data = rx_data;
-    req.rx_data = NULL;
     req.len = size;
-    req.bits = 8;
-    req.width = SPI17Y_WIDTH_1;
-    req.ssel = 0;
-    req.deass = 1;
-    req.ssel_pol = SPI17Y_POL_LOW;
-    req.tx_num = 0;
-    req.rx_num = 0;
-
     SPI_MasterTrans(SPI, &req);
 }
 

@@ -28,6 +28,7 @@
 #
 ******************************************************************************/
 #include "LCD_Driver.h"
+static uint8_t screen[LCD_HEIGHT][LCD_WIDTH][2];
 
 /*******************************************************************************
 function:
@@ -216,7 +217,7 @@ void LCD_SetCursor(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD  Yend)
 
 	LCD_WriteReg(0x2C);
 }
-
+#if 0
 /******************************************************************************
 function:	Clear screen function, refresh the screen to a certain color
 parameter	:
@@ -232,6 +233,7 @@ void LCD_Clear(UWORD Color)
 		}
 	 }
 }
+#endif
 
 /******************************************************************************
 function:	Refresh a certain area to the same color
@@ -275,12 +277,29 @@ parameter	:
 	  Y			:		Set the Y coordinate
 	  Color :		Set the color
 ******************************************************************************/
+#if 0
 void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
 {
 	LCD_SetCursor(x,y,x,y);
 	LCD_WriteData_Word(Color); 	    
 } 
+#endif
 
+void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
+{
+    screen[y][x][0] = (Color >> 8);
+    screen[y][x][1] = (Color & 0xFF);
+}
+
+void LCD_Clear(UWORD Color)
+{
+	UWORD i,j;
+	for(i = 0; i < LCD_WIDTH; i++){
+		for(j = 0; j < LCD_HEIGHT; j++){
+			LCD_SetUWORD(i, j, Color);
+		}
+	 }
+}
 
 void LCD_Set(uint8_t *data, int len)
 {
@@ -288,3 +307,9 @@ void LCD_Set(uint8_t *data, int len)
 	DEV_Digital_Write(DEV_DC_PIN,1);
     lcd_write(data, len);
 }
+
+void LCD_Update(void)
+{
+    LCD_Set((uint8_t*)screen, sizeof(screen));
+}
+

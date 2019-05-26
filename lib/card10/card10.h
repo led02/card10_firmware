@@ -1,5 +1,7 @@
 #ifndef CARD10_H
 
+#include "gpio.h"
+
 #include <stdint.h>
 
 void card10_init(void);
