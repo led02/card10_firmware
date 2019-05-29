@@ -29,7 +29,8 @@ void pmic_init(void)
 #if BOARD_EVKIT
     MAX77650_setTV_SBB2(0b110010); //Set output Voltage of SBB2 to 3.3V
 #else
-    MAX77650_setTV_SBB2(0b110100); //Set output Voltage of SBB2 to 5.0V
+    //MAX77650_setTV_SBB2(0b110100); //Set output Voltage of SBB2 to 5.0V
+    MAX77650_setTV_SBB2(0b010010); //Set output Voltage of SBB2 to 3.3V
 #endif
     MAX77650_setADE_SBB2(0b0); //Disable Active Discharge at SBB2 Output
     MAX77650_setEN_SBB2(0b110); //Enable SBB2 is on irrespective of FPS whenever the on/off controller is in its "On via Software" or "On via On/Off Controller" states
