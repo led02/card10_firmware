@@ -44,6 +44,14 @@ Info : Listening on port 3333 for gdb connections
 
 ```
 
+## Debugger Connection
+If you have the debugger provided with the `card10`, connect it as follows:
+  - `HDK`: This connection provides debugging (SWD) and UART
+  - `DEV`: This connection provides power (battery charger) and the native USB connection (bootloader)
+  - `USB-C`: Connect the proved USB-C cable with the side which has the blue dot, so the blue dots have the same side
+
+Now connect the USB-C cable, so the name of the cable manufacturer facing downwards (i.e. is not visible when looking at the display).
+
 ## Compiling
 Simply go to an example and run `make`. If you used the `./build_image` command before (see section "Bootloader"), run a `make clean` before. TODO: Unify the two build options.
 
