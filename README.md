@@ -91,7 +91,7 @@ The bootloader is used to flash card10 without an external debugger. It exposes 
 
 To flash the bootloader, go to the `bootloader` directory and follow the steps above.
 
-To execute the bootloader, turn off card10, press the lower right button and turn on. Connect card10 via a USB cable to a computer and mount the file system. You can now copy your card10.bin file to the file system. Eject the drive (IMPORTANT!) via your operating system. Turn card10 off and back on again. It will try to boot the image.
+To execute the bootloader, turn off card10, press the lower right button and turn on. Connect card10 via a USB cable to a computer and mount the file system. You can now copy your card10.bin file to the file system. Eject the drive (IMPORTANT!) via your operating system (`umount` and `sync` is not enough). Turn card10 off and back on again. It will try to boot the image.
 
 IMPORTANT: The prototypes have the USB data lines reversed. Use the provided USB adapter to connect card10.
 
