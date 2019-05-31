@@ -230,6 +230,11 @@ int main(void)
     GPIO_IntEnable(&interrupt_pin);
     NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
 
+// uncomment this to switch ECG to USB connector
+#if 0 
+    const gpio_cfg_t analog_switch = {PORT_0, PIN_31, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+    GPIO_OutSet(&analog_switch);
+#endif
 
     ecg_config();
 
