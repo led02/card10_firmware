@@ -1,16 +1,17 @@
+#!/usr/bin/env python3
 import sys
 import crc16
 
 crc = 0
 
-data = open(sys.argv[1]).read()
+data = open(sys.argv[1], 'rb').read()
 crc = crc16.crc16xmodem(data)
-print crc
+print(crc)
 
-padded = data + chr(crc >> 8) + chr(crc & 0xFF)
+padded = data + bytes([crc >> 8, crc & 0xFF])
 
 crc = 0
 crc = crc16.crc16xmodem(padded)
-print crc
+print(crc)
 
-open(sys.argv[1], 'w').write(padded)
+open(sys.argv[1], 'wb').write(padded)
