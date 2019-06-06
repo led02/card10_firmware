@@ -60,6 +60,8 @@ void pmic_init(void)
     MAX77650_setICHGIN_LIM(1);      // 190 mA limit on USB
     MAX77650_setCHG_CC(0b1011);     // 90 mA fast charge current
     MAX77650_setCHG_EN(1);          // Turn on charger
+
+    MAX77650_setVSYS_REG(0b11000);  // Set VSYS to 4.7 V to reduce voltage across bypass diode
 }
 
 void pmic_set_led(uint8_t led, uint8_t val)
