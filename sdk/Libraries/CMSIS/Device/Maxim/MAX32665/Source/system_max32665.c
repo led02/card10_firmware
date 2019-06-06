@@ -163,9 +163,8 @@ __weak void SystemInit(void)
     // All GPIO on port 0 to 1.8 V first
     MXC_GPIO0->vssel = 0;
     MXC_GPIO0->vssel |= (1UL << 0) | (1UL << 1) | (1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5); // Flash
-    MXC_GPIO0->vssel |= (1UL << 6) | ( 1UL << 7); // USB I2C
+    MXC_GPIO0->vssel |= (1UL << 6) | ( 1UL << 7); // 3.3V I2C
     MXC_GPIO0->vssel |= (1UL << 8); // Motor FET
-    MXC_GPIO0->vssel |= (1UL << 9) | (1UL << 10); // USB UART
     MXC_GPIO0->vssel |= (1UL << 20) | (1UL << 21) | (1UL << 22) | (1UL << 29); // Wristband
     MXC_GPIO0->vssel |= (1UL << 17) | (1UL << 23) | (1UL << 28); // GPIO to TOP
     MXC_GPIO0->vssel |= (1UL << 24) | (1UL << 25) | (1UL << 26) | (1UL << 27); // SPI to TOP
