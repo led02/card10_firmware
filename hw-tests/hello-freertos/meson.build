@@ -20,7 +20,7 @@ executable(
   name + '.elf',
   sources,
   include_directories: freertos_sdk_includes,
-  dependencies: [libcard10],
+  dependencies: [libcard10, max32665_startup],
   link_with: freertos,
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
