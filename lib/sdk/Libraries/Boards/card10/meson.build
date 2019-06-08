@@ -8,6 +8,7 @@ sources = files(
   '../Source/led.c',
   '../Source/mx25.c',
   '../Source/pb.c',
+  '../Source/stdio.c',
 )
 
 lib = static_library(
@@ -17,15 +18,7 @@ lib = static_library(
   dependencies: periphdriver,
 )
 
-libstdio = static_library(
-  'board-stdio',
-  '../Source/stdio.c',
-  include_directories: includes,
-  dependencies: periphdriver,
-)
-
 board_card10 = declare_dependency(
   include_directories: includes,
-  link_with: lib,
-  link_whole: libstdio,
+  link_whole: lib,
 )
