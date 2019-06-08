@@ -61,6 +61,7 @@ Initialize the build-system by running `meson --cross-file card10-cross.ini buil
   - `hw-tests/hello-world/hello-world.elf`
   - `hw-tests/imutest/imutest.elf`
   - `hw-tests/ips/ips.elf`
+  - `hw-tests/dual-core/dual-core{0,1}.elf`
 
 ## Flashing
 Run `arm-none-eabi-gdb` in the applications folder. It should connect to OpenOCD and say something like:
