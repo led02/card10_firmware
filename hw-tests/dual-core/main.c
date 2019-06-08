@@ -56,5 +56,12 @@ int main(void)
         leds_update();
         TMR_Delay(MXC_TMR0, MSEC(10), 0);
         h++;
+
+        // Send a txev using `sev` every once in a while to wake up core1
+        // and let it do something
+        if (h % 100 == 0) {
+            printf("core0: Triggering core1 using SEV ...\n");
+            __asm volatile("sev");
+        }
     }
 }
