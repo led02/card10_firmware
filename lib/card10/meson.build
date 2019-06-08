@@ -9,11 +9,7 @@ sources = files(
   'pmic.c',
 )
 
-lib = static_library(
-  'card10',
-  sources,
-  include_directories: includes,
-  dependencies: [
+deps = [
     bhy1,
     bma400,
     bme680,
@@ -21,20 +17,17 @@ lib = static_library(
     libgfx,
     max77650,
     periphdriver,
-  ],
+]
+
+lib = static_library(
+  'card10',
+  sources,
+  include_directories: includes,
+  dependencies: deps,
 )
 
 libcard10 = declare_dependency(
   include_directories: includes,
   link_with: lib,
-  dependencies: [
-    bhy1,
-    bma400,
-    bme680,
-    board_card10,
-    libgfx,
-    max32665_rt,
-    max77650,
-    periphdriver,
-  ],
+  dependencies: deps + [max32665_rt],
 )
