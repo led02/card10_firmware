@@ -5,12 +5,12 @@ sources = files(
 )
 
 lib = static_library(
-  'max32665-rt',
+  'max32665-startup',
   sources,
   dependencies: periphdriver,
 )
 
-max32665_rt = declare_dependency(
+max32665_startup = declare_dependency(
   link_whole: lib,
   link_args: [
     '-T', meson.current_source_dir() + 'Source/GCC/max32665.ld',

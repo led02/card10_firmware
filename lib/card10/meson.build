@@ -29,5 +29,5 @@ lib = static_library(
 libcard10 = declare_dependency(
   include_directories: includes,
   link_with: lib,
-  dependencies: deps + [max32665_rt],
+  dependencies: [deps, max32665_startup],
 )
