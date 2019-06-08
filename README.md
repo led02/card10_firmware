@@ -53,8 +53,14 @@ If you have the debugger provided with the `card10`, connect it as follows:
 Now connect the USB-C cable, so the name of the cable manufacturer facing downwards (i.e. is not visible when looking at the display).
 
 ## Compiling
-Simply go to an example and run `make`. If you used the `./build_image` command before (see section "Bootloader"), run a `make clean` before. TODO: Unify the two build options.
-
+Initialize the build-system by running `meson --cross-file card10-cross.ini build/` in the main directory.  Then you can build either everything using `ninja -C build/`, or build individual binaries by choosing one of the following targets (`ninja -C build/ <target>`):
+  - `hw-tests/bmatest/bmatest.elf`
+  - `hw-tests/bmetest/bmetest.elf`
+  - `hw-tests/ecgtest/ecgtest.elf`
+  - `hw-tests/hello-freertos/hello-freertos.elf`
+  - `hw-tests/hello-world/hello-world.elf`
+  - `hw-tests/imutest/imutest.elf`
+  - `hw-tests/ips/ips.elf`
 
 ## Flashing
 Run `arm-none-eabi-gdb` in the applications folder. It should connect to OpenOCD and say something like:
@@ -75,12 +81,13 @@ Transfer rate: 19 KB/sec, 11042 bytes/write.
 (gdb)
 ```
 
-To run the program, type: `mon mww 0x40000004 0x80000000`. This is a quirk as the prototypes to not have a reset line exposed to the debugger. Will be solved with production hardware.
+To run the program, type: `reset` (which runs `mon mww 0x40000004 0x80000000`). This is a quirk as the prototypes to not have a reset line exposed to the debugger. Will be solved with production hardware.
 
 TODO: Provide a make command to flash card10.
 
 ## Debugging
-After flashing and the initial reset using `mon mww 0x40000004 0x80000000`, you can say `mon reset halt` and then `continue`. You can now debug as usual.
+After flashing and the initial reset using `reset`, you can say `mon reset halt` and then `continue`. You can now debug as usual.
+(`reset` is defined in `.gdbinit` and runs `mon mww 0x40000004 0x80000000`)
 
 ## Serial Console
 card10 outputs debug information on the serial console. Baudrate is 115200. The provided USB adapter creates a CDC device (under Linux /dev/ttyACM0). You can use screen to open and view it: `screen /dev/ttyACM0 115200`.
