@@ -6,5 +6,7 @@ subdir('./vendor/Bosch/BMA400/')
 subdir('./vendor/Maxim/MAX77650/')
 subdir('./gfx/')
 
+subdir('./micropython/')
+
 subdir('./card10/')
 subdir('./ff13/')
