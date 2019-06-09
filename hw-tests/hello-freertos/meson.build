@@ -1,11 +1,13 @@
 name = 'hello-freertos'
 
 freertos = static_library(
-  'freertos-sdk',
-  freertos_sdk_sources,
+  'freertos',
+  freertos_sources,
+  freertos_cli_sources,
   dependencies: periphdriver,
   include_directories: [
-    freertos_sdk_includes,
+    freertos_includes,
+    freertos_cli_includes,
     include_directories('./'),
   ]
 )
@@ -19,7 +21,7 @@ sources = files(
 elf = executable(
   name + '.elf',
   sources,
-  include_directories: freertos_sdk_includes,
+  include_directories: [freertos_includes, freertos_cli_includes],
   dependencies: [libcard10, max32665_startup],
   link_with: freertos,
   link_whole: [max32665_startup_lib, board_card10_lib],
