@@ -1,5 +1,11 @@
 name = 'upy-minimal'
 
+modsrc = files(
+  'modules/buzzer.c',
+  'modules/leds.c',
+  'modules/utime.c',
+)
+
 #################################
 # MicroPython Generated Headers #
 #################################
@@ -18,14 +24,14 @@ version_h = custom_target(
 modules_h = custom_target(
   'moduledefs.h',
   output: 'moduledefs.h',
-  input: micropython_sources,
+  input: [micropython_sources, modsrc],
   command: [micropython_gen_modules, '@OUTPUT@', '@INPUT@'],
 )
 
 qstr_h = custom_target(
   'qstrdefs.generated.h',
   output: 'qstrdefs.generated.h',
-  input: [modules_h, version_h, micropython_sources],
+  input: [modules_h, version_h, micropython_sources, 'modules/qstr.h'],
   command: [micropython_gen_qstr, meson.current_source_dir(), '@OUTPUT@', '@INPUT@'],
 )
 
@@ -48,6 +54,7 @@ executable(
   'main.c',
   'uart.c',
   'systick.c',
+  modsrc,
   qstr_h,
   include_directories: micropython_includes,
   dependencies: [libcard10, max32665_startup],

@@ -18,6 +18,7 @@ micropython_gen_qstr = [
 micropython_includes = include_directories(
   './micropython/',
   './micropython/lib/utils',
+  './micropython/extmod/',
 )
 
 micropython_sources = files(
@@ -139,4 +140,5 @@ micropython_additional_sources = files(
   'micropython/lib/utils/stdout_helpers.c',
   'micropython/lib/utils/pyexec.c',
   'micropython/lib/mp-readline/readline.c',
+  'micropython/extmod/utime_mphal.c',
 )

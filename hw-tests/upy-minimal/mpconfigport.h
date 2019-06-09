@@ -61,6 +61,7 @@
 #define MICROPY_PY_UTIME_MP_HAL     (1)
 #define MODULE_BUZZER_ENABLED       (1)
 #define MODULE_UTIME_ENABLED        (1)
+#define MODULE_LEDS_ENABLED        (1)
 
 // type definitions for the specific machine
 
