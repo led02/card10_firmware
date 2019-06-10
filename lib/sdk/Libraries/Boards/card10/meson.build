@@ -11,7 +11,7 @@ sources = files(
   '../Source/stdio.c',
 )
 
-lib = static_library(
+board_card10_lib = static_library(
   'board-card10',
   sources,
   include_directories: includes,
@@ -20,5 +20,4 @@ lib = static_library(
 
 board_card10 = declare_dependency(
   include_directories: includes,
-  link_whole: lib,
 )
