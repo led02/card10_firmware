@@ -1,0 +1,35 @@
+image: "debian"
+
+build:
+    stage: build
+    before_script:
+        - apt update -qq && apt install -y -qq gcc-arm-none-eabi python3-pip
+        - pip3 install crc16
+    script:
+        - cd bootloader
+        - make
+        - cd ..
+        - cd Hello_World
+        - ./build_image
+        - cd ..
+        - cd Hello_World_FreeRTOS
+        - ./build_image
+        - cd ..
+        - cd ble
+        - ./build_image
+        - cd ..
+        - cd bmatest
+        - ./build_image
+        - cd ..
+        - cd bmetest
+        - ./build_image
+        - cd ..
+        - cd ecgtest
+        - ./build_image
+        - cd ..
+        - cd imutest
+        - ./build_image
+        - cd ..
+        - cd ips
+        - ./build_image
+        - cd ..
