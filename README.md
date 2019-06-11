@@ -1,15 +1,37 @@
 # card10 Firmware Readme
 
-## Toolchain
+## Setup
+To compile the firmware you need `meson`(>0.40.0) and a `arm-none-eabi-gcc`.  You should also have python3 installed on your system.
 
-The card10 is based on an ARM Cortex-M4F CPU. To compile the firmware, you need a working cross compiler. To flash the firmware, you either need to use the bootloader or an SWD adapter and OpenOCD.
+### Compiler (`arm-none-eabi-gcc`)
+Install the cross-compiler and debugger either from your distributions repositories, or alternatively download a precompiled toolchain from [ARM](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
 
+On Ubuntu, the package is called `gcc-arm-none-eabi`
 
-### GCC
+### Compiling the card10 firmware
+```bash
+# Configure the build system
+./bootstrap.sh
+# Start the build
+ninja -C build/
+```
 
-Please install `arm-none-eabi-gcc` on your system. Most distributions have it packaged (might be named `gcc-arm-none-eabi`). You can also download a precompiled toolchain from [ARM](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
+You can also build individual targets using
+```bash
+ninja -C build/ <target>
+```
 
-### GDB
+where `target` is one of
+  - `hw-tests/bmatest/bmatest.elf` - Test for `BMA400`
+  - `hw-tests/bmetest/bmetest.elf` - Test for `BME680`
+  - `hw-tests/ecgtest/ecgtest.elf` - Test for `MAX30003` ECG
+  - `hw-tests/hello-freertos/hello-freertos.elf` - FreeRTOS Demo
+  - `hw-tests/hello-world/hello-world.elf` - General Demo
+  - `hw-tests/imutest/imutest.elf` - Compass Test
+  - `hw-tests/ips/ips.elf` - Display Test
+  - `hw-tests/dual-core/dual-core{0,1}.elf` - Dual-Core Demo
+
+### GDB (`arm-none-eabi-gdb`)
 
 If you want to debug code or replace the bootloader, you need OpenOCD and GDB.
 
@@ -53,17 +75,6 @@ If you have the debugger provided with the `card10`, connect it as follows:
   - `USB-C`: Connect the proved USB-C cable with the side which has the blue dot, so the blue dots have the same side
 
 Now connect the USB-C cable, so the name of the cable manufacturer facing downwards (i.e. is not visible when looking at the display).
-
-## Compiling
-Initialize the build-system by running `meson --cross-file card10-cross.ini build/` in the main directory.  Then you can build either everything using `ninja -C build/`, or build individual binaries by choosing one of the following targets (`ninja -C build/ <target>`):
-  - `hw-tests/bmatest/bmatest.elf`
-  - `hw-tests/bmetest/bmetest.elf`
-  - `hw-tests/ecgtest/ecgtest.elf`
-  - `hw-tests/hello-freertos/hello-freertos.elf`
-  - `hw-tests/hello-world/hello-world.elf`
-  - `hw-tests/imutest/imutest.elf`
-  - `hw-tests/ips/ips.elf`
-  - `hw-tests/dual-core/dual-core{0,1}.elf`
 
 ## Flashing
 Run `arm-none-eabi-gdb` in the applications folder. It should connect to OpenOCD and say something like:
