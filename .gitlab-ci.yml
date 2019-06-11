@@ -3,8 +3,8 @@ image: "debian"
 build:
     stage: build
     before_script:
-        - apt update -qq && apt install -y -qq gcc-arm-none-eabi python-pip
-        - pip install crc16
+        - apt update -qq && apt install -y -qq gcc-arm-none-eabi python3-pip
+        - pip3 install crc16
     script:
         - cd bootloader
         - make
