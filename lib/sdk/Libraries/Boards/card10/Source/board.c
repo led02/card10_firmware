@@ -53,6 +53,7 @@ extern uint32_t SystemCoreClock;
 const gpio_cfg_t pb_pin[] = {
     {PORT_0, PIN_23, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO3 / Button 1
     {PORT_0, PIN_20, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // Wristband GPIO1
+    {PORT_1, PIN_7, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO5 / Button 2
 };
 const unsigned int num_pbs = (sizeof(pb_pin) / sizeof(gpio_cfg_t));
 
