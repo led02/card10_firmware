@@ -23,6 +23,9 @@
 /***** Definitions *****/
 
 /***** Globals *****/
+static bool ecg_switch;
+static bool internal_pull;
+
 
 /***** Functions *****/
 static uint32_t ecg_read_reg(uint8_t reg)
@@ -66,7 +69,7 @@ static void ecg_write_reg(uint8_t reg, uint32_t data)
     SPI_MasterTrans(SPI0, &req);
 }
 
-static void ecg_config(void)
+static void ecg_config(bool enable_internal_pull)
 {
     // Reset ECG to clear registers
     ecg_write_reg(SW_RST , 0);
@@ -74,9 +77,16 @@ static void ecg_config(void)
     // General config register setting
     union GeneralConfiguration_u CNFG_GEN_r;
     CNFG_GEN_r.bits.en_ecg = 1;     // Enable ECG channel
-    CNFG_GEN_r.bits.rbiasn = 1;     // Enable resistive bias on negative input
-    CNFG_GEN_r.bits.rbiasp = 1;     // Enable resistive bias on positive input
-    CNFG_GEN_r.bits.en_rbias = 1;   // Enable resistive bias
+    if(enable_internal_pull) {
+        CNFG_GEN_r.bits.rbiasn = 1;     // Enable resistive bias on negative input
+        CNFG_GEN_r.bits.rbiasp = 1;     // Enable resistive bias on positive input
+        CNFG_GEN_r.bits.en_rbias = 1;   // Enable resistive bias
+    } else {
+        CNFG_GEN_r.bits.rbiasn = 0;     // Enable resistive bias on negative input
+        CNFG_GEN_r.bits.rbiasp = 0;     // Enable resistive bias on positive input
+        CNFG_GEN_r.bits.en_rbias = 0;   // Enable resistive bias
+    }
+
     CNFG_GEN_r.bits.imag = 2;       // Current magnitude = 10nA
     CNFG_GEN_r.bits.en_dcloff = 1;  // Enable DC lead-off detection
     ecg_write_reg(CNFG_GEN , CNFG_GEN_r.all);
@@ -131,12 +141,11 @@ static void ecg_config(void)
 #define SIZE_X 160
 #define SIZE_Y 80
 
-static uint16_t content[SIZE_X*SIZE_Y];
 static uint8_t prev;
 
 static void clear(void)
 {
-    memset(content, 0x00, sizeof(content));
+    Paint_Clear(BLACK);
     prev = 32;
 }
 
@@ -147,7 +156,7 @@ static void set(uint8_t index, int8_t val)
     if(val < -31) val = -31;
     if(val > 32) val = 32;
 
-    int8_t pos = val + 32;
+    int8_t pos = 32 + val;
 
     int min, max;
     if(prev < pos) {
@@ -159,55 +168,50 @@ static void set(uint8_t index, int8_t val)
     }
 
     for(int i = min; i < max + 1; i++) {
-        uint16_t *p = content;
-        p += i * SIZE_X + (SIZE_X - index - 1);
-        *p = 0x00F8;
+        LCD_SetUWORD(SIZE_X - index - 1, i, RED);
     }
 
     prev = pos;
 }
 
-static int16_t samples[SIZE_X*2];
-
+static int16_t samples[SIZE_X];
 void update(void)
 {
     clear();
-    int16_t scale = 0;
-    for(int i=0; i<SIZE_X*2; i++) {
-        if(abs(samples[i]) > scale) {
-            scale = abs(samples[i]);
+
+    char buf[128];
+    sprintf(buf, "Switch: %d  Pull: %d", ecg_switch, internal_pull);
+    Paint_DrawString_EN(0, 0, buf, &Font8, 0x0000, 0xffff);
+
+
+    int16_t max = 0;
+    for(int i=0; i<SIZE_X; i++) {
+        if(abs(samples[i]) > max) {
+            max = abs(samples[i]);
         }
     }
 
-    scale /= 32;
+    int16_t scale = max / 32;
 
     for(int i=0; i<SIZE_X; i++) {
-        set(i, ((samples[i*2] + samples[i*2 + 1]) / scale) / 2);
+        set(i, (samples[i] / scale));
+        //set(i, ((samples[i*2] + samples[i*2 + 1]) / scale) / 2);
     }
 
-    LCD_Set((uint8_t*)content, sizeof(content));
+    LCD_Update();
 }
 
 static uint8_t sample_count = 0;
 
 static void add_sample(int16_t sample)
 {
-#if 1
-    memmove(samples, samples + 1, sizeof(*samples) * (SIZE_X*2-1));
-    samples[SIZE_X*2-1] = sample;
-#else
-    static index = 0;
-    samples[index] = sample;
-    index++;
-    if(index == SIZE_X*2) {
-        index = 0;
-    }
-#endif
+    memmove(samples, samples + 1, sizeof(*samples) * (SIZE_X-1));
+    samples[SIZE_X-1] = sample;
     sample_count++;
 
     if(sample_count == 5) {
-        update();
         sample_count = 0;
+        update();
     }
 }
 
@@ -230,13 +234,15 @@ int main(void)
     GPIO_IntEnable(&interrupt_pin);
     NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(PORT_1));
 
-// uncomment this to switch ECG to USB connector
-#if 0 
     const gpio_cfg_t analog_switch = {PORT_0, PIN_31, GPIO_FUNC_OUT, GPIO_PAD_NONE};
-    GPIO_OutSet(&analog_switch);
-#endif
+    GPIO_Config(&analog_switch);
 
-    ecg_config();
+
+    ecg_switch = false;
+    GPIO_OutClr(&analog_switch); // Wrist
+
+    internal_pull = true;
+    ecg_config(internal_pull);
 
     for(int i=0; i<0x20; i++) {
         uint32_t val = ecg_read_reg(i);
@@ -258,6 +264,22 @@ int main(void)
         // Read back ECG samples from the FIFO
         if( ecgFIFOIntFlag ) {
             ecgFIFOIntFlag = false;
+
+            if(PB_Get(0)) {
+                ecg_switch = !ecg_switch;
+                while(PB_Get(0));
+                if(ecg_switch) {
+                    GPIO_OutSet(&analog_switch); // USB
+                } else {
+                    GPIO_OutClr(&analog_switch); // Wrist
+                }
+            }
+
+            if(PB_Get(2)) {
+                internal_pull =! internal_pull;
+                while(PB_Get(2));
+                ecg_config(internal_pull);
+            }
 
             //printf("Int\n");
             status = ecg_read_reg( STATUS );      // Read the STATUS register
@@ -291,7 +313,6 @@ int main(void)
                     //printf("%6d\r\n", ecgSample[idx]);
                     add_sample(ecgSample[idx]);
                 }
-
             }
         }
     }
