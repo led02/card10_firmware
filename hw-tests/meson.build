@@ -1,0 +1,8 @@
+subdir('bmatest/')
+subdir('bmetest/')
+subdir('dual-core/')
+subdir('ecgtest/')
+subdir('hello-freertos/')
+subdir('hello-world/')
+subdir('imutest/')
+subdir('ips/')

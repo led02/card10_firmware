@@ -1,15 +1,37 @@
 # card10 Firmware Readme
 
-## Toolchain
+## Setup
+To compile the firmware you need `meson`(>0.40.0) and a `arm-none-eabi-gcc`.  You should also have python3 installed on your system.
 
-The card10 is based on an ARM Cortex-M4F CPU. To compile the firmware, you need a working cross compiler. To flash the firmware, you either need to use the bootloader or an SWD adapter and OpenOCD.
+### Compiler (`arm-none-eabi-gcc`)
+Install the cross-compiler and debugger either from your distributions repositories, or alternatively download a precompiled toolchain from [ARM](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
 
+On Ubuntu, the package is called `gcc-arm-none-eabi`
 
-### GCC
+### Compiling the card10 firmware
+```bash
+# Configure the build system
+./bootstrap.sh
+# Start the build
+ninja -C build/
+```
 
-Please install `arm-none-eabi-gcc` on your system. Most distributions have it packaged (might be named `gcc-arm-none-eabi`). You can also download a precompiled toolchain from [ARM](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
+You can also build individual targets using
+```bash
+ninja -C build/ <target>
+```
 
-### GDB
+where `target` is one of
+  - `hw-tests/bmatest/bmatest.elf` - Test for `BMA400`
+  - `hw-tests/bmetest/bmetest.elf` - Test for `BME680`
+  - `hw-tests/ecgtest/ecgtest.elf` - Test for `MAX30003` ECG
+  - `hw-tests/hello-freertos/hello-freertos.elf` - FreeRTOS Demo
+  - `hw-tests/hello-world/hello-world.elf` - General Demo
+  - `hw-tests/imutest/imutest.elf` - Compass Test
+  - `hw-tests/ips/ips.elf` - Display Test
+  - `hw-tests/dual-core/dual-core{0,1}.elf` - Dual-Core Demo
+
+### GDB (`arm-none-eabi-gdb`)
 
 If you want to debug code or replace the bootloader, you need OpenOCD and GDB.
 
@@ -54,10 +76,6 @@ If you have the debugger provided with the `card10`, connect it as follows:
 
 Now connect the USB-C cable, so the name of the cable manufacturer facing downwards (i.e. is not visible when looking at the display).
 
-## Compiling
-Simply go to an example and run `make`. If you used the `./build_image` command before (see section "Bootloader"), run a `make clean` before. TODO: Unify the two build options.
-
-
 ## Flashing
 Run `arm-none-eabi-gdb` in the applications folder. It should connect to OpenOCD and say something like:
 ```
@@ -77,12 +95,13 @@ Transfer rate: 19 KB/sec, 11042 bytes/write.
 (gdb)
 ```
 
-To run the program, type: `mon mww 0x40000004 0x80000000`. This is a quirk as the prototypes to not have a reset line exposed to the debugger. Will be solved with production hardware.
+To run the program, type: `reset` (which runs `mon mww 0x40000004 0x80000000`). This is a quirk as the prototypes to not have a reset line exposed to the debugger. Will be solved with production hardware.
 
 TODO: Provide a make command to flash card10.
 
 ## Debugging
-After flashing and the initial reset using `mon mww 0x40000004 0x80000000`, you can say `mon reset halt` and then `continue`. You can now debug as usual.
+After flashing and the initial reset using `reset`, you can say `mon reset halt` and then `continue`. You can now debug as usual.
+(`reset` is defined in `.gdbinit` and runs `mon mww 0x40000004 0x80000000`)
 
 ## Serial Console
 card10 outputs debug information on the serial console. Baudrate is 115200. The provided USB adapter creates a CDC device (under Linux /dev/ttyACM0). You can use screen to open and view it: `screen /dev/ttyACM0 115200`.

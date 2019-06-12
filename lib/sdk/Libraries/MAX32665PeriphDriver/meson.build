@@ -1,0 +1,60 @@
+includes = include_directories(
+  'Include/',
+  '../CMSIS/Device/Maxim/MAX32665/Include/',
+  '../CMSIS/Include/',
+)
+
+sources = files(
+  'Source/adc.c',
+  'Source/cipher.c',
+  'Source/crc.c',
+  'Source/dma.c',
+  'Source/dvs.c',
+  'Source/emcc.c',
+  'Source/flc.c',
+  'Source/gpio.c',
+  'Source/hash.c',
+  'Source/htmr.c',
+  'Source/i2c.c',
+  'Source/icc.c',
+  'Source/lp.c',
+  'Source/maa.c',
+  'Source/mem_utils.c',
+  'Source/mxc_assert.c',
+  'Source/mxc_delay.c',
+  'Source/mxc_lock.c',
+  'Source/mxc_pins.c',
+  'Source/mxc_sys.c',
+  'Source/nvic_table.c',
+  'Source/owm.c',
+  'Source/pt.c',
+  'Source/rpu.c',
+  'Source/rtc.c',
+  'Source/sdhc.c',
+  'Source/sema.c',
+  'Source/simo.c',
+  'Source/spi.c',
+  'Source/spi17y.c',
+  'Source/spixf.c',
+  'Source/spixfc.c',
+  'Source/spixr.c',
+  'Source/startup_core1.S',
+  'Source/system_core1.c',
+  'Source/tmr.c',
+  'Source/tmr_utils.c',
+  'Source/trng.c',
+  'Source/uart.c',
+  'Source/wdt.c',
+  'Source/wut.c',
+)
+
+lib = static_library(
+  'PeriphDriver',
+  sources,
+  include_directories: includes,
+)
+
+periphdriver = declare_dependency(
+  include_directories: includes,
+  link_with: lib,
+)
