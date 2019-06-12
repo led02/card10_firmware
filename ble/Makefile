@@ -67,8 +67,8 @@ endif
 
 # This is the path to the CMSIS root directory
 ifeq "$(MAXIM_PATH)" ""
-LIBS_DIR=../sdk/Libraries
-NDALIBS_DIR=../sdk/NDALibraries
+LIBS_DIR=../lib/sdk/Libraries
+NDALIBS_DIR=../lib/sdk/NDALibraries
 else
 LIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/Libraries)
 NDALIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/NDALibraries)
