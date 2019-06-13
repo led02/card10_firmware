@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "mxc_delay.h"
 #include "api.h"
+#include "tmr_utils.h"
 
 #include "api/api_dispatcher.h"
 
@@ -27,10 +28,18 @@ void api_set_led(uint8_t led, led_color_t color)
 int main(void)
 {
 	api_init(NULL);
+
+	while (1) {
+		api_dispatcher();
+                TMR_Delay(MXC_TMR1, MSEC(100), 0);
+	}
+
+#if 0
 	// Enable rxev on core1
 	MXC_GCR->evten |= 0x20;
 	for (int i = 0; 1; i++) {
 		__asm volatile("wfe");
 		printf("core1: Hello! %d\n", i);
 	}
+#endif
 }

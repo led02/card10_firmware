@@ -24,6 +24,13 @@ int main(void)
     card10_diag();
 
     printf("API Test.\n");
+    printf("core0: Starting dispatcher on core1\n");
+    Core1_Start();
+    TMR_Delay(MXC_TMR0, MSEC(100), 0);
+
+    api_set_buzzer(1);
+    TMR_Delay(MXC_TMR0, MSEC(300), 0);
+    api_set_buzzer(0);
 
     while(1) {
         printf("count = %d\n", count++);

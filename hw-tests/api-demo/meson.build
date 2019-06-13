@@ -30,7 +30,7 @@ name = 'api-demo-core1'
 
 executable(
   name + '.elf',
-  'test-payload.c',
+  'core1-dispatcher.c',
   './api/api_dispatcher.c',
   api_stubs[1],
   dependencies: [libcard10, max32665_startup_core1],
