@@ -1,4 +1,6 @@
-void* api_call_start (uint32_t id, void* args, size_t size)
+#include "api/api_caller.h"
+
+void* api_call_start (uint32_t id, void* args, uint32_t size)
 {
 	int ret;
 	// aquire semaphore

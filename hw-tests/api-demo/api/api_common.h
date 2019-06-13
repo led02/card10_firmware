@@ -9,4 +9,4 @@ struct api_call
 	unsigned char buf[1];
 };
 
-static struct api_call **ApiCallSpace = (void*)0x20080001;
+static struct api_call *ApiCallSpace = (struct api_call *)0x20080001;
