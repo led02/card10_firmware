@@ -1,3 +1,5 @@
+#include "mxc_errors.h"
+
 #include "api_common.h"
 
 void* api_call (uint32_t id, void *args, uint32_t size);
