@@ -3,6 +3,8 @@
 #include "mxc_delay.h"
 #include "api.h"
 
+#include "api/api_dispatcher.h"
+
 static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 void api_set_buzzer(uint8_t state)
@@ -24,6 +26,7 @@ void api_set_led(uint8_t led, led_color_t color)
 
 int main(void)
 {
+	api_init(NULL);
 	// Enable rxev on core1
 	MXC_GCR->evten |= 0x20;
 	for (int i = 0; 1; i++) {
