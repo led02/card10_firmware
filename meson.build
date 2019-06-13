@@ -27,5 +27,7 @@ add_global_link_arguments(
   language: 'c',
 )
 
+python3 = import('python').find_installation('python3')
+
 subdir('lib/')
 subdir('hw-tests/')

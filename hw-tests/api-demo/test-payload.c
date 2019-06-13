@@ -1,8 +1,26 @@
 #include "board.h"
 #include "gpio.h"
 #include "mxc_delay.h"
+#include "api.h"
 
 static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+
+void api_set_buzzer(uint8_t state)
+{
+	if (state) {
+		printf("API: Turning motor ON!\n");
+		GPIO_OutSet(&motor_pin);
+	} else {
+		printf("API: Turning motor OFF!\n");
+		GPIO_OutClr(&motor_pin);
+	}
+}
+
+void api_set_led(uint8_t led, led_color_t color)
+{
+	printf("API: Changing color of led %d.\n", led);
+	leds_set(led, color.red, color.green, color.blue);
+}
 
 int main(void)
 {
@@ -11,11 +29,5 @@ int main(void)
 	for (int i = 0; 1; i++) {
 		__asm volatile("wfe");
 		printf("core1: Hello! %d\n", i);
-
-#if 0
-		GPIO_OutSet(&motor_pin);
-		mxc_delay(30000);
-		GPIO_OutClr(&motor_pin);
-#endif
 	}
 }

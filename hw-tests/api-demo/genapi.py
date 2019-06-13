@@ -50,7 +50,12 @@ def main():
         f_client = cx.enter_context(open(args.client, "w"))
         f_server = cx.enter_context(open(args.server, "w"))
 
-        print('#include "{}"\n'.format(args.header))
+        print('#include "{}"\n'.format(
+            os.path.basename(args.header)
+        ), file=f_client)
+        print('#include "{}"\n'.format(
+            os.path.basename(args.header)
+        ), file=f_server)
 
         for match in matcher.finditer(source):
             api_id = match.group("id")
@@ -81,7 +86,8 @@ def main():
                     cdecl=api_decl,
                     cargs=api_args,
                     total_size=" + ".join(api_args_sizes),
-                )
+                ),
+                file=f_client,
             )
 
             for i, (arg, ty) in enumerate(zip(api_args_names, api_args_types)):
@@ -90,7 +96,8 @@ def main():
                         type=ty,
                         offset=" + ".join(api_args_sizes[:i]) if i > 0 else "0",
                         arg=arg,
-                    )
+                    ),
+                    file=f_client,
                 )
 
             print(
@@ -103,7 +110,8 @@ def main():
 }}
 """.format(
                     id=api_id
-                )
+                ),
+                file=f_client,
             )
 
 

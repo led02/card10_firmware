@@ -4,6 +4,7 @@
 
 #include "card10.h"
 #include "tmr_utils.h"
+#include "api.h"
 
 void Core1_Start(void) {
     //MXC_GCR->gp0 = (uint32_t)(&__isr_vector_core1);
