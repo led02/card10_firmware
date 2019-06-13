@@ -12,6 +12,9 @@ int api_init (sys_cfg_sema_t *sys_cfg)
 	return ret;
 }
 
+/* Generated function */
+void __api_dispatch_call(uint32_t id, void*buffer);
+
 void api_dispatcher()
 {
 	while (SEMA_GetSema(API_CALL_SEMA) == E_BUSY) {}
@@ -22,11 +25,7 @@ void api_dispatcher()
 	}
 
 	printf("core1: Catched API CALL!\n");
-	printf("%d: ",ApiCallSpace->id);
-	for (int i = 0; i < 16; i++) {
-		printf("0x%02x ", ((char*)ApiCallSpace->buf)[i]);
-	}
-	printf("\n");
+	__api_dispatch_call(ApiCallSpace->id, ApiCallSpace->buf);
 
 	ApiCallSpace->returning = 1;
 
