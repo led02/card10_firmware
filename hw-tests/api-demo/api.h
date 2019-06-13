@@ -18,4 +18,7 @@ typedef struct {
 #define API_LED 0xc0ffee
 API(API_LED, void api_set_led(uint8_t led, led_color_t color));
 
+#define API_TEST 0xdeadc0de
+API(API_TEST, void api_test(char test0, short test1, int test2, long test3));
+
 #endif /* _API_H */

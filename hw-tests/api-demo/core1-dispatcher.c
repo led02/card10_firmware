@@ -25,6 +25,12 @@ void api_set_led(uint8_t led, led_color_t color)
 	leds_set(led, color.red, color.green, color.blue);
 }
 
+void api_test(char test0, short test1, int test2, long test3)
+{
+	printf ("test0: %x, test1: %x, test2: %x, test3: %x\n",
+			test0, test1, test2, test3);
+}
+
 int main(void)
 {
 	api_init(NULL);
@@ -33,6 +39,7 @@ int main(void)
 		api_dispatcher();
                 TMR_Delay(MXC_TMR1, MSEC(100), 0);
 	}
+
 
 #if 0
 	// Enable rxev on core1
