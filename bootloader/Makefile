@@ -102,7 +102,7 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 #MXC_OPTIMIZE_CFLAGS=-Og
 
 # Point this variable to a linker file to override the default file
-# LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld
+LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC)_boot.ld
 
 ################################################################################
 # Include external library makefiles here
