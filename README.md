@@ -48,7 +48,7 @@ This allows gdb to use our .gdbinit files without specifying them on the command
 If you want to debug code or replace the bootloader, you need OpenOCD and GDB.
 
 Get OpenOCD from [Maxim](https://github.com/maximmbed/openocd) and checkout the `max32xxx` branch. Run `git submodule update --init`.
-Build using `./bootstrap`, `./configure` and 'make'. Make sure that the `CMSIS-DAP Compliant Debugger` is set to `yes(auto)` after running `./configure` (you might need to install libusb and other USB related libaries).
+Build using `./bootstrap`, `./configure` and 'make'. Make sure that the `CMSIS-DAP Compliant Debugger` is set to `yes(auto)` after running `./configure` (you might need to install libusb and other USB related libraries).
 If you get errors making the documentation you can `touch doc/openocd.info` to skip it and continue with 'make'.
 
 Please run `make install` after removing any already installed OpenOCD version. Otherwise please always specify the full path to openocd (the binary is under `src/openocd`, when calling `openocd`.
@@ -97,6 +97,8 @@ Transfer rate: 19 KB/sec, 11042 bytes/write.
 
 To run the program, type: `reset` (which runs `mon mww 0x40000004 0x80000000`). This is a quirk as the prototypes to not have a reset line exposed to the debugger. Will be solved with production hardware.
 
+Important: You need to flash the bootloader first and make sure that there is no `card10.bin` file on the internal file system. Otherwise your program might not boot, or is overwritten by the bootloader.
+
 TODO: Provide a make command to flash card10.
 
 ## Debugging
@@ -117,7 +119,7 @@ To execute the bootloader, turn off card10, press the lower right button and tur
 IMPORTANT: The prototypes have the USB data lines reversed. Use the provided USB adapter to connect card10.
 
 ### Building card10.bin
-Run `./build_image`. TODO: Add to makefile
+Run `./build_image`. TODO: Add to meson
 
 The tool uses Python to generate a CRC. Make sure to have `python-crc16` installed.
 
