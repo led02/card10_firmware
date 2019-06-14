@@ -38,7 +38,7 @@
 /* If used, they should be adjusted for the external Flash/RAM size */
 MEMORY {
     SPIX (rx)  : ORIGIN = 0x08000000, LENGTH = 128M
-    FLASH (rx) : ORIGIN = 0x10000000, LENGTH = 1M
+    FLASH (rx) : ORIGIN = 0x10010000, LENGTH = 960k
     SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 512k
     SPID (r)   : ORIGIN = 0x80000000, LENGTH = 512M
 }

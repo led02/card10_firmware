@@ -1,0 +1,6 @@
+name=$(basename `pwd`)
+ninja -C ../../build -t clean hw-tests/$name/$name.elf
+ninja -C ../../build hw-tests/$name/ecgtest.elf
+arm-none-eabi-objcopy -O binary ../../build/hw-tests/$name/$name.elf ../../build/hw-tests/$name/$name.bin
+cp ../../build/hw-tests/$name/$name.bin card10.bin
+../../bootloader/crc_patch.py card10.bin
