@@ -7,3 +7,4 @@ subdir('./vendor/Maxim/MAX77650/')
 subdir('./gfx/')
 
 subdir('./card10/')
+subdir('./ff13/')
