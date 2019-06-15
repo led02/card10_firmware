@@ -5,7 +5,7 @@ PYTHON="$1"
 SOURCE_DIR="$2"
 PROJECT_SRC="$3"
 OUTPUT="$4"
-# IGNORE="$5"
+CUSTOM_QSTR="$5"
 
 shift 5
 
@@ -27,7 +27,7 @@ gcc -E -DNO_QSTR -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" "$
 
 # Preprocess Header ... I did not come up with this, this is code copied from
 #    the official make file.  Seriously.
-cat "$SOURCE_DIR/micropython/py/qstrdefs.h" "$OUTPUT_DIR/qstrdefs.collected.h" \
+cat "$SOURCE_DIR/micropython/py/qstrdefs.h" "$CUSTOM_QSTR" "$OUTPUT_DIR/qstrdefs.collected.h" \
     | sed 's/^Q(.*)/"&"/' \
     | gcc -E -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" - \
     | sed 's/^\"\(Q(.*)\)\"/\1/' \

@@ -1,10 +1,10 @@
 #!/bin/sh
 set -xe
 
-cd "$(dirname "$0")" || exit 1
+cd "$(dirname "$0")"
 test -d build/ && rm -r build/
 
-git submodule update --init --recursive
+git submodule update --init ./lib/micropython
 meson --cross-file card10-cross.ini build/
 
 set +x

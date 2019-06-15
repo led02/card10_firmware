@@ -31,7 +31,8 @@ modules_h = custom_target(
 qstr_h = custom_target(
   'qstrdefs.generated.h',
   output: 'qstrdefs.generated.h',
-  input: [modules_h, version_h, micropython_sources, 'modules/qstr.h'],
+  input: ['modules/qstrdefs.h', micropython_sources],
+  depends: [modules_h, version_h],
   command: [micropython_gen_qstr, meson.current_source_dir(), '@OUTPUT@', '@INPUT@'],
 )
 
