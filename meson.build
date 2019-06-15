@@ -30,4 +30,5 @@ add_global_link_arguments(
 python3 = import('python').find_installation('python3')
 
 subdir('lib/')
+subdir('bootloader/')
 subdir('hw-tests/')

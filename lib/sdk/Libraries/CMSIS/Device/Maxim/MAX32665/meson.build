@@ -66,3 +66,17 @@ max32665_startup_core1 = declare_dependency(
     '--entry', 'Reset_Handler',
   ],
 )
+
+#############################################################
+# For the bootloader
+#############################################################
+
+# We can just reuse the same lib here
+max32665_startup_boot_lib = max32665_startup_lib
+
+max32665_startup_boot = declare_dependency(
+  link_args: [
+    '-T', meson.current_source_dir() + 'Source/GCC/max32665_boot.ld',
+    '--entry', 'Reset_Handler',
+  ],
+)
