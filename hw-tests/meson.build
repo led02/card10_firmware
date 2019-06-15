@@ -1,3 +1,4 @@
+subdir('api-demo/')
 subdir('bmatest/')
 subdir('bmetest/')
 subdir('dual-core/')
