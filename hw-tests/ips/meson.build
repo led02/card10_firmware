@@ -1,6 +1,6 @@
 name = 'ips'
 
-executable(
+elf = executable(
   name + '.elf',
   'main.c',
   'image/image.c',
@@ -10,4 +10,12 @@ executable(
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
+)
+
+custom_target(
+  name + '.bin',
+  build_by_default: true,
+  output: name + '.bin',
+  input: elf,
+  command: [build_image, '@INPUT@', '@OUTPUT0@'],
 )

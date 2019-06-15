@@ -17,3 +17,6 @@ executable(
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
 )
+
+# build_image.sh
+build_image = [files('./build_image.sh'), python3]
