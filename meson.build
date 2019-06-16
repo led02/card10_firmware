@@ -34,4 +34,6 @@ subdir('lib/')
 subdir('bootloader/')
 
 subdir('epicardium/')
+subdir('pycardium/')
+
 subdir('hw-tests/')
