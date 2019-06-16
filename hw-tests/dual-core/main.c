@@ -16,16 +16,6 @@
 #include <string.h>
 #include <Heart.h>
 
-void Core1_Start(void) {
-    //MXC_GCR->gp0 = (uint32_t)(&__isr_vector_core1);
-    MXC_GCR->gp0 = 0x10040000;
-    MXC_GCR->perckcn1 &= ~MXC_F_GCR_PERCKCN1_CPU1;
-}
-
-void Core1_Stop(void) {
-    MXC_GCR->perckcn1 |= MXC_F_GCR_PERCKCN1_CPU1;
-}
-
 int main(void)
 {
     card10_init();
@@ -41,7 +31,7 @@ int main(void)
     int h = 0;
 
     // Release core1
-    Core1_Start();
+    core1_start();
 
     while (1) {
         #define NUM     15
