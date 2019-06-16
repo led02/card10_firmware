@@ -11,20 +11,20 @@ modsrc = files(
 #################################
 
 version_h = custom_target(
-  'mpversion.h',
+  'mpversion-upymin.h',
   output: 'mpversion.h',
   command: [micropython_gen_version, '@OUTPUT@'],
 )
 
 modules_h = custom_target(
-  'moduledefs.h',
+  'moduledefs-upymin.h',
   output: 'moduledefs.h',
   input: [micropython_sources, modsrc],
   command: [micropython_gen_modules, '@OUTPUT@', '@INPUT@'],
 )
 
 qstr_h = custom_target(
-  'qstrdefs.generated.h',
+  'qstrdefs.generated-upymin.h',
   output: 'qstrdefs.generated.h',
   input: ['modules/qstrdefs.h', micropython_sources],
   depends: [modules_h, version_h],
