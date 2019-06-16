@@ -5,8 +5,11 @@ micropython_gen_modules = [
   meson.current_source_dir(),
 ]
 
-micropython_dir = meson.current_source_dir()
-micropython_gen_version = files('./gen-version.sh')
+micropython_gen_version = [
+  files('./gen-version.sh'),
+  python3,
+  meson.current_source_dir(),
+]
 
 micropython_gen_qstr = [
   files('gen-qstr.sh'),

@@ -13,12 +13,7 @@ modsrc = files(
 version_h = custom_target(
   'mpversion.h',
   output: 'mpversion.h',
-  command: [
-    micropython_gen_version,
-    python3,
-    micropython_dir,
-    '@OUTPUT@',
-  ],
+  command: [micropython_gen_version, '@OUTPUT@'],
 )
 
 modules_h = custom_target(
