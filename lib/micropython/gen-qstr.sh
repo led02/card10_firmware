@@ -29,7 +29,7 @@ gcc -E -DNO_QSTR -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" "$
 #    the official make file.  Seriously.
 cat "$SOURCE_DIR/micropython/py/qstrdefs.h" "$CUSTOM_QSTR" "$OUTPUT_DIR/qstrdefs.collected.h" \
     | sed 's/^Q(.*)/"&"/' \
-    | gcc -E -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" - \
+    | gcc -E -DNO_QSTR -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" - \
     | sed 's/^\"\(Q(.*)\)\"/\1/' \
     >"$OUTPUT_DIR/qstrdefs.preprocessed.h"
 
