@@ -6,24 +6,22 @@
 #include "py/obj.h"
 #include "py/runtime.h"
 
+#include "epicardium.h"
+
 /******************************************************************************
  * Serial Communication
  */
 
-/* TODO: Use API boundary instead of direct communication */
-#include "uart.h"
-extern mxc_uart_regs_t * ConsoleUart;
-
 /* Receive single character */
 int mp_hal_stdin_rx_chr(void)
 {
-	return UART_ReadByte(ConsoleUart);
+	return (int)epic_uart_read_chr();
 }
 
 /* Send string of given length */
 void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len)
 {
-	UART_Write(ConsoleUart, (uint8_t*)str, len);
+	epic_uart_write_str(str, len);
 }
 
 /******************************************************************************
@@ -60,12 +58,12 @@ MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
 
 int _getpid(void)
 {
-	;
+	return -1;
 }
 
 int _kill(int pid, int f)
 {
-	;
+	return -1;
 }
 
 void _exit(int r)
