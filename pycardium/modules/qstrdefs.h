@@ -1,5 +1,8 @@
 #include "py/mpconfig.h"
 
+/* leds */
+Q(leds)
+
 /* utime */
 Q(utime)
 Q(sleep)

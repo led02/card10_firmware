@@ -2,6 +2,7 @@ name = 'pycardium'
 
 modsrc = files(
   'modules/utime.c',
+  'modules/leds.c',
 )
 
 #################################
