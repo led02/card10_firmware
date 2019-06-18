@@ -7,4 +7,5 @@ subdir('hello-freertos/')
 subdir('hello-world/')
 subdir('imutest/')
 subdir('ips/')
-subdir('upy-minimal/')
+# Disabled due to meson bug in older version
+# subdir('upy-minimal/')
