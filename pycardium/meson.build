@@ -53,7 +53,7 @@ executable(
   modsrc,
   mp_headers,
   include_directories: micropython_includes,
-  dependencies: [max32665_startup_core1, board_card10, periphdriver],
+  dependencies: [max32665_startup_core1, board_card10, periphdriver, api_caller],
   link_whole: [max32665_startup_core1_lib, board_card10_lib],
   link_with: upy,
   link_args: [
