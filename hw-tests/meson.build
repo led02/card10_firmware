@@ -1,4 +1,5 @@
-subdir('api-demo/')
+# Disabled due to meson bug in older version
+# subdir('api-demo/')
 subdir('bmatest/')
 subdir('bmetest/')
 subdir('dual-core/')
