@@ -15,6 +15,12 @@ char epic_uart_read_chr(void)
 	return UART_ReadByte(ConsoleUart);
 }
 
+void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
+{
+	leds_set(led, r, g, b);
+	leds_update();
+}
+
 int main(void)
 {
 	card10_init();
