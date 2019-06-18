@@ -25,6 +25,20 @@ void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len)
 }
 
 /******************************************************************************
+ * Time & Delay
+ */
+
+void mp_hal_delay_ms(mp_uint_t ms)
+{
+	mxc_delay(ms * 1000);
+}
+
+void mp_hal_delay_us(mp_uint_t us)
+{
+	mxc_delay(us);
+}
+
+/******************************************************************************
  * Fatal Errors
  */
 

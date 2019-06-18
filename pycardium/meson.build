@@ -1,6 +1,7 @@
 name = 'pycardium'
 
 modsrc = files(
+  'modules/utime.c',
 )
 
 #################################
@@ -24,7 +25,7 @@ qstr_h = custom_target(
   'qstrdefs.generated.h',
   output: 'qstrdefs.generated.h',
   input: [
-    # 'modules/qstrdefs.h',
+    'modules/qstrdefs.h',
     'mpconfigport.h',
     micropython_sources,
   ],
@@ -54,8 +55,8 @@ executable(
   mp_headers,
   include_directories: micropython_includes,
   dependencies: [max32665_startup_core1, board_card10, periphdriver, api_caller],
-  link_whole: [max32665_startup_core1_lib, board_card10_lib],
   link_with: upy,
+  link_whole: [max32665_startup_core1_lib, board_card10_lib],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
