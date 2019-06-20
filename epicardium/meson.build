@@ -56,7 +56,7 @@ elf = executable(
   ],
 )
 
-custom_target(
+epicardium_bin = custom_target(
   name + '.bin',
   build_by_default: true,
   output: name + '.bin',

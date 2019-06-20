@@ -63,10 +63,18 @@ elf = executable(
   ],
 )
 
-custom_target(
+bin = custom_target(
   name + '.bin',
   build_by_default: true,
   output: name + '.bin',
   input: elf,
   command: [build_image, '@INPUT@', '@OUTPUT0@'],
+)
+
+custom_target(
+  name + '_epicardium.bin',
+  build_by_default: true,
+  output: name + '_epicardium.bin',
+  input: [epicardium_bin, bin],
+  command: [build_multi_image, '@INPUT@', '@OUTPUT0@'],
 )

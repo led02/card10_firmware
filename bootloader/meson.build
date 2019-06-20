@@ -20,3 +20,6 @@ executable(
 
 # build_image.sh
 build_image = [files('./build_image.sh'), python3]
+
+# build_multi_image.sh
+build_multi_image = [files('./build_multi_image.sh'), python3]
