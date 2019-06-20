@@ -67,15 +67,6 @@ custom_target(
   name + '.bin',
   build_by_default: true,
   output: name + '.bin',
-  #input: [elf, 'epicardium/epicardium.bin'],
-  input: [elf],
+  input: elf,
   command: [build_image, '@INPUT@', '@OUTPUT0@'],
 )
-
-#custom_target(
-#  name + '.b1n',
-#  build_by_default: true,
-#  output: name + '.b1n',
-#  input: bin,
-#  command: [build_image, '@INPUT@', '@OUTPUT0@'],
-#)

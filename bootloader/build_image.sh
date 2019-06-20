@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-echo "build image" $1 $2 $3
 PYTHON="$1"
 ELF="$2"
 BIN="$3"

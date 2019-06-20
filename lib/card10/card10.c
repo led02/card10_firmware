@@ -174,7 +174,7 @@ void card10_diag(void)
 
 void core1_start(void) {
     //MXC_GCR->gp0 = (uint32_t)(&__isr_vector_core1);
-    MXC_GCR->gp0 = 0x10080000;
+    MXC_GCR->gp0 = 0x10040000;
     MXC_GCR->perckcn1 &= ~MXC_F_GCR_PERCKCN1_CPU1;
 }
 

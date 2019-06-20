@@ -20,11 +20,8 @@
 
 
 #define PARTITION_START (0x10000000 + 64 * 1024)
-//#define PARTITION_END (0x10000000 + 512 * 1024 - 1) /* TODO: check if 1 MB also works. Might have to enable the second bank */
-#define PARTITION_END (0x10000000 + 1024 * 1024 - 1)
-
-//#define PARTITION_START (0x10080000)
-//#define PARTITION_END (0x10000000 + 1024 * 1024 - 1) /* TODO: check if 1 MB also works. Might have to enable the second bank */
+#define PARTITION_END (0x10000000 + 512 * 1024 - 1) /* TODO: check if 1 MB also works. Might have to enable the second bank */
+//#define PARTITION_END (0x10000000 + 1024 * 1024 - 1)
 
 extern void run_usbmsc(void);
 
@@ -191,14 +188,13 @@ int main(void)
         while(1);
     }
 
-    //MXC_FLC0->clkdiv = 96;
-    //MXC_FLC0->clkdiv = 96;
 
     if(mount()) {
         if(check_integrity()) {
             printf("Found valid application image\n");
             if(is_update_needed()) {
                 printf("Trying to update application from external flash\n");
+                MXC_FLC0->clkdiv = 54;
                 erase_partition();
                 flash_partition();
             } else {
