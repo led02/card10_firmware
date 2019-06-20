@@ -60,6 +60,7 @@ custom_target(
   name + '.bin',
   build_by_default: true,
   output: name + '.bin',
+  #output: 'card10.bin',
   input: elf,
   command: [build_image, '@INPUT@', '@OUTPUT0@'],
 )

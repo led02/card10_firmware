@@ -199,14 +199,18 @@ int FLC_PageErase(uint32_t address)
     uint32_t addr;
     mxc_flc_regs_t *flc = NULL;
     
+    printf("%p\n", address);
     // Get FLC Instance
     if ((err = SYS_FLC_GetByAddress(&flc, address)) != E_NO_ERROR) {
+        printf("A\n");
         return err;
     }
     if ((err = SYS_FLC_GetPhysicalAddress(address, &addr)) < E_NO_ERROR) {
+        printf("B\n");
         return err;
     }
     if ((err = prepare_flc(flc)) != E_NO_ERROR) {
+        printf("C\n");
         return err;
     }
     
@@ -227,6 +231,7 @@ int FLC_PageErase(uint32_t address)
     /* Check access violations */
     if (flc->intr & MXC_F_FLC_INTR_AF) {
         flc->intr &= ~MXC_F_FLC_INTR_AF;
+        printf("D\n");
         return E_BAD_STATE;
     }
     
