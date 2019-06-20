@@ -48,7 +48,7 @@ upy = static_library(
   include_directories: micropython_includes,
 )
 
-executable(
+elf = executable(
   name + '.elf',
   'main.c',
   'mphalport.c',
@@ -61,4 +61,12 @@ executable(
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
+)
+
+custom_target(
+  name + '.bin',
+  build_by_default: true,
+  output: name + '.bin',
+  input: elf,
+  command: [build_image, '@INPUT@', '@OUTPUT0@'],
 )
