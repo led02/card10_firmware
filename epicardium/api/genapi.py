@@ -11,6 +11,11 @@ MATCH_DECLARATION = re.compile(
 MATCH_ARGS = re.compile(r"(?P<type>\w+(?:\*+|\s+))(?P<name>\w+),")
 
 
+def sizeof(args):
+    """Return a string that describes the size of a list of arguments."""
+    return " + ".join(a["sizeof"] for a in args) if args != [] else "0"
+
+
 def parse_declarations(source):
     """Parse all declarations in the given source."""
     declarations = []
@@ -30,6 +35,7 @@ def parse_declarations(source):
                 "type": arg_type,
                 "name": arg_name,
                 "sizeof": "sizeof({})".format(arg_type),
+                "offset": sizeof(args),
             })
 
         declarations.append({
@@ -41,11 +47,6 @@ def parse_declarations(source):
         })
 
     return declarations
-
-
-def sizeof(args):
-    """Return a string that describes the size of a list of arguments."""
-    return " + ".join(a["sizeof"] for a in args) if args != [] else "0"
 
 
 def main():
@@ -112,7 +113,6 @@ def main():
             f_client.write(tmp.format(**decl))
 
             for i, arg in enumerate(decl["args"]):
-                arg["offset"] = sizeof(decl["args"][:i])
                 tmp = """\
         *({type}*)(buffer + {offset}) = {name};
 """
@@ -161,7 +161,6 @@ void __api_dispatch_call(uint32_t id, void*buffer)
 
             for i, arg in enumerate(decl["args"]):
                 arg["comma"] = "" if i == 0 else ","
-                arg["offset"] = sizeof(decl["args"][:i])
                 tmp = """{comma}
                         *({type}*)(buffer + {offset})"""
                 f_dispatcher.write(tmp.format(**arg))
