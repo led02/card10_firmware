@@ -2,16 +2,19 @@
 import sys
 import crc16
 
-crc = 0
 
-data = open(sys.argv[1], 'rb').read()
-crc = crc16.crc16xmodem(data)
-print(crc)
+def main():
+    data = open(sys.argv[1], 'rb').read()
+    crc = crc16.crc16xmodem(data)
+    # print(crc)
 
-padded = data + bytes([crc >> 8, crc & 0xFF])
+    padded = data + bytes([crc >> 8, crc & 0xFF])
 
-crc = 0
-crc = crc16.crc16xmodem(padded)
-print(crc)
+    crc = crc16.crc16xmodem(padded)
+    # print(crc)
 
-open(sys.argv[1], 'wb').write(padded)
+    open(sys.argv[1], 'wb').write(padded)
+
+
+if __name__ == "__main__":
+    main()
