@@ -7,6 +7,7 @@ sources = files(
   'card10.c',
   'leds.c',
   'pmic.c',
+  'portexpander.c',
 )
 
 deps = [

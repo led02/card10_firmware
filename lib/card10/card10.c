@@ -1,6 +1,7 @@
 #include "pmic.h"
 #include "bosch.h"
 #include "display.h"
+#include "portexpander.h"
 
 #include "bhy_uc_driver.h"
 #include "Bosch_PCB_7183_di03_BMI160_BMM150-7183_di03.2.1.11696_170103.h"
@@ -92,6 +93,8 @@ void card10_init(void)
         float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
         bhy_set_sic_matrix(sic_array);
     }
+
+    portexpander_init();
 }
 
 static uint32_t ecg_read_reg(uint8_t reg)
