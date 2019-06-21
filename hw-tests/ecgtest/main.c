@@ -26,6 +26,8 @@
 static bool ecg_switch;
 static bool internal_pull;
 
+#define Y_OFFSET    36
+#define Y_SCALE     35
 
 /***** Functions *****/
 static uint32_t ecg_read_reg(uint8_t reg)
@@ -146,17 +148,17 @@ static uint8_t prev;
 static void clear(void)
 {
     Paint_Clear(BLACK);
-    prev = 32;
+    prev = Y_OFFSET;
 }
 
 
 static void set(uint8_t index, int8_t val)
 {
 
-    if(val < -31) val = -31;
-    if(val > 32) val = 32;
+    if(val < -Y_SCALE) val = -Y_SCALE;
+    if(val > Y_SCALE) val = Y_SCALE;
 
-    int8_t pos = 32 + val;
+    int8_t pos = Y_OFFSET + val;
 
     int min, max;
     if(prev < pos) {
@@ -179,11 +181,6 @@ void update(void)
 {
     clear();
 
-    char buf[128];
-    sprintf(buf, "Switch: %d  Pull: %d", ecg_switch, internal_pull);
-    Paint_DrawString_EN(0, 0, buf, &Font8, 0x0000, 0xffff);
-
-
     int16_t max = 0;
     for(int i=0; i<SIZE_X; i++) {
         if(abs(samples[i]) > max) {
@@ -191,7 +188,12 @@ void update(void)
         }
     }
 
-    int16_t scale = max / 32;
+    int16_t scale = max / Y_SCALE + 1;
+
+    char buf[128];
+    sprintf(buf, "Switch: %d  Pull: %d Scale: %d", ecg_switch, internal_pull, scale);
+    Paint_DrawString_EN(0, 0, buf, &Font8, 0x0000, 0xffff);
+
 
     for(int i=0; i<SIZE_X; i++) {
         set(i, (samples[i] / scale));
