@@ -48,7 +48,8 @@ api_dispatcher_lib = static_library(
 elf = executable(
   name + '.elf',
   'main.c',
-  dependencies: [libcard10, max32665_startup_core0],
+  'cdcacm.c',
+  dependencies: [libcard10, max32665_startup_core0, maxusb],
   link_with: api_dispatcher_lib,
   link_whole: [max32665_startup_core0_lib, board_card10_lib],
   link_args: [
