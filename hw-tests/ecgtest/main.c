@@ -101,6 +101,7 @@ static void ecg_config(bool enable_internal_pull)
     //CNFG_ECG_r.bits.gain = 3;       // ECG gain = 160V/V
     CNFG_ECG_r.bits.gain = 0;
     CNFG_ECG_r.bits.rate = 2;       // Sample rate = 128 sps
+    //CNFG_ECG_r.bits.rate = 1;       // Sample rate = 256 sps
     ecg_write_reg(CNFG_ECG , CNFG_ECG_r.all);
 
 
@@ -203,6 +204,162 @@ void update(void)
     LCD_Update();
 }
 
+#if 0
+/*
+
+FIR filter designed with
+http://t-filter.appspot.com
+
+sampling frequency: 200 Hz
+
+* 0 Hz - 40 Hz
+  gain = 1
+  desired ripple = 5 dB
+  actual ripple = 4.1393894966071585 dB
+
+* 50 Hz - 100 Hz
+  gain = 0
+  desired attenuation = -40 dB
+  actual attenuation = -40.07355419274887 dB
+
+*/
+
+#define FILTER_TAP_NUM 21
+
+static double filter_taps[FILTER_TAP_NUM] = {
+  -0.02010411882885732,
+  -0.05842798004352509,
+  -0.061178403647821976,
+  -0.010939393385338943,
+  0.05125096443534972,
+  0.033220867678947885,
+  -0.05655276971833928,
+  -0.08565500737264514,
+  0.0633795996605449,
+  0.310854403656636,
+  0.4344309124179415,
+  0.310854403656636,
+  0.0633795996605449,
+  -0.08565500737264514,
+  -0.05655276971833928,
+  0.033220867678947885,
+  0.05125096443534972,
+  -0.010939393385338943,
+  -0.061178403647821976,
+  -0.05842798004352509,
+  -0.02010411882885732
+};
+#endif
+#if 1
+/*
+
+FIR filter designed with
+http://t-filter.appspot.com
+
+sampling frequency: 200 Hz
+
+* 0 Hz - 40 Hz
+  gain = 1
+  desired ripple = 0.5 dB
+  actual ripple = 0.3562617633495587 dB
+
+* 45 Hz - 100 Hz
+  gain = 0
+  desired attenuation = -40 dB
+  actual attenuation = -40.37207584888854 dB
+
+*/
+
+#define FILTER_TAP_NUM 71
+
+static double filter_taps[FILTER_TAP_NUM] = {
+  0.0057445089465822975,
+  0.007451288673767406,
+  -0.0011523652638272097,
+  -0.0030609271459832005,
+  -0.002596310763437956,
+  0.004452951934981218,
+  0.003740429140762826,
+  -0.002351310203707235,
+  -0.00638990322759006,
+  0.000013108391204023357,
+  0.007226767366250225,
+  0.003994033360879168,
+  -0.00665189327484351,
+  -0.008058131222070393,
+  0.0035814528837470965,
+  0.011450459869389184,
+  0.0016796020911726648,
+  -0.012657785603199918,
+  -0.008611714082779583,
+  0.010587105712461298,
+  0.01581354994840992,
+  -0.0044174953741535905,
+  -0.021419548904285074,
+  -0.005927897725436821,
+  0.023159558089340265,
+  0.01973520678092361,
+  -0.018604692334579287,
+  -0.035495574517452874,
+  0.004958680854279203,
+  0.05116349477789529,
+  0.02244341207607204,
+  -0.06449371846227892,
+  -0.0790927656214483,
+  0.07342794634140555,
+  0.3089023630319309,
+  0.42341742792869774,
+  0.3089023630319309,
+  0.07342794634140555,
+  -0.0790927656214483,
+  -0.06449371846227892,
+  0.02244341207607204,
+  0.05116349477789529,
+  0.004958680854279203,
+  -0.035495574517452874,
+  -0.018604692334579287,
+  0.01973520678092361,
+  0.023159558089340265,
+  -0.005927897725436821,
+  -0.021419548904285074,
+  -0.0044174953741535905,
+  0.01581354994840992,
+  0.010587105712461298,
+  -0.008611714082779583,
+  -0.012657785603199918,
+  0.0016796020911726648,
+  0.011450459869389184,
+  0.0035814528837470965,
+  -0.008058131222070393,
+  -0.00665189327484351,
+  0.003994033360879168,
+  0.007226767366250225,
+  0.000013108391204023357,
+  -0.00638990322759006,
+  -0.002351310203707235,
+  0.003740429140762826,
+  0.004452951934981218,
+  -0.002596310763437956,
+  -0.0030609271459832005,
+  -0.0011523652638272097,
+  0.007451288673767406,
+  0.0057445089465822975
+};
+#endif
+int32_t fir(int32_t a)
+{
+    static int32_t x[FILTER_TAP_NUM];
+    memmove(x + 1, x, sizeof(*x) * (FILTER_TAP_NUM-1));
+    x[0] = a;
+
+    int32_t y = 0;
+    int i;
+    for(i = 0; i < FILTER_TAP_NUM; i++) {
+        y += filter_taps[i] * x[i];
+    }
+    return y;
+}
+
 static uint8_t sample_count = 0;
 
 static void add_sample(int16_t sample)
@@ -244,6 +401,8 @@ int main(void)
     GPIO_OutClr(&analog_switch); // Wrist
 
     internal_pull = true;
+
+    #if 1
     ecg_config(internal_pull);
 
     for(int i=0; i<0x20; i++) {
@@ -252,6 +411,11 @@ int main(void)
     }
 
     ecg_write_reg(SYNCH, 0);
+    #else
+    max86150_begin();
+    max86150_setup(0x1F, 4, 3, 400, 411, 4096);
+    #endif
+
 
     uint32_t ecgFIFO, readECGSamples, idx, ETAG[32], status;
     int16_t ecgSample[32];
@@ -262,7 +426,9 @@ int main(void)
     const int ETAG_BITS_MASK = 0x7;
 
 
+
     while(1) {
+        #if 1
         // Read back ECG samples from the FIFO
         if( ecgFIFOIntFlag ) {
             ecgFIFOIntFlag = false;
@@ -317,5 +483,35 @@ int main(void)
                 }
             }
         }
+        #else
+        static float y1, y2, y3;
+
+        static const float alpha = 0.001;
+
+        if(max86150_check()>0) {
+            while(max86150_available()) {
+                uint32_t a = max86150_getFIFORed();
+                uint32_t b = max86150_getFIFOIR();
+                //if( a & (0x1 << 17) ) {
+                //    a |= 0xFFFC0000;
+                //}
+
+                //int32_t b = (int32_t)a;
+                //int32_t b = (int16_t)max86150_getFIFOEcg();
+                int16_t c = (int16_t)max86150_getFIFOECG();
+                c = fir(c);
+
+                y1 = (1. - alpha) * y1 + alpha * a;
+                y2 = (1. - alpha) * y2 + alpha * b;
+                y3 = (1. - alpha) * y3 + alpha * c;
+
+                //printf("%d,%d,%d\n", a - y1, b - y2, c - y3);
+                //printf("%d,%d,%d\n", a, b, c);
+
+                add_sample(c - y3);
+                max86150_nextSample();
+            }
+        }
+        #endif
     }
 }

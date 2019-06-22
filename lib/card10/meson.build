@@ -17,6 +17,7 @@ deps = [
     board_card10,
     libgfx,
     max77650,
+    max86150,
     periphdriver,
 ]
 
