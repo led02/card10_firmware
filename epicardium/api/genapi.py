@@ -2,13 +2,22 @@ import argparse
 import os
 import re
 import subprocess
+import sys
 
-MATCH_DECLARATION = re.compile(
-    r"__GENERATE_API \$ __GEN_ID_(?P<id>\w+) \$ (?P<type>\w+(?:\*+|\s+))(?P<name>.+?)\((?P<args>.*?)\) \$",
+
+MATCH_EXPANSION = re.compile(
+    r"__GENERATE_API \$ __GEN_ID_(?P<id>\w+) \$ (?P<decl>.*?) \$",
     re.DOTALL | re.MULTILINE,
 )
 
-MATCH_ARGS = re.compile(r"(?P<type>\w+(?:\*+|\s+))(?P<name>\w+),")
+MATCH_DECLARATION = re.compile(
+    r"^(?P<typename>.*?)\s*\((?P<args>.*)\)$",
+    re.DOTALL,
+)
+
+MATCH_TYPENAME = re.compile(
+    r"^(?P<type>(?:const )?(?:struct )?\w+(?:\s+|\*+))(?P<name>\w+)$",
+)
 
 
 def sizeof(args):
@@ -16,32 +25,50 @@ def sizeof(args):
     return " + ".join(a["sizeof"] for a in args) if args != [] else "0"
 
 
+def bailout(message, *args, **kwargs):
+    fmt = "\x1B[31;1mError\x1B[0m: {}"
+    print(fmt.format(message.format(*args, **kwargs)), file=sys.stderr)
+    sys.exit(1)
+
+
 def parse_declarations(source):
     """Parse all declarations in the given source."""
     declarations = []
-    for decl in MATCH_DECLARATION.finditer(source):
-        id = decl.group("id")
-        return_type = decl.group("type").strip()
-        name = decl.group("name")
+    for exp in MATCH_EXPANSION.finditer(source):
+        id = exp.group("id")
+        decl = MATCH_DECLARATION.match(exp.group("decl"))
+
+        if decl is None:
+            bailout("Error in declaration '{}'", exp.group("decl"))
+
+        typename = MATCH_TYPENAME.match(decl.group("typename"))
         args = []
         args_str = decl.group("args")
 
+        if typename is None:
+            bailout("Error in declaration '{}'", exp.group("decl"))
+
         # Parse arguments
-        for arg in MATCH_ARGS.finditer(args_str + ","):
-            arg_type = arg.group("type").strip()
-            arg_name = arg.group("name")
+        for arg_str in map(str.strip, args_str.split(",")):
+            if arg_str in ["void", ""]:
+                continue
+
+            arg = MATCH_TYPENAME.match(arg_str.strip())
+
+            if arg is None:
+                bailout("Failed to parse argument '{}'", arg_str.strip())
 
             args.append({
-                "type": arg_type,
-                "name": arg_name,
-                "sizeof": "sizeof({})".format(arg_type),
+                "type": arg.group("type").strip(),
+                "name": arg.group("name"),
+                "sizeof": "sizeof({})".format(arg.group("type").strip()),
                 "offset": sizeof(args),
             })
 
         declarations.append({
             "id": id,
-            "return_type": return_type,
-            "name": name,
+            "return_type": typename.group("type").strip(),
+            "name": typename.group("name"),
             "args": args,
             "args_str": args_str,
         })
