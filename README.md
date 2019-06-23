@@ -47,8 +47,19 @@ This allows gdb to use our .gdbinit files without specifying them on the command
 ### OpenOCD
 If you want to debug code or replace the bootloader, you need OpenOCD and GDB.
 
-Get OpenOCD from [Maxim](https://github.com/maximmbed/openocd) and checkout the `max32xxx` branch. Run `git submodule update --init`.
-Build using `./bootstrap`, `./configure` and 'make'. Make sure that the `CMSIS-DAP Compliant Debugger` is set to `yes(auto)` after running `./configure` (you might need to install libusb and other USB related libraries).
+Get OpenOCD from [our fork](https://git.card10.badge.events.ccc.de/card10/openocd) of [Maxim's fork](https://github.com/maximmbed/openocd):
+
+```bash
+git clone https://git.card10.badge.events.ccc.de/card10/openocd.git
+cd openocd
+
+git submodule update --init
+./bootstrap
+./configure --disable-werror
+make -j8
+```
+
+Make sure that the `CMSIS-DAP Compliant Debugger` is set to `yes(auto)` after running `./configure` (you might need to install libusb and other USB related libraries).
 If you get errors making the documentation you can `touch doc/openocd.info` to skip it and continue with 'make'.
 
 Please run `make install` after removing any already installed OpenOCD version. Otherwise please always specify the full path to openocd (the binary is under `src/openocd`, when calling `openocd`.
