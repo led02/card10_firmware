@@ -44,7 +44,7 @@ def main():
             re.DOTALL | re.MULTILINE,
         )
 
-        args_matcher = re.compile(r"(?P<type>\w+(?:\*+|\s+))(?P<name>\w+),")
+        args_matcher = re.compile(r"(?P<type>(?:const )?\w+(?:\*+|\s+))(?P<name>\w+),")
 
         # Open output files
         f_client = cx.enter_context(open(args.client, "w"))

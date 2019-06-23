@@ -7,6 +7,7 @@
 #include "py/runtime.h"
 
 #include "epicardium.h"
+#include "mxc_delay.h"
 
 /******************************************************************************
  * Serial Communication

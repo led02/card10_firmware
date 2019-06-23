@@ -2,6 +2,7 @@
 #include "card10.h"
 #include "uart.h"
 #include "cdcacm.h"
+#include "leds.h"
 #include "api/dispatcher.h"
 
 extern mxc_uart_regs_t * ConsoleUart;
@@ -9,20 +10,20 @@ extern mxc_uart_regs_t * ConsoleUart;
 void epic_uart_write_str(char*str, intptr_t length)
 {
 	UART_Write(ConsoleUart, (uint8_t*)str, length);
-    cdcacm_write((uint8_t*)str, length);
+	cdcacm_write((uint8_t*)str, length);
 }
 
 char epic_uart_read_chr(void)
 {
-    while(1) {
-        if(UART_NumReadAvail(ConsoleUart) > 0) {
-	        return UART_ReadByte(ConsoleUart);
-        }
+	while(1) {
+		if(UART_NumReadAvail(ConsoleUart) > 0) {
+			return UART_ReadByte(ConsoleUart);
+		}
 
-        if(cdcacm_num_read_avail() > 0) {
-            return cdcacm_read();
-        }
-    }
+		if(cdcacm_num_read_avail() > 0) {
+			return cdcacm_read();
+		}
+	}
 }
 
 void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
