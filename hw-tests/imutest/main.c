@@ -101,7 +101,7 @@ static void sensors_callback_orientation(bhy_data_generic_t * sensor_data, bhy_v
 }
 
 
-static void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
+static __attribute__((unused)) void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
     printf("x=%05d, y=%05d, z=%05d status=%d\n",
     sensor_data->data_vector.x,
@@ -111,7 +111,7 @@ static void sensors_callback_vector(bhy_data_generic_t * sensor_data, bhy_virtua
     );
 }
 
-static void sensors_callback_vector_uncalib(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
+static __attribute__((unused)) void sensors_callback_vector_uncalib(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
     printf("x=%05d, y=%05d, z=%05d status=%d\n",
     sensor_data->data_uncalib_vector.x,
@@ -128,7 +128,7 @@ static void sensors_callback_vector_uncalib(bhy_data_generic_t * sensor_data, bh
  * @param[in]   sensor_data
  * @param[in]   sensor_id
  */
-static void sensors_callback_rotation_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
+static __attribute__((unused)) void sensors_callback_rotation_vector(bhy_data_generic_t * sensor_data, bhy_virtual_sensor_t sensor_id)
 {
 #if 0
     float temp;

@@ -24,6 +24,7 @@ lib = static_library(
   sources,
   include_directories: includes,
   dependencies: periphdriver,
+  c_args: '-w',
 )
 
 maxusb = declare_dependency(

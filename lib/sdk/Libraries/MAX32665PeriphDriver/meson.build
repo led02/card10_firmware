@@ -52,6 +52,7 @@ lib = static_library(
   'PeriphDriver',
   sources,
   include_directories: includes,
+  c_args: '-w',
 )
 
 periphdriver = declare_dependency(
