@@ -200,11 +200,11 @@ static BaseType_t prvUptimeCommand(char *pcWriteBuffer, size_t xWriteBufferLen, 
 
 #if configUSE_TICKLESS_IDLE
   pcWriteBuffer += snprintf(pcWriteBuffer, xWriteBufferLen,
-			    "Uptime is 0x%08x (%u ms)\r\nMXC_RTCTMR->timer is %u\r\n",
+			    "Uptime is 0x%08lx (%lu ms)\r\nMXC_RTCTMR->timer is %lu\r\n",
 			    ticks, ticks / portTICK_PERIOD_MS, MXC_RTC->sec);
 #else
   pcWriteBuffer += snprintf(pcWriteBuffer, xWriteBufferLen,
-			    "Uptime is 0x%08x (%u ms)\r\n",
+			    "Uptime is 0x%08lx (%lu ms)\r\n",
 			    ticks, ticks / portTICK_PERIOD_MS);
 #endif
 
@@ -257,7 +257,7 @@ static BaseType_t lParameterNumber = 0;
 		memset( pcWriteBuffer, 0x00, xWriteBufferLen );
 		sprintf( pcWriteBuffer, "%d: ", (int)lParameterNumber );
 		strncat( pcWriteBuffer, pcParameter, lParameterStringLength );
-		strncat( pcWriteBuffer, "\r\n", strlen( "\r\n" ) );
+		strcat( pcWriteBuffer, "\r\n");
 
 		/* If this is the last of the three parameters then there are no more
 		strings to return after this one. */
@@ -323,7 +323,7 @@ static BaseType_t lParameterNumber = 0;
 			memset( pcWriteBuffer, 0x00, xWriteBufferLen );
 			sprintf( pcWriteBuffer, "%d: ", (int)lParameterNumber );
 			strncat( pcWriteBuffer, pcParameter, lParameterStringLength );
-			strncat( pcWriteBuffer, "\r\n", strlen( "\r\n" ) );
+			strcat( pcWriteBuffer, "\r\n");
 
 			/* There might be more parameters to return after this one. */
 			xReturn = pdTRUE;

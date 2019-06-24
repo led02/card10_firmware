@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <stdio.h>
 /***** Globals *****/
-static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 //const gpio_cfg_t DEV_RST_PIN = {PORT_0, PIN_28, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 const gpio_cfg_t DEV_DC_PIN = {PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 

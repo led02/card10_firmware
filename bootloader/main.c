@@ -13,6 +13,7 @@
 #include "led.h"
 #include "ff.h"
 #include "crc16-ccitt.h"
+#include "pb.h"
 
 
 #define GPIO_PORT_IN                PORT_1
@@ -161,6 +162,8 @@ static inline void boot(const void * vtable){
     SCB->VTOR = (uintptr_t) vtable;
 
 	// Reset stack pointer & branch to the new reset vector.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
 	__asm(  "mov r0, %0\n"
 			"ldr sp, [r0]\n"
 			"ldr r0, [r0, #4]\n"
@@ -168,6 +171,7 @@ static inline void boot(const void * vtable){
 			:
 			: "r"(vtable)
 			: "%sp", "r0");
+#pragma GCC diagnostic pop
 };
 
 

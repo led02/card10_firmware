@@ -2,7 +2,7 @@
 #include "gpio.h"
 #include "mxc_delay.h"
 
-static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+static const __attribute__((unused)) gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 int main(void)
 {

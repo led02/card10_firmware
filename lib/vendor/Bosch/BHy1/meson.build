@@ -16,6 +16,7 @@ lib = static_library(
   sources,
   include_directories: includes,
   dependencies: periphdriver,
+  c_args: '-w',
 )
 
 bhy1 = declare_dependency(

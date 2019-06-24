@@ -14,6 +14,7 @@
 #include "i2c.h"
 #include "rtc.h"
 #include "spi.h"
+#include "pb.h"
 #include "MAX30003.h"
 #include "GUI_DEV/GUI_Paint.h"
 #include "pmic.h"
@@ -53,7 +54,7 @@ static uint32_t ecg_read_reg(uint8_t reg)
 
 static void ecg_write_reg(uint8_t reg, uint32_t data)
 {
-    printf("write %02x %06x\n", reg, data);
+    printf("write %02x %06lx\n", reg, data);
     spi_req_t req;
     uint8_t tx_data[] = {(reg << 1) | 0 , data >> 16, (data >> 8 ) & 0xFF, data & 0xFF};
     uint8_t rx_data[] = {0, 0, 0, 0};
@@ -407,7 +408,7 @@ int main(void)
 
     for(int i=0; i<0x20; i++) {
         uint32_t val = ecg_read_reg(i);
-        printf("%02x: 0x%06x\n", i, val);
+        printf("%02x: 0x%06lx\n", i, val);
     }
 
     ecg_write_reg(SYNCH, 0);

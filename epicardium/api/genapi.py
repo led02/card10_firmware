@@ -201,7 +201,7 @@ void __api_dispatch_call(uint32_t id, void*buffer)
         tmp = """\
         default:
                 /* TODO: Better error handling */
-                printf("Error: API function %x is unknown!!\\n", id);
+                printf("Error: API function %lx is unknown!!\\n", id);
                 break;
         }}
 }}

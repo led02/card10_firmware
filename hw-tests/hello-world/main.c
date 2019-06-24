@@ -19,7 +19,7 @@
 /***** Definitions *****/
 
 /***** Globals *****/
-static const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
+static __attribute__((unused)) const gpio_cfg_t motor_pin = {PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 int main(void)
 {
@@ -35,7 +35,7 @@ int main(void)
         leds_set_dim(i, 1);
     }
 
-    int h = 0;
+    int __attribute__((unused)) h = 0;
     while (1) {
 #if 0
 

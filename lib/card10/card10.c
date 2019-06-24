@@ -170,7 +170,7 @@ void card10_diag(void)
     }
 #else
     uint32_t val = ecg_read_reg(0xf);
-    printf("ECG: %02x: 0x%06x (should be 0x5139a0)\n", 0xf, val);
+    printf("ECG: %02x: 0x%06lx (should be 0x5139a0)\n", 0xf, val);
 #endif
 
 }

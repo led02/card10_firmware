@@ -186,7 +186,7 @@ void vTickTockTask(void *pvParameters)
   
   while (1) {
     ticks = xTaskGetTickCount();
-    printf("Uptime is 0x%08x (%u seconds), tickless-idle is %s\n",
+    printf("Uptime is 0x%08lx (%lu seconds), tickless-idle is %s\n",
 	   ticks, ticks / configTICK_RATE_HZ,
 	   disable_tickless ? "disabled" : "ENABLED");
     vTaskDelayUntil(&xLastWakeTime, (configTICK_RATE_HZ * 60));

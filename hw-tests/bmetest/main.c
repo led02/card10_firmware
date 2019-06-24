@@ -79,25 +79,25 @@ int main(void)
         struct bme680_field_data data;
         rslt = bme680_get_sensor_data(&data, &gas_sensor);
 
-        printf("T: %.2f degC, P: %.2f hPa, H %.2f %%rH ", data.temperature / 100.0l,
+        printf("T: %.2Lf degC, P: %.2Lf hPa, H %.2Lf %%rH ", data.temperature / 100.0l,
             data.pressure / 100.0l, data.humidity / 1000.0l );
 
         char buf[128];
-        sprintf(buf, "T: %.2f degC", data.temperature / 100.0l);
+        sprintf(buf, "T: %.2Lf degC", data.temperature / 100.0l);
         Paint_DrawString_EN(0, 0, buf, &Font16, 0x0000, 0xffff);
 
-        sprintf(buf, "P: %.2f hPa", data.pressure / 100.0l);
+        sprintf(buf, "P: %.2Lf hPa", data.pressure / 100.0l);
         Paint_DrawString_EN(0, 16, buf, &Font16, 0x0000, 0xffff);
 
-        sprintf(buf, "H: %.2f %%rH", data.humidity / 1000.0l);
+        sprintf(buf, "H: %.2Lf %%rH", data.humidity / 1000.0l);
         Paint_DrawString_EN(0, 32, buf, &Font16, 0x0000, 0xffff);
 
         //printf("%.2f,%.2f,%.2f\n", data.temperature / 100.0f,
         //    data.pressure / 100.0f, data.humidity / 1000.0f );
         /* Avoid using measurements from an unstable heating setup */
         if(data.status & BME680_GASM_VALID_MSK) {
-            printf(", G: %d ohms", data.gas_resistance);
-            sprintf(buf, "G: %d ohms", data.gas_resistance);
+            printf(", G: %ld ohms", data.gas_resistance);
+            sprintf(buf, "G: %ld ohms", data.gas_resistance);
             Paint_DrawString_EN(0, 48, buf, &Font16, 0x0000, 0xffff);
         }
 
