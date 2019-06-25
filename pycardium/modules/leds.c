@@ -1,22 +1,33 @@
 #include "py/obj.h"
+#include "py/objlist.h"
+#include "py/runtime.h"
+
 #include "epicardium.h"
 
-static mp_obj_t mp_leds_set(size_t n_args, const mp_obj_t *args)
+static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
-	int led   = mp_obj_get_int(args[0]);
-	uint8_t r = mp_obj_get_int(args[1]);
-	uint8_t g = mp_obj_get_int(args[2]);
-	uint8_t b = mp_obj_get_int(args[3]);
+	mp_check_self(mp_obj_is_type(color_in, &mp_type_list));
+	mp_obj_list_t*color = MP_OBJ_TO_PTR(color_in);
+	int led = mp_obj_get_int(led_in);
 
-	epic_leds_set(led, r, g, b);
+	if (color->len < 3) {
+		mp_raise_ValueError("color list must have 3 elements");
+	}
+
+	epic_leds_set(
+		led,
+		mp_obj_get_int(color->items[0]),
+		mp_obj_get_int(color->items[1]),
+		mp_obj_get_int(color->items[2])
+	);
 
 	return mp_const_none;
 }
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(leds_set_obj, 4, 4, mp_leds_set);
+static MP_DEFINE_CONST_FUN_OBJ_2(leds_set_obj, mp_leds_set);
 
 static const mp_rom_map_elem_t leds_module_globals_table[] = {
-	{MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_leds)},
-	{MP_ROM_QSTR(MP_QSTR_set), MP_ROM_PTR(&leds_set_obj)},
+	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_leds) },
+	{ MP_ROM_QSTR(MP_QSTR_set), MP_ROM_PTR(&leds_set_obj) },
 };
 static MP_DEFINE_CONST_DICT(leds_module_globals, leds_module_globals_table);
 
