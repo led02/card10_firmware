@@ -24,6 +24,10 @@ micropython_includes = include_directories(
   './micropython/extmod/',
 )
 
+micropython_mod_sources = files(
+  'micropython/py/modarray.c',
+)
+
 micropython_sources = files(
   'micropython/py/argcheck.c',
   'micropython/py/asmarm.c', 'micropython/py/asmbase.c',

@@ -18,7 +18,7 @@ version_h = custom_target(
 modules_h = custom_target(
   'moduledefs.h',
   output: 'moduledefs.h',
-  input: [micropython_sources, modsrc],
+  input: [micropython_mod_sources, modsrc],
   command: [micropython_gen_modules, '@OUTPUT@', '@INPUT@'],
 )
 
@@ -30,7 +30,7 @@ qstr_h = custom_target(
     'mpconfigport.h',
     micropython_sources,
   ],
-  depends: [modules_h, version_h],
+  depends: [version_h],
   command: [micropython_gen_qstr, meson.current_source_dir(), '@OUTPUT@', '@INPUT@'],
 )
 
