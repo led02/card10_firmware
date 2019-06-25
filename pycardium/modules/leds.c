@@ -6,9 +6,12 @@
 
 static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
-	mp_check_self(mp_obj_is_type(color_in, &mp_type_list));
-	mp_obj_list_t*color = MP_OBJ_TO_PTR(color_in);
 	int led = mp_obj_get_int(led_in);
+
+	if (!mp_obj_is_type(color_in, &mp_type_list)) {
+		mp_raise_TypeError("color must be a list");
+	}
+	mp_obj_list_t*color = MP_OBJ_TO_PTR(color_in);
 
 	if (color->len < 3) {
 		mp_raise_ValueError("color list must have 3 elements");
