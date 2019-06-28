@@ -15,6 +15,8 @@ Install the cross-compiler and debugger either from your distributions repositor
 
 On Ubuntu, the package is called `gcc-arm-none-eabi`.
 
+If you downloaded the toolchain from ARM, you need to adjust `card10-cross.ini`.  Under `[binaries]`, prefix the names of each executable with the full path to the extracted toolchain directory.  Like `/path/to/gcc-arm-none-eabi-8-2018-q4-major/bin/arm-none-eabi-gcc`.
+
 ### Compiling the card10 firmware
 ```bash
 # Configure the build system
