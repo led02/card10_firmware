@@ -11,7 +11,7 @@ static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 	if (!mp_obj_is_type(color_in, &mp_type_list)) {
 		mp_raise_TypeError("color must be a list");
 	}
-	mp_obj_list_t*color = MP_OBJ_TO_PTR(color_in);
+	mp_obj_list_t* color = MP_OBJ_TO_PTR(color_in);
 
 	if (color->len < 3) {
 		mp_raise_ValueError("color list must have 3 elements");
@@ -35,7 +35,7 @@ static const mp_rom_map_elem_t leds_module_globals_table[] = {
 static MP_DEFINE_CONST_DICT(leds_module_globals, leds_module_globals_table);
 
 const mp_obj_module_t leds_module = {
-	.base = { &mp_type_module },
+	.base    = { &mp_type_module },
 	.globals = (mp_obj_dict_t*)&leds_module_globals,
 };
 

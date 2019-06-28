@@ -37,7 +37,7 @@ int main(void)
 	card10_init();
 	card10_diag();
 
-    cdcacm_init();
+	cdcacm_init();
 
 	printf("Initializing dispatcher ...\n");
 	api_dispatcher_init();
