@@ -1,12 +1,19 @@
 # card10 Firmware Readme
 
 ## Setup
-To compile the firmware you need `meson`(>0.40.0) and a `arm-none-eabi-gcc`.  You should also have python3 installed on your system.
+To compile the firmware you need the following:
+
+- `meson`(>0.40.0)
+- `arm-none-eabi-gcc` (package might be called `gcc-arm-none-eabi`)
+- `arm-none-eabi-binutils` (package might be called `binutils-arm-none-eabi`)
+- `arm-none-eabi-newlib` (package might be called `libnewlib-arm-none-eabi`)
+- `python3`
+- `python3-crc16` (`pip3 install --user crc16`)
 
 ### Compiler (`arm-none-eabi-gcc`)
 Install the cross-compiler and debugger either from your distributions repositories, or alternatively download a precompiled toolchain from [ARM](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
 
-On Ubuntu, the package is called `gcc-arm-none-eabi`
+On Ubuntu, the package is called `gcc-arm-none-eabi`.
 
 ### Compiling the card10 firmware
 ```bash
