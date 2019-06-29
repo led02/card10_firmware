@@ -3,11 +3,15 @@
 #include "py/lexer.h"
 #include "py/mpconfig.h"
 #include "py/mperrno.h"
+#include "py/mpstate.h"
 #include "py/obj.h"
 #include "py/runtime.h"
 
-#include "epicardium.h"
 #include "mxc_delay.h"
+#include "max32665.h"
+#include "tmr.h"
+
+#include "epicardium.h"
 
 /******************************************************************************
  * Serial Communication
@@ -23,6 +27,27 @@ int mp_hal_stdin_rx_chr(void)
 void mp_hal_stdout_tx_strn(const char* str, mp_uint_t len)
 {
 	epic_uart_write_str(str, len);
+}
+
+bool do_interrupt = false;
+
+/* Timer Interrupt used for control char notification */
+void TMR5_IRQHandler(void)
+{
+	TMR_IntClear(MXC_TMR5);
+
+	if (do_interrupt) {
+		/* Taken from lib/micropython/micropython/ports/unix/unix_mphal.c */
+		mp_obj_exception_clear_traceback(
+			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception))
+		);
+		nlr_raise(MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception)));
+	}
+}
+
+void mp_hal_set_interrupt_char(char c)
+{
+	do_interrupt = (c == 0x03);
 }
 
 /******************************************************************************

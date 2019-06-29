@@ -5,6 +5,7 @@
 
 #include "cdcacm.h"
 #include "uart.h"
+#include "tmr_utils.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -58,6 +59,11 @@ void vSerialTask(void*pvParameters)
 			chr = cdcacm_read();
 		} else {
 			continue;
+		}
+
+		if (chr == 0x3) {
+			/* Control-C */
+			TMR_TO_Start(MXC_TMR5, 1, 0);
 		}
 
 		if (xQueueSend(read_queue, &chr, 100) == errQUEUE_FULL) {

@@ -8,7 +8,11 @@
  * Right now, we do not support importing external modules
  * though this might change in the future.
  */
-#define MICROPY_ENABLE_EXTERNAL_IMPORT  (0)
+#define MICROPY_ENABLE_EXTERNAL_IMPORT      (0)
+
+/* We raise asynchronously from an interrupt handler */
+#define MICROPY_ASYNC_KBD_INTR              (1)
+#define MICROPY_KBD_EXCEPTION               (1)
 
 #define MICROPY_ENABLE_DOC_STRING           (1)
 #define MICROPY_ENABLE_GC                   (1)
