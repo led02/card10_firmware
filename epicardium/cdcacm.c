@@ -344,7 +344,10 @@ void USB_IRQHandler(void)
 }
 
 /******************************************************************************/
+/* TODO: We probably need to fix something related to this */
+#if 0
 void SysTick_Handler(void)
 {
     mxc_delay_handler();
 }
+#endif /* 0 */

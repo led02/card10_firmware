@@ -41,6 +41,22 @@ api_dispatcher_lib = static_library(
 
 ##########################################################################
 #
+# FreeRTOS
+#
+##########################################################################
+
+freertos = static_library(
+  'freertos',
+  freertos_sources,
+  dependencies: periphdriver,
+  include_directories: [
+    freertos_includes,
+    include_directories('./'),
+  ],
+)
+
+##########################################################################
+#
 # Epicardium executable
 #
 ##########################################################################
@@ -49,9 +65,11 @@ elf = executable(
   name + '.elf',
   'main.c',
   'cdcacm.c',
+  'serial.c',
   dependencies: [libcard10, max32665_startup_core0, maxusb],
-  link_with: api_dispatcher_lib,
+  link_with: [api_dispatcher_lib, freertos],
   link_whole: [max32665_startup_core0_lib, board_card10_lib],
+  include_directories: [freertos_includes],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
