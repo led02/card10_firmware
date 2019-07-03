@@ -2,6 +2,8 @@
 #include "py/gc.h"
 #include "lib/utils/pyexec.h"
 
+#include "max32665.h"
+
 static char* stack_top;
 static char heap[4096];
 
@@ -10,6 +12,9 @@ int main(void)
 	/* TODO: Replace this with a proper heap implementation */
 	int stack_dummy;
 	stack_top = (char*)&stack_dummy;
+
+	/* TMR5 is used to notify on keyboard interrupt */
+	NVIC_EnableIRQ(TMR5_IRQn);
 
 	gc_init(heap, heap + sizeof(heap));
 

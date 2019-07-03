@@ -7,6 +7,8 @@ subdir('./vendor/Maxim/MAX77650/')
 subdir('./vendor/Maxim/MAX86150/')
 subdir('./gfx/')
 
+subdir('./FreeRTOS/')
+subdir('./FreeRTOS-Plus/')
 subdir('./micropython/')
 
 subdir('./card10/')
