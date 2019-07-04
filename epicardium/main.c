@@ -57,6 +57,9 @@ int main(void)
 	card10_init();
 	card10_diag();
 
+	/* TODO: Move this to its own function */
+	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
 	pmic_set_button_callback(pmic_button);
 
 	cdcacm_init();

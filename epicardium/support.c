@@ -24,14 +24,10 @@ void pre_idle_sleep(TickType_t xExpectedIdleTime)
 		 * TODO: Ensure this is actually correct and does not have any
 		 * race conditions.
 		 */
-		__asm volatile( "cpsie i" ::: "memory" );
 		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "isb" );
+		__asm volatile( "sev" );
 		__asm volatile( "wfe" );
-		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "isb" );
-		__asm volatile( "cpsid i" ::: "memory" );
-		__asm volatile( "dsb" );
+		__asm volatile( "wfe" );
 		__asm volatile( "isb" );
 	}
 }
