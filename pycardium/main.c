@@ -16,13 +16,12 @@ int main(void)
 	/* TMR5 is used to notify on keyboard interrupt */
 	NVIC_EnableIRQ(TMR5_IRQn);
 
-	gc_init(heap, heap + sizeof(heap));
-
-	mp_init();
-	pyexec_friendly_repl();
-
 	while (1) {
-		;
+		gc_init(heap, heap + sizeof(heap));
+
+		mp_init();
+		pyexec_friendly_repl();
+		mp_deinit();
 	}
 }
 
