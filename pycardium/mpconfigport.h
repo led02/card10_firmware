@@ -4,15 +4,14 @@
 
 /* MicroPython Config Options */
 
-/*
- * Right now, we do not support importing external modules
- * though this might change in the future.
- */
-#define MICROPY_ENABLE_EXTERNAL_IMPORT      (0)
-
 /* We raise asynchronously from an interrupt handler */
 #define MICROPY_ASYNC_KBD_INTR              (1)
 #define MICROPY_KBD_EXCEPTION               (1)
+
+/* Enable precompiled frozen modules */
+#define MICROPY_MODULE_FROZEN_MPY           (1)
+#define MICROPY_MODULE_FROZEN               (1)
+#define MICROPY_QSTR_EXTRA_POOL             mp_qstr_frozen_const_pool
 
 #define MICROPY_ENABLE_DOC_STRING           (1)
 #define MICROPY_ENABLE_GC                   (1)

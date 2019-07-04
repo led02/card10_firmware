@@ -36,6 +36,20 @@ qstr_h = custom_target(
 
 mp_headers = [version_h, modules_h, qstr_h]
 
+#################################
+#    Python Frozen Modules      #
+#################################
+
+subdir('modules/py')
+
+frozen_source = custom_target(
+  'frozen.c',
+  output: 'frozen.c',
+  input: [qstr_h, frozen_modules],
+  build_by_default: true,
+  command: [micropython_gen_frozen, '@OUTPUT@', '@INPUT@'],
+)
+
 ###################
 # MicroPython Lib #
 ###################
@@ -52,6 +66,7 @@ elf = executable(
   name + '.elf',
   'main.c',
   'mphalport.c',
+  frozen_source,
   modsrc,
   mp_headers,
   include_directories: micropython_includes,

@@ -17,6 +17,36 @@ micropython_gen_qstr = [
   meson.current_source_dir(),
 ]
 
+# mpy-cross
+mpy_cross_bin = custom_target(
+  'mpy-cross',
+  output: 'mpy-cross',
+  build_by_default: true,
+  command: [files('gen-mpy-cross.sh'), meson.current_source_dir(), '@OUTPUT@'],
+)
+
+# seriously meson, this is retarded
+mpy_cross_wrapper = executable(
+  'mpy-cross-wrapper',
+  'mpy-cross-wrapper.c',
+  link_depends: mpy_cross_bin,
+  native: true,
+  c_args: ['-DMPY_CROSS_PATH="' + meson.current_build_dir() + '"'],
+)
+
+mpy_cross = generator(
+  mpy_cross_wrapper,
+  output: '@BASENAME@.mpy',
+  arguments: ['-o', '@OUTPUT@', '-s', '@PLAINNAME@', '-march=armv7m', '@INPUT@'],
+)
+
+micropython_gen_frozen = [
+  files('gen-frozen.sh'),
+  python3,
+  meson.current_source_dir(),
+]
+
+
 # Sources
 micropython_includes = include_directories(
   './micropython/',
