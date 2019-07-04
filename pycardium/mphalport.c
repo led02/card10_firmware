@@ -37,16 +37,24 @@ void TMR5_IRQHandler(void)
 	TMR_IntClear(MXC_TMR5);
 
 	if (do_interrupt) {
-		/* Taken from lib/micropython/micropython/ports/unix/unix_mphal.c */
-		mp_obj_exception_clear_traceback(
-			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception))
-		);
-		nlr_raise(MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception)));
+		/* Taken from lib/micropython/micropython/lib/utils/interrupt_char.c */
+		MP_STATE_VM(mp_pending_exception) =
+			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception));
+#if MICROPY_ENABLE_SCHEDULER
+		if (MP_STATE_VM(sched_state) == MP_SCHED_IDLE) {
+			MP_STATE_VM(sched_state) = MP_SCHED_PENDING;
+		}
+#endif
 	}
 }
 
 void mp_hal_set_interrupt_char(char c)
 {
+	if (c != -1) {
+		mp_obj_exception_clear_traceback(
+			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception))
+		);
+	}
 	do_interrupt = (c == 0x03);
 }
 
