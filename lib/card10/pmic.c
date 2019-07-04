@@ -4,6 +4,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
+static void pmic_interrupt_callback(void*_);
+static const gpio_cfg_t pmic_interrupt_pin = {
+    PORT_0, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
+};
+static pmic_button_callback_fn pmic_button_callback = NULL;
+
 void pmic_init(void)
 {
     uint8_t didm = MAX77650_getDIDM();
@@ -62,6 +68,50 @@ void pmic_init(void)
     MAX77650_setCHG_EN(1);          // Turn on charger
 
     MAX77650_setVSYS_REG(0b11000);  // Set VSYS to 4.7 V to reduce voltage across bypass diode
+
+    /* Setup interrupt & callback */
+    GPIO_Config(&pmic_interrupt_pin);
+    GPIO_RegisterCallback(&pmic_interrupt_pin, pmic_interrupt_callback, NULL);
+    GPIO_IntConfig(&pmic_interrupt_pin, GPIO_INT_EDGE, GPIO_INT_FALLING);
+    GPIO_IntEnable(&pmic_interrupt_pin);
+    NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pmic_interrupt_pin.port));
+
+/* Dropout Detector Rising */
+#define MAX77650_INT_DOD_R    (1 << 6)
+/* Thermal Alarm 2 Rising */
+#define MAX77650_INT_TJAL2_R  (1 << 5)
+/* Thermal Alarm 1 Rising */
+#define MAX77650_INT_TJAL1_R  (1 << 4)
+/* nEN Rising */
+#define MAX77650_INT_nEN_R    (1 << 3)
+/* nEN Falling */
+#define MAX77650_INT_nEN_F    (1 << 2)
+/* GPI Rising */
+#define MAX77650_INT_GPI_R    (1 << 1)
+/* GPI Falling */
+#define MAX77650_INT_GPI_F    (1 << 0)
+
+    /* Setup power button interrupt */
+    MAX77650_setINT_M_GLBL(~(MAX77650_INT_nEN_R | MAX77650_INT_nEN_F));
+    /* Clear existing interrupts */
+    MAX77650_getINT_GLBL();
+}
+
+static void pmic_interrupt_callback(void*_)
+{
+    uint8_t int_flag = MAX77650_getINT_GLBL();
+
+    if (int_flag & (MAX77650_INT_nEN_R | MAX77650_INT_nEN_F)) {
+        if (pmic_button_callback != NULL) {
+            (*pmic_button_callback)(int_flag & MAX77650_INT_nEN_F);
+        }
+    }
+    /* TODO: Other pmic interrupts */
+}
+
+void pmic_set_button_callback(pmic_button_callback_fn cb)
+{
+    pmic_button_callback = cb;
 }
 
 void pmic_set_led(uint8_t led, uint8_t val)
@@ -80,5 +130,3 @@ void pmic_set_led(uint8_t led, uint8_t val)
     }
 
 }
-
-
