@@ -12,7 +12,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-static TaskHandle_t dispatcher_task_id;
+TaskHandle_t dispatcher_task_id;
 
 /* TODO: Move out of main.c */
 void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
@@ -20,56 +20,6 @@ void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
 	leds_set(led, r, g, b);
 	leds_update();
 }
-
-/*
- * This hook is called before FreeRTOS enters tickless idle.
- */
-void pre_idle_sleep(TickType_t xExpectedIdleTime)
-{
-	if (xExpectedIdleTime > 0) {
-		/*
-		 * WFE because the other core should be able to notify
-		 * epicardium if it wants to issue an API call.
-		 */
-
-		/*
-		 * TODO: Ensure this is actually correct and does not have any
-		 * race conditions.
-		 */
-		__asm volatile( "cpsie i" ::: "memory" );
-		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "isb" );
-		__asm volatile( "wfe" );
-		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "isb" );
-		__asm volatile( "cpsid i" ::: "memory" );
-		__asm volatile( "dsb" );
-		__asm volatile( "isb" );
-	}
-}
-
-/*
- * This hook is called after FreeRTOS exits tickless idle.
- */
-void post_idle_sleep(TickType_t xExpectedIdleTime)
-{
-	/* Check whether a new API call was issued. */
-	if (api_dispatcher_poll_once()) {
-		xTaskNotifyGive(dispatcher_task_id);
-	}
-}
-
-#if 0
-void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
-{
-	if (xExpectedIdleTime > 0) {
-		__WFE();
-		if (api_dispatcher_poll()) {
-			xTaskNotifyGive(dispatcher_task_id);
-		}
-	}
-}
-#endif
 
 /*
  * API dispatcher task.  This task will sleep until an API call is issued and
@@ -83,36 +33,6 @@ void vApiDispatcher(void*pvParameters)
 		}
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 	}
-}
-
-void vApplicationGetIdleTaskMemory(
-	StaticTask_t**ppxIdleTaskTCBBuffer,
-	StackType_t**ppxIdleTaskStackBuffer,
-	uint32_t *pulIdleTaskStackSize)
-{
-	/*
-	 * If the buffers to be provided to the Idle task are declared inside this
-	 * function then they must be declared static - otherwise they will be allocated on
-	 * the stack and so not exists after this function exits.
-	 */
-	static StaticTask_t xIdleTaskTCB;
-	static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
-
-	/*
-	 * Pass out a pointer to the StaticTask_t structure in which the Idle task's
-	 * ktate will be stored.
-	 */
-	*ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
-
-	/* Pass out the array that will be used as the Idle task's stack. */
-	*ppxIdleTaskStackBuffer = uxIdleTaskStack;
-
-	/*
-	 * Pass out the size of the array pointed to by *ppxIdleTaskStackBuffer.
-	 * Note that, as the array is necessarily of type StackType_t,
-	 * configMINIMAL_STACK_SIZE is specified in words, not bytes.
-	 */
-	*pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
 int main(void)
