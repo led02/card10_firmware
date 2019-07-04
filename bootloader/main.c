@@ -8,6 +8,7 @@
 #include "mxc_delay.h"
 #include "flc.h"
 #include "icc.h"
+#include "i2c.h"
 #include "crc.h"
 #include "board.h"
 #include "led.h"
@@ -15,6 +16,7 @@
 #include "crc16-ccitt.h"
 #include "pb.h"
 
+#include "pmic.h"
 
 #define GPIO_PORT_IN                PORT_1
 #define GPIO_PIN_IN                 PIN_6
@@ -174,10 +176,25 @@ static inline void boot(const void * vtable){
 #pragma GCC diagnostic pop
 };
 
+static void pmic_button(bool falling)
+{
+	if (falling) {
+		MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+	}
+}
 
 /******************************************************************************/
 int main(void)
 {
+    /* Copied from card10_init() */
+    I2C_Shutdown(MXC_I2C0_BUS0);
+    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
+
+    I2C_Shutdown(MXC_I2C1_BUS0);
+    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+    pmic_init();
+    pmic_set_button_callback(pmic_button);
 
     printf("\n\nBootloader\n");
     // If the button is pressed, we go into MSC mode.
