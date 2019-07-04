@@ -13,7 +13,7 @@
 #include "queue.h"
 
 /* Task ID for the serial handler */
-TaskHandle_t serial_task_id;
+TaskHandle_t serial_task_id = NULL;
 
 /* The serial console in use (UART0) */
 extern mxc_uart_regs_t* ConsoleUart;
@@ -108,6 +108,10 @@ void vSerialTask(void*pvParameters)
 
 		while (UART_NumReadAvail(ConsoleUart) > 0) {
 			enqueue_char(UART_ReadByte(ConsoleUart));
+		}
+
+		while (cdcacm_num_read_avail() > 0) {
+			enqueue_char(cdcacm_read());
 		}
 	}
 }

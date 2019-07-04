@@ -172,6 +172,8 @@ void cdcacm_init(void)
 
     /* Start with USB in low power mode */
     usb_app_sleep();
+    /* TODO: Fix priority */
+    NVIC_SetPriority(USB_IRQn, 6);
     NVIC_EnableIRQ(USB_IRQn);
 }
 
@@ -338,9 +340,19 @@ static int usb_read_callback(void)
 }
 
 /******************************************************************************/
+#include "FreeRTOS.h"
+#include "task.h"
+
+extern TaskHandle_t serial_task_id;
 void USB_IRQHandler(void)
 {
     usb_event_handler();
+
+    if (serial_task_id != NULL) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(serial_task_id, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
 }
 
 /******************************************************************************/
