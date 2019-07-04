@@ -16,13 +16,6 @@
 
 TaskHandle_t dispatcher_task_id;
 
-/* TODO: Move out of main.c */
-void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
-{
-	leds_set(led, r, g, b);
-	leds_update();
-}
-
 /*
  * API dispatcher task.  This task will sleep until an API call is issued and
  * then wake up to dispatch it.

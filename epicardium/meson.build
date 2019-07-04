@@ -67,6 +67,7 @@ elf = executable(
   'main.c',
   'serial.c',
   'support.c',
+  'modules/leds.c',
   dependencies: [libcard10, max32665_startup_core0, maxusb],
   link_with: [api_dispatcher_lib, freertos],
   link_whole: [max32665_startup_core0_lib, board_card10_lib],
