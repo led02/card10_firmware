@@ -179,6 +179,14 @@ static inline void boot(const void * vtable){
 static void pmic_button(bool falling)
 {
 	if (falling) {
+		printf("Resetting ...\n");
+		/*
+		 * Give the UART fifo time to clear.
+		 * TODO: Do this properly
+		 */
+		for (int i = 0; i < 0x1000000; i++) {
+			__asm volatile("nop");
+		}
 		MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
 	}
 }
