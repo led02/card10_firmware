@@ -14,4 +14,7 @@ void vSerialTask(void *pvParameters);
 #define PMIC_PRESS_POWEROFF        40
 void vPmicTask(void *pvParameters);
 
+// Forces an unlock of the display. Only to be used in epicardium
+void disp_forcelock();
+
 #endif /* MODULES_H */

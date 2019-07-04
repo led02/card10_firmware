@@ -24,6 +24,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/color
    pycardium/leds
    pycardium/vibra
+   pycardium/display
 
 .. toctree::
    :maxdepth: 1
