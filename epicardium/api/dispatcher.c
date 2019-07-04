@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "sema.h"
 #include "api/dispatcher.h"
+#include "max32665.h"
 
 int api_dispatcher_init()
 {
@@ -13,7 +14,9 @@ int api_dispatcher_init()
 	 * Enable TX events for both cores.
 	 * TODO: Is this the right place?
 	 */
-	MXC_GCR->evten |= 0x24;
+	MXC_GCR->evten |= 0
+		| MXC_F_GCR_EVTEN_CPU0TXEVENT
+		| MXC_F_GCR_EVTEN_CPU1TXEVENT;
 
 	return ret;
 }
