@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "max32665.h"
 #include "uart.h"
 #include "cdcacm.h"
 
 #include "card10.h"
+#include "pmic.h"
 #include "leds.h"
 #include "api/dispatcher.h"
 #include "serial.h"
@@ -35,14 +37,23 @@ void vApiDispatcher(void*pvParameters)
 	}
 }
 
+static void pmic_button(bool falling)
+{
+	if (falling) {
+		MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+	}
+}
+
 int main(void)
 {
 	card10_init();
 	card10_diag();
 
+	pmic_set_button_callback(pmic_button);
+
 	cdcacm_init();
 
-	printf("Initializing tasks ...\n");
+	printf("=> Initializing tasks ...\n");
 
 	/* Serial */
 	if (xTaskCreate(
@@ -69,12 +80,13 @@ int main(void)
 		abort();
 	}
 
-	printf("Initializing dispatcher ...\n");
+	printf("=> Initializing dispatcher ...\n");
 	api_dispatcher_init();
 
-	printf("Staring core1 payload ...\n");
+	printf("=> Starting core1 payload ...\n");
 	core1_start();
 
+	printf("=> Starting FreeRTOS ...\n");
 	vTaskStartScheduler();
 	printf("ERROR: FreeRTOS did not start due to unknown error!\n");
 }
