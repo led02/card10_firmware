@@ -2,11 +2,25 @@
 #include "sema.h"
 #include "api/caller.h"
 
+#define  MXC_ASSERT_ENABLE
+#include "mxc_assert.h"
+
 void*_api_call_start(api_id_t id, uintptr_t size)
 {
 	while (SEMA_GetSema(_API_SEMAPHORE) == E_BUSY) {}
 
-	/* TODO: Check flag */
+	if (API_CALL_MEM->call_flag != _API_FLAG_IDLE) {
+		/*
+		 * The only way this can happen is if a call was issued from an
+		 * interrupt hander while another call is still happening.  This
+		 * has to be prevented at all cost!
+		 */
+		mxc_assert(
+			"API recalled during ongoing call!",
+			__FILE__,
+			__LINE__
+		);
+	}
 
 	API_CALL_MEM->id = id;
 	return API_CALL_MEM->buffer;
