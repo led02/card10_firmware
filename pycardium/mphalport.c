@@ -76,15 +76,14 @@ void mp_hal_delay_us(mp_uint_t us)
  * Fatal Errors
  */
 
+extern NORETURN void * Reset_Handler (void);
+
 void NORETURN nlr_jump_fail(void* val)
 {
-	/* TODO: Report error and restart */
 	char msg[] = " >>> nlr_jump_fail <<<\r\n";
 	epic_uart_write_str(msg, sizeof(msg));
 
-	while (1) {
-		__asm("nop");
-	}
+	Reset_Handler();
 }
 
 /******************************************************************************
