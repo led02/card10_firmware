@@ -17,6 +17,9 @@ ln -sfr "$OUTPUT" "$OUTPUT_DIR/genhdr/$(basename "$OUTPUT")"
 # call gcc -E to generate qstr.i.last
 gcc -E -DNO_QSTR -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" "$@" >"$OUTPUT_DIR/qstr.i.last"
 
+# Remove previous artifacts
+rm -rf "$OUTPUT_DIR/qstr"
+
 # Generate qstr.split
 "$PYTHON" "$SOURCE_DIR/micropython/py/makeqstrdefs.py" split \
     "$OUTPUT_DIR/qstr.i.last" "$OUTPUT_DIR/qstr" "$OUTPUT_DIR/qstrdefs.collected.h" >/dev/null
