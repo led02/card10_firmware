@@ -7,11 +7,20 @@
 int api_dispatcher_init();
 
 /*
- * Attempt to dispatch a call, if the caller has requested one.
- * Will return 0 if no call was dispatched and the ID of the dispatched
- * call otherwise.
+ * Check whether the other core requested a call.  If this function returns
+ * true, the dispatcher should call api_dispatcher_exec() to actually dispatch
+ * the call.  Consecutive calls to this function will return false.  Use
+ * api_dispatcher_poll() if your need to recheck.
  */
-api_id_t api_dispatcher_poll();
+bool api_dispatcher_poll_once();
+bool api_dispatcher_poll();
+
+/*
+ * Attempt to dispatch a call, if one had been polled using
+ * api_dispatcher_poll().  Will return 0 if no call was dispatched or the ID of
+ * the dispatched call otherwise.
+ */
+api_id_t api_dispatcher_exec();
 
 /* This function is defined by the generated dispatcher code */
 void __api_dispatch_call(api_id_t id, void*buffer);

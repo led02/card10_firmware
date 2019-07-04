@@ -1,6 +1,9 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+#define  MXC_ASSERT_ENABLE
+#include "mxc_assert.h"
+
 #include "max32665.h"
 
 /* CMSIS keeps a global updated with current system clock in Hz */
@@ -22,7 +25,14 @@
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY  ( ( unsigned char ) 5 << ( 8 - configPRIO_BITS) )  
 
 /* We want to use preemption to easier integrate components */
-#define configUSE_PREEMPTION        1
+/* TODO: Figure out why turning this on does not work ... */
+#define configUSE_PREEMPTION        0
+
+/*
+ * Tickless idle from the FreeRTOS port + our own hooks (defined further down in
+ * this file)
+ */
+#define configUSE_TICKLESS_IDLE     1
 
 /* TODO: Adjust */
 #define configUSE_IDLE_HOOK         0
@@ -41,5 +51,18 @@
 #define vPortSVCHandler       SVC_Handler
 #define xPortPendSVHandler    PendSV_Handler
 #define xPortSysTickHandler   SysTick_Handler
+
+/* Assert */
+#define configASSERT(x)       MXC_ASSERT(x)
+
+/* Tickless idle hooks */
+typedef uint32_t TickType_t;
+void pre_idle_sleep(TickType_t xExpectedIdleTime);
+#define configPRE_SLEEP_PROCESSING(xModifiableIdleTime) \
+	pre_idle_sleep(xModifiableIdleTime); xModifiableIdleTime = 0
+
+void post_idle_sleep(TickType_t xExpectedIdleTime);
+#define configPOST_SLEEP_PROCESSING(xExpectedIdleTime) \
+	post_idle_sleep(xExpectedIdleTime)
 
 #endif /* FREERTOS_CONFIG_H */

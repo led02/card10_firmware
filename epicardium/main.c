@@ -12,17 +12,65 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+static TaskHandle_t dispatcher_task_id;
+
+/* TODO: Move out of main.c */
 void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
 {
 	leds_set(led, r, g, b);
 	leds_update();
 }
 
+/*
+ * This hook is called before FreeRTOS enters tickless idle.
+ */
+void pre_idle_sleep(TickType_t xExpectedIdleTime)
+{
+	if (xExpectedIdleTime > 0) {
+		/*
+		 * WFE because the other core should be able to notify
+		 * epicardium if it wants to issue an API call.
+		 */
+		__asm volatile( "dsb" ::: "memory" );
+		__asm volatile( "wfe" );
+		__asm volatile( "isb" );
+	}
+}
+
+/*
+ * This hook is called after FreeRTOS exits tickless idle.
+ */
+void post_idle_sleep(TickType_t xExpectedIdleTime)
+{
+	/* Check whether a new API call was issued. */
+	if (api_dispatcher_poll_once()) {
+		xTaskNotifyGive(dispatcher_task_id);
+	}
+}
+
+#if 0
+void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
+{
+	if (xExpectedIdleTime > 0) {
+		__WFE();
+		if (api_dispatcher_poll()) {
+			xTaskNotifyGive(dispatcher_task_id);
+		}
+	}
+}
+#endif
+
+/*
+ * API dispatcher task.  This task will sleep until an API call is issued and
+ * then wake up to dispatch it.
+ */
 void vApiDispatcher(void*pvParameters)
 {
 	while (1) {
-		api_dispatcher_poll();
-		vTaskDelay(portTICK_PERIOD_MS * 10);
+		if (api_dispatcher_poll()) {
+			api_dispatcher_exec();
+		}
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 	}
 }
 
@@ -84,7 +132,7 @@ int main(void)
 		configMINIMAL_STACK_SIZE,
 		NULL,
 		tskIDLE_PRIORITY  + 2,
-		NULL
+		&dispatcher_task_id
 	) != pdPASS) {
 		printf("Failed to create api dispatcher task!\n");
 		abort();
@@ -97,12 +145,5 @@ int main(void)
 	core1_start();
 
 	vTaskStartScheduler();
-	printf("ERROR: FreeRTOS did not start due to above error!\n");
-
-#if 0
-	while(1) {
-		__WFE();
-		api_dispatcher_poll();
-	}
-#endif
+	printf("ERROR: FreeRTOS did not start due to unknown error!\n");
 }
