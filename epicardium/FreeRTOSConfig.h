@@ -25,8 +25,7 @@
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY  ( ( unsigned char ) 5 << ( 8 - configPRIO_BITS) )  
 
 /* We want to use preemption to easier integrate components */
-/* TODO: Figure out why turning this on does not work ... */
-#define configUSE_PREEMPTION        0
+#define configUSE_PREEMPTION        1
 
 /*
  * Tickless idle from the FreeRTOS port + our own hooks (defined further down in
