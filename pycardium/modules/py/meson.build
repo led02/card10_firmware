@@ -1,5 +1,5 @@
 python_modules = files(
-  'foo.py',
+  'color.py',
 )
 
 frozen_modules = mpy_cross.process(python_modules)
