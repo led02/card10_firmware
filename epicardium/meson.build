@@ -67,7 +67,6 @@ elf = executable(
   name + '.elf',
   'cdcacm.c',
   'main.c',
-  'serial.c',
   'support.c',
   module_sources,
   dependencies: [libcard10, max32665_startup_core0, maxusb],

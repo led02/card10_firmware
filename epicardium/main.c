@@ -9,7 +9,7 @@
 #include "pmic.h"
 #include "leds.h"
 #include "api/dispatcher.h"
-#include "serial.h"
+#include "modules/serial.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
