@@ -65,34 +65,11 @@ void card10_init(void)
         while (1);
     }
 
-
     display_init();
 
     leds_init();
 
     GPIO_Config(&bhi_interrupt_pin);
-
-    if(bhy_driver_init(bhy1_fw)) {
-        printf("Failed to init bhy\n");
-    } else {
-        /* wait for the bhy trigger the interrupt pin go down and up again */
-        while (GPIO_InGet(&bhi_interrupt_pin));
-        while (!GPIO_InGet(&bhi_interrupt_pin));
-
-        /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
-        /* calculated in a correct coordinates system. */
-        int8_t                     bhy_mapping_matrix_config[3*3] = {0,-1,0,1,0,0,0,0,1};
-        int8_t                     mag_mapping_matrix_config[3*3] = {-1,0,0,0,1,0,0,0,-1};
-        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_ACC, bhy_mapping_matrix_config);
-        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_MAG, mag_mapping_matrix_config);
-        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_GYRO, bhy_mapping_matrix_config);
-
-        /* the sic matrix should be calculated for customer platform by logging uncalibrated magnetometer data. */
-        /* the sic matrix here is only an example array (identity matrix). Customer should generate their own matrix. */
-        /* This affects magnetometer fusion performance. */
-        float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
-        bhy_set_sic_matrix(sic_array);
-    }
 
     portexpander_init();
 }
@@ -134,6 +111,29 @@ void card10_diag(void)
             printf("Found (7 bit) address 0x%02x on I2C1\n", addr);
         }
     }
+
+    if(bhy_driver_init(bhy1_fw)) {
+        printf("Failed to init bhy\n");
+    } else {
+        /* wait for the bhy trigger the interrupt pin go down and up again */
+        while (GPIO_InGet(&bhi_interrupt_pin));
+        while (!GPIO_InGet(&bhi_interrupt_pin));
+
+        /* the remapping matrix for BHI and Magmetometer should be configured here to make sure rotation vector is */
+        /* calculated in a correct coordinates system. */
+        int8_t                     bhy_mapping_matrix_config[3*3] = {0,-1,0,1,0,0,0,0,1};
+        int8_t                     mag_mapping_matrix_config[3*3] = {-1,0,0,0,1,0,0,0,-1};
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_ACC, bhy_mapping_matrix_config);
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_MAG, mag_mapping_matrix_config);
+        bhy_mapping_matrix_set(PHYSICAL_SENSOR_INDEX_GYRO, bhy_mapping_matrix_config);
+
+        /* the sic matrix should be calculated for customer platform by logging uncalibrated magnetometer data. */
+        /* the sic matrix here is only an example array (identity matrix). Customer should generate their own matrix. */
+        /* This affects magnetometer fusion performance. */
+        float sic_array[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+        bhy_set_sic_matrix(sic_array);
+    }
+
 
 
     struct bme680_dev gas_sensor;

@@ -15,6 +15,9 @@
 #include "ff.h"
 #include "crc16-ccitt.h"
 #include "pb.h"
+#include "display.h"
+#include "GUI_Paint.h"
+#include "card10.h"
 
 #include "pmic.h"
 
@@ -194,19 +197,20 @@ static void pmic_button(bool falling)
 /******************************************************************************/
 int main(void)
 {
-    /* Copied from card10_init() */
-    I2C_Shutdown(MXC_I2C0_BUS0);
-    I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
+    printf("\n\nBootloader\n");
+    card10_init();
 
-    I2C_Shutdown(MXC_I2C1_BUS0);
-    I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
-
-    pmic_init();
     pmic_set_button_callback(pmic_button);
 
-    printf("\n\nBootloader\n");
+    Paint_DrawString_EN(0, 16*0, "Bootloader", &Font16, 0x0000, 0xffff);
+    Paint_DrawString_EN(0, 16*1, __DATE__, &Font16, 0x0000, 0xffff);
+
+    LCD_Update();
+
     // If the button is pressed, we go into MSC mode.
     if (PB_Get(0) || PB_Get(1)) {
+        Paint_DrawString_EN(0, 16*2, "USB activated. Waiting.", &Font16, 0x0000, 0xffff);
+        LCD_Update();
         run_usbmsc();
 
         // If we return, don't try to boot. Maybe rather trigger a software reset.
@@ -215,28 +219,34 @@ int main(void)
         while(1);
     }
 
-    //MXC_FLC0->clkdiv = 96;
-    //MXC_FLC0->clkdiv = 96;
-
     if(mount()) {
         if(check_integrity()) {
             printf("Found valid application image\n");
             if(is_update_needed()) {
                 printf("Trying to update application from external flash\n");
+                Paint_DrawString_EN(0, 16*4, "Updating...", &Font16, 0x0000, 0xffff);
+                LCD_Update();
                 erase_partition();
                 flash_partition();
             } else {
                 printf("No update needed\n");
             }
         } else {
+            Paint_DrawString_EN(0, 16*2, "Integrity check failed", &Font16, 0x0000, 0xffff);
+            LCD_Update();
             printf("Integrity check failed\n");
         }
     } else {
+        Paint_DrawString_EN(0, 16*2, "Failed to mount file system", &Font16, 0x0000, 0xffff);
+        LCD_Update();
         printf("Failed to mount the external flash\n");
     }
 
 
     printf("Trying to boot\n");
+    Paint_DrawString_EN(0, 16*4, "Trying to boot", &Font16, 0x0000, 0xffff);
+    LCD_Update();
+    //while(1);
     // boot partition
     boot((uintptr_t *) PARTITION_START);
 
