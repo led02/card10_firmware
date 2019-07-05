@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "py/lexer.h"
 #include "py/mpconfig.h"
@@ -27,6 +29,16 @@ int mp_hal_stdin_rx_chr(void)
 void mp_hal_stdout_tx_strn(const char* str, mp_uint_t len)
 {
 	epic_uart_write_str(str, len);
+}
+
+/* Used by MicroPython for debug output */
+int DEBUG_printf(const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	int ret = vprintf(fmt, args);
+	va_end(args);
+	return ret;
 }
 
 bool do_interrupt = false;
