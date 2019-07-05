@@ -25,8 +25,6 @@ void pre_idle_sleep(TickType_t xExpectedIdleTime)
 		 * race conditions.
 		 */
 		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "sev" );
-		__asm volatile( "wfe" );
 		__asm volatile( "wfe" );
 		__asm volatile( "isb" );
 	}
