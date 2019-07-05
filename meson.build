@@ -24,8 +24,6 @@ add_global_arguments(
 add_global_link_arguments(
   '-Wl,--gc-sections',
   '-lm',
-  '--specs=nano.specs',
-  '-u _printf_float',
   language: 'c',
 )
 
