@@ -8,21 +8,21 @@ static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
 	int led = mp_obj_get_int(led_in);
 
-	if (!mp_obj_is_type(color_in, &mp_type_list)) {
-		mp_raise_TypeError("color must be a list");
-	}
-	mp_obj_list_t* color = MP_OBJ_TO_PTR(color_in);
-
-	if (color->len < 3) {
-		mp_raise_ValueError("color list must have 3 elements");
+	if (mp_obj_get_int(mp_obj_len(color_in)) < 3) {
+		mp_raise_ValueError("color must have 3 elements");
 	}
 
-	epic_leds_set(
-		led,
-		mp_obj_get_int(color->items[0]),
-		mp_obj_get_int(color->items[1]),
-		mp_obj_get_int(color->items[2])
+	uint8_t red = mp_obj_get_int(
+		mp_obj_subscr(color_in, mp_obj_new_int(0), MP_OBJ_SENTINEL)
 	);
+	uint8_t green = mp_obj_get_int(
+		mp_obj_subscr(color_in, mp_obj_new_int(1), MP_OBJ_SENTINEL)
+	);
+	uint8_t blue = mp_obj_get_int(
+		mp_obj_subscr(color_in, mp_obj_new_int(2), MP_OBJ_SENTINEL)
+	);
+
+	epic_leds_set(led, red, green, blue);
 
 	return mp_const_none;
 }
