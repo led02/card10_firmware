@@ -7,6 +7,8 @@
 
 #include "api/dispatcher.h"
 
+#include "card10.h"
+
 extern TaskHandle_t dispatcher_task_id;
 
 /*
@@ -39,6 +41,10 @@ void post_idle_sleep(TickType_t xExpectedIdleTime)
 	if (api_dispatcher_poll_once()) {
 		xTaskNotifyGive(dispatcher_task_id);
 	}
+
+    // Do card10 house keeping. E.g. polling the i2c devices if they triggered an interrupt
+    // TODO: Do this in a more task fokused way (high/low ISR)
+    card10_poll();
 }
 
 void vApplicationGetIdleTaskMemory(

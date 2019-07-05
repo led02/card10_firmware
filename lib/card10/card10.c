@@ -185,3 +185,7 @@ void core1_stop(void) {
     MXC_GCR->perckcn1 |= MXC_F_GCR_PERCKCN1_CPU1;
 }
 
+void card10_poll(void)
+{
+    pmic_poll();
+}

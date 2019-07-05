@@ -9,11 +9,14 @@ static const gpio_cfg_t pmic_interrupt_pin = {
     PORT_0, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
 };
 static pmic_button_callback_fn pmic_button_callback = NULL;
+static volatile bool interrupt_pending;
 
 void pmic_init(void)
 {
     uint8_t didm = MAX77650_getDIDM();
     uint8_t cid = MAX77650_getChipID();
+    interrupt_pending = false;
+
     printf("MAX7765x DIDM: 0x%02x CID: 0x%02x\n", didm, cid);
 
     MAX77650_setIP_SBB0(0b11);  //Limit switch current of SBB0 to 500mA for noise reduction
@@ -99,14 +102,23 @@ void pmic_init(void)
 
 static void pmic_interrupt_callback(void*_)
 {
-    uint8_t int_flag = MAX77650_getINT_GLBL();
+    interrupt_pending = true;
+}
 
-    if (int_flag & (MAX77650_INT_nEN_R | MAX77650_INT_nEN_F)) {
-        if (pmic_button_callback != NULL) {
-            (*pmic_button_callback)(int_flag & MAX77650_INT_nEN_F);
+void pmic_poll(void)
+{
+    if(interrupt_pending) {
+        /* There might be a race condition here. Don't care ATM. */
+        interrupt_pending = false;
+        uint8_t int_flag = MAX77650_getINT_GLBL();
+
+        if (int_flag & (MAX77650_INT_nEN_R | MAX77650_INT_nEN_F)) {
+            if (pmic_button_callback != NULL) {
+                (*pmic_button_callback)(int_flag & MAX77650_INT_nEN_F);
+            }
         }
+        /* TODO: Other pmic interrupts */
     }
-    /* TODO: Other pmic interrupts */
 }
 
 void pmic_set_button_callback(pmic_button_callback_fn cb)

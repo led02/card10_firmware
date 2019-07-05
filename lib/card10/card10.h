@@ -12,4 +12,5 @@ void card10_diag(void);
 void core1_start(void);
 void core1_stop(void);
 
+void card10_poll(void);
 #endif

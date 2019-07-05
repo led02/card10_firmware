@@ -51,7 +51,7 @@
 #include "msc.h"
 #include "descriptors.h"
 #include "mscmem.h"
-
+#include "card10.h"
 
 /***** Definitions *****/
 #define EVENT_ENUM_COMP     MAXUSB_NUM_EVENTS
@@ -212,6 +212,8 @@ void run_usbmsc(void)
                 printf("Remote Wakeup\n");
             }
         }
+
+        card10_poll();
     }
 }
 
