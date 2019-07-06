@@ -26,7 +26,7 @@ int mp_hal_stdin_rx_chr(void)
 }
 
 /* Send string of given length */
-void mp_hal_stdout_tx_strn(const char* str, mp_uint_t len)
+void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len)
 {
 	epic_uart_write_str(str, len);
 }
@@ -88,9 +88,9 @@ void mp_hal_delay_us(mp_uint_t us)
  * Fatal Errors
  */
 
-extern NORETURN void * Reset_Handler (void);
+extern NORETURN void *Reset_Handler(void);
 
-void NORETURN nlr_jump_fail(void* val)
+void NORETURN nlr_jump_fail(void *val)
 {
 	char msg[] = " >>> nlr_jump_fail <<<\r\n";
 	epic_uart_write_str(msg, sizeof(msg));
@@ -102,18 +102,18 @@ void NORETURN nlr_jump_fail(void* val)
  * Stubs
  */
 
-mp_lexer_t* mp_lexer_new_from_file(const char* filename)
+mp_lexer_t *mp_lexer_new_from_file(const char *filename)
 {
 	/* TODO: Do we need an implementation for this? */
 	mp_raise_OSError(MP_ENOENT);
 }
 
-mp_import_stat_t mp_import_stat(const char* path)
+mp_import_stat_t mp_import_stat(const char *path)
 {
 	return MP_IMPORT_STAT_NO_EXIST;
 }
 
-mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t* args, mp_map_t* kwargs)
+mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs)
 {
 	/* TODO: Once fs is implemented, get this working as well */
 	return mp_const_none;

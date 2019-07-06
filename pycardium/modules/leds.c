@@ -36,7 +36,7 @@ static MP_DEFINE_CONST_DICT(leds_module_globals, leds_module_globals_table);
 
 const mp_obj_module_t leds_module = {
 	.base    = { &mp_type_module },
-	.globals = (mp_obj_dict_t*)&leds_module_globals,
+	.globals = (mp_obj_dict_t *)&leds_module_globals,
 };
 
 /* Register the module to make it available in Python */
