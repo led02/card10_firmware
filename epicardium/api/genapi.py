@@ -16,7 +16,7 @@ MATCH_DECLARATION = re.compile(
 )
 
 MATCH_TYPENAME = re.compile(
-    r"^(?P<type>(?:const )?(?:struct )?\w+(?:\s+|\*+))(?P<name>\w+)$",
+    r"^(?P<type>(?:const )?(?:struct )?\w+[*\s]+)(?P<name>\w+)$",
 )
 
 
