@@ -1,17 +1,21 @@
 #include "py/runtime.h"
 #include "py/gc.h"
 #include "lib/utils/pyexec.h"
+#include "py/stackctrl.h"
+#include <stdio.h>
 
 #include "max32665.h"
 
-static char *stack_top;
 static char heap[4096];
+
+extern int __StackTop, __StackLimit;
 
 int main(void)
 {
-	/* TODO: Replace this with a proper heap implementation */
-	int stack_dummy;
-	stack_top = (char *)&stack_dummy;
+	if (0) {
+		mp_stack_set_top(&__StackTop);
+		mp_stack_set_limit((mp_int_t)&__StackLimit);
+	}
 
 	/* TMR5 is used to notify on keyboard interrupt */
 	NVIC_EnableIRQ(TMR5_IRQn);
@@ -27,13 +31,12 @@ int main(void)
 
 void gc_collect(void)
 {
-	/* TODO: Replace this with a proper heap implementation */
-	void *dummy;
+	void *sp = (void *)__get_MSP();
 
 	gc_collect_start();
 	gc_collect_root(
-		&dummy,
-		((mp_uint_t)stack_top - (mp_uint_t)&dummy) / sizeof(mp_uint_t)
+		sp,
+		((mp_uint_t)&__StackTop - (mp_uint_t)sp) / sizeof(mp_uint_t)
 	);
 	gc_collect_end();
 }
