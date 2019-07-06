@@ -8,7 +8,7 @@
 #define _API_SEMAPHORE    0
 
 /* Type of API IDs */
-typedef uint32_t api_id_t ;
+typedef uint32_t api_id_t;
 
 #define _API_FLAG_IDLE        0
 #define _API_FLAG_CALLING     1

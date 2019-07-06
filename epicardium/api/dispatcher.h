@@ -23,4 +23,4 @@ bool api_dispatcher_poll();
 api_id_t api_dispatcher_exec();
 
 /* This function is defined by the generated dispatcher code */
-void __api_dispatch_call(api_id_t id, void*buffer);
+void __api_dispatch_call(api_id_t id, void *buffer);

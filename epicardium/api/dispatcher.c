@@ -7,16 +7,15 @@ int api_dispatcher_init()
 {
 	int ret;
 
-	ret = SEMA_Init(NULL);
+	ret                     = SEMA_Init(NULL);
 	API_CALL_MEM->call_flag = _API_FLAG_IDLE;
 
 	/*
 	 * Enable TX events for both cores.
 	 * TODO: Is this the right place?
 	 */
-	MXC_GCR->evten |= 0
-		| MXC_F_GCR_EVTEN_CPU0TXEVENT
-		| MXC_F_GCR_EVTEN_CPU1TXEVENT;
+	MXC_GCR->evten |=
+		MXC_F_GCR_EVTEN_CPU0TXEVENT | MXC_F_GCR_EVTEN_CPU1TXEVENT;
 
 	return ret;
 }
@@ -29,7 +28,8 @@ bool api_dispatcher_poll_once()
 		return false;
 	}
 
-	while (SEMA_GetSema(_API_SEMAPHORE) == E_BUSY) {}
+	while (SEMA_GetSema(_API_SEMAPHORE) == E_BUSY) {
+	}
 
 	if (API_CALL_MEM->call_flag != _API_FLAG_CALLING) {
 		SEMA_FreeSema(_API_SEMAPHORE);

@@ -14,7 +14,7 @@
  *     to fill.  NULL if an error occured or no buffer of the requested
  *     size is available.
  */
-void*_api_call_start(api_id_t id, uintptr_t size);
+void *_api_call_start(api_id_t id, uintptr_t size);
 
 /*
  * Actually do the API call that was previously initiated using
@@ -26,4 +26,4 @@ void*_api_call_start(api_id_t id, uintptr_t size);
  * Returns:
  *   - Pointer to a buffer containing the return value
  */
-void*_api_call_transact(void*buffer);
+void *_api_call_transact(void *buffer);

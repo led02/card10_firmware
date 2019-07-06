@@ -3,6 +3,6 @@
 
 #define SERIAL_READ_BUFFER_SIZE 128
 
-void vSerialTask(void*pvParameters);
+void vSerialTask(void *pvParameters);
 
 #endif /* EPIC_SERIAL_H */

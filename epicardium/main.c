@@ -20,7 +20,7 @@ TaskHandle_t dispatcher_task_id;
  * API dispatcher task.  This task will sleep until an API call is issued and
  * then wake up to dispatch it.
  */
-void vApiDispatcher(void*pvParameters)
+void vApiDispatcher(void *pvParameters)
 {
 	while (1) {
 		if (api_dispatcher_poll()) {
@@ -61,25 +61,23 @@ int main(void)
 
 	/* Serial */
 	if (xTaskCreate(
-		vSerialTask,
-		(const char*)"Serial",
-		configMINIMAL_STACK_SIZE,
-		NULL,
-		tskIDLE_PRIORITY + 1,
-		NULL
-	) != pdPASS) {
+		    vSerialTask,
+		    (const char *)"Serial",
+		    configMINIMAL_STACK_SIZE,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
 		printf("Failed to create serial-comms task!\n");
 		abort();
 	}
 
 	if (xTaskCreate(
-		vApiDispatcher,
-		(const char*)"API Dispatcher",
-		configMINIMAL_STACK_SIZE,
-		NULL,
-		tskIDLE_PRIORITY  + 2,
-		&dispatcher_task_id
-	) != pdPASS) {
+		    vApiDispatcher,
+		    (const char *)"API Dispatcher",
+		    configMINIMAL_STACK_SIZE,
+		    NULL,
+		    tskIDLE_PRIORITY + 2,
+		    &dispatcher_task_id) != pdPASS) {
 		printf("Failed to create api dispatcher task!\n");
 		abort();
 	}

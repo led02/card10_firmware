@@ -26,9 +26,9 @@ void pre_idle_sleep(TickType_t xExpectedIdleTime)
 		 * TODO: Ensure this is actually correct and does not have any
 		 * race conditions.
 		 */
-		__asm volatile( "dsb" ::: "memory" );
-		__asm volatile( "wfe" );
-		__asm volatile( "isb" );
+		__asm volatile("dsb" ::: "memory");
+		__asm volatile("wfe");
+		__asm volatile("isb");
 	}
 }
 
@@ -42,23 +42,27 @@ void post_idle_sleep(TickType_t xExpectedIdleTime)
 		xTaskNotifyGive(dispatcher_task_id);
 	}
 
-    // Do card10 house keeping. E.g. polling the i2c devices if they triggered an interrupt
-    // TODO: Do this in a more task fokused way (high/low ISR)
-    card10_poll();
+	/*
+	 * Do card10 house keeping. e.g. polling the i2c devices if they
+	 * triggered an interrupt.
+	 *
+	 * TODO: Do this in a more task focused way (high/low ISR)
+	 */
+	card10_poll();
 }
 
 void vApplicationGetIdleTaskMemory(
-	StaticTask_t**ppxIdleTaskTCBBuffer,
-	StackType_t**ppxIdleTaskStackBuffer,
-	uint32_t *pulIdleTaskStackSize)
-{
+	StaticTask_t **ppxIdleTaskTCBBuffer,
+	StackType_t **ppxIdleTaskStackBuffer,
+	uint32_t *pulIdleTaskStackSize
+) {
 	/*
 	 * If the buffers to be provided to the Idle task are declared inside this
 	 * function then they must be declared static - otherwise they will be allocated on
 	 * the stack and so not exists after this function exits.
 	 */
 	static StaticTask_t xIdleTaskTCB;
-	static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
+	static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
 
 	/*
 	 * Pass out a pointer to the StaticTask_t structure in which the Idle task's

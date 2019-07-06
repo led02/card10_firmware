@@ -16,17 +16,17 @@
 TaskHandle_t serial_task_id = NULL;
 
 /* The serial console in use (UART0) */
-extern mxc_uart_regs_t* ConsoleUart;
+extern mxc_uart_regs_t *ConsoleUart;
 /* Read queue, filled by both UART and CDCACM */
 static QueueHandle_t read_queue;
 
 /*
  * API-call to write a string.  Output goes to both CDCACM and UART
  */
-void epic_uart_write_str(char*str, intptr_t length)
+void epic_uart_write_str(char *str, intptr_t length)
 {
-	UART_Write(ConsoleUart, (uint8_t*)str, length);
-	cdcacm_write((uint8_t*)str, length);
+	UART_Write(ConsoleUart, (uint8_t *)str, length);
+	cdcacm_write((uint8_t *)str, length);
 }
 
 /*
@@ -45,7 +45,7 @@ void UART0_IRQHandler(void)
 	UART_Handler(ConsoleUart);
 }
 
-static void uart_callback(uart_req_t*req, int error)
+static void uart_callback(uart_req_t *req, int error)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	vTaskNotifyGiveFromISR(serial_task_id, &xHigherPriorityTaskWoken);
@@ -65,7 +65,7 @@ static void enqueue_char(char chr)
 	}
 }
 
-void vSerialTask(void*pvParameters)
+void vSerialTask(void *pvParameters)
 {
 	static uint8_t buffer[sizeof(char) * SERIAL_READ_BUFFER_SIZE];
 	static StaticQueue_t read_queue_data;
@@ -74,10 +74,7 @@ void vSerialTask(void*pvParameters)
 
 	/* Setup read queue */
 	read_queue = xQueueCreateStatic(
-		SERIAL_READ_BUFFER_SIZE,
-		sizeof(char),
-		buffer,
-		&read_queue_data
+		SERIAL_READ_BUFFER_SIZE, sizeof(char), buffer, &read_queue_data
 	);
 
 	/* Setup UART interrupt */
