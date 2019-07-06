@@ -1,7 +1,15 @@
 #include "py/mpconfig.h"
 
+#ifndef Q
+#define Q(x)
+#endif
+
 /* leds */
 Q(leds)
+Q(BOTTOM_LEFT)
+Q(BOTTOM_RIGHT)
+Q(TOP_LEFT)
+Q(TOP_RIGHT)
 
 /* utime */
 Q(utime)

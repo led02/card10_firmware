@@ -31,6 +31,10 @@ static MP_DEFINE_CONST_FUN_OBJ_2(leds_set_obj, mp_leds_set);
 static const mp_rom_map_elem_t leds_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_leds) },
 	{ MP_ROM_QSTR(MP_QSTR_set), MP_ROM_PTR(&leds_set_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_BOTTOM_RIGHT), MP_OBJ_NEW_SMALL_INT(11) },
+	{ MP_ROM_QSTR(MP_QSTR_BOTTOM_LEFT), MP_OBJ_NEW_SMALL_INT(12) },
+	{ MP_ROM_QSTR(MP_QSTR_TOP_RIGHT), MP_OBJ_NEW_SMALL_INT(13) },
+	{ MP_ROM_QSTR(MP_QSTR_TOP_LEFT), MP_OBJ_NEW_SMALL_INT(14) },
 };
 static MP_DEFINE_CONST_DICT(leds_module_globals, leds_module_globals_table);
 
