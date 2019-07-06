@@ -6,9 +6,9 @@
 
 #include "max32665.h"
 
-static char heap[4096];
-
-extern int __StackTop, __StackLimit;
+/* Defined in linker script */
+extern void *__StackTop, *__StackLimit;
+extern void *__HeapBase, *__HeapLimit;
 
 int main(void)
 {
@@ -21,7 +21,7 @@ int main(void)
 	NVIC_EnableIRQ(TMR5_IRQn);
 
 	while (1) {
-		gc_init(heap, heap + sizeof(heap));
+		gc_init(&__HeapBase, &__HeapLimit);
 
 		mp_init();
 		pyexec_friendly_repl();
