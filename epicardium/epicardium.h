@@ -67,6 +67,8 @@ typedef unsigned int size_t;
 #define API_LIGHT_SENSOR_RUN       0x80
 #define API_LIGHT_SENSOR_GET       0x81
 #define API_LIGHT_SENSOR_STOP      0x82
+
+#define API_BMA400_GET_ACCEL       0x90
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -278,6 +280,37 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  *    }
  */
 API(API_STREAM_READ, int epic_stream_read(int sd, void *buf, size_t count));
+
+/**
+ * BMA400
+ * ======
+ */
+
+/**
+ * An acceleration vector.
+ */
+struct acceleration {
+	/** Acceleration component along x axis. */
+	float x;
+	/** Acceleration component along y axis. */
+	float y;
+	/** Acceleration component along z axis. */
+	float z;
+};
+
+/**
+ * Get the current acceleration vector.
+ *
+ * :param data: Where to store the acceleration vector.
+ * :return: 0 on success or ``-Exxx`` on error.  The following
+ *     errors might occur:
+ *
+ *     - ``-EFAULT``:  On NULL-pointer.
+ *     - ``-EINVAL``:  Invalid configuration.
+ *     - ``-EIO``:  Communication with the device failed.
+ *     - ``-ENODEV``:  Device was not found.
+ */
+API(API_BMA400_GET_ACCEL, int epic_bma400_get_accel(struct acceleration *data));
 
 /**
  * Vibration Motor

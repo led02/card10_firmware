@@ -1,6 +1,7 @@
 name = 'pycardium'
 
 modsrc = files(
+  'modules/bma400.c',
   'modules/interrupt.c',
   'modules/leds.c',
   'modules/sys_display.c',

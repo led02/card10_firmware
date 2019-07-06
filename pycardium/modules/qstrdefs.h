@@ -4,6 +4,10 @@
 #define Q(x)
 #endif
 
+/* bma400 */
+Q(bma400)
+Q(get_accel)
+
 /* leds */
 Q(leds)
 Q(BOTTOM_LEFT)

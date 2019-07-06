@@ -1,4 +1,5 @@
 module_sources = files(
+  'bma400.c',
   'display.c',
   'fatfs.c',
   'fatfs_fileops.c',

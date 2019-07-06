@@ -1,0 +1,8 @@
+``bma400`` - Accelerometer
+==========================
+
+.. py:function:: bma400.get_accel()
+
+   Get acceleration vector.
+
+   :return: Tuple containing ``x``, ``y``, and ``z`` acceleration.
