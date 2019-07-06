@@ -3,6 +3,7 @@ name = 'hello-freertos'
 freertos = static_library(
   'freertos',
   freertos_sources,
+  freertos_heap2,
   freertos_cli_sources,
   dependencies: periphdriver,
   include_directories: [

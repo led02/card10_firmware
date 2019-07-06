@@ -13,5 +13,12 @@ freertos_sources = files(
   './Source/timers.c',
 
   './Source/portable/GCC/ARM_CM4F/port.c',
+)
+
+freertos_heap2 = files(
   './Source/portable/MemMang/heap_2.c',
+)
+
+freertos_heap3 = files(
+  './Source/portable/MemMang/heap_3.c',
 )

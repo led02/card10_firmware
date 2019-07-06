@@ -12,8 +12,10 @@
 /* TODO: Adjust this for tickless idle */
 #define configTICK_RATE_HZ          ((portTickType)1000)
 
-/* Memory */
-#define configTOTAL_HEAP_SIZE       ((size_t)(26 * 1024))
+/* Memory
+ *
+ * Heap is managed by libc (heap_3.c).
+ */
 #define configMINIMAL_STACK_SIZE    ((unsigned short)128)
 
 #define configMAX_PRIORITIES        5

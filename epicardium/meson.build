@@ -48,6 +48,7 @@ api_dispatcher_lib = static_library(
 freertos = static_library(
   'freertos',
   freertos_sources,
+  freertos_heap3,
   dependencies: periphdriver,
   include_directories: [
     freertos_includes,
