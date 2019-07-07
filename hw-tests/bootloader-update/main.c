@@ -4,7 +4,7 @@
 
 /***** Includes *****/
 #include "card10.h"
-#include "bootloader-e3ae63e.h"
+#include "bootloader-9251ea6.h"
 #include "display.h"
 #include "GUI_Paint.h"
 #include "pmic.h"
