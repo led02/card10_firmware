@@ -1,2 +1,3 @@
 build/
-card10.bin
+/Documentation/output/
+__pycache__/

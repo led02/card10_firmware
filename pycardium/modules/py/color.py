@@ -4,8 +4,39 @@ _ColorTuple = ucollections.namedtuple("Color", ["red", "green", "blue"])
 
 
 class Color(_ColorTuple):
+    """
+    A color in 24-bit RGB.
+
+    You can create a new color from red, green, and blue::
+
+        yellow = Color(255, 255, 0)
+
+    You can get the HTML representation for a color using::
+
+        html_repr = str(Color(128, 128, 128))
+        assert html_repr == "#808080"
+
+    .. py:attribute:: red
+
+        Red component of this color.
+
+    .. py:attribute:: green
+
+        Green component of this color.
+
+    .. py:attribute:: blue
+
+        Blue component of this color.
+    """
+
     @classmethod
     def from_hex(cls, color):
+        """
+        Create a color from a hexadecimal number::
+
+            # Magenta
+            Color.from_hex(0xff00ff)
+        """
         red = (color & 0xff0000) >> 16
         green = (color & 0x00ff00) >> 8
         blue = (color & 0x0000ff)
