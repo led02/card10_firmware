@@ -42,7 +42,6 @@
 #include "uart.h"
 #include "gpio.h"
 #include "mxc_pins.h"
-#include "led.h"
 #include "pb.h"
 #include "spixfc.h"
 
@@ -51,17 +50,12 @@ mxc_uart_regs_t * ConsoleUart = MXC_UART_GET_UART(CONSOLE_UART);
 extern uint32_t SystemCoreClock;
 
 const gpio_cfg_t pb_pin[] = {
-    {PORT_0, PIN_23, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO3 / Button 1
     {PORT_0, PIN_20, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // Wristband GPIO1
-    {PORT_1, PIN_7, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO5 / Button 2
+    {PORT_0, PIN_20, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // Wristband GPIO1
+    {PORT_0, PIN_23, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO3 / Button 3
+    {PORT_1, PIN_7, GPIO_FUNC_IN, GPIO_PAD_PULL_UP},   // TOP GPIO5 / Button 4
 };
 const unsigned int num_pbs = (sizeof(pb_pin) / sizeof(gpio_cfg_t));
-
-const gpio_cfg_t led_pin[] = {
-    {PORT_0, PIN_21, GPIO_FUNC_OUT, GPIO_PAD_NONE},     // Wristband GPIO2
-    {PORT_0, PIN_22, GPIO_FUNC_OUT, GPIO_PAD_NONE},     // Wristband GPIO3
-};
-const unsigned int num_leds = (sizeof(led_pin) / sizeof(gpio_cfg_t));
 
 /***** File Scope Variables *****/
 const uart_cfg_t uart_cfg = {
@@ -111,16 +105,6 @@ int Board_Init(void)
     }
 
     if ((err = Console_Init()) != E_NO_ERROR) {
-        MXC_ASSERT_FAIL();
-        return err;
-    }
-
-    if ((err = PB_Init()) != E_NO_ERROR) {
-        MXC_ASSERT_FAIL();
-        return err;
-    }
-
-    if ((err = LED_Init()) != E_NO_ERROR) {
         MXC_ASSERT_FAIL();
         return err;
     }

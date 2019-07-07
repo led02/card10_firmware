@@ -208,7 +208,7 @@ int main(void)
     LCD_Update();
 
     // If the button is pressed, we go into MSC mode.
-    if (PB_Get(0) || PB_Get(1)) {
+    if (PB_Get(3)) {
         Paint_DrawString_EN(0, 16*2, "USB activated. Waiting.", &Font16, 0x0000, 0xffff);
         LCD_Update();
         run_usbmsc();

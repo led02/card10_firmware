@@ -12,6 +12,7 @@
 
 #include "mxc_config.h"
 #include "board.h"
+#include "pb.h"
 
 #include "tmr_utils.h"
 #include "i2c.h"
@@ -37,6 +38,12 @@ void card10_init(void)
 
     I2C_Shutdown(MXC_I2C1_BUS0);
     I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+    portexpander_init();
+
+    GPIO_Init();
+
+    PB_Init();
 
     pmic_init();
     pmic_set_led(0, 0);
@@ -71,7 +78,6 @@ void card10_init(void)
 
     GPIO_Config(&bhi_interrupt_pin);
 
-    portexpander_init();
 }
 
 static uint32_t ecg_read_reg(uint8_t reg)
@@ -189,3 +195,24 @@ void card10_poll(void)
 {
     pmic_poll();
 }
+
+void GPIO0_IRQHandler(void)
+{
+    GPIO_Handler(PORT_0);
+}
+
+void GPIO1_IRQHandler(void)
+{
+    GPIO_Handler(PORT_1);
+}
+
+void GPIO2_IRQHandler(void)
+{
+    GPIO_Handler(PORT_2);
+}
+
+void GPIO3_IRQHandler(void)
+{
+    GPIO_Handler(PORT_3);
+}
+

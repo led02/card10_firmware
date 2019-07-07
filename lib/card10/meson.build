@@ -8,6 +8,7 @@ sources = files(
   'leds.c',
   'pmic.c',
   'portexpander.c',
+  'pb.c'
 )
 
 deps = [

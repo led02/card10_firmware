@@ -434,7 +434,7 @@ int main(void)
         if( ecgFIFOIntFlag ) {
             ecgFIFOIntFlag = false;
 
-            if(PB_Get(0)) {
+            if(PB_Get(3)) {
                 ecg_switch = !ecg_switch;
                 while(PB_Get(0));
                 if(ecg_switch) {
@@ -444,7 +444,7 @@ int main(void)
                 }
             }
 
-            if(PB_Get(2)) {
+            if(PB_Get(4)) {
                 internal_pull =! internal_pull;
                 while(PB_Get(2));
                 ecg_config(internal_pull);

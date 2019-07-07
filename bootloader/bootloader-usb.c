@@ -182,9 +182,9 @@ void run_usbmsc(void)
     while (1) {
 
         if (suspended || !configured) {
-            LED_Off(0);
+            //LED_Off(0);
         } else {
-            LED_On(0);
+            //LED_On(0);
         }
 
         if (event_flags) {

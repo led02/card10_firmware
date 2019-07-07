@@ -5,9 +5,7 @@ includes = include_directories(
 
 sources = files(
   './Source/board.c',
-  '../Source/led.c',
   '../Source/mx25.c',
-  '../Source/pb.c',
   '../Source/stdio.c',
 )
 
