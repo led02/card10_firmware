@@ -25,6 +25,7 @@
 /* Modules */
 #define MODULE_UTIME_ENABLED                (1)
 #define MODULE_LEDS_ENABLED                 (1)
+#define MODULE_VIBRA_ENABLED                (1)
 
 /*
  * This port is intended to be 32-bit, but unfortunately, int32_t for
