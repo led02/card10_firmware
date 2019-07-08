@@ -53,4 +53,8 @@ API(API_UART_READ, char epic_uart_read_chr(void));
  */
 API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
 
+// turn vibration motor on or off
+#define API_VIBRA_SET  0x4
+API(API_VIBRA_SET, void epic_vibra_set(int status));
+
 #endif /* _EPICARDIUM_H */
