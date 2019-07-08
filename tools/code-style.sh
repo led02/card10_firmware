@@ -12,6 +12,11 @@ if ! command -v python3 >/dev/null 2>&1; then
     exit 127
 fi
 
+if [ "$#" == 0 ]; then
+    echo "usage: $0 <source.c> ..."
+    exit 1
+fi
+
 script_dir="$(dirname "$0")"
 
 for source_file in "$@"; do
