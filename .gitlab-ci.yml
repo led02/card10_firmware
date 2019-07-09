@@ -19,8 +19,6 @@ pages:
         - apt update -qq
         - apt install -y -qq python3-pip git clang libclang-dev llvm
         - pip3 install sphinx sphinx_rtd_theme clang
-        - git clone https://github.com/jnikula/hawkmoth.git
-        - (cd hawkmoth; python3 setup.py install)
     script:
         - export LD_LIBRARY_PATH=$(llvm-config --libdir)
         - echo $LD_LIBRARY_PATH
