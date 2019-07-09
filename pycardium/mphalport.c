@@ -41,6 +41,13 @@ int DEBUG_printf(const char *fmt, ...)
 	return ret;
 }
 
+/* newlib syscall to allow printf to work */
+long _write(int fd, const char *buf, size_t cnt)
+{
+	epic_uart_write_str(buf, cnt);
+	return cnt;
+}
+
 bool do_interrupt = false;
 
 /* Timer Interrupt used for control char notification */

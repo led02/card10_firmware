@@ -71,9 +71,9 @@ elf = executable(
   modsrc,
   mp_headers,
   include_directories: micropython_includes,
-  dependencies: [max32665_startup_core1, board_card10, periphdriver, api_caller],
+  dependencies: [max32665_startup_core1, periphdriver, api_caller],
   link_with: upy,
-  link_whole: [max32665_startup_core1_lib, board_card10_lib],
+  link_whole: [max32665_startup_core1_lib],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],
