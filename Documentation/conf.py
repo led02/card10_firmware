@@ -9,6 +9,7 @@ import sphinx.util.logging
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 sys.path.insert(0, os.path.abspath("../pycardium/modules/py"))
+sys.path.insert(0, os.path.abspath("./"))
 
 logger = sphinx.util.logging.getLogger("card10/conf.py")
 
@@ -41,7 +42,7 @@ extensions = [
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["output", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["output", "Thumbs.db", ".DS_Store", "hawkmoth"]
 
 # -- Options for HTML output ------------------------------------------------- {{{
 
@@ -83,8 +84,9 @@ try:
 
     cautodoc_root = os.path.abspath("..")
     has_hawkmoth = True
-except ImportError:
-    logger.warning("Hawkmoth was not found.  Documentation for Epicardium API will not be generated.")
+except ImportError as e:
+    if e.name == "clang":
+        logger.warning("hawkmoth requires the clang python module.  Documentation for Epicardium API will not be generated.")
 # }}}
 
 
