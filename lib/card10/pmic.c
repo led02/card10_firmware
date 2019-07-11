@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-static void pmic_interrupt_callback(void*_);
 static const gpio_cfg_t pmic_interrupt_pin = {
     PORT_0, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
 };
@@ -77,22 +76,8 @@ void pmic_init(void)
     GPIO_RegisterCallback(&pmic_interrupt_pin, pmic_interrupt_callback, NULL);
     GPIO_IntConfig(&pmic_interrupt_pin, GPIO_INT_EDGE, GPIO_INT_FALLING);
     GPIO_IntEnable(&pmic_interrupt_pin);
+    NVIC_SetPriority((IRQn_Type)MXC_GPIO_GET_IRQ(pmic_interrupt_pin.port), 2);
     NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pmic_interrupt_pin.port));
-
-/* Dropout Detector Rising */
-#define MAX77650_INT_DOD_R    (1 << 6)
-/* Thermal Alarm 2 Rising */
-#define MAX77650_INT_TJAL2_R  (1 << 5)
-/* Thermal Alarm 1 Rising */
-#define MAX77650_INT_TJAL1_R  (1 << 4)
-/* nEN Rising */
-#define MAX77650_INT_nEN_R    (1 << 3)
-/* nEN Falling */
-#define MAX77650_INT_nEN_F    (1 << 2)
-/* GPI Rising */
-#define MAX77650_INT_GPI_R    (1 << 1)
-/* GPI Falling */
-#define MAX77650_INT_GPI_F    (1 << 0)
 
     /* Setup power button interrupt */
     MAX77650_setINT_M_GLBL(~(MAX77650_INT_nEN_R | MAX77650_INT_nEN_F));
@@ -100,7 +85,7 @@ void pmic_init(void)
     MAX77650_getINT_GLBL();
 }
 
-static void pmic_interrupt_callback(void*_)
+__attribute__((weak)) void pmic_interrupt_callback(void*_)
 {
     interrupt_pending = true;
 }
