@@ -6,6 +6,9 @@
 void vSerialTask(void *pvParameters);
 
 /* ---------- PMIC --------------------------------------------------------- */
+/* In 1/10s */
+#define PMIC_PRESS_SLEEP           20
+#define PMIC_PRESS_POWEROFF        40
 void vPmicTask(void *pvParameters);
 
 #endif /* MODULES_H */

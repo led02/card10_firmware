@@ -25,30 +25,46 @@ void pmic_interrupt_callback(void *_)
 
 void vPmicTask(void *pvParameters)
 {
+	int count = 0;
+	portTickType delay = portMAX_DELAY;
 	pmic_task_id = xTaskGetCurrentTaskHandle();
 
 	while (1) {
-		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		ulTaskNotifyTake(pdTRUE, delay);
+
+		if (count == PMIC_PRESS_SLEEP) {
+			printf("pmic: Sleep\n"
+			       "[[ Unimplemented ]]\n");
+		}
+
+		if (count == PMIC_PRESS_POWEROFF) {
+			printf("pmic: Poweroff\n"
+			       "[[ Unimplemented ]]\n");
+		}
 
 		uint8_t int_flag = MAX77650_getINT_GLBL();
 
 		if (int_flag & MAX77650_INT_nEN_F) {
 			/* Button was pressed */
-			printf("pmic: Button pressed!\n");
+			count = 0;
+			delay = portTICK_PERIOD_MS * 100;
 		}
 		if (int_flag & MAX77650_INT_nEN_R) {
 			/* Button was pressed */
-			printf("pmic: Button released!\n");
-
-			printf("Resetting ...\n");
-			/*
-			 * Give the UART fifo time to clear.
-			 * TODO: Do this properly
-			 */
-			for (int i = 0; i < 0x1000000; i++) {
-				__asm volatile("nop");
+			if (count < PMIC_PRESS_SLEEP) {
+				printf("pmic: Reset\n");
+				/*
+				 * Give the UART fifo time to clear.
+				 * TODO: Do this properly
+				 */
+				for (int i = 0; i < 0x1000000; i++) {
+					__asm volatile("nop");
+				}
+				MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
 			}
-			MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+
+			count = 0;
+			delay = portMAX_DELAY;
 		}
 
 		/* TODO: Remove when all interrupts are handled */
@@ -56,6 +72,10 @@ void vPmicTask(void *pvParameters)
 			printf("=====> WARNING <=====\n"
 			       "* Unhandled PMIC Interrupt: %x\n",
 			       int_flag);
+		}
+
+		if (delay != portMAX_DELAY) {
+			count += 1;
 		}
 	}
 }
