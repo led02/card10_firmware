@@ -12,10 +12,8 @@ extern void *__HeapBase, *__HeapLimit;
 
 int main(void)
 {
-	if (0) {
-		mp_stack_set_top(&__StackTop);
-		mp_stack_set_limit((mp_int_t)&__StackLimit);
-	}
+	mp_stack_set_top(&__StackTop);
+	mp_stack_set_limit((mp_int_t)&__StackLimit);
 
 	/* TMR5 is used to notify on keyboard interrupt */
 	NVIC_EnableIRQ(TMR5_IRQn);
