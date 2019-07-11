@@ -1,8 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "serial.h"
-
 #include "max32665.h"
 #include "cdcacm.h"
 #include "uart.h"
@@ -11,6 +9,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+
+#include "modules.h"
 
 /* Task ID for the serial handler */
 TaskHandle_t serial_task_id = NULL;
