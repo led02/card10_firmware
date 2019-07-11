@@ -18,13 +18,15 @@
  */
 #define configMINIMAL_STACK_SIZE    ((unsigned short)128)
 
+/* FIXME: Assign proper priorities to all interrupts */
 #define configMAX_PRIORITIES        5
 /* # of priority bits (configured in hardware) is provided by CMSIS */
 #define configPRIO_BITS             __NVIC_PRIO_BITS
 /* Priority 7, or 255 as only the top three bits are implemented.  This is the lowest priority. */
-#define configKERNEL_INTERRUPT_PRIORITY       ( ( unsigned char ) 7 << ( 8 - configPRIO_BITS) )
-/* Priority 5, or 160 as only the top three bits are implemented. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY  ( ( unsigned char ) 5 << ( 8 - configPRIO_BITS) )  
+#define configKERNEL_INTERRUPT_PRIORITY \
+	( ( unsigned char ) 7 << ( 8 - configPRIO_BITS) )
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY \
+	( ( unsigned char ) 2 << ( 8 - configPRIO_BITS) )
 
 /* We want to use preemption to easier integrate components */
 #define configUSE_PREEMPTION        1
