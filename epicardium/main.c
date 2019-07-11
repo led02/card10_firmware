@@ -30,21 +30,6 @@ void vApiDispatcher(void *pvParameters)
 	}
 }
 
-static void pmic_button(bool falling)
-{
-	if (falling) {
-		printf("Resetting ...\n");
-		/*
-		 * Give the UART fifo time to clear.
-		 * TODO: Do this properly
-		 */
-		for (int i = 0; i < 0x1000000; i++) {
-			__asm volatile("nop");
-		}
-		MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
-	}
-}
-
 int main(void)
 {
 	card10_init();
@@ -52,8 +37,6 @@ int main(void)
 
 	/* TODO: Move this to its own function */
 	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
-
-	pmic_set_button_callback(pmic_button);
 
 	cdcacm_init();
 
@@ -71,6 +54,19 @@ int main(void)
 		abort();
 	}
 
+	/* PMIC */
+	if (xTaskCreate(
+		    vPmicTask,
+		    (const char *)"PMIC",
+		    configMINIMAL_STACK_SIZE,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
+		printf("Failed to create pmic task!\n");
+		abort();
+	}
+
+	/* API */
 	if (xTaskCreate(
 		    vApiDispatcher,
 		    (const char *)"API Dispatcher",

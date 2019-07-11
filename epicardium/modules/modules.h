@@ -5,5 +5,8 @@
 #define SERIAL_READ_BUFFER_SIZE 128
 void vSerialTask(void *pvParameters);
 
+/* ---------- PMIC --------------------------------------------------------- */
+void vPmicTask(void *pvParameters);
+
 #endif /* MODULES_H */
 
