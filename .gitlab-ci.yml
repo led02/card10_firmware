@@ -11,6 +11,7 @@ build:
     script:
         - ./bootstrap.sh
         - ninja -C build/
+        - arm-none-eabi-size build/bootloader/bootloader.elf build/epicardium/epicardium.elf build/pycardium/pycardium.elf
 
 pages:
     stage: deploy
