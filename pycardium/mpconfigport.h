@@ -18,9 +18,13 @@
 #define MICROPY_FLOAT_IMPL                  (MICROPY_FLOAT_IMPL_FLOAT)
 #define MICROPY_HELPER_REPL                 (1)
 #define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_LONGLONG)
+
+/* Builtin function and modules */
 #define MICROPY_PY_BUILTINS_HELP            (1)
 #define MICROPY_PY_BUILTINS_HELP_MODULES    (1)
 #define MICROPY_PY_UTIME_MP_HAL             (1)
+#define MICROPY_PY_URANDOM                  (1)
+#define MICROPY_PY_URANDOM_EXTRA_FUNCS      (1)
 
 /* Modules */
 #define MODULE_UTIME_ENABLED                (1)
