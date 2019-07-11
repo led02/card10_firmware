@@ -38,8 +38,8 @@ void vPmicTask(void *pvParameters)
 		}
 
 		if (count == PMIC_PRESS_POWEROFF) {
-			printf("pmic: Poweroff\n"
-			       "[[ Unimplemented ]]\n");
+			printf("pmic: Poweroff\n");
+			MAX77650_setSFT_RST(0x2);
 		}
 
 		uint8_t int_flag = MAX77650_getINT_GLBL();
