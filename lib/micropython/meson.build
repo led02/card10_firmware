@@ -177,5 +177,20 @@ micropython_additional_sources = files(
   'micropython/lib/utils/stdout_helpers.c',
   'micropython/lib/utils/pyexec.c',
   'micropython/lib/mp-readline/readline.c',
+)
+
+micropython_extmod_sources = files(
   'micropython/extmod/utime_mphal.c',
+  'micropython/extmod/modbtree.c',
+  'micropython/extmod/modframebuf.c',
+  'micropython/extmod/modubinascii.c',
+  'micropython/extmod/moducryptolib.c',
+  'micropython/extmod/moductypes.c',
+  'micropython/extmod/moduhashlib.c',
+  'micropython/extmod/moduheapq.c',
+  'micropython/extmod/modujson.c',
+  'micropython/extmod/modurandom.c',
+  'micropython/extmod/modure.c',
+  'micropython/extmod/moduselect.c',
+  'micropython/extmod/modutimeq.c',
 )

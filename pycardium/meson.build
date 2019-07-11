@@ -30,6 +30,7 @@ qstr_h = custom_target(
     'modules/qstrdefs.h',
     'mpconfigport.h',
     micropython_sources,
+    micropython_extmod_sources,
   ],
   depends: [version_h],
   command: [micropython_gen_qstr, meson.current_source_dir(), '@OUTPUT@', '@INPUT@'],
@@ -59,6 +60,7 @@ upy = static_library(
   'micropython',
   micropython_sources,
   micropython_additional_sources,
+  micropython_extmod_sources,
   mp_headers,
   include_directories: micropython_includes,
 )
