@@ -36,6 +36,12 @@ void portexpander_init(void)
     // Set outputs to high (i.e. open-drain)
     command[0] = 0x01; command[1] = 0x97;
     I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, command, 2, 0);
+
+    // Turn on LEDs
+    // TODO: only turn on LEDs if value != 0,0,0 && dim > 0
+    command[0] = 0x01; command[1] = 0x90;
+    I2C_MasterWrite(MXC_I2C1_BUS0, addr << 1, command, 2, 0);
+
 }
 
 uint8_t portexpander_get(void)
