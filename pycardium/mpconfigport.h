@@ -22,6 +22,7 @@
 /* Builtin function and modules */
 #define MICROPY_PY_BUILTINS_HELP            (1)
 #define MICROPY_PY_BUILTINS_HELP_MODULES    (1)
+#define MICROPY_PY_UBINASCII                (1)
 #define MICROPY_PY_UHEAPQ                   (1)
 #define MICROPY_PY_UJSON                    (1)
 #define MICROPY_PY_URANDOM                  (1)
