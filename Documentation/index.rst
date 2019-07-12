@@ -12,7 +12,15 @@ The design roughly looks like this:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: Epicardium
 
-   epicardium
-   pycardium
+   epicardium/intro
+   epicardium/api
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Pycardium
+
+   pycardium/intro
+   pycardium/color
+   pycardium/leds

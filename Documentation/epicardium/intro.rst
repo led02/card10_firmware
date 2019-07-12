@@ -1,9 +1,9 @@
-Epicardium
-==========
+Epicardium Intro
+================
 
-Epicardium is the main firmware.  It runs on core0 and is based on FreeRTOS.
-Epicardium provides an API to a payload running on the other core which exposes
-most functionality.  This section of the docs details this "Epicardium API".
+Epicardium is the main component of the firmware.  It runs on core0 and is
+based on FreeRTOS.  Epicardium provides an API to a payload running on the
+other core which exposes most functionality.
 
 The API functions follow the kernel convention of either returning a boolean if
 the function is a predicate or returning a success integer (with negative
@@ -33,8 +33,3 @@ values denoting errors) if it is an action or imperative command.  To quote:
       for success or -EBUSY for failure.  In the same way, ``PCI device present`` is
       a predicate, and the pci_dev_present() function returns 1 if it succeeds in
       finding a matching device or 0 if it doesn't.
-
-.. toctree::
-   :maxdepth: 1
-
-   epicardium/api
