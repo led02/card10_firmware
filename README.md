@@ -31,14 +31,14 @@ ninja -C build/ <target>
 ```
 
 where `target` is one of
-  - `hw-tests/bmatest/bmatest.elf` - Test for `BMA400`
-  - `hw-tests/bmetest/bmetest.elf` - Test for `BME680`
-  - `hw-tests/ecgtest/ecgtest.elf` - Test for `MAX30003` ECG
-  - `hw-tests/hello-freertos/hello-freertos.elf` - FreeRTOS Demo
-  - `hw-tests/hello-world/hello-world.elf` - General Demo
-  - `hw-tests/imutest/imutest.elf` - Compass Test
-  - `hw-tests/ips/ips.elf` - Display Test
-  - `hw-tests/dual-core/dual-core{0,1}.elf` - Dual-Core Demo
+  - `hw-tests/bmatest/bmatest.bin` - Test for `BMA400`
+  - `hw-tests/bmetest/bmetest.bin` - Test for `BME680`
+  - `hw-tests/ecgtest/ecgtest.bin` - Test for `MAX30003` ECG
+  - `hw-tests/hello-freertos/hello-freertos.bin` - FreeRTOS Demo
+  - `hw-tests/hello-world/hello-world.bin` - General Demo
+  - `hw-tests/imutest/imutest.bin` - Compass Test
+  - `hw-tests/ips/ips.bin` - Display Test
+  - `hw-tests/dual-core/dual-core{0,1}.bin` - Dual-Core Demo
 
 ### GDB (`arm-none-eabi-gdb`)
 
