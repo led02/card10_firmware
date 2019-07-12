@@ -34,7 +34,6 @@ where `target` is one of
   - `hw-tests/bmatest/bmatest.bin` - Test for `BMA400`
   - `hw-tests/bmetest/bmetest.bin` - Test for `BME680`
   - `hw-tests/ecgtest/ecgtest.bin` - Test for `MAX30003` ECG
-  - `hw-tests/hello-freertos/hello-freertos.bin` - FreeRTOS Demo
   - `hw-tests/hello-world/hello-world.bin` - General Demo
   - `hw-tests/imutest/imutest.bin` - Compass Test
   - `hw-tests/ips/ips.bin` - Display Test
