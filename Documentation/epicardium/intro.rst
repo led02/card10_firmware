@@ -1,10 +1,24 @@
 Epicardium Intro
 ================
-
 Epicardium is the main component of the firmware.  It runs on core0 and is
 based on FreeRTOS.  Epicardium provides an API to a payload running on the
 other core which exposes most functionality.
 
+API Design
+----------
+.. note::
+
+   This is the current design.  We might adjust it in the future to allow for
+   more performance in cases where this approach is too slow.
+
+The API is strictly synchroneous.  This means, an API call looks exactly the
+same as calling any other function.  Internally, the call will wake up
+Epicardium and dispatch the call.  Once the call has finished, it will return a
+result.
+
+
+API Conventions
+---------------
 The API functions follow the kernel convention of either returning a boolean if
 the function is a predicate or returning a success integer (with negative
 values denoting errors) if it is an action or imperative command.  To quote:
