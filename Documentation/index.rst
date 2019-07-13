@@ -39,3 +39,4 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    how-to-build
    how-to-flash
    debugger
+   pycardium-guide
