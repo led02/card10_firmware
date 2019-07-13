@@ -46,16 +46,10 @@ pushing that into external flash.
 
    .. _#11: https://git.card10.badge.events.ccc.de/card10/firmware/issues/11
 
-C Modules
----------
-C modules are quite a bit more complicated.  First, this guide will show how to
-create a new module and then, there will be some information related to
-different aspects of writing modules.
-
 Creating a new C module
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 Module Source
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 Create a new file in ``pycardium/modules``.  The basic structure of a C module
 looks like this:
 
@@ -89,13 +83,13 @@ looks like this:
    MP_REGISTER_MODULE(MP_QSTR_example, example_module, MODULE_EXAMPLE_ENABLED);
 
 Build Integration
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 Next, you need to add your module to ``pycardium/meson.build``. There is a list
 of module sources at the very top called ``modsrc`` where you need to add your
 file (e.g. ``modules/example.c``).
 
 QSTR Definitions
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 If you now run ``ninja -C build/``, you will hit a few errors regarding missing
 QSTR definitions.  With the example module above, they will look similar to
 this:
@@ -119,7 +113,7 @@ Each ``Q(...)`` will define into a corresponding ``MP_QSTR_...``.  So
 ``Q(example)`` corresponds to ``MP_QSTR_example``.
 
 Enable Module
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 The last step is to actually enable inclusion of your module into the firmware.
 Do this by adding a define in ``pycardium/mpconfigport.h``:
 
@@ -130,7 +124,7 @@ Do this by adding a define in ``pycardium/mpconfigport.h``:
 The name of the define is the one from the last line in the module source above.
 
 Wrapping Epicardium API
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 Most modules will probably make use of the :ref:`Epicardium API
 <epicardium_api_overview>`. Doing so does not require any extra work, you can
 just call the API from your module code.  You should check the input that your
@@ -149,7 +143,7 @@ calls.  As most API calls use *errno* codes, you can just wrap them in an
    }
 
 QSTRs
-~~~~~
+-----
 QSTRs are so called “interned strings”. This means they are not allocated like
 normal python objects but instead live in flash and are indexed. This allow
 MicroPython to very efficiently use them as identifiers. According to them,
