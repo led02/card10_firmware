@@ -7,7 +7,7 @@
 #include "max32665.h"
 
 /* CMSIS keeps a global updated with current system clock in Hz */
-#define configCPU_CLOCK_HZ          ((unsigned long)120000000)
+#define configCPU_CLOCK_HZ          ((unsigned long)96000000)
 
 /* TODO: Adjust this for tickless idle */
 #define configTICK_RATE_HZ          ((portTickType)1000)
