@@ -5,9 +5,7 @@ Debugger
 If you have one of our debuggers for card10, this page details how you can use
 it.  The debugger looks like either one in the following pictures:
 
-.. todo::
-
-   Debugger Picture
+.. image:: static/debuggers.png
 
 OpenOCD
 -------

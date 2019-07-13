@@ -11,9 +11,7 @@ the bottom right pressed.  Rebooting is done by either short pressing the power
 button (top left) while you have a working firmware, or turning the card10 off
 completely (by pressing the power button for 8 seconds) and then starting it again.
 
-.. todo::
-
-   Image showing the location of the buttons
+.. image:: static/bootloader-buttons.png
 
 If you did everything correctly, the bootloader will display:
 
