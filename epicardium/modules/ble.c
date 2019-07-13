@@ -12,8 +12,14 @@
 #include "mcr_regs.h"
 #include "hci_core.h"
 
+#include "FreeRTOS.h"
+#include "timers.h"
+
 #include <stdio.h>
 #include <string.h>
+
+/* Task ID for the ble handler */
+static TaskHandle_t ble_task_id = NULL;
 
 /* Number of WSF buffer pools */
 #define WSF_BUF_POOLS              6
@@ -65,28 +71,19 @@ static void myTrace(const char *pStr, va_list args)
     }
 }
 
+/*************************************************************************************************/
+/*!
+ *  \brief  Initialize WSF.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
 static void WsfInit(void)
 {
     WsfTimerInit();
     WsfBufInit(sizeof(mainBufMem), (uint8_t*)mainBufMem, WSF_BUF_POOLS, mainPoolDesc);
     WsfTraceRegister(myTrace);
 }
-
-void MacInit(void)
-{
-    wsfHandlerId_t handlerId;
-
-    /* Initialize link layer. */
-    BbInit();
-    handlerId = WsfOsSetNextHandler(SchHandler);
-    SchInit(handlerId);
-    LlAdvSlaveInit();
-    LlConnSlaveInit();
-    handlerId = WsfOsSetNextHandler(LlHandler);
-    LlHandlerInit(handlerId);
-}
-
-
 /* TODO: WTF? */
 /*
  * In two-chip solutions, setting the address must wait until the HCI interface is initialized.
@@ -109,6 +106,67 @@ void SetAddress(uint8_t event)
     }
 }
 
+/*************************************************************************************************/
+/*!
+ *  \brief  Initialize MAC layer.
+ *
+ *  \param  None.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+extern int8_t tx_rfpower_on;
+void MacInit(void)
+{
+    wsfHandlerId_t handlerId;
+
+    /* Initialize link layer. */
+    BbInit();
+    handlerId = WsfOsSetNextHandler(SchHandler);
+    SchInit(handlerId);
+    LlAdvSlaveInit();
+    LlConnSlaveInit();
+    handlerId = WsfOsSetNextHandler(LlHandler);
+    LlHandlerInit(handlerId);
+}
+
+
+
+
+static StaticTimer_t x;
+TimerHandle_t timerWakeup;
+int lasttick = 0;
+
+static void vTimerCallback(xTimerHandle pxTimer)
+{
+    bool_t          timerRunning;
+    wsfTimerTicks_t time_to_next_expire;
+    do {
+        int tick = xTaskGetTickCount();
+        WsfTimerUpdate(tick - lasttick);
+        lasttick = tick;
+        time_to_next_expire = WsfTimerNextExpiration(&timerRunning);
+    } while (timerRunning && time_to_next_expire == 0);
+
+
+    if(timerRunning) {
+        printf("time_to_next_expire = %d\n", time_to_next_expire);
+        timerWakeup = xTimerCreateStatic(
+            "timerWakeup", /* name */
+            pdMS_TO_TICKS(time_to_next_expire), /* period/time */
+            pdFALSE, /* auto reload */
+            NULL, /* timer ID */
+            vTimerCallback, &x); /* callback */
+
+        if(timerWakeup != NULL) {
+            xTimerStart(timerWakeup, 0);
+        } else {
+            printf("could not create timer\n");
+        }
+    } else {
+        printf("No timer running\n");
+    }
+}
 
 
 static void ble_init(void)
@@ -121,14 +179,23 @@ static void ble_init(void)
 
     /* Register a handler for Application events */
     AppUiActionRegister(SetAddress);
+
+    lasttick = xTaskGetTickCount();
+    vTimerCallback(NULL);
 }
 
 
 void vBleTask(void*pvParameters)
 {
+	ble_task_id = xTaskGetCurrentTaskHandle();
+
     ble_init();
+    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+
     while (1){
         // TODO: this need some timing and sleeping
         wsfOsDispatcher();
+        vTimerCallback(NULL);
+        vTaskDelay( xDelay );
     }
 }
