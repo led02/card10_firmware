@@ -1,26 +1,44 @@
 card10 firmware docs
 ====================
 
-This is the API documentation for card10's default firmware.
+**Dear traveller,**
 
-Overview
---------
+these transcripts describe how you can write code for your card10.  This
+includes the Python modules that are available but also documentation of the
+lower level firmware components.
 
-The design roughly looks like this:
+If you want to write Python code for card10, you will want to take a look at
+the :ref:`pycardium_index` docs.  If you are interested in writing applications
+in other languages, you'll probably want to interface with
+:ref:`epicardium_api_index` directly.
 
-.. image:: static/overview.svg
+Last but not least, if you want to start hacking the lower-level firmware, the
+:ref:`firmware_index` section of these docs is a good starting place.
 
+
+.. _pycardium_index:
 .. toctree::
-   :maxdepth: 2
-   :caption: Epicardium
-
-   epicardium/intro
-   epicardium/api
-
-.. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Pycardium
 
-   pycardium/intro
+   pycardium/overview
    pycardium/color
    pycardium/leds
+
+.. _epicardium_api_index:
+.. toctree::
+   :maxdepth: 1
+   :caption: Epicardium API
+
+   epicardium/overview
+   epicardium/api
+
+.. _firmware_index:
+.. toctree::
+   :maxdepth: 1
+   :caption: Firmware
+
+   overview
+   how-to-build
+   how-to-flash
+   debugger
