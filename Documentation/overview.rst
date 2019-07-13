@@ -1,3 +1,5 @@
+.. _firmware_overview:
+
 Overview
 ========
 To make the most of card10's dual-core processor, its firmware will have been
@@ -9,8 +11,8 @@ this will have been *Pycardium*, our MicroPython port.
 
 Epicardium
 ----------
-Epicardium is based on `FreeRTOS`_.  There are a number of tasks that will have
-been keeping card10 running.  These are:
+Epicardium is based on `FreeRTOS <https://www.freertos.org/>`_.  There are a
+number of tasks that will have been keeping card10 running.  These are:
 
 * **Dispatcher**:  The dispatcher task handles API calls from core 1.
 * **PMIC**:  The power manager task checks the battery level and other interesting
@@ -22,10 +24,10 @@ been keeping card10 running.  These are:
 
    The following tasks have not yet been implemented/are currently in the works:
 
-   - **Bluetooth**: The bluetooth stack
+   - **Bluetooth**: The bluetooth stack (`#23`_)
    - **Payload Controller**: Control what is running on core 1
 
-.. _FreeRTOS: https://www.freertos.org/
+   .. _#23: https://git.card10.badge.events.ccc.de/card10/firmware/issues/23
 
 Pycardium
 ---------

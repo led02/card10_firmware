@@ -1,3 +1,5 @@
+.. _epicardium_api_overview:
+
 Overview
 ========
 Epicardium, the "main" firmware running on core 0, exposes a lot of

@@ -8,15 +8,14 @@ includes the Python modules that are available but also documentation of the
 lower level firmware components.
 
 If you want to write Python code for card10, you will want to take a look at
-the :ref:`pycardium_index` docs.  If you are interested in writing applications
+the :ref:`Pycardium <pycardium_overview>` docs.  If you are interested in writing applications
 in other languages, you'll probably want to interface with
-:ref:`epicardium_api_index` directly.
+:ref:`Epicardium API <epicardium_api_overview>` directly.
 
 Last but not least, if you want to start hacking the lower-level firmware, the
-:ref:`firmware_index` section of these docs is a good starting place.
+:ref:`Firmware <firmware_overview>` section of these docs is a good starting place.
 
 
-.. _pycardium_index:
 .. toctree::
    :maxdepth: 1
    :caption: Pycardium
@@ -25,7 +24,6 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/color
    pycardium/leds
 
-.. _epicardium_api_index:
 .. toctree::
    :maxdepth: 1
    :caption: Epicardium API
@@ -33,7 +31,6 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    epicardium/overview
    epicardium/api
 
-.. _firmware_index:
 .. toctree::
    :maxdepth: 1
    :caption: Firmware
