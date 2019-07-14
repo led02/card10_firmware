@@ -30,6 +30,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
 
    epicardium/overview
    epicardium/api
+   epicardium-guide
 
 .. toctree::
    :maxdepth: 1
