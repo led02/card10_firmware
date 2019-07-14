@@ -29,6 +29,7 @@ void epic_uart_write_str(const char *str, intptr_t length)
 {
 	UART_Write(ConsoleUart, (uint8_t *)str, length);
 	cdcacm_write((uint8_t *)str, length);
+	ble_uart_write((uint8_t *)str, length);
 }
 
 /*
@@ -72,7 +73,7 @@ static void uart_callback(uart_req_t *req, int error)
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-static void enqueue_char(char chr)
+void serial_enqueue_char(char chr)
 {
 	if (chr == 0x3) {
 		/* Control-C */
@@ -122,15 +123,15 @@ void vSerialTask(void *pvParameters)
 		ulTaskNotifyTake(pdTRUE, portTICK_PERIOD_MS * 1000);
 
 		if (read_req.num > 0) {
-			enqueue_char(*read_req.data);
+			serial_enqueue_char(*read_req.data);
 		}
 
 		while (UART_NumReadAvail(ConsoleUart) > 0) {
-			enqueue_char(UART_ReadByte(ConsoleUart));
+			serial_enqueue_char(UART_ReadByte(ConsoleUart));
 		}
 
 		while (cdcacm_num_read_avail() > 0) {
-			enqueue_char(cdcacm_read());
+			serial_enqueue_char(cdcacm_read());
 		}
 	}
 }
