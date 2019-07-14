@@ -234,9 +234,56 @@ Booleans
 
 Integers
 ~~~~~~~~
-.. todo::
+As long as your integers stay within **31**-bit limits, integers are stored very
+efficiently and can be accessed and created like this:
 
-   Integers
+.. code-block:: cpp
+
+   #include "py/obj.h"
+
+   /* Create a new integer which is < 2^31 */
+   mp_obj_t int_obj = MP_OBJ_NEW_SMALL_INT(0xc0ffee);
+
+   /* Check if an integer is small and if so, extract it */
+   if (mp_obj_is_small_int(int_obj)) {
+           int int_value = MP_OBJ_SMALL_INT_VALUE(int_obj);
+   }
+
+For bigger integers or if you are uncertain about the limits, use the following
+functions:
+
+.. code-block:: cpp
+
+   #include "py/obj.h"
+
+   /* Create new integer objects in various sizes and signedness */
+   mp_obj_t int0_obj = mp_obj_new_int((mp_int_t)value);
+   mp_obj_t int1_obj = mp_obj_new_int_from_uint((mp_uint_t)value);
+   mp_obj_t int2_obj = mp_obj_new_int_from_ll((long long)value);
+   mp_obj_t int3_obj = mp_obj_new_int_from_ull((unsigned long long)value);
+
+   /* Check if a value is an integer */
+   if (mp_obj_is_integer(int_obj)) {
+
+           /* Get an integer */
+           int int0 = mp_obj_get_int(int_obj);
+           int int0 = mp_obj_get_int_truncated(int_obj);
+   }
+
+   int value;
+   if (!mp_obj_get_int_maybe(int_obj, &value)) {
+      /* Not an integer! */
+   }
+
+To get really big integers you have to use
+
+.. code-block:: cpp
+
+   #include "py/obj.h"
+   #include "py/objint.h"
+
+   long long value;
+   mp_obj_int_to_bytes_impl(int_obj, 8, (byte*)&value);
 
 Strings
 ~~~~~~~
