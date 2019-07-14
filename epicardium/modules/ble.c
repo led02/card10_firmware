@@ -139,6 +139,8 @@ static void notify(void)
 void WsfTimerNotify(void)
 {
     //printf("WsfTimerNotify\n");
+    // TODO: Can we do this without waking up the task?
+    // xTimerChangePeriodFromISR exists
     notify();
 }
 
@@ -229,7 +231,7 @@ void *SvcUARTAddGroupDyn(void)
     /* UART tx value */
     /* TODO: do we need ATTS_SET_READ_CBACK ? */
     AttsDynAddAttr(pSHdl, attUartTxChUuid, initUARTVal, sizeof(uint8_t), sizeof(uint8_t),
-                   0, ATTS_PERMIT_READ);
+                   ATTS_SET_READ_CBACK, ATTS_PERMIT_READ);
     /* UART tx CCC descriptor */
     AttsDynAddAttr(pSHdl, attCliChCfgUuid, initCcc, sizeof(uint16_t), sizeof(uint16_t),
                    ATTS_SET_CCC, ATTS_PERMIT_READ | ATTS_PERMIT_WRITE);
@@ -240,15 +242,13 @@ void *SvcUARTAddGroupDyn(void)
 
 dmConnId_t active_connection = 0;
 
-#if 0
 uint8_t UARTReadCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
                      uint16_t offset, attsAttr_t *pAttr)
 {
   //AppHwBattRead(pAttr->pValue);
-
+  printf("read callback\n");
   return ATT_SUCCESS;
 }
-#endif
 
 uint8_t UARTWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
                           uint16_t offset, uint16_t len, uint8_t *pValue,
@@ -264,7 +264,7 @@ uint8_t UARTWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
   }
   serial_enqueue_char('\r');
   //printf("\n");
- 
+
 #if 0
   AttsSetAttr(UART_TX_HDL, len, pValue);
   AttsHandleValueNtf(connId, UART_TX_HDL, len, pValue);
@@ -275,6 +275,7 @@ uint8_t UARTWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
 
 uint8_t ble_uart_tx_buf[129];
 uint8_t ble_uart_buf_tx_fill;
+int ble_uart_lasttick = 0;
 
 void ble_uart_write(uint8_t *pValue, uint8_t len)
 {
@@ -283,11 +284,24 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
     if(pValue[i] >= 0x20 && pValue[i] < 0x7f) {
         ble_uart_tx_buf[ble_uart_buf_tx_fill] = pValue[i];
         ble_uart_buf_tx_fill++;
-    } else if(pValue[i] >= '\r') {
+    } else if(pValue[i] == '\r' || pValue[i] == '\n') {
         if(ble_uart_buf_tx_fill > 0) {
             AttsSetAttr(UART_TX_HDL, ble_uart_buf_tx_fill, ble_uart_tx_buf);
             if(active_connection) {
+                int x = xTaskGetTickCount() - ble_uart_lasttick;
+                if(x < 100) {
+                    // Ugly hack if we already send something recently.
+                    // TODO: figure out how these notifications are acknowledged
+                    vTaskDelay(100 - x);
+                }
+                //printf("notify: ");
+                //int j;
+                //for(j=0;j<ble_uart_buf_tx_fill;j++) {
+                //    printf("%02x ", ble_uart_tx_buf[j]);
+                //}
+                //printf("\n");
                 AttsHandleValueNtf(active_connection, UART_TX_HDL, ble_uart_buf_tx_fill, ble_uart_tx_buf);
+                ble_uart_lasttick = xTaskGetTickCount();
             }
             ble_uart_buf_tx_fill = 0;
         }
@@ -309,8 +323,8 @@ static void ble_init(void)
     AttsDynInit();
     void *pSHdl;
     pSHdl = SvcUARTAddGroupDyn();
-    //AttsDynRegister(pSHdl, UARTReadCback, UARTWriteCback);
-    AttsDynRegister(pSHdl, NULL, UARTWriteCback);
+    AttsDynRegister(pSHdl, UARTReadCback, UARTWriteCback);
+    //AttsDynRegister(pSHdl, NULL, UARTWriteCback);
 
 
     /* Register a handler for Application events */
