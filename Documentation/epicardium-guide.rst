@@ -29,6 +29,9 @@ like this:
 
 There are a number of rules you should follow when defining new calls:
 
+* Each API call need a unique call number (``API_ROCKET`` in this case).
+  There are no special rules regarding call numbers, choose any number not yet
+  in use.  Call numbers are ``uint32_t`` so you have plenty to choose from.
 * API calls have the prefix ``epic_`` which of course is just an abbreviation
   for *Epicardium*.
 * Only use types from the standard library or types defined (and documented!)
@@ -42,8 +45,6 @@ There are a number of rules you should follow when defining new calls:
   negative values denoting errors) if they are an imperative command or action
   (ref `Kernel Coding Style`_).  If you are reasonably sure your call cannot fail
   or an error is non-recoverable from core 1, return ``void``.
-* There are no special rules regarding call numbers, choose any number not yet
-  in use.  Call numbers are ``uint32_t`` so you have plenty to choose from.
 
 .. _Kernel Coding Style: https://www.kernel.org/doc/html/v5.2/process/coding-style.html#function-return-values-and-names
 
@@ -84,8 +85,9 @@ For the example above, the definition might look like this:
    }
 
 To keep code-style uniform across the project, please format your code using
-``./tools/code-style.sh``.  Note that this is not a definite style, however:
-If something looks better when manually formatted, don't be afraid to do so.
+``./tools/code-style.sh <filename>`` (requires ``clang-format``).  Note that
+this is not a definite style, however: If something looks better when manually
+formatted, don't be afraid to do so.
 
 .. warning::
 

@@ -71,16 +71,24 @@ output:
    Info : max32xxx.cpu: hardware has 6 breakpoints, 4 watchpoints
    Info : Listening on port 3333 for gdb connections
 
-Next, start *gdb* in parallel and connect it to OpenOCD.  You can do this easily
-if you run gdb from the firmware repository root where we have provided a
-``.gdbinit`` file.  Apart from automatically connecting to OpenOCD, this script
-file also defines a ``reset`` command to soft-reset card10.
+Next, start *GDB* in parallel and connect it to OpenOCD.  You can do this easily
+if you run GDB from the firmware repository root where we have provided a
+``gdbinit`` file. Specify ``-x gdbinit`` to use this file.  Apart from
+automatically connecting to OpenOCD, this script file also defines a ``reset``
+command to soft-reset card10.
 
 .. code-block:: shell-session
 
-   $ arm-none-eabi-gdb build/hw-tests/hello-world/hello-world.elf
+   $ arm-none-eabi-gdb -x gdbinit build/hw-tests/hello-world/hello-world.elf
    ...
    (gdb)
+
+.. warning::
+   If you are used to use ``mon reset halt``, be aware that the card10 prototypes
+   do not connect the reset line to the debugger. OpenOCD is configured to only do
+   a soft-reset. This reset only resets the core, but not its peripherals.
+   Our custom ``reset`` sets a special bit in the CPU which also resets the
+   peripherals.
 
 You are now connected to card10 and ready to start debugging!  If card10 is
 still running, stop it using

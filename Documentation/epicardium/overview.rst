@@ -2,7 +2,8 @@
 
 Overview
 ========
-Epicardium, the "main" firmware running on core 0, exposes a lot of
+Epicardium, the "main" firmware running on core 0 (more about our dual
+core design can be found :ref:`here <firmware_overview>`), exposes a lot of
 functionality to user-code via the so-called *Epicardium API*.  This API
 consists of a number of calls that can be issued by core 1 using an
 auto-generated library.

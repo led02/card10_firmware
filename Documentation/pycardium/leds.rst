@@ -3,7 +3,9 @@
 
 .. py:function:: leds.set(led, color)
 
-   Set one of the card10's RGB LEDs to a certain color::
+   Set one of the card10's RGB LEDs to a certain color.
+
+   Example which sets all LEDs on the top to red:::
 
       import leds, color
 

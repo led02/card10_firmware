@@ -26,14 +26,6 @@ Last but not least, if you want to start hacking the lower-level firmware, the
 
 .. toctree::
    :maxdepth: 1
-   :caption: Epicardium API
-
-   epicardium/overview
-   epicardium/api
-   epicardium-guide
-
-.. toctree::
-   :maxdepth: 1
    :caption: Firmware
 
    overview
@@ -41,3 +33,13 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    how-to-flash
    debugger
    pycardium-guide
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Epicardium API
+
+   epicardium/overview
+   epicardium/api
+   epicardium-guide
+
+

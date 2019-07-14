@@ -14,11 +14,15 @@ hacking!
    makes its console available as a CDC ACM device via USB or, if you have a
    debugger, on the debugging serial port.
 
-   This means, you can only interact with Python through a REPL for now.
-   However, this will soon change, once `#10`_ and `#11`_ are implemented.
+   This means, you can only interact with Python through the REPL console for
+   now. However, this will soon change, once `#10`_ and `#11`_ are implemented.
 
    .. _#10: https://git.card10.badge.events.ccc.de/card10/firmware/issues/10
    .. _#11: https://git.card10.badge.events.ccc.de/card10/firmware/issues/11
+
+   In other words: It is currently not possible to execute Python code
+   from .py files on the filesystem. You have to test new modules using the
+   serial console.
 
 .. todo::
 

@@ -41,7 +41,7 @@ Flash Using Debugger
 .. warning::
 
    With the current version of the bootloader, before attempting to flash using
-   the debugger, make sure there is not ``card10.bin`` stored on the device.
+   the debugger, make sure there is no ``card10.bin`` stored on the device.
    If there is, the bootloader will overwrite whatever you just flashed after
    reboot every time.
 
@@ -49,6 +49,16 @@ First, setup everything as explained on the :ref:`debugger` page.  Following
 that and after connecting to card10, you can flash your binary using the
 ``load`` command.  After loading, you need to use ``reset`` to reboot card10
 using your new firmware.
+
+
+.. info::
+   If OpenOCD was able to connect, but GDB gives you an
+   ``Error erasing flash with vFlashErase packet`` error, issue a ``reset``
+   command, quickly followed by a ``load`` command.
+
+   Reason: The Epicardium puts parts of the CPU to sleep and the debugging
+   interface is part of that. After a reset the bootloader starts up
+   and lets OpenOCD/GDB take control again.
 
 .. code-block:: text
 
