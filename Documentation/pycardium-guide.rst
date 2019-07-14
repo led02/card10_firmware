@@ -287,9 +287,34 @@ To get really big integers you have to use
 
 Strings
 ~~~~~~~
-.. todo::
+As in CPython, MicroPython also has multiple string representations:  There is
+``str``, ``bytes``, and ``bytearray`` but also the above mentions ``QSTR``\ s.
+Ideally, code should work with as many of these as possible and to ensure this,
+please use these generic functions:
 
-   Strings
+.. code-block:: cpp
+
+   #include "py/obj.h"
+
+   /* Create a new string object */
+   char buf[] = "Hello MicroPython!";
+   mp_obj_t str_obj = mp_obj_new_str(buf, sizeof(buf));
+
+   /* Check if an object is a string */
+   if (mp_obj_is_str(str_obj)) {
+           /* Either str or QSTR */
+   }
+   if (mp_obj_is_str_or_bytes) {
+           /* Either str, QSTR, or bytes */
+   }
+
+   /*
+    * Get a char array from a string object.
+    * CAUTION! This string is not necessarily null terminated!
+    */
+   char *str_data;
+   size_t str_len;
+   str_data = mp_obj_str_get_data(str_obj, &str_len);
 
 Lists & Tuples
 ~~~~~~~~~~~~~~
