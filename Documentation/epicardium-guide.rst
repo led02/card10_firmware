@@ -31,8 +31,6 @@ There are a number of rules you should follow when defining new calls:
 
 * API calls have the prefix ``epic_`` which of course is just an abbreviation
   for *Epicardium*.
-* There are no special rules regarding call numbers, choose any number not yet
-  in use.  Call numbers are ``uint32_t`` so you have plenty to choose from.
 * Only use types from the standard library or types defined (and documented!)
   in ``epicardium.h``.  **Never** include another header in ``epicardium.h``.
 * When passing pointers, keep in mind that this will mean the other core will
@@ -44,8 +42,21 @@ There are a number of rules you should follow when defining new calls:
   negative values denoting errors) if they are an imperative command or action
   (ref `Kernel Coding Style`_).  If you are reasonably sure your call cannot fail
   or an error is non-recoverable from core 1, return ``void``.
+* There are no special rules regarding call numbers, choose any number not yet
+  in use.  Call numbers are ``uint32_t`` so you have plenty to choose from.
 
 .. _Kernel Coding Style: https://www.kernel.org/doc/html/v5.2/process/coding-style.html#function-return-values-and-names
+
+.. warning::
+
+   After the 4th of August 00:00 UTC, **no** changes to existing IDs and the signature
+   and behavior of existing calls are allowed!  This is necessary to ensure
+   compatibility of future firmware versions with older payloads.  We call this
+   date the **API Freeze Deadline**.  Addition of new calls will always be allowed.
+
+   In return this also means payloads compiled against a version of *Epicardium
+   API* released before that date are not guaranteed to work during and after
+   camp.
 
 API Call Definition
 -------------------
