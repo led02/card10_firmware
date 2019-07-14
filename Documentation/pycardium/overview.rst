@@ -24,6 +24,20 @@ hacking!
    from .py files on the filesystem. You have to test new modules using the
    serial console.
 
+Serial Console
+--------------
+If you have a debugger, you can just use the debuggers serial console.
+Otherwise, card10 will open a serial usb-device on its usb-port. On most Linux
+systems this device will be called ``/dev/ttyACM0`` or ``/dev/ttyACM1``.
+
+Choose a terminal-emulator of your liking and open the above mentioned device.
+Baud-rate is 115200.  Some options are:
+
+* **screen**: ``screen /dev/ttyACM0 115200``
+* **picocom**: ``picocom -b 115200 /dev/ttyACM0``
+
+After connecting, reboot card10 and you should see the MicroPython REPL pop up.
+
 .. todo::
 
    Getting Started Guide for people interested in writing Python code.

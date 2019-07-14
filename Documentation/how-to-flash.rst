@@ -51,10 +51,15 @@ that and after connecting to card10, you can flash your binary using the
 using your new firmware.
 
 
-.. info::
+.. note::
+
    If OpenOCD was able to connect, but GDB gives you an
-   ``Error erasing flash with vFlashErase packet`` error, issue a ``reset``
-   command, quickly followed by a ``load`` command.
+
+   .. code-block:: text
+
+      Error erasing flash with vFlashErase packet
+
+   error, issue a ``reset`` command, quickly followed by a ``load`` command.
 
    Reason: The Epicardium puts parts of the CPU to sleep and the debugging
    interface is part of that. After a reset the bootloader starts up
