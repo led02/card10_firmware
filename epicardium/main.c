@@ -11,6 +11,9 @@
 #include "api/dispatcher.h"
 #include "modules/modules.h"
 
+#include <Heart.h>
+#include "GUI_Paint.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -34,6 +37,9 @@ int main(void)
 {
 	card10_init();
 	card10_diag();
+
+	Paint_DrawImage(Heart, 0, 0, 160, 80);
+	LCD_Update();
 
 	/* TODO: Move this to its own function */
 	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
