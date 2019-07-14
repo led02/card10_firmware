@@ -66,6 +66,23 @@ except ImportError:
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["static"]
+
+# Theme Options
+html_theme_options = {
+    "style_external_links": True,
+}
+
+# Show "Edit on GitLab" links
+html_show_sourcelink = False
+html_context = {
+    "display_gitlab": True,
+    "gitlab_host": "git.card10.badge.events.ccc.de",
+    "gitlab_user": "card10",
+    "gitlab_repo": "firmware",
+    "gitlab_version": "master/",
+    "conf_py_path": "Documentation/",
+    "theme_vcs_pageview_mode": "edit",
+}
 # }}}
 
 # -- Options for Auto-Doc ---------------------------------------------------- {{{
