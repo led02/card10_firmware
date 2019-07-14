@@ -4,28 +4,28 @@
 #include "wsf_timer.h"
 #include "wsf_trace.h"
 #include "app_ui.h"
-#include "ll_api.h"
-#include "sch_api.h"
 #include "fit/fit_api.h"
-#include "mxc_config.h"
-#include "gcr_regs.h"
-#include "mcr_regs.h"
-#include "hci_core.h"
+#include "hci_vs.h"
 
 #include "FreeRTOS.h"
 #include "timers.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+
+
+/* Size of buffer for stdio functions */
+#define WSF_BUF_POOLS       6
+#define WSF_BUF_SIZE        0x1048
+
+uint32_t SystemHeapSize=WSF_BUF_SIZE;
+uint32_t SystemHeap[WSF_BUF_SIZE/4];
+uint32_t SystemHeapStart;
 
 /* Task ID for the ble handler */
 static TaskHandle_t ble_task_id = NULL;
 
-/* Number of WSF buffer pools */
-#define WSF_BUF_POOLS              6
-
-/*! Free memory for pool buffers (use word elements for word alignment). */
-static uint32_t mainBufMem[3584/sizeof(uint32_t)+96];
 
 /*! Default pool descriptor. */
 static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
@@ -35,40 +35,31 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
   {  64,  4 },
   { 128,  4 },
   { 256,  4 },
-  { 384,  4 }
+  { 512,  4 }
 };
 
+/*! \brief  Stack initialization for app. */
+extern void StackInitFit(void);
 
-static void PlatformInit(void)
+/*************************************************************************************************/
+void PalSysAssertTrap(void)
 {
-    /* Change the pullup on the RST pin to 25K */
-    /* TODO: Is this really needed? */
-    MXC_MCR->ctrl = 0x202;
-
-    /* Set VREGO_D to 1.3V */
-    *((volatile uint32_t*)0x40004410) = 0x50;
-
-    /* Set TX LDO to 1.1V and enable LDO. Set RX LDO to 0.9V and enable LDO */
-    MXC_GCR->btleldocn = 0xD9; // TX 1.1V RX 0.9V
-
-    /* Power up the 32MHz XO */
-    MXC_GCR->clkcn |= MXC_F_GCR_CLKCN_X32M_EN;
-
-    /* Enable peripheral clocks */
-    /* TODO: Is this really needed? */
-    MXC_GCR->perckcn0 &= ~(MXC_F_GCR_PERCKCN0_GPIO0D | MXC_F_GCR_PERCKCN0_GPIO1D);  // Clear GPIO0 and GPIO1 Disable
-    MXC_GCR->perckcn1 &= ~(MXC_F_GCR_PERCKCN1_BTLED | MXC_F_GCR_PERCKCN1_TRNGD );  // Clear BTLE and ICACHE0 disable
+    while(1) {}
 }
 
-static void myTrace(const char *pStr, va_list args)
+
+/*************************************************************************************************/
+static bool_t myTrace(const uint8_t *pBuf, uint32_t len)
 {
     extern uint8_t wsfCsNesting;
 
     if (wsfCsNesting == 0)
     {
-        vprintf(pStr, args);
-        printf("\r\n");
+        fwrite(pBuf, len, 1, stdout);
+        return TRUE;
     }
+
+    return FALSE;
 }
 
 /*************************************************************************************************/
@@ -80,11 +71,20 @@ static void myTrace(const char *pStr, va_list args)
 /*************************************************************************************************/
 static void WsfInit(void)
 {
+    uint32_t bytesUsed;
     WsfTimerInit();
-    WsfBufInit(sizeof(mainBufMem), (uint8_t*)mainBufMem, WSF_BUF_POOLS, mainPoolDesc);
-    WsfTraceRegister(myTrace);
+
+    SystemHeapStart = (uint32_t)&SystemHeap;
+    memset(SystemHeap, 0, sizeof(SystemHeap));
+    //printf("SystemHeapStart = 0x%x\n", SystemHeapStart);
+    //printf("SystemHeapSize = 0x%x\n", SystemHeapSize);
+    bytesUsed = WsfBufInit(WSF_BUF_POOLS, mainPoolDesc);
+    printf("bytesUsed = %u\n", (unsigned int)bytesUsed);
+    
+    WsfTraceRegisterHandler(myTrace);
+    WsfTraceEnable(TRUE);
 }
-/* TODO: WTF? */
+/* TODO: We need a source of MACs */
 /*
  * In two-chip solutions, setting the address must wait until the HCI interface is initialized.
  * This handler can also catch other Application events, but none are currently implemented.
@@ -98,68 +98,64 @@ void SetAddress(uint8_t event)
     switch (event) {
     case APP_UI_RESET_CMPL:
         printf("Setting address -- MAC %02X:%02X:%02X:%02X:%02X:%02X\n", bdAddr[5], bdAddr[4], bdAddr[3], bdAddr[2], bdAddr[1], bdAddr[0]);
-        LlSetBdAddr((uint8_t*)&bdAddr);
-        LlGetBdAddr(hciCoreCb.bdAddr);
+        HciVsSetBdAddr(bdAddr);
         break;
     default:
         break;
     }
 }
 
-/*************************************************************************************************/
-/*!
- *  \brief  Initialize MAC layer.
- *
- *  \param  None.
- *
- *  \return None.
- */
-/*************************************************************************************************/
-extern int8_t tx_rfpower_on;
-void MacInit(void)
-{
-    wsfHandlerId_t handlerId;
-
-    /* Initialize link layer. */
-    BbInit();
-    handlerId = WsfOsSetNextHandler(SchHandler);
-    SchInit(handlerId);
-    LlAdvSlaveInit();
-    LlConnSlaveInit();
-    handlerId = WsfOsSetNextHandler(LlHandler);
-    LlHandlerInit(handlerId);
-}
-
-
-
-
 static StaticTimer_t x;
-TimerHandle_t timerWakeup;
+TimerHandle_t timerWakeup = NULL;
 int lasttick = 0;
+bool schedule_needed = false;
 
 static void vTimerCallback(xTimerHandle pxTimer)
 {
+    //printf("wake\n");
+    int tick = xTaskGetTickCount();
+    printf("WsfTimerUpdate(%d)\n", tick - lasttick);
+    WsfTimerUpdate(tick - lasttick);
+    lasttick = tick;
+    //printf("done\n");
+}
+
+static void notify(void)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    if(xPortIsInsideInterrupt()) {
+	    vTaskNotifyGiveFromISR(ble_task_id, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    } else {
+	     xTaskNotifyGive(ble_task_id);
+    }
+}
+
+void WsfTimerNotify(void)
+{
+    //printf("WsfTimerNotify\n");
+    notify();
+}
+
+void wsf_ble_signal_event(void)
+{
+    //printf("wsf_ble_signal_event\n");
+    notify();
+}
+
+static void scheduleTimer(void)
+{
     bool_t          timerRunning;
     wsfTimerTicks_t time_to_next_expire;
-    do {
-        int tick = xTaskGetTickCount();
-        WsfTimerUpdate(tick - lasttick);
-        lasttick = tick;
-        time_to_next_expire = WsfTimerNextExpiration(&timerRunning);
-    } while (timerRunning && time_to_next_expire == 0);
 
+    time_to_next_expire = WsfTimerNextExpiration(&timerRunning);
 
     if(timerRunning) {
-        printf("time_to_next_expire = %d\n", time_to_next_expire);
-        timerWakeup = xTimerCreateStatic(
-            "timerWakeup", /* name */
-            pdMS_TO_TICKS(time_to_next_expire), /* period/time */
-            pdFALSE, /* auto reload */
-            NULL, /* timer ID */
-            vTimerCallback, &x); /* callback */
-
+        //printf("time_to_next_expire = %d\n", time_to_next_expire);
+        //printf("change period\n");
         if(timerWakeup != NULL) {
-            xTimerStart(timerWakeup, 0);
+            xTimerChangePeriod(timerWakeup, pdMS_TO_TICKS(time_to_next_expire), 0);
+            //printf("insert done\n");
         } else {
             printf("could not create timer\n");
         }
@@ -168,34 +164,36 @@ static void vTimerCallback(xTimerHandle pxTimer)
     }
 }
 
-
 static void ble_init(void)
 {
-    PlatformInit();
     WsfInit();
-    MacInit();
-    //StackInitFit();
-    //FitStart();
+    StackInitFit();
+    NVIC_SetPriority(BTLE_SFD_TO_IRQn, 2);
+    NVIC_SetPriority(BTLE_TX_DONE_IRQn, 2);
+    NVIC_SetPriority(BTLE_RX_RCVD_IRQn, 2);
+    FitStart();
 
     /* Register a handler for Application events */
     AppUiActionRegister(SetAddress);
 
     lasttick = xTaskGetTickCount();
-    vTimerCallback(NULL);
-}
 
+    timerWakeup = xTimerCreateStatic(
+        "timerWakeup", /* name */
+        pdMS_TO_TICKS(1), /* period/time */
+        pdFALSE, /* auto reload */
+        NULL, /* timer ID */
+        vTimerCallback, &x); /* callback */
+}
 
 void vBleTask(void*pvParameters)
 {
 	ble_task_id = xTaskGetCurrentTaskHandle();
-
     ble_init();
-    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
     while (1){
-        // TODO: this need some timing and sleeping
+		ulTaskNotifyTake(pdTRUE, portTICK_PERIOD_MS * 1000);
         wsfOsDispatcher();
-        vTimerCallback(NULL);
-        vTaskDelay( xDelay );
+        scheduleTimer();
     }
 }

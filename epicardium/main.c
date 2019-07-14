@@ -109,7 +109,7 @@ int main(void)
 	if (xTaskCreate(
 		vBleTask,
 		(const char*)"BLE",
-		configMINIMAL_STACK_SIZE,
+		configMINIMAL_STACK_SIZE * 10,
 		NULL,
 		tskIDLE_PRIORITY  + 1,
         NULL

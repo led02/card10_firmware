@@ -132,7 +132,7 @@ void WsfSetEvent(wsfHandlerId_t handlerId, wsfEventMask_t event)
   WSF_CS_EXIT(cs);
 
   /* set event in OS */
-  // wsf_mbed_ble_signal_event();
+  wsf_ble_signal_event();
 }
 
 /*************************************************************************************************/
@@ -157,7 +157,7 @@ void WsfTaskSetReady(wsfHandlerId_t handlerId, wsfTaskEvent_t event)
   WSF_CS_EXIT(cs);
 
   /* set event in OS */
-  // wsf_mbed_ble_signal_event();
+  wsf_ble_signal_event();
 }
 
 /*************************************************************************************************/

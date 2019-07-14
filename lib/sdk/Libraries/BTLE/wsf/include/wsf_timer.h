@@ -164,6 +164,8 @@ void WsfTimerSleep(void);
 /*************************************************************************************************/
 void WsfTimerSleepUpdate(void);
 
+void WsfTimerNotify(void);
+
 /*! \} */    /* WSF_TIMER_API */
 
 #ifdef __cplusplus
