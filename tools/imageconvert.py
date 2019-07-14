@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from PIL import Image
 import sys
@@ -11,7 +11,7 @@ im = Image.open(sys.argv[1])
 
 out_name = '.'.join(sys.argv[1].split('.')[:-1])
 
-print out_name
+print(out_name)
 out = open(out_name + ".h", 'w')
 
 out.write("const unsigned char %s[] = {\n" % out_name.split('/')[-1])
