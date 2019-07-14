@@ -164,3 +164,121 @@ QSTRs.  Instead all QSTRs needed by modules need to be defined in the header
 .. _makeqstrdefs.py: https://github.com/micropython/micropython/blob/master/py/makeqstrdefs.py
 .. _makeqstrdata.py: https://github.com/micropython/micropython/blob/master/py/makeqstrdata.py
 .. _lib/micropython: https://git.card10.badge.events.ccc.de/card10/firmware/tree/master/lib/micropython
+
+Functions for MicroPython
+-------------------------
+As shown in the example above, you can create functions that can be called from
+MicroPython code.  These functions always have one of the following signatures.
+To create a MicroPython object for a function, you need the macro call shown
+after each signature.  Please place these calls directly after the function
+body as shown above.
+
+.. code-block:: cpp
+
+   /* Function with 0 arguments */
+   mp_obj_t mp_example_fun0(void);
+   static MP_DEFINE_CONST_FUN_OBJ_0(example_fun0_obj, mp_example_fun0);
+
+   /* Function with 1 argument */
+   mp_obj_t mp_example_fun1(mp_obj_t arg0_in);
+   static MP_DEFINE_CONST_FUN_OBJ_1(example_fun1_obj, mp_example_fun0);
+
+   /* Function with 2 arguments */
+   mp_obj_t mp_example_fun2(mp_obj_t arg0_in, mp_obj_t arg1_in);
+   static MP_DEFINE_CONST_FUN_OBJ_2(example_fun2_obj, mp_example_fun0);
+
+   /* Function with 3 arguments */
+   mp_obj_t mp_example_fun3(mp_obj_t arg0_in, mp_obj_t arg1_in, mp_obj_t arg2_in);
+   static MP_DEFINE_CONST_FUN_OBJ_3(example_fun3_obj, mp_example_fun0);
+
+   /* Function with 4 or more arguments */
+   mp_obj_t mp_example_fun4(size_t n_args, mp_obj_t *args);
+   static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(example_fun4_obj, 4, 4, mp_example_fun4);
+
+For functions with 4 or more arguments, you need to use the
+``MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN`` macro and instead of directly accessing
+the arguments, you get an array.  The macro gets two numbers (they are the same
+in the example above):  The minimum and maximum number of arguments.
+
+MicroPython Objects
+-------------------
+**TL;DR**: Look at |obj.h|_.  It contains most functions needed to create,
+access, and modify MicroPython objects.
+
+.. |obj.h| replace:: ``lib/micropython/micropython/py/obj.h``
+.. _obj.h: https://github.com/micropython/micropython/blob/master/py/obj.h
+
+For C modules to interface with MicroPython, you need to be able to interface
+with MicroPython objects.  The generic type of an object is ``mp_obj_t``.  As
+you can see in the example above, this is also what a function gets as
+arguments and returns back to MicroPython.  You can cast ``mp_obj_t`` to
+concrete object types if you made sure it is actually the correct type.
+
+Booleans
+~~~~~~~~
+``True`` and ``False`` are *const* objects, called ``mp_const_true`` and
+``mp_const_false`` respectively.  A usual equality check can be used:
+
+.. code-block:: cpp
+
+   #include "py/obj.h"
+   #include "py/runtime.h"
+
+   if (bool_obj == mp_const_true) {
+       /* is a boolean true */
+   } else if (bool_obj == mp_const_false) {
+       /* is a boolean false */
+   } else {
+       mp_raise_TypeError("arg 0 is not a boolean");
+   }
+
+Integers
+~~~~~~~~
+.. todo::
+
+   Integers
+
+Strings
+~~~~~~~
+.. todo::
+
+   Strings
+
+Lists & Tuples
+~~~~~~~~~~~~~~
+While lists and tuples can be accessed using type specific functions, you
+should refrain from doing so:  Use generic indexing functions instead, as they
+also allow types derived from lists or tuples or types with custom indexing
+implementations (i.e. duck-typing).
+
+.. code-block:: cpp
+
+   #include "py/obj.h"
+   #include "py/runtime.h"
+
+   /* Get the length of a list-like object */
+   mp_int_t len = mp_obj_get_int(mp_obj_len(list_obj));
+
+   /* Get element at a specific index */
+   mp_obj_t elem5 = mp_obj_subscr(
+           list_obj,
+           MP_OBJ_NEW_SMALL_INT(5),
+           MP_OBJ_SENTINEL
+   );
+
+To create a list or tuple:
+
+.. code-block:: cpp
+
+   mp_obj_t values[] = {
+           MP_OBJ_NEW_SMALL_INT(0xde),
+           MP_OBJ_NEW_SMALL_INT(0xad),
+           MP_OBJ_NEW_SMALL_INT(0xbe),
+           MP_OBJ_NEW_SMALL_INT(0xef),
+   };
+
+   /* Create a tuple */
+   mp_obj_t tuple = mp_obj_new_tuple(4, values);
+
+   /* Create a list */
+   mp_obj_t list = mp_obj_new_list(4, values);
