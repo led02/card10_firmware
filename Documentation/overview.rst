@@ -32,7 +32,8 @@ number of tasks that will have been keeping card10 running.  These are:
 Pycardium
 ---------
 Pycardium is our MicroPython fork.  Its purpose is to make it as easy as
-possible to interact with card10.
+possible to interact with card10.  If you are interested in working on
+Pycardium, take a look at the :ref:`pycardium_guide` guide.
 
 \*cardium
 ---------

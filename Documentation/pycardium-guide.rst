@@ -1,3 +1,5 @@
+.. _pycardium_guide:
+
 Pycardium Module Development
 ============================
 This is a step-by-step guide on augmenting Pycardium with new modules.  These
