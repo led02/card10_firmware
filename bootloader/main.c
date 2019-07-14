@@ -60,6 +60,9 @@ bool check_integrity(void)
 
     res=f_open(&file, filename, FA_OPEN_EXISTING|FA_READ);
     if(res != FR_OK) {
+        Paint_DrawString_EN(0, 16*2, "card10.bin not found", &Font16, 0x0000, 0xffff);
+        LCD_Update();
+
         printf("f_open error %d\n", res);
         return false;
     }
@@ -80,6 +83,8 @@ bool check_integrity(void)
     if(crcval == 0) {
         return true;
     } else {
+        Paint_DrawString_EN(0, 16*2, "Integrity check failed", &Font16, 0x0000, 0xffff);
+        LCD_Update();
         printf("CRC check failed. Final CRC: %d\n", crcval);
         return false;
     }
@@ -232,8 +237,6 @@ int main(void)
                 printf("No update needed\n");
             }
         } else {
-            Paint_DrawString_EN(0, 16*2, "Integrity check failed", &Font16, 0x0000, 0xffff);
-            LCD_Update();
             printf("Integrity check failed\n");
         }
     } else {
