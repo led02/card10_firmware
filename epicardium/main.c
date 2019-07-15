@@ -4,6 +4,7 @@
 #include "max32665.h"
 #include "uart.h"
 #include "cdcacm.h"
+#include "fatfs.h"
 
 #include "card10.h"
 #include "pmic.h"
@@ -45,6 +46,7 @@ int main(void)
 	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 
 	cdcacm_init();
+	fatfs_init();
 
 	printf("=> Initializing tasks ...\n");
 

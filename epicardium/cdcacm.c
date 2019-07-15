@@ -67,7 +67,8 @@
 #define TOSTRING(x) STRINGIFY(x)
 
 /***** Global Data *****/
-volatile int configured;
+//SWYM: rename to CDC_xy or put into struct CDC_state
+volatile int configured; //SWYM: actually unused...
 volatile int suspended;
 volatile unsigned int event_flags;
 int remote_wake_en;
