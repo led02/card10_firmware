@@ -34,6 +34,11 @@ Please run ``make install`` after removing any already installed OpenOCD
 version. Otherwise please always specify the full path to OpenOCD (the binary
 is under ``src/openocd``).
 
+.. info::
+   If you want to use OpenOCD as normal user, copy ``contrib/60-openocd.rules``
+   into the ``/etc/udev/rules.d/`` directory and run ``udevadm control --reload``
+   afterwards.
+
 GDB (``arm-none-eabi-gdb``)
 ---------------------------
 Apart from OpenOCD you also need ``arm-none-eabi-gdb``.  You should install
