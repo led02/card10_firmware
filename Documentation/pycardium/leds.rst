@@ -5,16 +5,21 @@
 
    Set one of the card10's RGB LEDs to a certain color.
 
-   Example which sets all LEDs on the top to red:::
+   **Example**:
+
+   .. code-block:: python
 
       import leds, color
 
+      # Set all of the top LEDs to red
       for i in range(11):
          leds.set(i, color.RED)
 
-   :param led:  Which led to set.  0-10 are the leds on the top and 11-14 are the 4 "ambient" leds.
-   :param color:  What color to set the led to.  Should be a :py:class:`color.Color` but any list/tuple
-      with 3 elements will work just as well.
+   :param led:  Which led to set.  0-10 are the leds on the top
+      and 11-14 are the 4 "ambient" leds.
+   :param color:  What color to set the led to.  Should be a
+      :py:class:`color.Color` but any list/tuple with 3 elements
+      will work just as well.
 
 .. py:data:: leds.BOTTOM_RIGHT
 

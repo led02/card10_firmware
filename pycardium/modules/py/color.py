@@ -32,10 +32,26 @@ class Color(_ColorTuple):
     @classmethod
     def from_hex(cls, color):
         """
-        Create a color from a hexadecimal number::
+        Create a color from a hexadecimal number.
+
+        This function is available both as a class method and directly inside
+        the color module:
+
+        **Example**:
+
+        .. code-block:: python
+
+            from color import Color
 
             # Magenta
             Color.from_hex(0xff00ff)
+
+        .. code-block:: python
+
+            import color
+
+            # Cyan
+            color.from_hex(0x00ffff)
         """
         red = (color & 0xff0000) >> 16
         green = (color & 0x00ff00) >> 8
