@@ -34,7 +34,8 @@ Please run ``make install`` after removing any already installed OpenOCD
 version. Otherwise please always specify the full path to OpenOCD (the binary
 is under ``src/openocd``).
 
-.. info::
+.. note::
+
    If you want to use OpenOCD as normal user, copy ``contrib/60-openocd.rules``
    into the ``/etc/udev/rules.d/`` directory and run ``udevadm control --reload``
    afterwards.
