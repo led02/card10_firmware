@@ -4,7 +4,6 @@
 #include "max32665.h"
 #include "uart.h"
 #include "cdcacm.h"
-#include "fatfs.h"
 
 #include "card10.h"
 #include "pmic.h"

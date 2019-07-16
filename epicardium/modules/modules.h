@@ -1,6 +1,9 @@
 #ifndef MODULES_H
 #define MODULES_H
 
+/* FatFS */
+void fatfs_init(void);
+
 /* ---------- Serial ------------------------------------------------------- */
 #define SERIAL_READ_BUFFER_SIZE 128
 void vSerialTask(void *pvParameters);

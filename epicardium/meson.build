@@ -67,7 +67,6 @@ subdir('modules/')
 elf = executable(
   name + '.elf',
   'cdcacm.c',
-  'fatfs.c',
   'main.c',
   'support.c',
   module_sources,
