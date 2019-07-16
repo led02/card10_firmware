@@ -1,4 +1,4 @@
-source ../../.gdbinit
+source ../../init.gdb
 
 set confirm off
 
