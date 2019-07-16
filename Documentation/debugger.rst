@@ -78,14 +78,14 @@ output:
    Info : Listening on port 3333 for gdb connections
 
 Next, start *GDB* in parallel and connect it to OpenOCD.  You can do this easily
-if you run GDB from the firmware repository root where we have provided a
-``gdbinit`` file. Specify ``-x gdbinit`` to use this file.  Apart from
+if you run GDB from the firmware repository root where we have provided an
+``init.gdb`` file. Specify ``-x init.gdb`` to use this file.  Apart from
 automatically connecting to OpenOCD, this script file also defines a ``reset``
 command to soft-reset card10.
 
 .. code-block:: shell-session
 
-   $ arm-none-eabi-gdb -x gdbinit build/hw-tests/hello-world/hello-world.elf
+   $ arm-none-eabi-gdb -x init.gdb build/hw-tests/hello-world/hello-world.elf
    ...
    (gdb)
 
