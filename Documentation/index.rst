@@ -33,6 +33,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    how-to-flash
    debugger
    pycardium-guide
+   memory-map
 
 .. toctree::
    :maxdepth: 1
