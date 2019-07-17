@@ -11,6 +11,7 @@
 #include "api/dispatcher.h"
 #include "modules/modules.h"
 #include "modules/log.h"
+#include "modules/stream.h"
 
 #include <Heart.h>
 #include "GUI_Paint.h"
@@ -53,6 +54,7 @@ int main(void)
 	}
 
 	fatfs_init();
+	stream_init();
 
 	LOG_INFO("startup", "Initializing tasks ...");
 

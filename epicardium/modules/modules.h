@@ -15,4 +15,3 @@ void vSerialTask(void *pvParameters);
 void vPmicTask(void *pvParameters);
 
 #endif /* MODULES_H */
-

@@ -4,5 +4,6 @@ module_sources = files(
   'log.c',
   'pmic.c',
   'serial.c',
+  'stream.c',
   'vibra.c',
 )
