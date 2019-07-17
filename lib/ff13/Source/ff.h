@@ -311,10 +311,10 @@ void ff_memfree (void* mblock);			/* Free memory block */
 
 /* Sync functions */
 #if FF_FS_REENTRANT
-int ff_cre_syncobj (BYTE vol, FF_SYNC_t* sobj) __attribute__((weak));	/* Create a sync object */
-int ff_req_grant (FF_SYNC_t sobj) __attribute__((weak));		/* Lock sync object */
-void ff_rel_grant (FF_SYNC_t sobj) __attribute__((weak));		/* Unlock sync object */
-int ff_del_syncobj (FF_SYNC_t sobj) __attribute__((weak));	/* Delete a sync object */
+int ff_cre_syncobj (BYTE vol, FF_SYNC_t* sobj);	/* Create a sync object */
+int ff_req_grant (FF_SYNC_t sobj);		/* Lock sync object */
+void ff_rel_grant (FF_SYNC_t sobj);		/* Unlock sync object */
+int ff_del_syncobj (FF_SYNC_t sobj);	/* Delete a sync object */
 #endif
 
 
