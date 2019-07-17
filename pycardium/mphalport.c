@@ -44,7 +44,21 @@ int DEBUG_printf(const char *fmt, ...)
 /* newlib syscall to allow printf to work */
 long _write(int fd, const char *buf, size_t cnt)
 {
-	epic_uart_write_str(buf, cnt);
+	/*
+	 * Only print one line at a time.  Insert `\r` between lines so
+	 * they are properly displayed on the serial console.
+	 */
+	size_t i, last = 0;
+	for (i = 0; i < cnt; i++) {
+		if (buf[i] == '\n') {
+			epic_uart_write_str(&buf[last], i - last);
+			epic_uart_write_str("\r", 1);
+			last = i;
+		}
+	}
+	if (last != i) {
+		epic_uart_write_str(&buf[last], cnt - last);
+	}
 	return cnt;
 }
 
