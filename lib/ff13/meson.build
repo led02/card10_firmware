@@ -1,5 +1,6 @@
 includes = include_directories(
   './Source/',
+  './util/',
 )
 
 sources = files(
@@ -7,6 +8,7 @@ sources = files(
   './Source/ff.c',
   './Source/ffsystem.c',
   './Source/ffunicode.c',
+  './util/fs_util.c',
 )
 
 lib = static_library(
