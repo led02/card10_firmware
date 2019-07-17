@@ -12,4 +12,5 @@ subdir('./FreeRTOS-Plus/')
 subdir('./micropython/')
 
 subdir('./card10/')
+subdir('./mx25lba/')
 subdir('./ff13/')

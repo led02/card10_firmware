@@ -35,17 +35,6 @@
  *******************************************************************************
  */
 
-/**
- * @file    mscmem.h
- * @brief   Memory routines used by the USB Mass Storage Class example.
- *          See the msc_mem_t structure in msc.h for function details.
- * @details Functions are provided for using the internal RAM of the
- *          device or the external SPI flash memory.  Use the SPIXF_DISK
- *          and RAM_DISK defines to select the desired memory at compile
- *          time.
- */
-
-#include "mscmem.h"
 #include <string.h>
 #include <stdio.h>
 #include "mx25.h"
