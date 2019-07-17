@@ -11,6 +11,7 @@
 #define API_UART_READ          0x2
 #define API_LEDS_SET           0x3
 #define API_VIBRA_SET          0x4
+#define API_VIBRA_VIBRATE      0x5
 /* clang-format on */
 
 /**
@@ -65,5 +66,12 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  * :param status: 1 to turn on, 0 to turn off.
  */
 API(API_VIBRA_SET, void epic_vibra_set(int status));
+
+/**
+ * Turn vibration motor on for a given time
+ *
+ * :param millis: number of milliseconds to run the vibration motor.
+ */
+API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
 
 #endif /* _EPICARDIUM_H */

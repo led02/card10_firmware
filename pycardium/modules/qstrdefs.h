@@ -24,3 +24,4 @@ Q(ticks_diff)
 
 /* vibra */
 Q(vibra)
+Q(vibrate)
