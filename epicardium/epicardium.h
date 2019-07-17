@@ -4,17 +4,24 @@
 #include <stddef.h>
 #include <errno.h>
 
+/* clang-format off */
+#define API_INT_CTRL_C  1
+#define API_INT_BHI160  2
+#define API_INT_MAX     API_INT_BHI160
+
 #ifndef API
 #define API(id, def) def
 #endif
 
-/* clang-format off */
 #define API_UART_WRITE         0x1
 #define API_UART_READ          0x2
 #define API_LEDS_SET           0x3
 #define API_VIBRA_SET          0x4
 #define API_VIBRA_VIBRATE      0x5
 #define API_STREAM_READ        0x6
+#define API_INTERRUPT_ENABLE   0x7
+#define API_INTERRUPT_DISABLE  0x8
+
 /* clang-format on */
 
 /**
@@ -138,5 +145,24 @@ API(API_VIBRA_SET, void epic_vibra_set(int status));
  * :param millis: number of milliseconds to run the vibration motor.
  */
 API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
+
+/**
+ * API interrupt type
+ */
+typedef uint32_t api_int_id_t;
+
+/**
+ * Enable/unmask an API interrupt
+ *
+ * :param int_id: The interrupt to be enabled
+ */
+API(API_INTERRUPT_ENABLE, void epic_interrupt_enable(api_int_id_t int_id));
+
+/**
+ * Disable/mask an API interrupt
+ *
+ * :param int_id: The interrupt to be disabled
+ */
+API(API_INTERRUPT_DISABLE, void epic_interrupt_disable(api_int_id_t int_id));
 
 #endif /* _EPICARDIUM_H */

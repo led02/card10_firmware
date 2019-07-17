@@ -22,6 +22,7 @@ api = custom_target(
 api_caller_lib = static_library(
   'api-caller',
   'api/caller.c',
+  'api/interrupt-receiver.c',
   api[0], # Caller
   dependencies: periphdriver,
 )
@@ -35,6 +36,7 @@ api_caller = declare_dependency(
 api_dispatcher_lib = static_library(
   'api-dispatcher',
   'api/dispatcher.c',
+  'api/interrupt-sender.c',
   api[1], # Dispatcher
   dependencies: periphdriver,
 )

@@ -4,7 +4,6 @@
 #include "max32665.h"
 #include "cdcacm.h"
 #include "uart.h"
-#include "tmr_utils.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -12,6 +11,7 @@
 
 #include "modules.h"
 #include "modules/log.h"
+#include "api/interrupt-sender.h"
 
 /* Task ID for the serial handler */
 TaskHandle_t serial_task_id = NULL;
@@ -24,7 +24,7 @@ static QueueHandle_t read_queue;
 /*
  * API-call to write a string.  Output goes to both CDCACM and UART
  */
-void epic_uart_write_str(char *str, intptr_t length)
+void epic_uart_write_str(const char *str, intptr_t length)
 {
 	UART_Write(ConsoleUart, (uint8_t *)str, length);
 	cdcacm_write((uint8_t *)str, length);
@@ -57,7 +57,12 @@ static void enqueue_char(char chr)
 {
 	if (chr == 0x3) {
 		/* Control-C */
-		TMR_TO_Start(MXC_TMR5, 1, 0);
+		api_interrupt_trigger(API_INT_CTRL_C);
+	}
+
+	if (chr == 0x0e) {
+		/* Control-N */
+		api_interrupt_trigger(API_INT_BHI160);
 	}
 
 	if (xQueueSend(read_queue, &chr, 100) == errQUEUE_FULL) {
