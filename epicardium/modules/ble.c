@@ -99,9 +99,22 @@ static void WsfInit(void)
 void SetAddress(uint8_t event)
 {
     uint8_t bdAddr[6] = {0x02, 0x02, 0x44, 0x8B, 0x05, 0x00};
+    char buf[32];
 
     switch (event) {
     case APP_UI_RESET_CMPL:
+        fs_read_text_file("mac.txt", buf, sizeof(buf));
+        printf("mac file: %s\n", buf);
+        int a, b, c, d, e, f;
+        if(sscanf(buf, "%x:%x:%x:%x:%x:%x", &a, &b, &c, &d, &e, &f) == 6) {
+            bdAddr[0] = f;
+            bdAddr[1] = e;
+            bdAddr[2] = d;
+            bdAddr[3] = c;
+            bdAddr[4] = b;
+            bdAddr[5] = a;
+        }
+
         printf("Setting address -- MAC %02X:%02X:%02X:%02X:%02X:%02X\n", bdAddr[5], bdAddr[4], bdAddr[3], bdAddr[2], bdAddr[1], bdAddr[0]);
         HciVsSetBdAddr(bdAddr);
         break;
