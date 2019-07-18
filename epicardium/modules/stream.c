@@ -67,7 +67,7 @@ int epic_stream_read(int sd, void *buf, size_t count)
 
 	size_t i;
 	for (i = 0; i < count; i += stream->item_size) {
-		if (!xQueueReceive(stream->queue, buf + i, STREAM_QUEUE_WAIT)) {
+		if (!xQueueReceive(stream->queue, buf + i, 0)) {
 			break;
 		}
 	}
