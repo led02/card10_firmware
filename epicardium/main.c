@@ -77,7 +77,7 @@ int main(void)
 	if (xTaskCreate(
 		    vApiDispatcher,
 		    (const char *)"API Dispatcher",
-		    configMINIMAL_STACK_SIZE,
+		    configMINIMAL_STACK_SIZE * 16,
 		    NULL,
 		    tskIDLE_PRIORITY + 2,
 		    &dispatcher_task_id) != pdPASS) {

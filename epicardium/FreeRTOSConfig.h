@@ -16,7 +16,7 @@
  *
  * Heap is managed by libc (heap_3.c).
  */
-#define configMINIMAL_STACK_SIZE    ((unsigned short)128)
+#define configMINIMAL_STACK_SIZE    ((unsigned short)256)
 
 /* FIXME: Assign proper priorities to all interrupts */
 #define configMAX_PRIORITIES        5
@@ -73,5 +73,12 @@ void pre_idle_sleep(TickType_t xExpectedIdleTime);
 void post_idle_sleep(TickType_t xExpectedIdleTime);
 #define configPOST_SLEEP_PROCESSING(xExpectedIdleTime) \
 	post_idle_sleep(xExpectedIdleTime)
+
+/*
+ * Uncomment to trace FreeRTOS malloc wrapper.
+ *
+ */
+// extern int printf (const char *__restrict __format, ...);
+// #define traceMALLOC( pvAddress, uiSize ) printf("[%s:%d] %p %d\n", __FILE__, __LINE__, pvAddress, uiSize)
 
 #endif /* FREERTOS_CONFIG_H */
