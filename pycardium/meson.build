@@ -7,6 +7,7 @@ modsrc = files(
   'modules/utime.c',
   'modules/vibra.c',
   'modules/light_sensor.c'
+  'modules/fat_file.c',
 )
 
 #################################

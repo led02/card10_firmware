@@ -48,6 +48,14 @@ typedef unsigned int size_t;
 #define API_DISP_RECT          0x16
 #define API_DISP_CIRC          0x17
 #define API_DISP_PIXEL         0x18
+
+#define API_FILE_OPEN          0x30
+#define API_FILE_CLOSE         0x31
+#define API_FILE_READ          0x32
+#define API_FILE_WRITE         0x34
+#define API_FILE_FLUSH         0x35
+#define API_FILE_SEEK          0x36 //NYI
+#define API_FILE_TELL          0x37 //NYI
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -438,5 +446,21 @@ API(API_LIGHT_SENSOR_GET, int epic_light_sensor_get(uint16_t* value));
  *      - ``-EBUSY``: The timer stop could not be scheduled.
  */
 API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
+
+/**
+ * File
+ * ====
+ * 
+ * Except for epic_open, which models C stdio's fopen function, close, read and write
+ * model close (3), read (3) and write(3)
+ * All file-related functions return >= 0 on success and -Exyz on failure, with error
+ * codes from errno.h (EIO, EINVAL etc.)
+ * 
+ */
+API(API_FILE_OPEN,  int32_t epic_open(const char* filename, const char* modeString));
+API(API_FILE_CLOSE, int32_t epic_close(int32_t fd));
+API(API_FILE_READ,  int32_t epic_read(int32_t fd, void* buf, uint32_t nbytes));
+API(API_FILE_WRITE, int32_t epic_write(int32_t fd, const void* buf, uint32_t nbytes));
+API(API_FILE_FLUSH, int32_t epic_flush(int32_t fd));
 
 #endif /* _EPICARDIUM_H */
