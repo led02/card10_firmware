@@ -52,20 +52,22 @@ int epic_stream_read(int sd, void *buf, size_t count)
 		return -ENODEV;
 	}
 
-	/* Poll the stream */
-	int ret = stream->poll_stream();
-	if (ret < 0) {
-		return ret;
+	/* Poll the stream, if a poll_stream function exists */
+	if (stream->poll_stream != NULL) {
+		int ret = stream->poll_stream();
+		if (ret < 0) {
+			return ret;
+		}
 	}
 
-	/* Check buffer sizing */
+	/* Check buffer size is a multiple of the data packet size */
 	if (count % stream->item_size != 0) {
 		return -EINVAL;
 	}
 
 	size_t i;
 	for (i = 0; i < count; i += stream->item_size) {
-		if (!xQueueReceive(stream->queue, buf + i, 10)) {
+		if (!xQueueReceive(stream->queue, buf + i, STREAM_QUEUE_WAIT)) {
 			break;
 		}
 	}

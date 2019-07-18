@@ -7,6 +7,8 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
+#define STREAM_QUEUE_WAIT pdMS_TO_TICKS(10)
+
 /**
  * **Stream Descriptors**:
  *
