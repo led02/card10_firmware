@@ -58,6 +58,75 @@ class Color(_ColorTuple):
         blue = (color & 0x0000ff)
         return cls(red, green, blue)
 
+    @classmethod
+    def from_hsv(cls, hue, saturation, value):
+        """
+        Create a color from a HSV tuple (hue, saturation, value).
+
+        This function is available both as a class method and directly inside
+        the color module:
+
+        **Example**:
+
+        .. code-block:: python
+
+            from color import Color
+
+            # Magenta
+            Color.from_hsv(300, 1, 1)
+
+        .. code-block:: python
+
+            import color
+
+            # Cyan
+            color.from_hsv(180, 1, 1)
+
+        Code via https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative
+
+        """
+        def f(n):
+            k = (n + (hue / 60)) % 6
+            return value - (value * saturation * max(min(k, 4-k, 1), 0))
+        def f2(x):
+            return round(f(x) * 255)
+        return cls(f2(5), f2(3), f2(1))
+
+    @classmethod
+    def from_hsl(cls, hue, saturation, lightness):
+        """
+        Create a color from a HSL tuple (hue, saturation, lightness).
+
+        This function is available both as a class method and directly inside
+        the color module:
+
+        **Example**:
+
+        .. code-block:: python
+
+            from color import Color
+
+            # Magenta
+            Color.from_hsl(300, 1, 0.5)
+
+        .. code-block:: python
+
+            import color
+
+            # Cyan
+            color.from_hsv(180, 1, 0.5)
+
+        Code via https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative
+
+        """
+        a = saturation * min(lightness, 1 - lightness)
+        def f(n):
+            k = (n + hue/30) % 12
+            return lightness - (a * max(min(k-3, 9-k, 1), -1))
+        def f2(x):
+            return round(f(x) * 255)
+        return cls(f2(0), f2(8), f2(4))
+
     def __str__(self):
         # Return the color in hex
         return "#{:02x}{:02x}{:02x}".format(
