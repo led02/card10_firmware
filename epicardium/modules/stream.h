@@ -12,9 +12,10 @@
 /**
  * **Stream Descriptors**:
  *
- *    All supported streams have to have a unique ID in this list.  :c:macro:`SD_MAX`
- *    must be greater than or equal to the highest defined ID.  Please keep IDs in
- *    sequential order.
+ *    This enum defines all known stream descriptors.  Internally, the stream
+ *    module allocates an array slot for each ID defined here.  For that to
+ *    work, :c:macro:`SD_MAX` must be greater than the highest defined ID.
+ *    Please keep IDs in sequential order.
  */
 enum stream_descriptor {
 	/** Highest descriptor must always be ``SD_MAX``. */
