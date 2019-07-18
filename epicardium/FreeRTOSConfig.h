@@ -51,6 +51,7 @@
 
 #define INCLUDE_vTaskSuspend        1
 #define INCLUDE_vTaskDelay          1
+#define INCLUDE_uxTaskGetStackHighWaterMark 1
 
 /* Allow static allocation of data structures */
 #define configSUPPORT_STATIC_ALLOCATION 1
