@@ -35,6 +35,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    debugger
    pycardium-guide
    memorymap
+   epicardium/sensor-streams
 
 .. toctree::
    :maxdepth: 1
@@ -43,5 +44,3 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    epicardium/overview
    epicardium/api
    epicardium-guide
-
-

@@ -10,18 +10,37 @@
 /**
  * **Stream Descriptors**:
  *
- *    All supported streams have to have a unique ID in this list.  ``SD_MAX``
- *    must be greater than or equal to the highest defined ID.  Please keep IDs
- *    in sequential order.
+ *    All supported streams have to have a unique ID in this list.  :c:macro:`SD_MAX`
+ *    must be greater than or equal to the highest defined ID.  Please keep IDs in
+ *    sequential order.
  */
 enum stream_descriptor {
 	/** Highest descriptor must always be ``SD_MAX``. */
 	SD_MAX,
 };
 
+/**
+ * Stream Information Object.
+ *
+ * This struct contains the information necessary for :c:func:`epic_stream_read`
+ * to read from a sensor's stream.  This consists of:
+ */
 struct stream_info {
+	/**
+	 * A FreeRTOS queue handle.
+	 *
+	 * Management of this queue is the sensor drivers responsibility.
+	 */
 	QueueHandle_t queue;
+	/** The size of one data packet (= queue element). */
 	size_t item_size;
+	/**
+	 * An optional function to call before performing the read.
+	 *
+	 * ``poll_stream()`` is intended for sensors who passively collect data.
+	 * A sensor driver might for example retrieve the latest samples in this
+	 * function instead of actively polling in a task loop.
+	 */
 	int (*poll_stream)();
 };
 
