@@ -25,4 +25,5 @@ const mp_obj_module_t mp_module_utime = {
 };
 
 /* Register the module to make it available in Python */
+/* clang-format off */
 MP_REGISTER_MODULE(MP_QSTR_utime, mp_module_utime, MODULE_UTIME_ENABLED);

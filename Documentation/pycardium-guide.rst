@@ -82,7 +82,14 @@ looks like this:
    };
 
    /* This is a special macro that will make MicroPython aware of this module */
+   /* clang-format off */
    MP_REGISTER_MODULE(MP_QSTR_example, example_module, MODULE_EXAMPLE_ENABLED);
+
+.. note::
+
+   Please keep the ``/* clang-format off */``.  It ensures that *clang-format*
+   won't touch the following line.  This is necessary because MicroPython's
+   codegen scripts can'd deal with newlines in the ``MP_REGISTER_MODULE`` macro.
 
 Build Integration
 ~~~~~~~~~~~~~~~~~

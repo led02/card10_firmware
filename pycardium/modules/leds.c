@@ -44,4 +44,5 @@ const mp_obj_module_t leds_module = {
 };
 
 /* Register the module to make it available in Python */
+/* clang-format off */
 MP_REGISTER_MODULE(MP_QSTR_leds, leds_module, MODULE_LEDS_ENABLED);

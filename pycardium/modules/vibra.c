@@ -37,5 +37,6 @@ const mp_obj_module_t vibra_module = {
 	.globals = (mp_obj_dict_t *)&vibra_module_globals,
 };
 
-// Register the module to make it available in Python
+/* Register the module to make it available in Python */
+/* clang-format off */
 MP_REGISTER_MODULE(MP_QSTR_vibra, vibra_module, MODULE_VIBRA_ENABLED);
