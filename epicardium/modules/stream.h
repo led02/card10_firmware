@@ -7,6 +7,9 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
+/* Time to wait for the descriptor table lock to become available */
+#define STREAM_MUTEX_WAIT pdMS_TO_TICKS(100)
+
 /**
  * **Stream Descriptors**:
  *
