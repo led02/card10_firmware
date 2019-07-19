@@ -1,5 +1,4 @@
-import color
-
+from color import Color
 
 ALICEBLUE            = Color.from_hex(0xf0f8ff)
 ANTIQUEWHITE         = Color.from_hex(0xfaebd7)
