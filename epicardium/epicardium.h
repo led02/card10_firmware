@@ -68,11 +68,18 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
 
 /**
  * Read sensor data into a buffer.  ``epic_stream_read()`` will read as many
- * sensor data packets as possible into ``buf`` and return as soon as possible.
- * It will poke the sensor driver once to check whether new data can be fetched.
- * If there is no new sensor data, ``epic_stream_read()`` will return ``0`` and
- * not touch ``buf``.  Otherwise it will return the number of data packets which
- * were read into ``buf``.
+ * sensor samples into the provided buffer as possible and return the number of
+ * samples written.  If no samples are available, ``epic_stream_read()`` will
+ * return ``0`` immediately.
+ *
+ * ``epic_stream_read()`` expects the provided buffer to have a size which is a
+ * multiple of the sample size for the given stream.  For the sample-format and
+ * size, please consult the sensors documentation.
+ *
+ * Before reading the internal sensor sample queue, ``epic_stream_read()`` will
+ * call a sensor specific *poll* function to allow the sensor driver to fetch
+ * new samples from its hardware.  This should, however, never take a long
+ * amount of time.
  *
  * :param int sd: Sensor Descriptor.  You get sensor descriptors as return
  *    values when activating the respective sensors.
@@ -84,8 +91,7 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  *
  *    - ``-ENODEV``: Sensor is not currently available.
  *    - ``-EBADF``: The given sensor descriptor is unknown.
- *    - ``-EINVAL``:  If ``count`` is not a multiple of the sensor data packet
- *      size.
+ *    - ``-EINVAL``:  ``count`` is not a multiple of the sensor's sample size.
  *
  * **Example**:
  *

@@ -7,8 +7,6 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-#define STREAM_QUEUE_WAIT pdMS_TO_TICKS(10)
-
 /**
  * **Stream Descriptors**:
  *
@@ -38,11 +36,14 @@ struct stream_info {
 	/** The size of one data packet (= queue element). */
 	size_t item_size;
 	/**
-	 * An optional function to call before performing the read.
+	 * An optional function to call before performing the read.  Set to
+	 * ``NULL`` if unused.
 	 *
 	 * ``poll_stream()`` is intended for sensors who passively collect data.
 	 * A sensor driver might for example retrieve the latest samples in this
 	 * function instead of actively polling in a task loop.
+	 *
+	 * The function registered here should never block for a longer time.
 	 */
 	int (*poll_stream)();
 };
@@ -50,7 +51,7 @@ struct stream_info {
 /**
  * Register a stream so it can be read from Epicardium API.
  *
- * :param int sd: Stream Descriptor.  Must be from the above enum.
+ * :param int sd: Stream Descriptor.  Must be from the :c:type:`stream_descriptor` enum.
  * :param stream_info stream: Stream info.
  * :returns: ``0`` on success or a negative value on error.  Possible errors:
  *
