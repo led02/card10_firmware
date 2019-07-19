@@ -20,6 +20,7 @@
 #define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_LONGLONG)
 
 /* Builtin function and modules */
+#define MICROPY_PY_ALL_SPECIAL_METHODS      (1)
 #define MICROPY_PY_BUILTINS_HELP            (1)
 #define MICROPY_PY_BUILTINS_HELP_MODULES    (1)
 #define MICROPY_PY_UBINASCII                (1)
