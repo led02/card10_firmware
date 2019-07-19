@@ -25,6 +25,8 @@ typedef unsigned int size_t;
  *    Please keep IDs in sequential order.
  */
 enum stream_descriptor {
+	/** BHI160 Accelerometer */
+	SD_BHI160_ACCELEROMETER,
 	/** Highest descriptor must always be ``SD_MAX``. */
 	SD_MAX,
 };

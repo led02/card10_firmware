@@ -84,4 +84,10 @@ int hwlock_release(enum hwlock_periph p);
 /* Forces an unlock of the display. Only to be used in Epicardium */
 void disp_forcelock();
 
+/* ---------- BHI160 ------------------------------------------------------- */
+#define BHI160_FIFO_SIZE             128
+#define BHI160_MUTEX_WAIT_MS          50
+void vBhi160Task(void *pvParameters);
+
+
 #endif /* MODULES_H */

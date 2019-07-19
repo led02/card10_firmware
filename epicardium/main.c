@@ -50,6 +50,18 @@ int main(void)
 		abort();
 	}
 
+	/* BHI160 */
+	if (xTaskCreate(
+		    vBhi160Task,
+		    (const char *)"BHI160 Driver",
+		    configMINIMAL_STACK_SIZE * 2,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
+		printf("Failed to create bhi160 dispatcher task!\n");
+		abort();
+	}
+
 	/* API */
 	if (xTaskCreate(
 		    vApiDispatcher,
