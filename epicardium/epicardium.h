@@ -92,6 +92,7 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  *    - ``-ENODEV``: Sensor is not currently available.
  *    - ``-EBADF``: The given sensor descriptor is unknown.
  *    - ``-EINVAL``:  ``count`` is not a multiple of the sensor's sample size.
+ *    - ``-EBUSY``: The descriptor table lock could not be acquired.
  *
  * **Example**:
  *

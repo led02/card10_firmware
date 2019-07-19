@@ -60,6 +60,7 @@ struct stream_info {
  *
  *    - ``-EINVAL``: Out of range sensor descriptor.
  *    - ``-EACCES``: Stream already registered.
+ *    - ``-EBUSY``: The descriptor lock could not be acquired.
  */
 int stream_register(int sd, struct stream_info *stream);
 
@@ -74,6 +75,7 @@ int stream_register(int sd, struct stream_info *stream);
  *
  *    - ``-EINVAL``: Out of range sensor descriptor.
  *    - ``-EACCES``: Stream ``stream`` was not registered for ``sd``.
+ *    - ``-EBUSY``: The descriptor lock could not be acquired.
  */
 int stream_deregister(int sd, struct stream_info *stream);
 
