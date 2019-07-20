@@ -4,7 +4,8 @@
 #include "semphr.h"
 
 #include "epicardium.h"
-#include "stream.h"
+#include "modules/log.h"
+#include "modules/stream.h"
 
 /* Internal buffer of registered streams */
 static struct stream_info *stream_table[SD_MAX];
@@ -24,6 +25,7 @@ int stream_init()
 int stream_register(int sd, struct stream_info *stream)
 {
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
+		LOG_WARN("stream", "Lock contention error");
 		return -EBUSY;
 	}
 
@@ -45,6 +47,7 @@ int stream_register(int sd, struct stream_info *stream)
 int stream_deregister(int sd, struct stream_info *stream)
 {
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
+		LOG_WARN("stream", "Lock contention error");
 		return -EBUSY;
 	}
 
@@ -71,6 +74,7 @@ int epic_stream_read(int sd, void *buf, size_t count)
 	 * of this would look like.
 	 */
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
+		LOG_WARN("stream", "Lock contention error");
 		return -EBUSY;
 	}
 
