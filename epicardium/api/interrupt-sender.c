@@ -4,16 +4,19 @@
 
 static bool enabled[API_INT_MAX + 1];
 
-void api_interrupt_trigger(api_int_id_t id)
+int api_interrupt_trigger(api_int_id_t id)
 {
-	if (id <= API_INT_MAX) {
-		if (enabled[id]) {
-			while (API_CALL_MEM->int_id)
-				;
-			API_CALL_MEM->int_id = id;
-			TMR_TO_Start(MXC_TMR5, 1, 0);
-		}
+	if (id > API_INT_MAX) {
+		return EINVAL;
 	}
+
+	if (enabled[id]) {
+		while (API_CALL_MEM->int_id)
+			;
+		API_CALL_MEM->int_id = id;
+		TMR_TO_Start(MXC_TMR5, 1, 0);
+	}
+	return 0;
 }
 
 void api_interrupt_init(void)
@@ -26,16 +29,22 @@ void api_interrupt_init(void)
 	}
 }
 
-void epic_interrupt_enable(api_int_id_t int_id)
+int epic_interrupt_enable(api_int_id_t int_id)
 {
-	if (int_id <= API_INT_MAX) {
-		enabled[int_id] = true;
+	if (int_id > API_INT_MAX) {
+		return EINVAL;
 	}
+
+	enabled[int_id] = true;
+	return 0;
 }
 
-void epic_interrupt_disable(api_int_id_t int_id)
+int epic_interrupt_disable(api_int_id_t int_id)
 {
-	if (int_id <= API_INT_MAX) {
-		enabled[int_id] = false;
+	if (int_id > API_INT_MAX) {
+		return EINVAL;
 	}
+
+	enabled[int_id] = false;
+	return 0;
 }

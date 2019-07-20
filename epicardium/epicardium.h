@@ -156,13 +156,13 @@ typedef uint32_t api_int_id_t;
  *
  * :param int_id: The interrupt to be enabled
  */
-API(API_INTERRUPT_ENABLE, void epic_interrupt_enable(api_int_id_t int_id));
+API(API_INTERRUPT_ENABLE, int epic_interrupt_enable(api_int_id_t int_id));
 
 /**
  * Disable/mask an API interrupt
  *
  * :param int_id: The interrupt to be disabled
  */
-API(API_INTERRUPT_DISABLE, void epic_interrupt_disable(api_int_id_t int_id));
+API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 
 #endif /* _EPICARDIUM_H */

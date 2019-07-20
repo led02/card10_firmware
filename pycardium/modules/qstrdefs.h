@@ -28,4 +28,5 @@ Q(vibrate)
 
 Q(set_callback)
 Q(enable_callback)
+Q(disable_callback)
 Q(BHI160)

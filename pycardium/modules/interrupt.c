@@ -44,16 +44,32 @@ STATIC mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
 	api_int_id_t id = mp_obj_get_int(id_in);
 
 	// TODO: throw error if id is out of range or epic_interrupt_enable failed
-	epic_interrupt_enable(id);
+	if (epic_interrupt_enable(id) < 0) {
+	}
 
 	return mp_const_none;
 }
+
+STATIC mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
+{
+	api_int_id_t id = mp_obj_get_int(id_in);
+
+	// TODO: throw error if id is out of range or epic_interrupt_enable failed
+	if (epic_interrupt_disable(id) < 0) {
+	}
+
+	return mp_const_none;
+}
+
 
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(
 	interrupt_set_callback_obj, mp_interrupt_set_callback
 );
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(
 	interrupt_enable_callback_obj, mp_interrupt_enable_callback
+);
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(
+	interrupt_disable_callback_obj, mp_interrupt_disable_callback
 );
 
 STATIC const mp_rom_map_elem_t interrupt_module_globals_table[] = {
@@ -62,6 +78,8 @@ STATIC const mp_rom_map_elem_t interrupt_module_globals_table[] = {
 	  MP_ROM_PTR(&interrupt_set_callback_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_enable_callback),
 	  MP_ROM_PTR(&interrupt_enable_callback_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_disable_callback),
+	  MP_ROM_PTR(&interrupt_disable_callback_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_BHI160), MP_OBJ_NEW_SMALL_INT(2) },
 };
 STATIC MP_DEFINE_CONST_DICT(
