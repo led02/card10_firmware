@@ -10,6 +10,7 @@
 #include "leds.h"
 #include "api/dispatcher.h"
 #include "modules/modules.h"
+#include "modules/log.h"
 
 #include <Heart.h>
 #include "GUI_Paint.h"
@@ -47,7 +48,7 @@ int main(void)
 	cdcacm_init();
 	fatfs_init();
 
-	printf("=> Initializing tasks ...\n");
+	LOG_DEBUG("startup", "Initializing tasks ...");
 
 	/* Serial */
 	if (xTaskCreate(
@@ -57,7 +58,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		printf("Failed to create serial-comms task!\n");
+		LOG_CRIT("startup", "Failed to create %s task!", "Serial");
 		abort();
 	}
 
@@ -69,7 +70,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		printf("Failed to create pmic task!\n");
+		LOG_CRIT("startup", "Failed to create %s task!", "PMIC");
 		abort();
 	}
 
@@ -81,17 +82,19 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 2,
 		    &dispatcher_task_id) != pdPASS) {
-		printf("Failed to create api dispatcher task!\n");
+		LOG_CRIT("startup", "Failed to create %s task!", "API Dispatcher");
 		abort();
 	}
 
-	printf("=> Initializing dispatcher ...\n");
+	LOG_INFO("startup", "Initializing dispatcher ...");
 	api_dispatcher_init();
 
-	printf("=> Starting core1 payload ...\n");
+	LOG_INFO("startup", "Starting core1 payload ...");
 	core1_start();
 
-	printf("=> Starting FreeRTOS ...\n");
+	LOG_INFO("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
-	printf("ERROR: FreeRTOS did not start due to unknown error!\n");
+
+	LOG_CRIT("startup", "FreeRTOS did not start due to unknown error!");
+	abort();
 }
