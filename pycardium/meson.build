@@ -4,6 +4,7 @@ modsrc = files(
   'modules/utime.c',
   'modules/leds.c',
   'modules/vibra.c',
+  'modules/interrupt.c',
 )
 
 #################################
@@ -75,7 +76,7 @@ elf = executable(
   include_directories: micropython_includes,
   dependencies: [max32665_startup_core1, periphdriver, api_caller],
   link_with: upy,
-  link_whole: [max32665_startup_core1_lib],
+  link_whole: [max32665_startup_core1_lib, api_caller_lib],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
   ],

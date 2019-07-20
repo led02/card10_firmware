@@ -1,3 +1,6 @@
+#pragma once
+#include "epicardium.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -25,6 +28,9 @@ struct api_call_mem {
 
 	/* ID if the ongoing API call */
 	api_id_t id;
+
+	/* ID of the current interrupt */
+	api_int_id_t int_id;
 
 	/*
 	 * Buffer for arguments/return value.  This buffer will be

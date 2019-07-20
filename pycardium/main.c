@@ -19,7 +19,7 @@ int main(void)
 	NVIC_EnableIRQ(TMR5_IRQn);
 
 	while (1) {
-		gc_init(&__HeapBase, &__HeapLimit);
+		gc_init(&__HeapBase + 1024 * 10, &__HeapLimit);
 
 		mp_init();
 		pyexec_friendly_repl();

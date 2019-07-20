@@ -14,7 +14,7 @@
 #include "tmr.h"
 
 #include "epicardium.h"
-
+#include "api/common.h"
 /******************************************************************************
  * Serial Communication
  */
@@ -62,23 +62,16 @@ long _write(int fd, const char *buf, size_t cnt)
 	return cnt;
 }
 
-bool do_interrupt = false;
-
-/* Timer Interrupt used for control char notification */
-void TMR5_IRQHandler(void)
+void api_interrupt_handler_ctrl_c(void)
 {
-	TMR_IntClear(MXC_TMR5);
-
-	if (do_interrupt) {
-		/* Taken from lib/micropython/micropython/lib/utils/interrupt_char.c */
-		MP_STATE_VM(mp_pending_exception) =
-			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception));
+	/* Taken from lib/micropython/micropython/lib/utils/interrupt_char.c */
+	MP_STATE_VM(mp_pending_exception) =
+		MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception));
 #if MICROPY_ENABLE_SCHEDULER
-		if (MP_STATE_VM(sched_state) == MP_SCHED_IDLE) {
-			MP_STATE_VM(sched_state) = MP_SCHED_PENDING;
-		}
-#endif
+	if (MP_STATE_VM(sched_state) == MP_SCHED_IDLE) {
+		MP_STATE_VM(sched_state) = MP_SCHED_PENDING;
 	}
+#endif
 }
 
 void mp_hal_set_interrupt_char(char c)
@@ -88,7 +81,12 @@ void mp_hal_set_interrupt_char(char c)
 			MP_OBJ_FROM_PTR(&MP_STATE_VM(mp_kbd_exception))
 		);
 	}
-	do_interrupt = (c == 0x03);
+
+	if (c == 0x03) {
+		epic_interrupt_enable(API_INT_CTRL_C);
+	} else {
+		epic_interrupt_disable(API_INT_CTRL_C);
+	}
 }
 
 /******************************************************************************
@@ -137,7 +135,7 @@ mp_import_stat_t mp_import_stat(const char *path)
 mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs)
 {
 	/* TODO: Once fs is implemented, get this working as well */
-	mp_raise_NotImplementedError ("FS is not yet implemented");
+	mp_raise_NotImplementedError("FS is not yet implemented");
 	return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);

@@ -25,3 +25,8 @@ Q(ticks_diff)
 /* vibra */
 Q(vibra)
 Q(vibrate)
+
+Q(set_callback)
+Q(enable_callback)
+Q(disable_callback)
+Q(BHI160)
