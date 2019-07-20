@@ -21,11 +21,14 @@ int log_msg(const char *subsys, const char *format, ...)
 		char *msg_color = "";
 
 		switch (format[0]) {
+		case 'D':
+			msg_color = "\x1B[2m";
+			break;
 		case 'W':
 			msg_color = "\x1B[1m";
 			break;
 		case 'E':
-			msg_color = "\x1B[31;1m";
+			msg_color = "\x1B[31m";
 			break;
 		case 'C':
 			msg_color = "\x1B[37;41;1m";

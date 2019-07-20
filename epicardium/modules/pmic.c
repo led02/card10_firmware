@@ -10,6 +10,7 @@
 
 #include "epicardium.h"
 #include "modules.h"
+#include "modules/log.h"
 
 /* Task ID for the pmic handler */
 static TaskHandle_t pmic_task_id = NULL;
@@ -33,12 +34,11 @@ void vPmicTask(void *pvParameters)
 		ulTaskNotifyTake(pdTRUE, delay);
 
 		if (count == PMIC_PRESS_SLEEP) {
-			printf("pmic: Sleep\n"
-			       "[[ Unimplemented ]]\n");
+			LOG_ERR("pmic", "Sleep [[ Unimplemented ]]");
 		}
 
 		if (count == PMIC_PRESS_POWEROFF) {
-			printf("pmic: Poweroff\n");
+			LOG_INFO("pmic", "Poweroff");
 			MAX77650_setSFT_RST(0x2);
 		}
 
@@ -52,7 +52,7 @@ void vPmicTask(void *pvParameters)
 		if (int_flag & MAX77650_INT_nEN_R) {
 			/* Button was pressed */
 			if (count < PMIC_PRESS_SLEEP) {
-				printf("pmic: Reset\n");
+				LOG_INFO("pmic", "Reset");
 				/*
 				 * Give the UART fifo time to clear.
 				 * TODO: Do this properly
@@ -69,9 +69,8 @@ void vPmicTask(void *pvParameters)
 
 		/* TODO: Remove when all interrupts are handled */
 		if (int_flag & ~(MAX77650_INT_nEN_F | MAX77650_INT_nEN_R)) {
-			printf("=====> WARNING <=====\n"
-			       "* Unhandled PMIC Interrupt: %x\n",
-			       int_flag);
+			LOG_WARN("pmic", "Unhandled PMIC Interrupt: %x",
+			         int_flag);
 		}
 
 		if (delay != portMAX_DELAY) {

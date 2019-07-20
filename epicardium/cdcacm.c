@@ -57,6 +57,8 @@
 #include "cdc_acm.h"
 #include "descriptors.h"
 
+#include "modules/log.h"
+#include <errno.h>
 
 /***** Definitions *****/
 #define EVENT_ENUM_COMP     MAXUSB_NUM_EVENTS
@@ -117,7 +119,7 @@ void delay_us(unsigned int usec)
 
 
 /******************************************************************************/
-void cdcacm_init(void)
+int cdcacm_init(void)
 {
     maxusb_cfg_options_t usb_opts;
 
@@ -135,14 +137,14 @@ void cdcacm_init(void)
 
     /* Initialize the usb module */
     if (usb_init(&usb_opts) != 0) {
-        printf("usb_init() failed\n");
-        while (1);
+        LOG_ERR("cdcacm", "usb_init() failed");
+        return -EIO;
     }
 
     /* Initialize the enumeration module */
     if (enum_init() != 0) {
-        printf("enum_init() failed\n");
-        while (1);
+        LOG_ERR("cdcacm", "enum_init() failed");
+        return -EIO;
     }
 
     /* Register enumeration data */
@@ -161,8 +163,8 @@ void cdcacm_init(void)
 
     /* Initialize the class driver */
     if (acm_init(&config_descriptor.comm_interface_descriptor) != 0) {
-        printf("acm_init() failed\n");
-        while (1);
+        LOG_ERR("cdcacm", "acm_init() failed");
+        return -EIO;
     }
 
     /* Register callbacks */
@@ -176,6 +178,8 @@ void cdcacm_init(void)
     /* TODO: Fix priority */
     NVIC_SetPriority(USB_IRQn, 6);
     NVIC_EnableIRQ(USB_IRQn);
+
+    return 0;
 }
 
 int cdcacm_num_read_avail(void)

@@ -26,6 +26,7 @@ TaskHandle_t dispatcher_task_id;
  */
 void vApiDispatcher(void *pvParameters)
 {
+	LOG_DEBUG("dispatcher", "Ready.");
 	while (1) {
 		if (api_dispatcher_poll()) {
 			api_dispatcher_exec();
@@ -36,6 +37,8 @@ void vApiDispatcher(void *pvParameters)
 
 int main(void)
 {
+	LOG_INFO("startup", "Epicardium startup ...");
+
 	card10_init();
 	card10_diag();
 
@@ -45,10 +48,13 @@ int main(void)
 	/* TODO: Move this to its own function */
 	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 
-	cdcacm_init();
+	if (cdcacm_init() < 0) {
+		LOG_ERR("startup", "USB-Serial unavailable");
+	}
+
 	fatfs_init();
 
-	LOG_DEBUG("startup", "Initializing tasks ...");
+	LOG_INFO("startup", "Initializing tasks ...");
 
 	/* Serial */
 	if (xTaskCreate(

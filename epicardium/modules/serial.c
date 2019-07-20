@@ -11,6 +11,7 @@
 #include "queue.h"
 
 #include "modules.h"
+#include "modules/log.h"
 
 /* Task ID for the serial handler */
 TaskHandle_t serial_task_id = NULL;
@@ -93,7 +94,7 @@ void vSerialTask(void *pvParameters)
 	while (1) {
 		int ret = UART_ReadAsync(ConsoleUart, &read_req);
 		if (ret != E_NO_ERROR && ret != E_BUSY) {
-			printf("error reading uart: %d\n", ret);
+			LOG_ERR("serial", "error reading uart: %d", ret);
 			vTaskDelay(portMAX_DELAY);
 		}
 

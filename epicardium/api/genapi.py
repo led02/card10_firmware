@@ -165,7 +165,7 @@ def main():
     # Generate Dispatcher {{{
     with open(args.server, "w") as f_dispatcher:
         tmp = """\
-#include <stdio.h>
+#include "modules/log.h"
 #include "{header}"
 
 void __api_dispatch_call(uint32_t id, void*buffer)
@@ -201,7 +201,7 @@ void __api_dispatch_call(uint32_t id, void*buffer)
         tmp = """\
         default:
                 /* TODO: Better error handling */
-                printf("Error: API function %lx is unknown!!\\n", id);
+                LOG_ERR("api-dispatcher", "API function 0x%lx is unknown!!", id);
                 break;
         }}
 }}
