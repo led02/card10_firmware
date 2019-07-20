@@ -7,7 +7,7 @@ static bool enabled[API_INT_MAX + 1];
 int api_interrupt_trigger(api_int_id_t id)
 {
 	if (id > API_INT_MAX) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	if (enabled[id]) {
@@ -32,7 +32,7 @@ void api_interrupt_init(void)
 int epic_interrupt_enable(api_int_id_t int_id)
 {
 	if (int_id > API_INT_MAX) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	enabled[int_id] = true;
@@ -42,7 +42,7 @@ int epic_interrupt_enable(api_int_id_t int_id)
 int epic_interrupt_disable(api_int_id_t int_id)
 {
 	if (int_id > API_INT_MAX) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	enabled[int_id] = false;
