@@ -5,8 +5,13 @@ import subprocess
 import sys
 
 
-MATCH_EXPANSION = re.compile(
+MATCH_API_EXPANSION = re.compile(
     r"__GENERATE_API \$ __GEN_ID_(?P<id>\w+) \$ (?P<decl>.*?) \$",
+    re.DOTALL | re.MULTILINE,
+)
+
+MATCH_ISR_EXPANSION = re.compile(
+    r"__GENERATE_API_ISR \$ __GEN_ID_(?P<id>\w+) \$ (?P<isr>.*?) \$",
     re.DOTALL | re.MULTILINE,
 )
 
@@ -34,7 +39,7 @@ def bailout(message, *args, **kwargs):
 def parse_declarations(source):
     """Parse all declarations in the given source."""
     declarations = []
-    for exp in MATCH_EXPANSION.finditer(source):
+    for exp in MATCH_API_EXPANSION.finditer(source):
         id = exp.group("id")
         decl = MATCH_DECLARATION.match(exp.group("decl"))
 
@@ -76,6 +81,21 @@ def parse_declarations(source):
     return declarations
 
 
+def parse_interrupts(source):
+    """Parse all isr declarations in the given source."""
+    interrupts = []
+    for exp in MATCH_ISR_EXPANSION.finditer(source):
+        id = exp.group("id")
+        isr = exp.group("isr")
+
+        interrupts.append({
+            "id": id,
+            "isr": isr,
+        })
+
+    return interrupts
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate the API stubs from a header file."
@@ -98,6 +118,7 @@ def main():
     # a way we can find later on.
     api_src = """\
 #define API(id, def) __GENERATE_API $ __GEN_ID_##id $ def $
+#define API_ISR(id, isr) __GENERATE_API_ISR $ __GEN_ID_##id $ isr $
 #include "{header}"
 """.format(
         header=os.path.relpath(args.header)
@@ -109,6 +130,8 @@ def main():
     ).decode()
 
     declarations = parse_declarations(source)
+    interrupts = parse_interrupts(source)
+
     fmt_header = {
         "header": os.path.basename(args.header)
     }
@@ -118,6 +141,7 @@ def main():
         tmp = """\
 #include <stdio.h>
 
+#define API_ISR(id, isr)
 #include "{header}"
 #include "api/caller.h"
 """
@@ -160,6 +184,64 @@ def main():
 }}
 """
                 f_client.write(tmp.format(**decl))
+
+        tmp = """\
+
+
+/* Weakly linked stubs for ISRs */
+"""
+        f_client.write(tmp)
+
+        for isr in interrupts:
+            tmp = """\
+void {isr}(api_int_id_t id)
+        __attribute__((weak, alias("__epic_isr_default_handler")));
+"""
+            f_client.write(tmp.format(**isr))
+
+        tmp = """\
+
+/* Default handler stub */
+__attribute__((weak)) void epic_isr_default_handler(api_int_id_t id)
+{
+        ;
+}
+
+/*
+ * This function is needed because aliasing the weak default handler will
+ * lead to issues.
+ */
+void __epic_isr_default_handler(api_int_id_t id)
+{
+        epic_isr_default_handler(id);
+}
+
+/*
+ * __dispatch_isr() will be called from the actual isr which was triggered
+ * by core 0.  It will then call the appropriate isr.
+ */
+void __dispatch_isr(api_int_id_t id)
+{
+        switch (id) {
+"""
+        f_client.write(tmp)
+
+        for isr in interrupts:
+            tmp = """\
+        case {id}:
+                {isr}(id);
+                break;
+"""
+            f_client.write(tmp.format(**isr))
+
+        tmp = """\
+        default:
+                epic_isr_default_handler(id);
+                break;
+        }
+}
+"""
+        f_client.write(tmp)
     # END: Generate Client }}}
 
     # Generate Dispatcher {{{
