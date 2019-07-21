@@ -15,6 +15,12 @@ class Display:
             disp.clear().update()
     """
 
+    def __init__(self):
+        """
+        Opens the display. Will fail the display can't be locked
+        """
+        sys_display.open()
+
     def __enter__(self):
         return self
 
@@ -26,10 +32,10 @@ class Display:
         """
         Opens the display. Will fail the display can't be locked
         """
-        sys_display.open()
         return cls()
 
-    def close(self):
+    @staticmethod
+    def close():
         """
         Closes and unlocks the display. To be able to use it again,
         it is necessary to open and lock it again with Display.open()
@@ -126,3 +132,4 @@ class Display:
         return self
 
 open = Display.open
+close = Display.close
