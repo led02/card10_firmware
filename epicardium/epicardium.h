@@ -101,8 +101,11 @@ API(API_UART_WRITE, void epic_uart_write_str(const char *str, intptr_t length));
 
 /**
  * Blocking read a single character from any connected serial device.
- * ``epic_uart_read_chr`` only returns
- * once one byte has been read.
+ * ``epic_uart_read_chr`` only returns once one byte has been read.
+ *
+ * .. todo::
+ *
+ *    This API function is currently in violation of the API rules.
  *
  * :return:  The byte.
  */
