@@ -57,12 +57,12 @@ static void enqueue_char(char chr)
 {
 	if (chr == 0x3) {
 		/* Control-C */
-		api_interrupt_trigger(API_INT_CTRL_C);
+		api_interrupt_trigger(EPIC_INT_CTRL_C);
 	}
 
 	if (chr == 0x0e) {
 		/* Control-N */
-		api_interrupt_trigger(API_INT_BHI160);
+		api_interrupt_trigger(EPIC_INT_BHI160_TEST);
 	}
 
 	if (xQueueSend(read_queue, &chr, 100) == errQUEUE_FULL) {

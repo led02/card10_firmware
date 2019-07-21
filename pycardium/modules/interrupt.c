@@ -6,15 +6,15 @@
 #include "mphalport.h"
 
 // TODO: these should be intialized as mp_const_none
-mp_obj_t callbacks[API_INT_MAX + 1] = {
+mp_obj_t callbacks[EPIC_INT_NUM] = {
 	0,
 };
 
-void api_interrupt_handler_catch_all(api_int_id_t id)
+void epic_isr_default_handler(api_int_id_t id)
 {
 	// TODO: check if id is out of rante
 	// TOOD: check against mp_const_none
-	if (id <= API_INT_MAX) {
+	if (id < EPIC_INT_NUM) {
 		if (callbacks[id]) {
 			mp_sched_schedule(
 				callbacks[id], MP_OBJ_NEW_SMALL_INT(id)
@@ -32,7 +32,7 @@ STATIC mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
 	}
 
 	// TODO: throw error if id is out of range
-	if (id <= API_INT_MAX) {
+	if (id < EPIC_INT_NUM) {
 		callbacks[id] = callback_obj;
 	}
 

@@ -2,15 +2,15 @@
 #include "api/common.h"
 #include "tmr_utils.h"
 
-static bool enabled[API_INT_MAX + 1];
+static bool int_enabled[EPIC_INT_NUM];
 
 int api_interrupt_trigger(api_int_id_t id)
 {
-	if (id > API_INT_MAX) {
+	if (id >= EPIC_INT_NUM) {
 		return -EINVAL;
 	}
 
-	if (enabled[id]) {
+	if (int_enabled[id]) {
 		while (API_CALL_MEM->int_id)
 			;
 		API_CALL_MEM->int_id = id;
@@ -21,30 +21,29 @@ int api_interrupt_trigger(api_int_id_t id)
 
 void api_interrupt_init(void)
 {
-	int i;
 	API_CALL_MEM->int_id = 0;
 
-	for (i = 0; i <= API_INT_MAX; i++) {
-		enabled[i] = false;
+	for (int i = 0; i < EPIC_INT_NUM; i++) {
+		int_enabled[i] = false;
 	}
 }
 
 int epic_interrupt_enable(api_int_id_t int_id)
 {
-	if (int_id > API_INT_MAX) {
+	if (int_id >= EPIC_INT_NUM) {
 		return -EINVAL;
 	}
 
-	enabled[int_id] = true;
+	int_enabled[int_id] = true;
 	return 0;
 }
 
 int epic_interrupt_disable(api_int_id_t int_id)
 {
-	if (int_id > API_INT_MAX) {
+	if (int_id >= EPIC_INT_NUM) {
 		return -EINVAL;
 	}
 
-	enabled[int_id] = false;
+	int_enabled[int_id] = false;
 	return 0;
 }

@@ -62,7 +62,7 @@ long _write(int fd, const char *buf, size_t cnt)
 	return cnt;
 }
 
-void api_interrupt_handler_ctrl_c(void)
+void epic_isr_ctrl_c(void)
 {
 	/* Taken from lib/micropython/micropython/lib/utils/interrupt_char.c */
 	MP_STATE_VM(mp_pending_exception) =
@@ -83,9 +83,9 @@ void mp_hal_set_interrupt_char(char c)
 	}
 
 	if (c == 0x03) {
-		epic_interrupt_enable(API_INT_CTRL_C);
+		epic_interrupt_enable(EPIC_INT_CTRL_C);
 	} else {
-		epic_interrupt_disable(API_INT_CTRL_C);
+		epic_interrupt_disable(EPIC_INT_CTRL_C);
 	}
 }
 

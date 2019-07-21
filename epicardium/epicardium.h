@@ -11,18 +11,22 @@
 typedef unsigned int size_t;
 #endif /* __SPHINX_DOC */
 
-/* clang-format off */
-#define API_INT_CTRL_C  1
-#define API_INT_BHI160  2
-#define API_INT_MAX     API_INT_BHI160
-
 /*
  * These definitions are required for the code-generator.  Please don't touch!
  */
 #ifndef API
 #define API(id, def) def
 #endif
+#ifndef API_ISR
+#define API_ISR(id, isr) void isr(void);
+#endif
 
+/*
+ * IDs for all defined API calls.  These IDs should not be needed in application
+ * code on any side.
+ */
+
+/* clang-format off */
 #define API_UART_WRITE         0x1
 #define API_UART_READ          0x2
 #define API_LEDS_SET           0x3
@@ -31,8 +35,52 @@ typedef unsigned int size_t;
 #define API_STREAM_READ        0x6
 #define API_INTERRUPT_ENABLE   0x7
 #define API_INTERRUPT_DISABLE  0x8
-
 /* clang-format on */
+
+typedef uint32_t api_int_id_t;
+
+/**
+ * Interrupts
+ * ==========
+ * Next to API calls, Epicardium API also has an interrupt mechanism to serve
+ * the other direction.  These interrupts can be enabled/disabled
+ * (masked/unmasked) using :c:func:`epic_interrupt_enable` and
+ * :c:func:`epic_interrupt_disable`.
+ */
+
+/**
+ * Enable/unmask an API interrupt.
+ *
+ * :param int_id: The interrupt to be enabled
+ */
+API(API_INTERRUPT_ENABLE, int epic_interrupt_enable(api_int_id_t int_id));
+
+/**
+ * Disable/mask an API interrupt.
+ *
+ * :param int_id: The interrupt to be disabled
+ */
+API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
+
+/**
+ * The following interrupts are defined:
+ */
+
+/* clang-format off */
+/** Reset Handler? **TODO** */
+#define EPIC_INT_RESET                  0
+/** ``^C`` interrupt. See :c:func:`epic_isr_ctrl_c` for details.  */
+#define EPIC_INT_CTRL_C                 1
+/* Debug interrupt, please ignore */
+#define EPIC_INT_BHI160_TEST            2
+API_ISR(EPIC_INT_BHI160_TEST, epic_isr_bhi160_test);
+
+/* Number of defined interrupts. */
+#define EPIC_INT_NUM                    3
+/* clang-format on */
+
+API_ISR(EPIC_INT_RESET, epic_isr_reset);
+
 
 /**
  * UART/Serial Interface
@@ -59,6 +107,21 @@ API(API_UART_WRITE, void epic_uart_write_str(const char *str, intptr_t length));
  * :return:  The byte.
  */
 API(API_UART_READ, char epic_uart_read_chr(void));
+
+/**
+ * **Interrupt Service Routine**
+ *
+ * A user-defineable ISR which is triggered when a ``^C`` (``0x04``) is received
+ * on any serial input device.  This function is weakly aliased to
+ * :c:func:`epic_isr_default` by default.
+ *
+ * To enable this interrupt, you need to enable :c:data:`EPIC_INT_CTRL_C`:
+ *
+ * .. code-block:: cpp
+ *
+ *    epic_interrupt_enable(EPIC_INT_CTRL_C);
+ */
+API_ISR(EPIC_INT_CTRL_C, epic_isr_ctrl_c);
 
 /**
  * LEDs
@@ -155,24 +218,5 @@ API(API_VIBRA_SET, void epic_vibra_set(int status));
  * :param millis: number of milliseconds to run the vibration motor.
  */
 API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
-
-/**
- * API interrupt type
- */
-typedef uint32_t api_int_id_t;
-
-/**
- * Enable/unmask an API interrupt
- *
- * :param int_id: The interrupt to be enabled
- */
-API(API_INTERRUPT_ENABLE, int epic_interrupt_enable(api_int_id_t int_id));
-
-/**
- * Disable/mask an API interrupt
- *
- * :param int_id: The interrupt to be disabled
- */
-API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 
 #endif /* _EPICARDIUM_H */
