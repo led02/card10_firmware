@@ -52,7 +52,7 @@ int epic_disp_line(
 	uint16_t xend,
 	uint16_t yend,
 	uint16_t color,
-	enum linestyle_t linestyle,
+	enum disp_linestyle linestyle,
 	uint16_t pixelsize
 ) {
 	int cl = check_lock();
@@ -72,7 +72,7 @@ int epic_disp_rect(
 	uint16_t xend,
 	uint16_t yend,
 	uint16_t color,
-	enum fillstyle_t fillstyle,
+	enum disp_fillstyle fillstyle,
 	uint16_t pixelsize
 ) {
 	int cl = check_lock();
@@ -91,7 +91,7 @@ int epic_disp_circ(
 	uint16_t y,
 	uint16_t rad,
 	uint16_t color,
-	enum fillstyle_t fillstyle,
+	enum disp_fillstyle fillstyle,
 	uint16_t pixelsize
 ) {
 	int cl = check_lock();

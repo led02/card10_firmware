@@ -178,7 +178,7 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
  */
 
 /** Line-Style */
-enum linestyle_t {
+enum disp_linestyle {
   /** */
   LINESTYLE_FULL = 0,
   /** */
@@ -186,7 +186,7 @@ enum linestyle_t {
 };
 
 /** Fill-Style */
-enum fillstyle_t {
+enum disp_fillstyle {
   /** */
   FILLSTYLE_EMPTY = 0,
   /** */
@@ -269,7 +269,7 @@ API(API_DISP_LINE,
 	    uint16_t xend,
 	    uint16_t yend,
 	    uint16_t color,
-	    enum linestyle_t linestyle,
+	    enum disp_linestyle linestyle,
 	    uint16_t pixelsize)
     );
 
@@ -294,7 +294,7 @@ API(API_DISP_RECT,
 	    uint16_t xend,
 	    uint16_t yend,
 	    uint16_t color,
-	    enum fillstyle_t fillstyle,
+	    enum disp_fillstyle fillstyle,
 	    uint16_t pixelsize)
     );
 
@@ -317,7 +317,7 @@ API(API_DISP_CIRC,
 	    uint16_t y,
 	    uint16_t rad,
 	    uint16_t color,
-	    enum fillstyle_t fillstyle,
+	    enum disp_fillstyle fillstyle,
 	    uint16_t pixelsize)
     );
 
