@@ -1,8 +1,14 @@
 #ifndef STREAM_H
 #define STREAM_H
 
-#include <stddef.h>
 #include <stdint.h>
+
+#ifndef __SPHINX_DOC
+/* stddef.h is not recognized by hawkmoth for some odd reason */
+#include <stddef.h>
+#else
+typedef unsigned int size_t;
+#endif /* __SPHINX_DOC */
 
 #include "FreeRTOS.h"
 #include "queue.h"

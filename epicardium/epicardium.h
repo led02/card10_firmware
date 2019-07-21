@@ -1,14 +1,24 @@
 #ifndef _EPICARDIUM_H
 #define _EPICARDIUM_H
+
 #include <stdint.h>
-#include <stddef.h>
 #include <errno.h>
+
+#ifndef __SPHINX_DOC
+/* stddef.h is not recognized by hawkmoth for some odd reason */
+#include <stddef.h>
+#else
+typedef unsigned int size_t;
+#endif /* __SPHINX_DOC */
 
 /* clang-format off */
 #define API_INT_CTRL_C  1
 #define API_INT_BHI160  2
 #define API_INT_MAX     API_INT_BHI160
 
+/*
+ * These definitions are required for the code-generator.  Please don't touch!
+ */
 #ifndef API
 #define API(id, def) def
 #endif

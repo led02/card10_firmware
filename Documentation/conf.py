@@ -103,6 +103,7 @@ try:
     extensions.append("hawkmoth")
 
     cautodoc_root = os.path.abspath("..")
+    cautodoc_clang = "-D__SPHINX_DOC"
     has_hawkmoth = True
 except ImportError as e:
     if e.name == "clang":
