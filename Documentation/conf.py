@@ -87,6 +87,7 @@ html_context = {
 
 # -- Options for Auto-Doc ---------------------------------------------------- {{{
 autodoc_mock_imports = [
+    "sys_display",
     "ucollections",
     "urandom",
     "utime",

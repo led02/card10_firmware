@@ -30,3 +30,12 @@ Q(set_callback)
 Q(enable_callback)
 Q(disable_callback)
 Q(BHI160)
+
+/* display */
+Q(sys_display)
+Q(display)
+Q(print)
+Q(line)
+Q(rect)
+Q(circ)
+Q(clear)

@@ -35,6 +35,15 @@ typedef unsigned int size_t;
 #define API_STREAM_READ        0x6
 #define API_INTERRUPT_ENABLE   0x7
 #define API_INTERRUPT_DISABLE  0x8
+
+#define API_DISP_OPEN          0x10
+#define API_DISP_CLOSE         0x11
+#define API_DISP_PRINT         0x12
+#define API_DISP_CLEAR         0x13
+#define API_DISP_UPDATE        0x14
+#define API_DISP_LINE          0x15
+#define API_DISP_RECT          0x16
+#define API_DISP_CIRC          0x17
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -221,5 +230,154 @@ API(API_VIBRA_SET, void epic_vibra_set(int status));
  * :param millis: number of milliseconds to run the vibration motor.
  */
 API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
+
+/**
+ * Display
+ * =======
+ */
+
+/** Line-Style */
+enum disp_linestyle {
+  /** */
+  LINESTYLE_FULL = 0,
+  /** */
+  LINESTYLE_DOTTED = 1
+};
+
+/** Fill-Style */
+enum disp_fillstyle {
+  /** */
+  FILLSTYLE_EMPTY = 0,
+  /** */
+  FILLSTYLE_FILLED = 1
+};
+
+/**
+ * Locks the display.
+ *
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_OPEN, int epic_disp_open());
+
+/**
+ * Unlocks the display again.
+ *
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_CLOSE, int epic_disp_close());
+
+/**
+ * Causes the changes that have been written to the framebuffer
+ * to be shown on the display
+ */
+API(API_DISP_UPDATE, int epic_disp_update());
+
+/**
+ * Prints a string into the display framebuffer
+ *
+ * :param posx: x position to print to. 0 <= x <= 160
+ * :param posy: y position to print to. 0 <= y <= 80
+ * :param pString: string to print
+ * :param fg: foreground color in rgb565
+ * :param bg: background color in rgb565
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_PRINT,
+    int epic_disp_print(
+	    uint16_t posx,
+	    uint16_t posy,
+	    const char *pString,
+	    uint16_t fg,
+	    uint16_t bg)
+    );
+
+/**
+ * Fills the whole screen with one color
+ *
+ * :param color: fill color in rgb565
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
+
+/**
+ * Draws a line on the display
+ *
+ * :param xstart: x starting position; 0 <= x <= 160
+ * :param ystart: y starting position; 0 <= y <= 80
+ * :param xend: x ending position; 0 <= x <= 160
+ * :param yend: y ending position; 0 <= y <= 80
+ * :param color: line color in rgb565
+ * :param linestyle: 0 for solid, 1 for dottet (almost no visual difference)
+ * :param pixelsize: thickness of the line; 1 <= pixelsize <= 8
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_LINE,
+    int epic_disp_line(
+	    uint16_t xstart,
+	    uint16_t ystart,
+	    uint16_t xend,
+	    uint16_t yend,
+	    uint16_t color,
+	    enum disp_linestyle linestyle,
+	    uint16_t pixelsize)
+    );
+
+/**
+ * Draws a rectangle on the display
+ *
+ * :param xstart: x coordinate of top left corner; 0 <= x <= 160
+ * :param ystart: y coordinate of top left corner; 0 <= y <= 80
+ * :param xend: x coordinate of bottom right corner; 0 <= x <= 160
+ * :param yend: y coordinate of bottom right corner; 0 <= y <= 80
+ * :param color: line color in rgb565
+ * :param fillstyle: 0 for empty, 1 for filled
+ * :param pixelsize: thickness of the rectangle outline; 1 <= pixelsize <= 8
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_RECT,
+    int epic_disp_rect(
+	    uint16_t xstart,
+	    uint16_t ystart,
+	    uint16_t xend,
+	    uint16_t yend,
+	    uint16_t color,
+	    enum disp_fillstyle fillstyle,
+	    uint16_t pixelsize)
+    );
+
+/**
+ * Draws a circle on the display
+ *
+ * :param x: x coordinate of the center; 0 <= x <= 160
+ * :param y: y coordinate of the center; 0 <= y <= 80
+ * :param rad: radius of the circle
+ * :param color: fill and outline color of the circle (rgb565)
+ * :param fillstyle: 0 for empty, 1 for filled
+ * :param pixelsize: thickness of the circle outline; 1 <= pixelsize <= 8
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_CIRC,
+    int epic_disp_circ(
+	    uint16_t x,
+	    uint16_t y,
+	    uint16_t rad,
+	    uint16_t color,
+	    enum disp_fillstyle fillstyle,
+	    uint16_t pixelsize)
+    );
 
 #endif /* _EPICARDIUM_H */

@@ -1,10 +1,11 @@
 name = 'pycardium'
 
 modsrc = files(
-  'modules/utime.c',
-  'modules/leds.c',
-  'modules/vibra.c',
   'modules/interrupt.c',
+  'modules/leds.c',
+  'modules/sys_display.c',
+  'modules/utime.c',
+  'modules/vibra.c',
 )
 
 #################################
