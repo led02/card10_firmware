@@ -879,6 +879,8 @@ int usb_get_setup(usb_setup_pkt *sud)
     MXC_USBHS->index = 0;
 
     if ((sud == NULL) || !(MXC_USBHS->csr0 & MXC_F_USBHS_CSR0_OUTPKTRDY)) {
+        printf("MAXUSB ISSUE 3\n");
+        MAXUSB_EXIT_CRITICAL();
         return -1;
     }
 
@@ -1027,6 +1029,8 @@ int usb_read_endpoint(usb_req_t *req)
 
     /* EP must be enabled (configured) and not stalled */
     if (!usb_is_configured(ep)) {
+        printf("MAXUSB ISSUE 1\n");
+        MAXUSB_EXIT_CRITICAL();
         return -1;
     }
 
@@ -1099,6 +1103,9 @@ int usb_read_endpoint(usb_req_t *req)
                 MAXUSB_EXIT_CRITICAL();
             }
         }
+    } else {
+        printf("MAXUSB ISSUE 2\n");
+        MAXUSB_EXIT_CRITICAL();
     }
 
     return 0;
