@@ -199,10 +199,14 @@ uint8_t cdcacm_read(void)
 
 void cdcacm_write(uint8_t *data, int len)
 {
-    while (acm_present()) {
-        // TODO: This might fail horribly
-        if (acm_write(data, len) == len) {
-            break;
+    static int lockup_disable = 0;
+    if (acm_present() && !lockup_disable) {
+        int ret = acm_write(data, len);
+        if (ret < 0) {
+            LOG_ERR("cdcacm", "fifo lockup detected");
+            lockup_disable = 1;
+        } else if (ret != len) {
+            LOG_WARN("cdcacm", "write length mismatch, got %d", ret);
         }
     }
 }

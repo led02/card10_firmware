@@ -329,16 +329,22 @@ int acm_read(uint8_t *buf, unsigned int len)
 int acm_write(uint8_t *buf, unsigned int len)
 {
   unsigned int i = 0;
+  unsigned int failcount = 0;
 
   /* Write data into the FIFO */
   while (len > 0) {
     if (fifo_put8(&wfifo, buf[i]) == 0) {
+      failcount = 0;
       /* Success */
       i++; len--;
     } else {
       /* Buffer full -- see if some characters can be sent to host */
       if (wreq.reqlen == 0) {
 	svc_in_to_host(&wreq);
+      }
+
+      if (failcount++ > 4096) {
+        return -1;
       }
     }
   }
