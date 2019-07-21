@@ -7,9 +7,9 @@ class Display:
     in card10 to be used in a safe way. All draw methods return
     the display object so that it is possible to chain calls.
     It is recommended to use a context manager as following:
-    
+
     .. code-block:: python
-        
+
         import display
         with display.open() as disp:
             disp.clear().update()
@@ -57,7 +57,7 @@ class Display:
     def print(self, text, *, fg=None, bg=None, posx=0, posy=0):
         """
         Prints a string on the display. Font size is locked to 20px
-        
+
         :param text: Text to print
         :param fg: Foreground color (expects RGB triple)
         :param bg: Background color (expects RGB triple)
@@ -80,8 +80,8 @@ class Display:
         :param ye: Y end coordinate, 0 <= ye <= 80
         :param col: color of the line (expects RGB triple)
         :param dotted: whether the line should be dotted or not
-        (questionable implementation: draws every other pixel white, draws
-        white squares at higher pixel sizes)
+           (questionable implementation: draws every other pixel white, draws
+           white squares at higher pixel sizes)
         :param size: size of the individual pixels, ranges from 1 to 8
         """
 
@@ -111,7 +111,7 @@ class Display:
     def circ(self, x, y, rad, *, col=None, filled=True, size=1):
         """
         Draws a circle on the display.
-        
+
         :param x: center x coordinate, 0 <= x <= 160
         :param y: center y coordinate, 0 <= y <= 80
         :param rad: radius

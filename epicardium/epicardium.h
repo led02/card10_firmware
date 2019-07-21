@@ -177,19 +177,19 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
  * =======
  */
 
-/**
- *
- */
+/** Line-Style */
 enum linestyle_t {
+  /** */
   LINESTYLE_FULL = 0,
+  /** */
   LINESTYLE_DOTTED = 1
 };
 
-/**
- *
- */
+/** Fill-Style */
 enum fillstyle_t {
+  /** */
   FILLSTYLE_EMPTY = 0,
+  /** */
   FILLSTYLE_FILLED = 1
 };
 
@@ -197,7 +197,8 @@ enum fillstyle_t {
  * Locks the display.
  *
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_OPEN, int epic_disp_open());
 
@@ -205,7 +206,8 @@ API(API_DISP_OPEN, int epic_disp_open());
  * Unlocks the display again.
  *
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_CLOSE, int epic_disp_close());
 
@@ -224,7 +226,8 @@ API(API_DISP_UPDATE, int epic_disp_update());
  * :param fg: foreground color in rgb565
  * :param bg: background color in rgb565
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_PRINT,
     int epic_disp_print(
@@ -240,7 +243,8 @@ API(API_DISP_PRINT,
  *
  * :param color: fill color in rgb565
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
 
@@ -255,7 +259,8 @@ API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
  * :param linestyle: 0 for solid, 1 for dottet (almost no visual difference)
  * :param pixelsize: thickness of the line; 1 <= pixelsize <= 8
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_LINE,
     int epic_disp_line(
@@ -279,7 +284,8 @@ API(API_DISP_LINE,
  * :param fillstyle: 0 for empty, 1 for filled
  * :param pixelsize: thickness of the rectangle outline; 1 <= pixelsize <= 8
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_RECT,
     int epic_disp_rect(
@@ -302,7 +308,8 @@ API(API_DISP_RECT,
  * :param fillstyle: 0 for empty, 1 for filled
  * :param pixelsize: thickness of the circle outline; 1 <= pixelsize <= 8
  * :return: ``0`` on success or a negative value in case of an error:
- *   - ``-EBUSY``: Display was already locked from another task.
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_CIRC,
     int epic_disp_circ(
