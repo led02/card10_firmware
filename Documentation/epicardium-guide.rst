@@ -1,3 +1,5 @@
+.. _epicardium_api_guide:
+
 Epicardium API Development
 ==========================
 If you are interested in augmenting the Epicardium API with new calls, this

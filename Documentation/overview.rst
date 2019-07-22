@@ -19,6 +19,9 @@ number of tasks that will have been keeping card10 running.  These are:
   statistics that can be gathered from our power manager IC (MAX77650).
 * **Serial**:  Handles serial communication via *UART*, *CDC ACM* and possibly
   Bluetooth.
+* **BHI160**: Housekeeping task for interaction with the `BHI160`_.
+
+.. _BHI160: https://www.bosch-sensortec.com/bst/products/all_products/bhi160
 
 .. todo::
 
@@ -28,6 +31,13 @@ number of tasks that will have been keeping card10 running.  These are:
    - **Payload Controller**: Control what is running on core 1
 
    .. _#23: https://git.card10.badge.events.ccc.de/card10/firmware/issues/23
+
+Epicardium API
+--------------
+Epicardium exposes lots of functionality via the *Epicardium API*.  The
+technical details if this API can be found in this :ref:`overview
+<epicardium_api_overview>`.  If you are interesting in adding new API calls,
+you should probably read the :ref:`epicardium_api_guide` guide.
 
 Pycardium
 ---------
