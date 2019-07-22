@@ -6,6 +6,7 @@
 #include "task.h"
 
 #include "api/dispatcher.h"
+#include "modules/log.h"
 
 #include "card10.h"
 
@@ -111,4 +112,9 @@ void vApplicationGetTimerTaskMemory(
 	 * bytes.
 	 */
 	*pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+{
+	LOG_CRIT("rtos", "Task \"%s\" overflowed stack!", pcTaskName);
 }

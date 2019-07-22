@@ -56,6 +56,13 @@
 /* Allow static allocation of data structures */
 #define configSUPPORT_STATIC_ALLOCATION 1
 
+/*
+ * Enable stack overflow detector.
+ *
+ * TODO: Remove for production.
+ */
+#define configCHECK_FOR_STACK_OVERFLOW 2
+
 /* Alias the default handler names to match CMSIS weak symbols */
 #define vPortSVCHandler       SVC_Handler
 #define xPortPendSVHandler    PendSV_Handler
