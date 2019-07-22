@@ -24,7 +24,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#define SPI_SPEED       (15 * 1000 * 1000 * 1)  // Bit Rate. Display has 15 MHz limit
+/* XXX: The display supports max 15 Mhz, but we have stability issues at that rate.
+ * Current suspicion is that the SDK is buggy.
+ *
+ * At 12 MHz things seem stable*/
+#define SPI_SPEED       (12 * 1000 * 1000)  // Bit Rate. Display has 15 MHz limit
 
 const gpio_cfg_t bhi_interrupt_pin = {PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP};
 
