@@ -13,6 +13,7 @@ Dependencies
   - Arch: ``arm-none-eabi-gcc``, ``arm-none-eabi-binutils``, ``arm-none-eabi-newlib``
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
 * **python3**:  For meson and various scripts needed for building.
+* **ninja**: Needed for meson.
 * **meson** (>0.43.0):  Unfortunately most distros only have very old versions
   of meson in their repositories.  Instead, you'll probably save yourself a lot
   of headaches by installing meson from ``pip3 install --user meson``.
