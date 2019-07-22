@@ -76,6 +76,20 @@ class Display:
         sys_display.print(text, posx, posy, fg, bg)
         return self
 
+    def pixel(self, x, y, *, col=None):
+        """
+        Draws a pixel on the display
+
+        :param x: X coordinate, 0<= x <= 160
+        :param y: Y coordinate, 0<= y <= 80
+        :param col: color of the pixel (expects RGB tripple)
+        """
+
+        col = col or color.WHITE
+
+        sys_display.pixel(x, y, col)
+        return self
+
     def line(self, xs, ys, xe, ye, *, col=None, dotted=False, size=1):
         """
         Draws a line on the display.

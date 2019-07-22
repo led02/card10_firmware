@@ -49,6 +49,29 @@ static mp_obj_t mp_display_print(size_t n_args, const mp_obj_t *args)
 	return mp_const_none;
 }
 
+/* draw pixel on the display */
+static mp_obj_t mp_display_pixel(size_t n_args, const mp_obj_t *args)
+{
+	uint16_t x   = mp_obj_get_int(args[0]);
+	uint16_t y   = mp_obj_get_int(args[1]);
+	uint16_t col = get_color(args[2]);
+
+	//TODO: Move sanity checks to epicardium
+	if (x > 160 || x < 0) {
+		mp_raise_ValueError("X-Coords have to be 0 < x < 160");
+	}
+
+	if (y > 80 || y < 0) {
+		mp_raise_ValueError("Y-Coords have to be 0 < y < 80");
+	}
+
+	int res = epic_disp_pixel(x, y, col);
+	if (res < 0) {
+		mp_raise_OSError(-res);
+	}
+	return mp_const_none;
+}
+
 /* draw line on the display */
 static mp_obj_t mp_display_line(size_t n_args, const mp_obj_t *args)
 {
@@ -175,6 +198,9 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_print_obj, 5, 5, mp_display_print
 );
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+	display_pixel_obj, 3, 3, mp_display_pixel
+);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_line_obj, 7, 7, mp_display_line
 );
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
@@ -194,6 +220,7 @@ static const mp_rom_map_elem_t display_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&display_open_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_close), MP_ROM_PTR(&display_close_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_print), MP_ROM_PTR(&display_print_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&display_pixel_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_line), MP_ROM_PTR(&display_line_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_rect), MP_ROM_PTR(&display_rect_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_circ), MP_ROM_PTR(&display_circ_obj) },

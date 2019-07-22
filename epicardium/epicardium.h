@@ -44,6 +44,7 @@ typedef unsigned int size_t;
 #define API_DISP_LINE          0x15
 #define API_DISP_RECT          0x16
 #define API_DISP_CIRC          0x17
+#define API_DISP_PIXEL         0x18
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -306,6 +307,23 @@ API(API_DISP_PRINT,
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
+
+/**
+ * Draws a pixel on the display
+ *
+ * :param x: x position; 0 <= x <= 160
+ * :param y: y position; 0 <= y <= 80
+ * :param color: pixel color in rgb565
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_PIXEL,
+    int epic_disp_pixel(
+	    uint16_t x,
+	    uint16_t y,
+	    uint16_t color)
+    );
 
 /**
  * Draws a line on the display

@@ -46,6 +46,17 @@ int epic_disp_clear(uint16_t color)
 	}
 }
 
+int epic_disp_pixel(uint16_t x, uint16_t y, uint16_t color)
+{
+	int cl = check_lock();
+	if (cl < 0) {
+		return cl;
+	} else {
+		Paint_SetPixel(x, y, color);
+		return 0;
+	}
+}
+
 int epic_disp_line(
 	uint16_t xstart,
 	uint16_t ystart,
