@@ -6,6 +6,7 @@ modsrc = files(
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
+  'modules/light_sensor.c'
 )
 
 #################################

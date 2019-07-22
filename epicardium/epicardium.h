@@ -35,6 +35,9 @@ typedef unsigned int size_t;
 #define API_STREAM_READ        0x6
 #define API_INTERRUPT_ENABLE   0x7
 #define API_INTERRUPT_DISABLE  0x8
+#define API_LIGHT_SENSOR_RUN   0x9
+#define API_LIGHT_SENSOR_GET   0xa
+#define API_LIGHT_SENSOR_STOP  0xb
 
 #define API_DISP_OPEN          0x10
 #define API_DISP_CLOSE         0x11
@@ -397,5 +400,43 @@ API(API_DISP_CIRC,
 	    enum disp_fillstyle fillstyle,
 	    uint16_t pixelsize)
     );
+
+/**
+ * Start continuous readout of the light sensor. Will read light level
+ * at preconfigured interval and make it available via `epic_light_sensor_get()`.
+ *
+ * If the continuous readout was already running, this function will silently pass.
+ *
+ *
+ * :return: `0` if the start was successful or a negative error value
+ *      if an error occured. Possible errors:
+ *
+ *      - ``-EBUSY``: The timer could not be scheduled.
+ */
+API(API_LIGHT_SENSOR_RUN, int epic_light_sensor_run());
+
+/**
+ * Get the last light level measured by the continuous readout.
+ *
+ * :param uint16_t* value: where the last light level should be written.
+ * :return: `0` if the readout was successful or a negative error
+ *      value. Possible errors:
+ *
+ *      - ``-ENODATA``: Continuous readout not currently running.
+ */
+API(API_LIGHT_SENSOR_GET, int epic_light_sensor_get(uint16_t* value));
+
+
+/**
+ * Stop continuous readout of the light sensor.
+ *
+ * If the continuous readout wasn't running, this function will silently pass.
+ *
+ * :return: `0` if the stop was sucessful or a negative error value
+ *      if an error occured. Possible errors:
+ *
+ *      - ``-EBUSY``: The timer stop could not be scheduled.
+ */
+API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
 
 #endif /* _EPICARDIUM_H */

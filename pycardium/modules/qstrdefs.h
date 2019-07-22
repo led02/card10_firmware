@@ -40,3 +40,9 @@ Q(line)
 Q(rect)
 Q(circ)
 Q(clear)
+
+/* ambient */
+Q(light_sensor)
+Q(start)
+Q(get_reading)
+Q(stop)
