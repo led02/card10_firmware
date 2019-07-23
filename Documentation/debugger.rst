@@ -23,12 +23,16 @@ the following commands:
    $ git submodule update --init
    $ ./bootstrap
    $ ./configure --disable-werror
-   $ make -j8
 
 Make sure ``CMSIS-DAP Compliant Debugger`` is set to **yes (auto)** after
-running ``./configure`` (if it is not, you might need to install libusb).  If
-you get errors making the documentation you can ``touch doc/openocd.info`` to
-skip it and continue with ``make``.
+running ``./configure`` (if it is not, you might need to install ``libhidapi-dev``
+(Ubuntu)). If you get errors making the documentation you can 
+``touch doc/openocd.info`` to skip it and continue with ``make``.
+
+.. code-block:: shell-session
+
+   $ make -j8
+
 
 Please run ``make install`` after removing any already installed OpenOCD
 version. Otherwise please always specify the full path to OpenOCD (the binary
@@ -45,7 +49,8 @@ GDB (``arm-none-eabi-gdb``)
 Apart from OpenOCD you also need ``arm-none-eabi-gdb``.  You should install
 that package from your distros repositories:
 
-* Ubuntu: ``gdb-arm-none-eabi``
+* Ubuntu (older): ``gdb-arm-none-eabi``
+* Ubuntu (newer): ``gdb-multiarch``
 * Arch: ``arm-none-eabi-gdb``
 
 Debugging
