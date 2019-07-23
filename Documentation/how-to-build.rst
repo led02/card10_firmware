@@ -53,3 +53,9 @@ the binaries:
 - ``build/pycardium/pycardium_epicardium.bin``: The entire firmware in one ``.bin``.
 - ``build/epicardium/epicardium.elf``: The core 0 part of the firmware, called Epicardium.
 - ``build/pycardium/pycardium.elf``: Our MicroPython port, the core 1 part of the firmware.
+
+In order to do a rebuild you can issue a clean command to ninja via
+
+.. code-block:: shell-session
+
+  $ ninja -C build/ -t clean
