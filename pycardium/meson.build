@@ -71,6 +71,7 @@ upy = static_library(
 elf = executable(
   name + '.elf',
   'main.c',
+  'patch.c',
   'mphalport.c',
   frozen_source,
   modsrc,

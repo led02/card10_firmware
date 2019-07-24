@@ -8,6 +8,7 @@
 #include "py/mpstate.h"
 #include "py/obj.h"
 #include "py/runtime.h"
+#include "py/mpprint.h"
 
 #include "mxc_delay.h"
 #include "max32665.h"
@@ -15,6 +16,7 @@
 
 #include "epicardium.h"
 #include "api/common.h"
+
 /******************************************************************************
  * Serial Communication
  */
@@ -36,30 +38,15 @@ int DEBUG_printf(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	int ret = vprintf(fmt, args);
+	int ret = mp_vprintf(MP_PYTHON_PRINTER, fmt, args);
 	va_end(args);
 	return ret;
 }
 
-/* newlib syscall to allow printf to work */
-long _write(int fd, const char *buf, size_t cnt)
+void __attribute__((noreturn)) sbrk_is_not_implemented___see_issue_44(void);
+intptr_t _sbrk(int incr)
 {
-	/*
-	 * Only print one line at a time.  Insert `\r` between lines so
-	 * they are properly displayed on the serial console.
-	 */
-	size_t i, last = 0;
-	for (i = 0; i < cnt; i++) {
-		if (buf[i] == '\n') {
-			epic_uart_write_str(&buf[last], i - last);
-			epic_uart_write_str("\r", 1);
-			last = i;
-		}
-	}
-	if (last != i) {
-		epic_uart_write_str(&buf[last], cnt - last);
-	}
-	return cnt;
+	sbrk_is_not_implemented___see_issue_44();
 }
 
 void epic_isr_ctrl_c(void)
