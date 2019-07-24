@@ -485,7 +485,6 @@ typedef struct epic_stat_t {
  * :param epic_stat_t* stat: pointer to result
  *
  * :return: `0` on success, negative on error
- *      if an error occured.
  */
 API(API_FILE_STAT,  int32_t epic_stat(const char* path, epic_stat_t* stat));
 
