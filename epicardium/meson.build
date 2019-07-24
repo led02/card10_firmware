@@ -73,7 +73,6 @@ elf = executable(
   'cdcacm.c',
   'main.c',
   'support.c',
-  'stack_fit.c',
   module_sources,
   l0der_sources,
   dependencies: [libcard10, max32665_startup_core0, maxusb, libff13, ble],
