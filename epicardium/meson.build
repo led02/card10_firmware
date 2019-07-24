@@ -74,7 +74,7 @@ elf = executable(
   module_sources,
   dependencies: [libcard10, max32665_startup_core0, maxusb, libff13],
   link_with: [api_dispatcher_lib, freertos],
-  link_whole: [max32665_startup_core0_lib, board_card10_lib],
+  link_whole: [max32665_startup_core0_lib, board_card10_lib, newlib_heap_lib],
   include_directories: [freertos_includes],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',

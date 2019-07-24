@@ -1,4 +1,17 @@
 #############################################################
+# NewLib Heap
+#############################################################
+
+sources = files(
+  './Source/heap.c',
+)
+
+newlib_heap_lib = static_library(
+  'newlib_heap',
+  sources,
+)
+
+#############################################################
 # For applications using just core0 or not dual-binaries
 #############################################################
 
@@ -28,7 +41,6 @@ max32665_startup = declare_dependency(
 sources = files(
   './Source/GCC/startup_max32665.S',
   './Source/system_max32665.c',
-  './Source/heap.c',
 )
 
 max32665_startup_core0_lib = static_library(
@@ -51,7 +63,6 @@ max32665_startup_core0 = declare_dependency(
 sources = files(
   './Source/GCC/startup_max32665.S',
   './Source/system_max32665_core1.c',
-  './Source/heap.c',
 )
 
 max32665_startup_core1_lib = static_library(
