@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "py/lexer.h"
 #include "py/mpconfig.h"
@@ -27,10 +28,34 @@ int mp_hal_stdin_rx_chr(void)
 	return (int)epic_uart_read_chr();
 }
 
-/* Send string of given length */
+/* Send a string */
 void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len)
 {
 	epic_uart_write_str(str, len);
+}
+
+/* Send a string, but replace \n with \n\r */
+void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len)
+{
+	/*
+	 * Only print one line at a time.  Insert `\r` between lines so
+	 * they are properly displayed on the serial console.
+	 */
+	size_t i, last = 0;
+	for (i = 0; i < len; i++) {
+		if (str[i] == '\n') {
+			epic_uart_write_str(&str[last], i - last);
+			epic_uart_write_str("\r", 1);
+			last = i;
+		}
+	}
+	epic_uart_write_str(&str[last], len - last);
+}
+
+/* Send a zero-terminated string */
+void mp_hal_stdout_tx_str(const char *str)
+{
+	mp_hal_stdout_tx_strn(str, strlen(str));
 }
 
 /* Used by MicroPython for debug output */
@@ -88,6 +113,11 @@ void mp_hal_delay_ms(mp_uint_t ms)
 void mp_hal_delay_us(mp_uint_t us)
 {
 	mxc_delay(us);
+}
+
+mp_uint_t mp_hal_ticks_ms(void)
+{
+	return 0;
 }
 
 /******************************************************************************
