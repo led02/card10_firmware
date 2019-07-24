@@ -121,14 +121,3 @@ void NORETURN nlr_jump_fail(void *val)
  * Stubs
  */
 
-mp_lexer_t *mp_lexer_new_from_file(const char *filename)
-{
-	/* TODO: Do we need an implementation for this? */
-	mp_raise_OSError(MP_ENOENT);
-}
-
-mp_import_stat_t mp_import_stat(const char *path)
-{
-	return MP_IMPORT_STAT_NO_EXIST;
-}
-

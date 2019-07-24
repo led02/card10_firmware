@@ -31,6 +31,7 @@
 #include "py/builtin.h"
 #include "py/stream.h"
 #include "py/mperrno.h"
+
 #include "epicardium.h"
 
 extern const mp_obj_type_t mp_type_fat_textio;
@@ -271,3 +272,4 @@ mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs)
 	return file_open(&mp_type_fat_textio, arg_vals);
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
+

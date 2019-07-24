@@ -56,6 +56,7 @@ typedef unsigned int size_t;
 #define API_FILE_FLUSH         0x35
 #define API_FILE_SEEK          0x36 //NYI
 #define API_FILE_TELL          0x37 //NYI
+#define API_FILE_STAT          0x38
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -462,5 +463,30 @@ API(API_FILE_CLOSE, int32_t epic_close(int32_t fd));
 API(API_FILE_READ,  int32_t epic_read(int32_t fd, void* buf, uint32_t nbytes));
 API(API_FILE_WRITE, int32_t epic_write(int32_t fd, const void* buf, uint32_t nbytes));
 API(API_FILE_FLUSH, int32_t epic_flush(int32_t fd));
+
+enum epic_stat_type {
+    EPICSTAT_FILE,
+    EPICSTAT_DIR,
+};
+
+typedef struct epic_stat_t {
+    enum epic_stat_type type;
+} epic_stat_t;
+
+/**
+ * stat path
+ *
+ * This does not follow posix convention, but rather takes
+ * a path as parameter. This aligns more with libff's API and
+ * also this has been implemented for python import support, which
+ * passes the filename as well.
+ *
+ * :param const char* filename: path to stat
+ * :param epic_stat_t* stat: pointer to result
+ *
+ * :return: `0` on success, negative on error
+ *      if an error occured.
+ */
+API(API_FILE_STAT,  int32_t epic_stat(const char* path, epic_stat_t* stat));
 
 #endif /* _EPICARDIUM_H */

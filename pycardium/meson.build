@@ -6,8 +6,9 @@ modsrc = files(
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
-  'modules/light_sensor.c'
+  'modules/light_sensor.c',
   'modules/fat_file.c',
+  'modules/fat_reader_import.c',
 )
 
 #################################

@@ -14,6 +14,7 @@
 #include <semphr.h>
 
 #include "modules.h"
+#include "epicardium.h"
 
 #ifndef EPIC_FAT_STATIC_SEMAPHORE
 #define EPIC_FAT_STATIC_SEMAPHORE 0
@@ -321,6 +322,24 @@ int32_t epic_flush(int32_t fd) {
     res = f_sync(&o->file);
     if (res != FR_OK) {
         return -fresult_to_errno_table[res];
+    }
+
+    return 0;
+}
+
+int32_t epic_stat(const char* filename, epic_stat_t* stat) {
+
+    int res;
+    FILINFO finfo;
+    res = f_stat(filename, &finfo);
+    if (res != FR_OK) {
+        return -fresult_to_errno_table[res];
+    }
+
+    if(finfo.fattrib & AM_DIR) {
+        stat->type = EPICSTAT_DIR;
+    } else {
+        stat->type = EPICSTAT_FILE;
     }
 
     return 0;
