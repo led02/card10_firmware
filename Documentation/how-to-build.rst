@@ -24,6 +24,14 @@ Dependencies
 
 .. _ARM's GNU toolchain: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
+Cloning
+-------
+Clone the master branch of the git repository containing the firmware using the following command:
+
+.. code-block:: shell-session
+
+   $ git clone https://git.card10.badge.events.ccc.de/card10/firmware.git
+
 Building
 --------
 Build using the following two commands:
