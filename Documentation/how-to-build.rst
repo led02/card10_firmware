@@ -9,16 +9,17 @@ Dependencies
 * **gcc**, **binutils** & **newlib** for ``arm-none-eabi``:  The packages have
   slightly different names on different distros.
 
-  - Ubuntu: ``apt install gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi``
+  - Ubuntu / Debian: ``apt install gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi``
   - Arch: ``pacman -S arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib``
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
 * **python3**:  For meson and various scripts needed for building.
 * **ninja**: Needed for meson.
-  - Ubuntu: ``apt install ninja-build``
+  - Ubuntu / Debian: ``apt install ninja-build``
   - Arch: ``pacman -S ninja``
 * **meson** (>0.43.0):  Unfortunately most distros only have very old versions
   of meson in their repositories.  Instead, you'll probably save yourself a lot
   of headaches by installing meson from ``pip3 install --user meson``.
+  - Ubuntu / Debian: ``apt install meson``
 * **python3-crc16**: Install with ``pip3 install --user crc16``.
 
 .. _ARM's GNU toolchain: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
