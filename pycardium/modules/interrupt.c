@@ -23,7 +23,7 @@ void epic_isr_default_handler(api_int_id_t id)
 	}
 }
 
-STATIC mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
+static mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 	if (callback_obj != mp_const_none &&
@@ -39,7 +39,7 @@ STATIC mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
 	return mp_const_none;
 }
 
-STATIC mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
+static mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 
@@ -50,7 +50,7 @@ STATIC mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
 	return mp_const_none;
 }
 
-STATIC mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
+static mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 
@@ -61,18 +61,17 @@ STATIC mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
 	return mp_const_none;
 }
 
-
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(
+static MP_DEFINE_CONST_FUN_OBJ_2(
 	interrupt_set_callback_obj, mp_interrupt_set_callback
 );
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(
+static MP_DEFINE_CONST_FUN_OBJ_1(
 	interrupt_enable_callback_obj, mp_interrupt_enable_callback
 );
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(
+static MP_DEFINE_CONST_FUN_OBJ_1(
 	interrupt_disable_callback_obj, mp_interrupt_disable_callback
 );
 
-STATIC const mp_rom_map_elem_t interrupt_module_globals_table[] = {
+static const mp_rom_map_elem_t interrupt_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_interrupt) },
 	{ MP_ROM_QSTR(MP_QSTR_set_callback),
 	  MP_ROM_PTR(&interrupt_set_callback_obj) },
@@ -82,7 +81,7 @@ STATIC const mp_rom_map_elem_t interrupt_module_globals_table[] = {
 	  MP_ROM_PTR(&interrupt_disable_callback_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_BHI160), MP_OBJ_NEW_SMALL_INT(2) },
 };
-STATIC MP_DEFINE_CONST_DICT(
+static MP_DEFINE_CONST_DICT(
 	interrupt_module_globals, interrupt_module_globals_table
 );
 

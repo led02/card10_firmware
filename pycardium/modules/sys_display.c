@@ -48,7 +48,7 @@ static mp_obj_t mp_display_print(size_t n_args, const mp_obj_t *args)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_print_obj, 5, 5, mp_display_print
 );
 
@@ -74,7 +74,7 @@ static mp_obj_t mp_display_pixel(size_t n_args, const mp_obj_t *args)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_pixel_obj, 3, 3, mp_display_pixel
 );
 
@@ -108,7 +108,7 @@ static mp_obj_t mp_display_line(size_t n_args, const mp_obj_t *args)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_line_obj, 7, 7, mp_display_line
 );
 
@@ -142,7 +142,7 @@ static mp_obj_t mp_display_rect(size_t n_args, const mp_obj_t *args)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_rect_obj, 7, 7, mp_display_rect
 );
 
@@ -166,7 +166,7 @@ static mp_obj_t mp_display_circ(size_t n_args, const mp_obj_t *args)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_circ_obj, 6, 6, mp_display_circ
 );
 
@@ -180,7 +180,7 @@ static mp_obj_t mp_display_clear(mp_obj_t col)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(display_clear_obj, mp_display_clear);
+static MP_DEFINE_CONST_FUN_OBJ_1(display_clear_obj, mp_display_clear);
 
 static mp_obj_t mp_display_update()
 {
@@ -190,7 +190,7 @@ static mp_obj_t mp_display_update()
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(display_update_obj, mp_display_update);
+static MP_DEFINE_CONST_FUN_OBJ_0(display_update_obj, mp_display_update);
 
 static mp_obj_t mp_display_open()
 {
@@ -200,7 +200,7 @@ static mp_obj_t mp_display_open()
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(display_open_obj, mp_display_open);
+static MP_DEFINE_CONST_FUN_OBJ_0(display_open_obj, mp_display_open);
 
 static mp_obj_t mp_display_close()
 {
@@ -210,7 +210,7 @@ static mp_obj_t mp_display_close()
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(display_close_obj, mp_display_close);
+static MP_DEFINE_CONST_FUN_OBJ_0(display_close_obj, mp_display_close);
 
 /* The globals table for this module */
 static const mp_rom_map_elem_t display_module_globals_table[] = {

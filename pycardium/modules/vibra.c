@@ -3,7 +3,7 @@
 #include "py/builtin.h"
 #include "epicardium.h"
 
-STATIC mp_obj_t mp_vibra_set(mp_obj_t state_obj)
+static mp_obj_t mp_vibra_set(mp_obj_t state_obj)
 {
 	if (state_obj == mp_const_true) {
 		epic_vibra_set(1);
@@ -14,22 +14,22 @@ STATIC mp_obj_t mp_vibra_set(mp_obj_t state_obj)
 	}
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(vibra_set_obj, mp_vibra_set);
+static MP_DEFINE_CONST_FUN_OBJ_1(vibra_set_obj, mp_vibra_set);
 
-STATIC mp_obj_t mp_vibra_vibrate(mp_obj_t a_obj)
+static mp_obj_t mp_vibra_vibrate(mp_obj_t a_obj)
 {
-    int millis = mp_obj_get_int(a_obj);
-    epic_vibra_vibrate(millis);
-    return mp_const_none;
+	int millis = mp_obj_get_int(a_obj);
+	epic_vibra_vibrate(millis);
+	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(vibra_vibrate_obj, mp_vibra_vibrate);
+static MP_DEFINE_CONST_FUN_OBJ_1(vibra_vibrate_obj, mp_vibra_vibrate);
 
-STATIC const mp_rom_map_elem_t vibra_module_globals_table[] = {
+static const mp_rom_map_elem_t vibra_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_vibra) },
 	{ MP_ROM_QSTR(MP_QSTR_set), MP_ROM_PTR(&vibra_set_obj) },
-    { MP_ROM_QSTR(MP_QSTR_vibrate), MP_ROM_PTR(&vibra_vibrate_obj) }
+	{ MP_ROM_QSTR(MP_QSTR_vibrate), MP_ROM_PTR(&vibra_vibrate_obj) }
 };
-STATIC MP_DEFINE_CONST_DICT(vibra_module_globals, vibra_module_globals_table);
+static MP_DEFINE_CONST_DICT(vibra_module_globals, vibra_module_globals_table);
 
 // Define module object.
 const mp_obj_module_t vibra_module = {
