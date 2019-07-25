@@ -1,9 +1,11 @@
+#include "mphalport.h"
+
+#include "api/common.h"
+#include "epicardium.h"
+
+#include "py/builtin.h"
 #include "py/obj.h"
 #include "py/runtime.h"
-#include "py/builtin.h"
-#include "epicardium.h"
-#include "api/common.h"
-#include "mphalport.h"
 
 // TODO: these should be intialized as mp_const_none
 mp_obj_t callbacks[EPIC_INT_NUM] = {

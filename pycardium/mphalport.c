@@ -1,7 +1,12 @@
-#include <stdint.h>
+#include "api/common.h"
+#include "epicardium.h"
+
+#include "max32665.h"
+#include "mxc_delay.h"
+#include "tmr.h"
+
+/* stdarg.h must be included before mpprint.h */
 #include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "py/lexer.h"
 #include "py/mpconfig.h"
@@ -11,12 +16,9 @@
 #include "py/runtime.h"
 #include "py/mpprint.h"
 
-#include "mxc_delay.h"
-#include "max32665.h"
-#include "tmr.h"
-
-#include "epicardium.h"
-#include "api/common.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 /******************************************************************************
  * Serial Communication

@@ -1,9 +1,10 @@
+#include "epicardium.h"
+
 #include "py/obj.h"
-#include "py/objstr.h"
 #include "py/objint.h"
+#include "py/objstr.h"
 #include "py/runtime.h"
 
-#include "epicardium.h"
 #include <stdio.h>
 
 static uint16_t rgb888_to_rgb565(uint8_t *bytes)

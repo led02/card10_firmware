@@ -1,7 +1,7 @@
-#include "py/mpconfig.h"
-#include "extmod/utime_mphal.h"
-
 #include "mxc_delay.h"
+
+#include "extmod/utime_mphal.h"
+#include "py/mpconfig.h"
 
 static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_utime) },

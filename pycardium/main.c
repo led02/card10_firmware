@@ -1,10 +1,11 @@
-#include "py/runtime.h"
-#include "py/gc.h"
-#include "lib/utils/pyexec.h"
-#include "py/stackctrl.h"
-#include <stdio.h>
-
 #include "max32665.h"
+
+#include "lib/utils/pyexec.h"
+#include "py/gc.h"
+#include "py/runtime.h"
+#include "py/stackctrl.h"
+
+#include <stdio.h>
 
 /* Defined in linker script */
 extern void *__StackTop, *__StackLimit;

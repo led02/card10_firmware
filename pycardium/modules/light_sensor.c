@@ -1,7 +1,8 @@
+#include "epicardium.h"
+
+#include "py/builtin.h"
 #include "py/obj.h"
 #include "py/runtime.h"
-#include "py/builtin.h"
-#include "epicardium.h"
 
 static mp_obj_t mp_light_sensor_start()
 {

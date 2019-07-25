@@ -1,8 +1,8 @@
+#include "epicardium.h"
+
 #include "py/obj.h"
 #include "py/objlist.h"
 #include "py/runtime.h"
-
-#include "epicardium.h"
 
 static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
