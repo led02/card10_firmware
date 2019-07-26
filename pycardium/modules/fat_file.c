@@ -60,7 +60,7 @@ STATIC mp_uint_t
 file_obj_read(mp_obj_t self_in, void *buf, mp_uint_t size, int *errcode)
 {
 	pyb_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
-	int res              = epic_read(self->fd, buf, size);
+	int res              = epic_file_read(self->fd, buf, size);
 	if (res < 0) {
 		*errcode = -res;
 		return MP_STREAM_ERROR;
@@ -72,7 +72,7 @@ STATIC mp_uint_t
 file_obj_write(mp_obj_t self_in, const void *buf, mp_uint_t size, int *errcode)
 {
 	pyb_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
-	int res              = epic_write(self->fd, buf, size);
+	int res              = epic_file_write(self->fd, buf, size);
 	if (res < 0) {
 		*errcode = -res;
 		return MP_STREAM_ERROR;
@@ -96,14 +96,14 @@ file_obj_ioctl(mp_obj_t o_in, mp_uint_t request, uintptr_t arg, int *errcode)
 	int res;
 	switch (request) {
 	case MP_STREAM_FLUSH:
-		res = epic_flush(self->fd);
+		res = epic_file_flush(self->fd);
 		if (res < 0) {
 			*errcode = -res;
 			return MP_STREAM_ERROR;
 		}
 		return 0;
 	case MP_STREAM_CLOSE:
-		res = epic_close(self->fd);
+		res = epic_file_close(self->fd);
 		if (res < 0) {
 			*errcode = -res;
 			return MP_STREAM_ERROR;
@@ -170,7 +170,7 @@ STATIC mp_obj_t file_open(const mp_obj_type_t *type, mp_arg_val_t *args)
 	o->base.type      = type;
 
 	const char *fname = mp_obj_str_get_str(args[0].u_obj);
-	int res           = epic_open(fname, modeString);
+	int res           = epic_file_open(fname, modeString);
 	if (res < 0) {
 		m_del_obj(pyb_file_obj_t, o);
 		mp_raise_OSError(-res);
