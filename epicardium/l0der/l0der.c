@@ -273,6 +273,9 @@ static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint
 	Elf32_Shdr shdr;
 	Elf32_Rel rel;
 
+	uint32_t load_start = image_start + (uint32_t)load_addr;
+	uint32_t load_limit = image_limit + (uint32_t)load_addr;
+
 	// Go through all relocation sections.
 	for (int i = 0; i < hdr->e_shnum; i++) {
 		uint32_t shdr_addr = hdr->e_shoff + (i * hdr->e_shentsize);
@@ -321,8 +324,9 @@ static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint
 						return -ENOEXEC;
 					}
 					volatile uint32_t *addr = (uint32_t *)(rel.r_offset + load_addr);
-					if ((uint32_t)addr < image_start || (uint32_t)addr >= image_limit) {
-						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address is outside image boundaries");
+					if ((uint32_t)addr < load_start || (uint32_t)addr >= load_limit) {
+						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address (%08lx) is outside image boundaries",
+								(uint32_t)addr);
 						return -ENOEXEC;
 					}
 
