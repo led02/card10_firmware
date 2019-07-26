@@ -93,26 +93,26 @@ STATIC mp_uint_t
 file_obj_ioctl(mp_obj_t o_in, mp_uint_t request, uintptr_t arg, int *errcode)
 {
 	pyb_file_obj_t *self = MP_OBJ_TO_PTR(o_in);
-    int res;
-    switch (request) {
-        case MP_STREAM_FLUSH:
-            res = epic_flush(self->fd);
-            if (res < 0) {
-                *errcode = -res;
-                return MP_STREAM_ERROR;
-            }
-            return 0;
-        case MP_STREAM_CLOSE:
-            res = epic_close(self->fd);
-            if (res < 0) {
-                *errcode = -res;
-                return MP_STREAM_ERROR;
-            }
-            return 0;
-    }
-    //every valid case returns either success or error, so this is EINVAL land:
-    *errcode = MP_EINVAL;
-    return MP_STREAM_ERROR;
+	int res;
+	switch (request) {
+	case MP_STREAM_FLUSH:
+		res = epic_flush(self->fd);
+		if (res < 0) {
+			*errcode = -res;
+			return MP_STREAM_ERROR;
+		}
+		return 0;
+	case MP_STREAM_CLOSE:
+		res = epic_close(self->fd);
+		if (res < 0) {
+			*errcode = -res;
+			return MP_STREAM_ERROR;
+		}
+		return 0;
+	}
+	//every valid case returns either success or error, so this is EINVAL land:
+	*errcode = MP_EINVAL;
+	return MP_STREAM_ERROR;
 	// if (request == MP_STREAM_SEEK) {
 	//     struct mp_stream_seek_t *s = (struct mp_stream_seek_t*)(uintptr_t)arg;
 
@@ -175,7 +175,7 @@ STATIC mp_obj_t file_open(const mp_obj_type_t *type, mp_arg_val_t *args)
 		m_del_obj(pyb_file_obj_t, o);
 		mp_raise_OSError(-res);
 	}
-    o->fd = res;
+	o->fd = res;
 
 	return MP_OBJ_FROM_PTR(o);
 }
@@ -272,4 +272,3 @@ mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs)
 	return file_open(&mp_type_fat_textio, arg_vals);
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
-
