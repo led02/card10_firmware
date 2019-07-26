@@ -54,3 +54,9 @@ Pycardium, take a look at the :ref:`pycardium_guide` guide.
 
 Next to Pycardium, other bare-metal code can also run on core 1.  For example,
 a Rustcardium or Cccardium.
+
+Program Flow Diagram
+--------------------
+The following diagram is a rough overview of the program flow in this fimware:
+
+.. image:: ./static/firmware-flow.svg
