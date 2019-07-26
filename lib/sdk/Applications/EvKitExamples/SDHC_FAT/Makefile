@@ -29,8 +29,8 @@
  # property whatsoever. Maxim Integrated Products, Inc. retains all
  # ownership rights.
  #
- # $Date: 2018-08-10 14:36:39 +0000 (Fri, 10 Aug 2018) $ 
- # $Revision: 36825 $
+ # $Date: 2019-05-30 14:18:04 -0500 (Thu, 30 May 2019) $ 
+ # $Revision: 43593 $
  #
  ###############################################################################
 
@@ -90,7 +90,8 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 # Point this variable to a startup file to override the default file
 #STARTUPFILE=start.S
 
-MXC_OPTIMIZE=-O1
+# Set MXC_OPTIMIZE to override the default optimization level
+#MXC_OPTIMIZE_CFLAGS=-Og
 
 # Point this variable to a linker file to override the default file
 # LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld

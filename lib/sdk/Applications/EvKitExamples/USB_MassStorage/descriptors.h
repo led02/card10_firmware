@@ -45,8 +45,8 @@
 usb_device_descriptor_t __attribute__((aligned(4))) device_descriptor = {
     0x12,         /* bLength = 18                     */
     0x01,         /* bDescriptorType = Device         */
-    0x0110,       /* bcdUSB USB spec rev (BCD)        */
-    0x00,         /* bDeviceClass = mass storage (0)  */
+    0x0200,       /* bcdUSB USB spec rev (BCD)        */
+    0x00,         /* bDeviceClass = Unspecified       */
     0x00,         /* bDeviceSubClass                  */
     0x00,         /* bDeviceProtocol                  */
     0x40,         /* bMaxPacketSize0 is 64 bytes      */
@@ -57,6 +57,19 @@ usb_device_descriptor_t __attribute__((aligned(4))) device_descriptor = {
     0x02,         /* iProduct Descriptor ID           */
     0x03,         /* iSerialNumber = (0) No string    */
     0x01          /* bNumConfigurations               */
+};
+
+/* Device qualifier needed for high-speed operation */
+usb_device_qualifier_descriptor_t __attribute__((aligned(4))) device_qualifier_descriptor = {
+    0x0A,         /* bLength = 10                       */
+    0x06,         /* bDescriptorType = Device Qualifier */
+    0x0200,       /* bcdUSB USB spec rev (BCD)          */
+    0x00,         /* bDeviceClass = Unspecified         */
+    0x00,         /* bDeviceSubClass                    */
+    0x00,         /* bDeviceProtocol                    */
+    0x40,         /* bMaxPacketSize0 is 64 bytes        */
+    0x01,         /* bNumConfigurations                 */
+    0x00          /* Reserved, must be 0                */
 };
 
 __attribute__((aligned(4)))
@@ -75,7 +88,7 @@ struct __attribute__((packed)) {
         0x01,       /*  bConfigValue                    */
         0x00,       /*  iConfiguration                  */
         0xC0,       /*  bmAttributes (self-powered, no remote wakeup) */
-        0x01,       /*  MaxPower is 2ma (units are 2ma/bit) */
+        0x32,       /*  MaxPower is 100ma (units are 2ma/bit) */
     },
     { /*  First Interface Descriptor For MSC Interface */
         0x09,       /*  bLength = 9                     */
@@ -103,6 +116,53 @@ struct __attribute__((packed)) {
         0x02,         /*  bmAttributes (bulk)              */
         0x0040,       /*  wMaxPacketSize                   */
         0x00          /*  bInterval (N/A)                  */
+    }
+};
+
+__attribute__((aligned(4)))
+struct __attribute__((packed)) {
+    usb_configuration_descriptor_t  config_descriptor;
+    usb_interface_descriptor_t      msc_interface_descriptor;
+    usb_endpoint_descriptor_t       endpoint_descriptor_1;
+    usb_endpoint_descriptor_t       endpoint_descriptor_2;
+} config_descriptor_hs =
+{
+    {
+        0x09,       /*  bLength = 9                     */
+        0x02,       /*  bDescriptorType = Config (2)    */
+        0x0020,     /*  wTotalLength(L/H)               */
+        0x01,       /*  bNumInterfaces                  */
+        0x01,       /*  bConfigValue                    */
+        0x00,       /*  iConfiguration                  */
+        0xC0,       /*  bmAttributes (self-powered, no remote wakeup) */
+        0x32,       /*  MaxPower is 100ma (units are 2ma/bit) */
+    },
+    { /*  First Interface Descriptor For MSC Interface */
+        0x09,       /*  bLength = 9                     */
+        0x04,       /*  bDescriptorType = Interface (4) */
+        0x00,       /*  bInterfaceNumber                */
+        0x00,       /*  bAlternateSetting               */
+        0x02,       /*  bNumEndpoints (one for INm one for OUT)     */
+        0x08,       /*  bInterfaceClass = Mass Storage (8) */
+        0x06,       /*  bInterfaceSubClass = SCSI Transparent Command Set */
+        0x50,       /*  bInterfaceProtocol = Bulk-Only Transport */
+        0x00,       /*  iInterface                      */
+    },
+    { /*  OUT Endpoint 1 (Descriptor #1) */
+        0x07,         /*  bLength                          */
+        0x05,         /*  bDescriptorType (Endpoint)       */
+        0x01,         /*  bEndpointAddress (EP1-OUT)       */
+        0x02,         /*  bmAttributes (bulk)              */
+        0x0200,       /*  wMaxPacketSize                   */
+        0x01,         /*  bInterval                        */
+    },
+    { /*  IN Endpoint 2 (Descriptor #2) */
+        0x07,         /*  bLength                          */
+        0x05,         /*  bDescriptorType (Endpoint)       */
+        0x82,         /*  bEndpointAddress (EP2-IN)        */
+        0x02,         /*  bmAttributes (bulk)              */
+        0x0200,       /*  wMaxPacketSize                   */
+        0x01          /*  bInterval                        */
     }
 };
 

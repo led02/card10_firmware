@@ -229,5 +229,21 @@ void I2C_DrainTX(mxc_i2c_regs_t *i2c);
  */
 int I2C_AbortAsync(i2c_req_t *req);
 
+/**
+ * @brief      Enable and Set Timeout 
+ *
+ * @param      i2c   pointer to I2C regs
+ * @param[in]  us    micro seconds to delay
+ *
+ * @return     E_NO_ERROR or E_BAD_PARAM if delay is to long.
+ */
+int I2C_SetTimeout(mxc_i2c_regs_t *i2c, int us);
+
+/**
+ * @brief      clear and disable timeout
+ *
+ * @param      i2c   pointer to I2C regs
+ */
+void I2C_ClearTimeout(mxc_i2c_regs_t *i2c);
 /**@} end of group i2c */
 #endif /* _I2C_H_ */

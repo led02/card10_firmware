@@ -95,6 +95,22 @@ typedef void (*pb_callback)(void *pb);
 int PB_RegisterCallback(unsigned int pb, pb_callback callback);
 
 /**
+ * @brief      Register or Unregister a callback handler for rising and falling events on the @p pb push button.
+ * @details
+ * - Calling this function with a pointer to a function @p callback, configures the pushbutton @p pb and enables the
+ * interrupt to handle the push button events.
+ * - Calling this function with a <tt>NULL</tt> pointer will disable the interrupt and unregister the
+ * callback function.
+ * @p pb must be a value between 0 and \c num_pbs.
+ *
+ * @param      pb        push button index to receive event callbacks.
+ * @param      callback  Callback function pointer of type @c pb_callback
+ * @return     #E_NO_ERROR if configured and callback registered successfully.
+ * @return     "Error Code" @ref MXC_Error_Codes "Error Code" if unsuccessful.
+ */
+int PB_RegisterRiseFallCallback(unsigned int pb, pb_callback callback);
+
+/**
  * @brief   Enable a callback interrupt.
  * @note    PB_RegisterCallback must be called prior to enabling the callback interrupt.
  * @param   pb          push button index value between 0 and \c num_pbs.

@@ -57,10 +57,10 @@ void NVIC_SetRAM(void)
     extern void (* const __isr_vector[])(void);
 #else
     /* should be defined in starup_<device>.S */
-    extern uint32_t __isr_vector;
+    extern uint32_t *__isr_vector;
 #endif
     
-    memcpy(&ramVectorTable, &__isr_vector, sizeof(ramVectorTable));
+    memcpy((void*)&ramVectorTable, (void*)&__isr_vector, sizeof(ramVectorTable));
     SCB->VTOR = (uint32_t)&ramVectorTable;
 }
 

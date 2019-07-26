@@ -6,3 +6,5 @@ subdir('./Libraries/Boards/card10/')
 subdir('./Libraries/FreeRTOS/')
 
 subdir('./Libraries/MAXUSB/')
+
+subdir('./Libraries/BTLE/')

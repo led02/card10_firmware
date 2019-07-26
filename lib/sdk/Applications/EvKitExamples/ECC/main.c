@@ -1,5 +1,13 @@
+
+/**
+ * @file    main.c
+ * @brief   Demonstration of SRAM ECC
+ * @details This program demonstrates single and double-bit error detection and
+ *          single-bit correction for SRAM memories.
+ */
+
 /*******************************************************************************
- * Copyright (C) 2016 Maxim Integrated Products, Inc., All Rights Reserved.
+ * Copyright (C) 2019 Maxim Integrated Products, Inc., All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,22 +42,17 @@
  *
  ******************************************************************************/
 
-/**
- * @file    main.c
- * @brief   Hello World!
- * @details This example uses the UART to print to a terminal and flashes an LED.
- */
-
 /***** Includes *****/
 #include <stdio.h>
 #include <stdint.h>
 #include "mxc_config.h"
 #include "led.h"
 #include "board.h"
-#include "tmr_utils.h"
 #include "mcr_regs.h"
 
 /***** Definitions *****/
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 /***** Globals *****/
 volatile uint32_t badData;
@@ -58,67 +61,152 @@ volatile uint32_t eccErr;
 volatile uint32_t eccDErr;
 volatile uint32_t eccAddr;
 
-
+// Find the highest address in RAM, subtract the portion taken away by ECC
+uint32_t ramTop = (MXC_SRAM_MEM_BASE + (MXC_SRAM_MEM_SIZE*0.8));
 /***** Functions *****/
+int PreInit(void)
+{
+    /* This PreInit overrides the default in system_max32665.c, so that
+     * ECC can be turned on before the C init routine. One must be
+     * careful not to use stack, bss/ibss, or heap in this routine.
+     */
+
+    // Turn on ECC for all banks 
+    MXC_MCR->eccen =
+        MXC_F_MCR_ECCEN_SYSRAM0ECCEN |
+        MXC_F_MCR_ECCEN_SYSRAM1ECCEN |
+        MXC_F_MCR_ECCEN_SYSRAM2ECCEN |
+        MXC_F_MCR_ECCEN_SYSRAM3ECCEN |
+        MXC_F_MCR_ECCEN_SYSRAM4ECCEN |
+        MXC_F_MCR_ECCEN_SYSRAM5ECCEN;
+
+    // Zeroize all banks, which ensures ECC bits are written for no errors 
+    MXC_GCR->memzcn =
+        MXC_F_GCR_MEMZCN_SRAM0Z |
+        MXC_F_GCR_MEMZCN_SRAM1Z |
+        MXC_F_GCR_MEMZCN_SRAM2Z |
+        MXC_F_GCR_MEMZCN_SRAM3Z |
+        MXC_F_GCR_MEMZCN_SRAM4Z |
+        MXC_F_GCR_MEMZCN_SRAM5Z;
+
+    while (MXC_GCR->memzcn & (MXC_F_GCR_MEMZCN_SRAM0Z |
+                    MXC_F_GCR_MEMZCN_SRAM1Z |
+                    MXC_F_GCR_MEMZCN_SRAM2Z |
+                    MXC_F_GCR_MEMZCN_SRAM3Z |
+                    MXC_F_GCR_MEMZCN_SRAM4Z |
+                    MXC_F_GCR_MEMZCN_SRAM5Z));
+    
+    // Per the API in system_max32665.c, return 0 so normal C init occurs 
+    return 0;
+}
+
 void ECC_IRQHandler(void) 
 {
     eccErr = MXC_GCR->eccerr;
     eccDErr = MXC_GCR->eccnded;
     eccAddr = MXC_GCR->eccerrad;
-	eccFlag = 1;
+    eccFlag = 1;
 
-    MXC_GCR->eccerr = 0xFFFFFFFF;
-    MXC_GCR->eccnded = 0xFFFFFFFF;
+    MXC_GCR->eccerr = MXC_GCR->eccerr;
+    MXC_GCR->eccnded = MXC_GCR->eccnded;
 }
 
 // *****************************************************************************
 int main(void)
 {
-    printf("------------------------------------------------------\n");
-    printf("ECC Example\n");
-    printf("This example will corrupt a word of data\n");
-    printf("and ensure that the ECC throws an error when it's read\n");
-    
-    // Clear all ECC Errors
-    MXC_GCR->eccerr = 0xFFFFFFFF;
-    MXC_GCR->eccnded = 0xFFFFFFFF;
+    unsigned int i, test_fail, test_pass;
+    volatile uint32_t *cursor;
 
-	// Enable SysRAM ECC and interrupts
-    MXC_MCR->eccen |= 1;
-    MXC_GCR->eccirqen |= 0x3F;
+    test_fail = test_pass = 0;
+    
+    printf("\n\n***** MAX" TOSTRING(TARGET) " SRAM ECC Example *****\n\n");
+    printf("This example will corrupt a word of data\n");
+    printf("and ensure that the ECC interrupts on an error\n");
+    printf("when the corrupted address is read\n\n");
+    
+    // Clear all ECC Errors -- write-1-to-clear
+    MXC_GCR->eccerr = MXC_GCR->eccerr;
+    MXC_GCR->eccnded = MXC_GCR->eccnded;
+
+    // Enable interrupts for ECC errors
+    MXC_GCR->eccirqen |=
+            MXC_F_GCR_ECCIRQEN_SYSRAM0ECCEN |
+            MXC_F_GCR_ECCIRQEN_SYSRAM1ECCEN |
+            MXC_F_GCR_ECCIRQEN_SYSRAM2ECCEN |
+            MXC_F_GCR_ECCIRQEN_SYSRAM3ECCEN |
+            MXC_F_GCR_ECCIRQEN_SYSRAM4ECCEN |
+            MXC_F_GCR_ECCIRQEN_SYSRAM5ECCEN;
     NVIC_EnableIRQ(ECC_IRQn);
 
+    // Scan all of memory, which should not cause any errors to be detected
+    printf("Preliminary scan to ensure no pre-existing ECC errors\n");
+    eccFlag = 0;
+   
+    for (i = MXC_SRAM_MEM_BASE; i < ramTop-sizeof(uint32_t); i+= sizeof(uint32_t)) {
+        cursor = (uint32_t *)i;
+        *cursor;
+        if (eccFlag) {
+            break;
+        }
+    }
+    printf("%d\n", ramTop);
+    if (eccFlag) {
+        printf("ECC Error:              0x%08x\n", eccErr);
+        printf("ECC Not Double Error:   0x%08x\n", eccDErr);
+        printf("ECC Error Address:      0x%08x\n", eccAddr);
+        printf("FAIL: Error found in preliminary memory scan\n");
+        test_fail++;
+    } else {
+        printf("PASS: No errors\n");
+        test_pass++;
+    }
+        
+    // Initialize data
     badData = 0xDEADBEEF;
-    printf("--------\nData before Corruption: 0x%08x\n", badData);
+    
+    printf("\nData before Corruption: 0x%08x\n", badData);
     printf("Address of data: 0x%08x\n", &badData);
 
-    // Disable IRQ and Corrupt Data
-    MXC_MCR->eccen &= ~1;
+    // Disable ECC so data can be corrupted
+    MXC_MCR->eccen &= ~MXC_F_MCR_ECCEN_SYSRAM0ECCEN;
     badData = 0xDEADBEEE;
-    MXC_MCR->eccen |= 1;
+    MXC_MCR->eccen |= MXC_F_MCR_ECCEN_SYSRAM0ECCEN;
 
-    printf("--------\nData after 1bit error: 0x%08x\n", badData);
+    printf("\nData after single-bit error: 0x%08x\n", badData);
     printf("ECC Error:              0x%08x\n", eccErr);
     printf("ECC Not Double Error:   0x%08x\n", eccDErr);
     printf("ECC Error Address:      0x%08x\n", eccAddr);
-    if(eccFlag) {
-    	printf("An ECC Error was found!\n");
-    	eccFlag = 0;
+    if (eccFlag) {
+        printf("PASS: An ECC Error was found\n");
+        eccFlag = 0;
+        test_pass++;
+    } else {
+        printf("FAIL: Error not detected!\n");
+        eccFlag = 0;
+        test_fail++;
     }
-    
-    MXC_MCR->eccen &= ~1;
+
+    // Disable ECC so data can be corrupted
+    MXC_MCR->eccen &= ~MXC_F_MCR_ECCEN_SYSRAM0ECCEN;
     badData = 0xDEADBEEC;
-    MXC_MCR->eccen |= 1;
+    MXC_MCR->eccen |= MXC_F_MCR_ECCEN_SYSRAM0ECCEN;
 
-    printf("--------\nData after 2 bit error: 0x%08x\n", badData);
+    printf("\nData after double-bit error: 0x%08x\n", badData);
     printf("ECC Error:              0x%08x\n", eccErr);
     printf("ECC Not Double Error:   0x%08x\n", eccDErr);
     printf("ECC Error Address:      0x%08x\n", eccAddr);
-    if(eccFlag) {
-    	printf("An ECC Error was found!\n");
-    	eccFlag = 0;
+    if (eccFlag) {
+        printf("PASS: An ECC Error was found\n");
+        eccFlag = 0;
+        test_pass++;
+    } else {
+        printf("FAIL: Error not detected!\n");
+        eccFlag = 0;
+        test_fail++;
     }
 
+    printf("\n# Passed: %u, # Failed: %u, Test %s\n", test_pass, test_fail, test_fail ? "FAIL!" : "Ok");
     printf("Example Complete\n");
+
     while(1);
 }

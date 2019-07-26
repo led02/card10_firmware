@@ -138,9 +138,12 @@ typedef enum {
 
 /** @brief DMA transfer data width */
 typedef enum {
-    DMA_WIDTH_BYTE = MXC_S_DMA_CFG_SRCWD_BYTE,          /**< DMA transfer in bytes */
-    DMA_WIDTH_HALFWORD = MXC_S_DMA_CFG_SRCWD_HALFWORD,  /**< DMA transfer in 16-bit half-words */
-    DMA_WIDTH_WORD = MXC_S_DMA_CFG_SRCWD_WORD,          /**< DMA transfer in 32-bit words */
+    /* Using the '_V_' define instead of the '_S_' since these same values will be used to 
+       specify the DSTWD also.  The API functions will shift the value the correct amount 
+       prior to writing the cfg register. */
+    DMA_WIDTH_BYTE = MXC_V_DMA_CFG_SRCWD_BYTE,          /**< DMA transfer in bytes */
+    DMA_WIDTH_HALFWORD = MXC_V_DMA_CFG_SRCWD_HALFWORD,  /**< DMA transfer in 16-bit half-words */
+    DMA_WIDTH_WORD = MXC_V_DMA_CFG_SRCWD_WORD,          /**< DMA transfer in 32-bit words */
 } dma_width_t;
 
 /** @brief Convenience defines for options */

@@ -29,8 +29,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *
- * $Date: 2019-03-01 20:40:05 +0000 (Fri, 01 Mar 2019) $
- * $Revision: 41358 $
+ * $Date: 2019-04-26 16:05:18 -0500 (Fri, 26 Apr 2019) $
+ * $Revision: 42983 $
  *
  ******************************************************************************/
 
@@ -226,7 +226,7 @@ typedef enum {
 #define MXC_INFO_MEM_BASE               MXC_INFO0_MEM_BASE
 #define MXC_INFO_MEM_SIZE               0x00004000UL
 #define MXC_SRAM_MEM_BASE               0x20000000UL
-#define MXC_SRAM_MEM_SIZE               0x000A0000UL
+#define MXC_SRAM_MEM_SIZE               0x0008C000UL
 #define MXC_XIP_DATA_MEM_BASE           0x80000000UL
 #define MXC_XIP_DATA_MEM_SIZE           0x20000000UL
 

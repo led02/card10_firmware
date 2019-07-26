@@ -34,13 +34,36 @@
  *
  ******************************************************************************/
 
+
+/* Allocate space if SDMA_SIZE is defined at the start of SRAM*/
+SRAM_ORIGIN = 0x20000000;
+SDMA_LEN = DEFINED(SDMA_SIZE) ? SDMA_SIZE : 0;
+OTP_LEN = DEFINED(SDMA_SIZE) ? 0x40 : 0;
+SHARED_LEN = DEFINED(SDMA_SIZE) ? 1k : 0;
+SHARED_LEN_HALF = SHARED_LEN / 2;
+
+OTP_ADDR = SRAM_ORIGIN;
+SHARED_ADDR = OTP_ADDR + OTP_LEN;
+SDMA_ADDR = SHARED_ADDR + SHARED_LEN;
+SRAM_ADDR = SDMA_ADDR + SDMA_LEN;
+
+/* Give leftover SRAM to the SRAM memory region */
+/* SRAM_SIZE must be defined */
+SRAM_LEN = SRAM_SIZE - OTP_LEN - SHARED_LEN - SDMA_LEN;
+
 /* SPID and SPIX Sections here are maximum possible sizes */
 /* If used, they should be adjusted for the external Flash/RAM size */
 MEMORY {
-    SPIX (rx)  : ORIGIN = 0x08000000, LENGTH = 128M
-    FLASH (rx) : ORIGIN = 0x10010000, LENGTH = 960k
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 512k
-    SPID (r)   : ORIGIN = 0x80000000, LENGTH = 512M
+    SPIX (rx)  : ORIGIN = 0x08000000,                           LENGTH = 128M
+    FLASH (rx) : ORIGIN = 0x10010000,                           LENGTH = 960k
+
+    OTP (rwx)       : ORIGIN = OTP_ADDR,                        LENGTH = OTP_LEN
+    ARM_SHARED(rwx) : ORIGIN = SHARED_ADDR,                     LENGTH = SHARED_LEN_HALF
+    SDMA_SHARED(rwx): ORIGIN = SHARED_ADDR + SHARED_LEN_HALF,   LENGTH = SHARED_LEN_HALF
+    SDMA (rwx)      : ORIGIN = SDMA_ADDR,                       LENGTH = SDMA_LEN
+    
+    SRAM (rwx) : ORIGIN = SRAM_ADDR,                            LENGTH = SRAM_LEN
+    SPID (rw)  : ORIGIN = 0x80000000,                           LENGTH = 512M
 }
 
 SECTIONS {
@@ -110,6 +133,39 @@ SECTIONS {
         _edata = ALIGN(., 4);
     } > SRAM AT>FLASH
     __load_data = LOADADDR(.data);
+
+    .otp (NOLOAD) :
+    {
+        _otp = ALIGN(., 4);
+        *(.otp*)           /*Copy of OTP memory*/
+
+        _eotp = ALIGN(., 4);
+    } > OTP
+
+    .arm_shared (NOLOAD) :
+    {
+        _arm_shared = ALIGN(., 4);
+        *(.arm_shared*)           /*Shared memory section*/
+
+    _earm_shared = ALIGN(., 4);
+    } > ARM_SHARED
+
+    .sdma_shared (NOLOAD) :
+    {
+        _sdma_shared = ALIGN(., 4);
+        *(.sdma_shared*)           /*Shared memory section*/
+
+        _esdma_shared = ALIGN(., 4);
+    } > SDMA_SHARED
+
+    .sdma :
+    {
+        _sdma = ALIGN(., 4);
+        *(.sdma_code*)           /*SDMA Code*/
+
+        _esdma = ALIGN(., 4);
+    } > SDMA AT>FLASH
+    __load_sdma = LOADADDR(.sdma);
 
     .bss :
     {

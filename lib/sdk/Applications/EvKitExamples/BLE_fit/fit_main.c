@@ -23,6 +23,7 @@
 #include "util/bstream.h"
 #include "wsf_msg.h"
 #include "wsf_trace.h"
+#include "wsf_buf.h"
 #include "hci_api.h"
 #include "dm_api.h"
 #include "att_api.h"
@@ -40,7 +41,8 @@
 #include "bas/bas_api.h"
 #include "hrps/hrps_api.h"
 #include "rscp/rscp_api.h"
-#include "fit_api.h"
+#include "fit/fit_api.h"
+#include "util/calc128.h"
 
 /**************************************************************************************************
   Macros
@@ -88,7 +90,7 @@ static const appAdvCfg_t fitAdvCfg =
 /*! configurable parameters for slave */
 static const appSlaveCfg_t fitSlaveCfg =
 {
-  FIT_CONN_MAX,                           /*! Maximum connections */
+  1,                           /*! Maximum connections */
 };
 
 /*! configurable parameters for security */
@@ -98,8 +100,11 @@ static const appSecCfg_t fitSecCfg =
   0,                                      /*! Initiator key distribution flags */
   DM_KEY_DIST_LTK,                        /*! Responder key distribution flags */
   FALSE,                                  /*! TRUE if Out-of-band pairing data is present */
-  TRUE                                    /*! TRUE to initiate security upon connection */
+  FALSE                                    /*! TRUE to initiate security upon connection */
 };
+
+/*! TRUE if Out-of-band pairing data is to be sent */
+static const bool_t fitSendOobData = FALSE;
 
 /*! configurable parameters for connection parameter update */
 static const appUpdateCfg_t fitUpdateCfg =
@@ -216,6 +221,9 @@ static uint16_t fitRscmPeriod = FIT_DEFAULT_RSCM_PERIOD;
 /* Heart Rate Monitor feature flags */
 static uint8_t fitHrmFlags = CH_HRM_FLAGS_VALUE_8BIT | CH_HRM_FLAGS_ENERGY_EXP;
 
+/* LESC OOB configuration */
+static dmSecLescOobCfg_t *fitOobCfg;
+
 /*************************************************************************************************/
 /*!
  *  \brief  Application DM callback.
@@ -230,12 +238,40 @@ static void fitDmCback(dmEvt_t *pDmEvt)
   dmEvt_t *pMsg;
   uint16_t len;
 
-  len = DmSizeOfEvt(pDmEvt);
-
-  if ((pMsg = WsfMsgAlloc(len)) != NULL)
+  if (pDmEvt->hdr.event == DM_SEC_ECC_KEY_IND)
   {
-    memcpy(pMsg, pDmEvt, len);
-    WsfMsgSend(fitHandlerId, pMsg);
+    DmSecSetEccKey(&pDmEvt->eccMsg.data.key);
+
+    // If the local device sends OOB data.
+    if (fitSendOobData)
+    {
+      uint8_t oobLocalRandom[SMP_RAND_LEN];
+      SecRand(oobLocalRandom, SMP_RAND_LEN);
+      DmSecCalcOobReq(oobLocalRandom, pDmEvt->eccMsg.data.key.pubKey_x);
+    }
+  }
+  else if (pDmEvt->hdr.event == DM_SEC_CALC_OOB_IND)
+  {
+    if (fitOobCfg == NULL)
+    {
+      fitOobCfg = WsfBufAlloc(sizeof(dmSecLescOobCfg_t));
+    }
+
+    if (fitOobCfg)
+    {
+      Calc128Cpy(fitOobCfg->localConfirm, pDmEvt->oobCalcInd.confirm);
+      Calc128Cpy(fitOobCfg->localRandom, pDmEvt->oobCalcInd.random);
+    }
+  }
+  else
+  {
+    len = DmSizeOfEvt(pDmEvt);
+
+    if ((pMsg = WsfMsgAlloc(len)) != NULL)
+    {
+      memcpy(pMsg, pDmEvt, len);
+      WsfMsgSend(fitHandlerId, pMsg);
+    }
   }
 }
 

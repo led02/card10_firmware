@@ -122,17 +122,14 @@ typedef struct {
  #define MXC_F_ADC_CTRL_REFBUF_PWR_POS                  3 /**< CTRL_REFBUF_PWR Position */
  #define MXC_F_ADC_CTRL_REFBUF_PWR                      ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_REFBUF_PWR_POS)) /**< CTRL_REFBUF_PWR Mask */
 
- #define MXC_F_ADC_CTRL_CHGPUMP_PWR_POS                 4 /**< CTRL_CHGPUMP_PWR Position */
- #define MXC_F_ADC_CTRL_CHGPUMP_PWR                     ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_CHGPUMP_PWR_POS)) /**< CTRL_CHGPUMP_PWR Mask */
+ #define MXC_F_ADC_CTRL_REF_SEL_POS                     4 /**< CTRL_REF_SEL Position */
+ #define MXC_F_ADC_CTRL_REF_SEL                         ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_REF_SEL_POS)) /**< CTRL_REF_SEL Mask */
 
  #define MXC_F_ADC_CTRL_REF_SCALE_POS                   8 /**< CTRL_REF_SCALE Position */
  #define MXC_F_ADC_CTRL_REF_SCALE                       ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_REF_SCALE_POS)) /**< CTRL_REF_SCALE Mask */
 
  #define MXC_F_ADC_CTRL_SCALE_POS                       9 /**< CTRL_SCALE Position */
  #define MXC_F_ADC_CTRL_SCALE                           ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_SCALE_POS)) /**< CTRL_SCALE Mask */
-
- #define MXC_F_ADC_CTRL_REF_SEL_POS                     10 /**< CTRL_REF_SEL Position */
- #define MXC_F_ADC_CTRL_REF_SEL                         ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_REF_SEL_POS)) /**< CTRL_REF_SEL Mask */
 
  #define MXC_F_ADC_CTRL_CLK_EN_POS                      11 /**< CTRL_CLK_EN Position */
  #define MXC_F_ADC_CTRL_CLK_EN                          ((uint32_t)(0x1UL << MXC_F_ADC_CTRL_CLK_EN_POS)) /**< CTRL_CLK_EN Mask */

@@ -1,0 +1,1 @@
+BLE direct test mode example

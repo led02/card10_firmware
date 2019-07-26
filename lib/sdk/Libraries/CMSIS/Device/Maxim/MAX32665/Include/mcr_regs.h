@@ -113,8 +113,23 @@ typedef struct {
  * @brief    ECC Enable Register
  * @{
  */
- #define MXC_F_MCR_ECCEN_SYSRAMECCEN_POS                0 /**< ECCEN_SYSRAMECCEN Position */
- #define MXC_F_MCR_ECCEN_SYSRAMECCEN                    ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAMECCEN_POS)) /**< ECCEN_SYSRAMECCEN Mask */
+ #define MXC_F_MCR_ECCEN_SYSRAM0ECCEN_POS               0 /**< ECCEN_SYSRAM0ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM0ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM0ECCEN_POS)) /**< ECCEN_SYSRAM0ECCEN Mask */
+
+ #define MXC_F_MCR_ECCEN_SYSRAM1ECCEN_POS               1 /**< ECCEN_SYSRAM1ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM1ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM1ECCEN_POS)) /**< ECCEN_SYSRAM1ECCEN Mask */
+
+ #define MXC_F_MCR_ECCEN_SYSRAM2ECCEN_POS               2 /**< ECCEN_SYSRAM2ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM2ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM2ECCEN_POS)) /**< ECCEN_SYSRAM2ECCEN Mask */
+
+ #define MXC_F_MCR_ECCEN_SYSRAM3ECCEN_POS               3 /**< ECCEN_SYSRAM3ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM3ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM3ECCEN_POS)) /**< ECCEN_SYSRAM3ECCEN Mask */
+
+ #define MXC_F_MCR_ECCEN_SYSRAM4ECCEN_POS               4 /**< ECCEN_SYSRAM4ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM4ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM4ECCEN_POS)) /**< ECCEN_SYSRAM4ECCEN Mask */
+
+ #define MXC_F_MCR_ECCEN_SYSRAM5ECCEN_POS               5 /**< ECCEN_SYSRAM5ECCEN Position */
+ #define MXC_F_MCR_ECCEN_SYSRAM5ECCEN                   ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_SYSRAM5ECCEN_POS)) /**< ECCEN_SYSRAM5ECCEN Mask */
 
  #define MXC_F_MCR_ECCEN_IC0ECCEN_POS                   8 /**< ECCEN_IC0ECCEN Position */
  #define MXC_F_MCR_ECCEN_IC0ECCEN                       ((uint32_t)(0x1UL << MXC_F_MCR_ECCEN_IC0ECCEN_POS)) /**< ECCEN_IC0ECCEN Mask */

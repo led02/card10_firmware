@@ -29,9 +29,14 @@
 # property whatsoever. Maxim Integrated Products, Inc. retains all
 # ownership rights.
 #
-# $Id: Makefile 38694 2018-10-24 20:41:14Z zach.metzinger $
+# $Id: Makefile 44577 2019-07-11 21:47:07Z kevin.gillespie $
 #
 ################################################################################
+
+# Include project configuration.
+ifneq "$(wildcard config.mk)" ""
+include config.mk
+endif
 
 # This is the name of the build output file
 ifeq "$(PROJECT)" ""
@@ -67,10 +72,8 @@ endif
 # This is the path to the CMSIS root directory
 ifeq "$(MAXIM_PATH)" ""
 LIBS_DIR=../../../Libraries
-NDALIBS_DIR=../../../NDALibraries
 else
 LIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/Libraries)
-NDALIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/NDALibraries)
 endif
 CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
@@ -78,7 +81,6 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 SRCS  = main.c
 SRCS += stack_fit.c
 SRCS += fit_main.c
-SRCS += svc_dis.c
 
 # Where to find source files for this test
 VPATH  = .
@@ -86,10 +88,64 @@ VPATH  = .
 # Where to find header files for this test
 IPATH  = .
 
-# Enable assertion checking for development
-PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
+################################################################################
+# Project build configuration.
 
+#-------------------------------------------------------------------------------
+# Configuration passed via environment vars.
+
+ifdef CONSOLE_UART
+ifneq "$(CONSOLE_UART)" ""
+PROJ_CFLAGS+=-DCONSOLE_UART=$(CONSOLE_UART)
+endif
+endif
+
+ifdef ENABLE_SDMA
+ifneq "$(ENABLE_SDMA)" ""
+ifeq "$(ENABLE_SDMA)" "0"
+undefine ENABLE_SDMA
+else
+ifeq "$(ENABLE_SDMA)" "FALSE"
+undefine ENABLE_SDMA
+else
+ENABLE_SDMA=1
+endif
+endif
+endif
+endif
+
+#-------------------------------------------------------------------------------
+# Configuration specified here.
+
+#--------------------
+# Stack configuration
+
+# Enable assertion checking for development
+PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE=TRUE
+PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=TRUE
+PROJ_CFLAGS+=-DWSF_ASSERT_ENABLED=TRUE
+# PROJ_CFLAGS+=-DLL_TRACE_ENABLED=TRUE
+# PROJ_CFLAGS+=-DLL_DBG_PIN_ENABLED=TRUE
+PROJ_CFLAGS+=-DWSF_MS_PER_TICK=1
+
+
+#--------------------
+# Application CFLAGS configuration
+
+#--------------------
+# Stack CFLAGS configuration
+
+PROJ_CFLAGS+=-DINIT_BROADCASTER
+# PROJ_CFLAGS+=-DINIT_OBSERVER
+# PROJ_CFLAGS+=-DINIT_CENTRAL
+PROJ_CFLAGS+=-DINIT_PERIPHERAL
+PROJ_CFLAGS+=-DINIT_ENCRYPTED
+
+ENABLE_LL_TESTER?=#1
+
+# Use this variable to override default compilier optimization.
 #MXC_OPTIMIZE_CFLAGS=-Os
+#MXC_OPTIMIZE_CFLAGS=-O0 -fomit-frame-pointer
 
 # Point this variable to a linker file to override the default file
 #LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld
@@ -106,8 +162,7 @@ PERIPH_DRIVER_DIR=$(LIBS_DIR)/$(TARGET)PeriphDriver
 include ${PERIPH_DRIVER_DIR}/periphdriver.mk
 
 # Include Cordio BTLE Library
-TRACE=1
-CORDIO_DIR=$(NDALIBS_DIR)/BTLE
+CORDIO_DIR=$(LIBS_DIR)/BTLE
 include ${CORDIO_DIR}/btle.mk
 
 # Include MAXUSB library

@@ -2,6 +2,7 @@
 // FIXME: Copied from ME11, removed RAM shutdown functions, needs review
 // FIXME: Needs copyright header
 
+#include <stdio.h>
 #include "lp.h"
 #include "pwrseq_regs.h"
 #include "mxc_errors.h"
@@ -10,6 +11,9 @@
 #include "mxc_sys.h"
 #include "tmr_utils.h"
 #include "mcr_regs.h"
+
+extern void Reset_Handler(void);
+extern void Backup_Handler(void);
 
 void LP_ClearWakeStatus(void)
 {
@@ -314,14 +318,9 @@ void LP_FastWakeupDisable(void)
     MXC_PWRSEQ->lpcn &= ~MXC_F_PWRSEQ_LPCN_FWKM;
 }
 
-void LP_PowerFailMonitorEnable(void)
+void LP_SetRAMRetention(ram_retained_t ramRetained) 
 {
-    MXC_PWRSEQ->lpcn &= ~MXC_F_PWRSEQ_LPCN_PORVDDCMD;
-}
-
-void LP_PowerFailMonitorDisable(void)
-{
-    MXC_PWRSEQ->lpcn |= MXC_F_PWRSEQ_LPCN_PORVDDCMD;
+    MXC_SETFIELD(MXC_PWRSEQ->lpcn, MXC_F_PWRSEQ_LPCN_RAMRET, ramRetained);
 }
 
 void LP_EnterSleepMode(void)
@@ -347,10 +346,21 @@ void LP_EnterDeepSleepMode(void)
     __WFI();
 }
 
-void LP_EnterBackupMode(void)
+void LP_EnterBackupMode(void* func(void))
 {
     LP_ClearWakeStatus();
 
+    MXC_PWRSEQ->gp0 = (uint32_t)(&Backup_Handler) | 1;
+    if(func == NULL) {
+        MXC_PWRSEQ->gp1 = (uint32_t)(&Reset_Handler) | 1;
+    } else {
+        MXC_PWRSEQ->gp1 = (uint32_t)(&func) | 1;
+    }
+
+    // Enable the VDDCSW to ensure we have enough power to start
+    MXC_MCR->ctrl |= MXC_F_MCR_CTRL_VDDCSWEN;
+
+    // Enable backup mode
     MXC_GCR->pm &= ~MXC_F_GCR_PM_MODE;
     MXC_GCR->pm |= MXC_S_GCR_PM_MODE_BACKUP;
     while(1); // Should never reach this line - device will jump to backup vector on exit from background mode.

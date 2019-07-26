@@ -29,8 +29,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *
- * $Date: 2019-02-28 19:54:56 +0000 (Thu, 28 Feb 2019) $
- * $Revision: 41324 $
+ * $Date: 2019-05-30 14:18:04 -0500 (Thu, 30 May 2019) $
+ * $Revision: 43593 $
  *
  ******************************************************************************/
 
@@ -64,6 +64,8 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
+#define MAXLEN 256
+
 /***** Globals *****/
     FATFS *fs;		//FFat Filesystem Object
     FATFS fs_obj;
@@ -71,7 +73,7 @@
     FRESULT err;	//FFat Result (Struct)
     FILINFO fno;	//FFat File Information Object
     DIR dir;		//FFat Directory Object
-    TCHAR message[256], directory[256], cwd[256], filename[256], volume_label[24], volume = '0';
+    TCHAR message[MAXLEN], directory[MAXLEN], cwd[MAXLEN], filename[MAXLEN], volume_label[24], volume = '0';
     TCHAR *FF_ERRORS[20];
     DWORD clusters_free = 0, sectors_free = 0, sectors_total = 0, volume_sn = 0;
     UINT bytes_written = 0, bytes_read = 0, mounted = 0;
@@ -81,6 +83,14 @@
     gpio_cfg_t SDPowerEnablePin = {PORT_1, PIN_12, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 /***** FUNCTIONS *****/
+
+void generateMessage(unsigned length)
+{
+    for(int i = 0 ; i < length; i++) {						
+        /*Generate some random data to put in file*/
+        message[i] =  charset[rand() % (sizeof(charset)-1)];
+    }
+}
 
 int mount() {    
     fs = &fs_obj;
@@ -192,10 +202,12 @@ int ls() {
 }
 
 int createFile() {
+
+    unsigned int length = 128;
+      
     if(!mounted) {
         mount();
     }
-	int length = 128;
 
     printf("Enter the name of the text file: \n");
     scanf("%255s", filename);
@@ -209,11 +221,8 @@ int createFile() {
     }
     printf("File opened!\n");
 
-    for(int i = 0 ; i < length; i++) {						
-        /*Generate some random data to put in file*/
-        message[i] =  charset[rand() % (sizeof(charset)-1)];
-    }
-
+    generateMessage(length);
+    
     if((err = f_write(&file, &message, length, &bytes_written)) != FR_OK){
         printf("Error writing file: %s\n", FF_ERRORS[err]);
         f_mount(NULL, "", 0); return err;
@@ -228,11 +237,13 @@ int createFile() {
     return err;
 }
 
-int appendFile() {
+int appendFile()
+{
+    unsigned int length = 0;
+	
     if(!mounted) {
         mount();
     }
-    int length = 0;
 
     printf("Type name of file to append: \n");
     scanf("%255s", filename);
@@ -249,10 +260,8 @@ int appendFile() {
     }
     printf("File opened!\n");
 
-    for(int i = 0 ; i < length; i++) {
-        message[i] =  charset[rand()%(sizeof(charset)-1)];
-    }
-
+    generateMessage(length);
+    
     if((err = f_write(&file, &message, length, &bytes_written)) != FR_OK){
         printf("Error writing file: %s\n", FF_ERRORS[err]);
         return err;
@@ -342,7 +351,10 @@ int delete() {
 
 }
 
-int example() { //cr: call other funcs from here
+int example()
+{
+    unsigned int length = 256;
+	
     if((err = formatSDHC()) != FR_OK) {
         printf("Error Formatting SD Card: %s\n", FF_ERRORS[err]);
         return err;
@@ -380,7 +392,9 @@ int example() { //cr: call other funcs from here
     }
     printf("File opened!\n");
 
-    if((err = f_write(&file, &message, sizeof(message), &bytes_written)) != FR_OK){
+    generateMessage(length);
+    
+    if((err = f_write(&file, &message, length, &bytes_written)) != FR_OK){
         printf("Error writing file: %s\n", FF_ERRORS[err]);
         f_mount(NULL, "", 0);
         return err;

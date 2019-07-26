@@ -59,9 +59,9 @@ static spi17y_req_state_t states[MXC_SPI17Y_INSTANCES];
 
 /* **** Functions **** */
 static int SPI17Y_TransSetup(mxc_spi17y_regs_t *spi, spi17y_req_t *req, int master);
-static int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req);
-static int SPI17Y_TransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req);
-static int SPI17Y_SlaveTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req);
+static int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req, uint8_t async);
+static int SPI17Y_TransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req, uint8_t async);
+static int SPI17Y_SlaveTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req, uint8_t async);
 
 /* ************************************************************************** */
 int SPI17Y_Init(mxc_spi17y_regs_t *spi, unsigned int mode, unsigned int freq,
@@ -313,14 +313,14 @@ void SPI17Y_Handler(mxc_spi17y_regs_t *spi)
     if ((states[spi_num].req != NULL) && (flags)) {
         if ((spi->ctrl0 & MXC_F_SPI17Y_CTRL0_MASTER)>> MXC_F_SPI17Y_CTRL0_MASTER_POS) {
             do {
-                SPI17Y_MasterTransHandler(spi,  states[spi_num].req);
+                SPI17Y_MasterTransHandler(spi,  states[spi_num].req, 1);
                 rx_avail = (spi->dma & MXC_F_SPI17Y_DMA_RX_FIFO_CNT) >> MXC_F_SPI17Y_DMA_RX_FIFO_CNT_POS;
             } while ((states[spi_num].req->rx_data != NULL) && (rx_avail > (spi->dma & MXC_F_SPI17Y_DMA_RX_FIFO_LEVEL)
                      >>MXC_F_SPI17Y_DMA_RX_FIFO_LEVEL_POS));
                      
         } else {
             do {
-                SPI17Y_SlaveTransHandler(spi, states[spi_num].req);
+                SPI17Y_SlaveTransHandler(spi, states[spi_num].req, 1);
                 rx_avail = (spi->dma & MXC_F_SPI17Y_DMA_RX_FIFO_CNT) >> MXC_F_SPI17Y_DMA_RX_FIFO_CNT_POS;
             } while ((states[spi_num].req->rx_data != NULL) && (rx_avail > (spi->dma & MXC_F_SPI17Y_DMA_RX_FIFO_LEVEL)
                      >>MXC_F_SPI17Y_DMA_RX_FIFO_LEVEL_POS));
@@ -339,7 +339,7 @@ int SPI17Y_MasterTrans(mxc_spi17y_regs_t *spi,spi17y_req_t *req)
     }
     req->callback = NULL;
     
-    while (SPI17Y_MasterTransHandler(spi,req)==0) {
+    while (SPI17Y_MasterTransHandler(spi,req,0)==0) {
     }
     
     while (!(spi->int_fl & MXC_F_SPI17Y_INT_FL_M_DONE)) {
@@ -359,7 +359,7 @@ int SPI17Y_SlaveTrans(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
     }
     req->callback = NULL;
     
-    while (SPI17Y_SlaveTransHandler(spi,req)==0) {
+    while (SPI17Y_SlaveTransHandler(spi,req,0)==0) {
         
     }
     
@@ -374,7 +374,7 @@ int SPI17Y_MasterTransAsync(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
         return error;
     }
     
-    SPI17Y_MasterTransHandler(spi,req);
+    SPI17Y_MasterTransHandler(spi,req, 1);
     
     return E_NO_ERROR;
 }
@@ -387,14 +387,14 @@ int SPI17Y_SlaveTransAsync(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
         return error;
     }
     
-    SPI17Y_SlaveTransHandler(spi,req);
+    SPI17Y_SlaveTransHandler(spi,req, 1);
     
     
     return E_NO_ERROR;
 }
 
 /* ************************************************************************** */
-int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
+int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req,uint8_t async)
 {
     int retval;
     int spi_num;
@@ -406,7 +406,7 @@ int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
         spi->ctrl0 |= MXC_F_SPI17Y_CTRL0_SS_CTRL;
     }
     
-    retval = SPI17Y_TransHandler(spi,req);
+    retval = SPI17Y_TransHandler(spi,req, async);
     
     if (!states[spi_num].started) {
         spi->ctrl0 |= MXC_F_SPI17Y_CTRL0_START;
@@ -422,14 +422,14 @@ int SPI17Y_MasterTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
 }
 
 /* ************************************************************************** */
-int SPI17Y_SlaveTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
+int SPI17Y_SlaveTransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req, uint8_t async)
 {
-    return SPI17Y_TransHandler(spi,req);
+    return SPI17Y_TransHandler(spi,req, async);
 }
 
 /* ************************************************************************** */
 // Returns non-zero if transactions is complete, or 0 if not.
-int SPI17Y_TransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
+int SPI17Y_TransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req, uint8_t async)
 {
 
     unsigned tx_avail, rx_avail;
@@ -576,8 +576,9 @@ int SPI17Y_TransHandler(mxc_spi17y_regs_t *spi, spi17y_req_t *req)
         }
         return 1;
     }
-
-    spi->int_en = int_en;
+    if(async){
+        spi->int_en = int_en;
+    }
     return 0;
 }
 

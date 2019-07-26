@@ -1,21 +1,18 @@
 /*************************************************************************************************/
 /*!
- *  \file   
+ *  \file
  *
- *  \brief  
+ *  \brief  Proprietary data transfer client sample application for Nordic-ble.
  *
- *          $Date: 2018-11-15 02:01:14 +0000 (Thu, 15 Nov 2018) $
- *          $Revision: 39269 $
- *
- *  Copyright (c) 2012 Wicentric, Inc., all rights reserved.
- *  Wicentric confidential and proprietary.
+ *  Copyright (c) 2012-2018 Arm Ltd. All Rights Reserved.
+ *  ARM Ltd. confidential and proprietary.
  *
  *  IMPORTANT.  Your use of this file is governed by a Software License Agreement
  *  ("Agreement") that must be accepted in order to download or otherwise receive a
  *  copy of this file.  You may not use or copy this file for any purpose other than
  *  as described in the Agreement.  If you do not agree to all of the terms of the
  *  Agreement do not use this file and delete all copies in your possession or control;
- *  if you do not have a copy of the Agreement, you must contact Wicentric, Inc. prior
+ *  if you do not have a copy of the Agreement, you must contact ARM Ltd. prior
  *  to any use, copying or further distribution of this software.
  */
 /*************************************************************************************************/
@@ -27,20 +24,28 @@
 #include "wsf_msg.h"
 #include "wsf_trace.h"
 #include "wsf_assert.h"
+#include "wsf_buf.h"
 #include "hci_api.h"
 #include "dm_api.h"
+#include "gap/gap_api.h"
 #include "att_api.h"
 #include "smp_api.h"
 #include "app_cfg.h"
 #include "app_api.h"
 #include "app_db.h"
 #include "app_ui.h"
+#include "svc_core.h"
 #include "svc_ch.h"
 #include "gatt/gatt_api.h"
 #include "wpc/wpc_api.h"
 #include "scanner_api.h"
+#include "util/calc128.h"
 
-#include "app_config.h"
+/**************************************************************************************************
+Macros
+**************************************************************************************************/
+
+#define TEST_TIMER_IND   0x99
 
 /**************************************************************************************************
   Local Variables
@@ -53,49 +58,84 @@ struct
   bool_t            scanning;                       /*! TRUE if scanning */
 } scannerCb;
 
+/*! test control block */
+struct
+{
+  unsigned int counter;
+  wsfTimer_t timer;
+} testCb;
+
 /**************************************************************************************************
   Configurable Parameters
 **************************************************************************************************/
 
+#ifdef BTLE_APP_USE_LEGACY_API
 /*! configurable parameters for master */
-
-#ifdef USE_EXTENDED_ADV
-static const appExtMasterCfg_t scannerExtMasterCfg =
-{
-  {160},                                   /*! The scan interval, in 0.625 ms units */
-  {160},                                   /*! The scan window, in 0.625 ms units  */
-  0,                                       /*! The scan duration in ms */
-  0,                                       /*! The scan period in ms */
-  DM_DISC_MODE_NONE,                       /*! The GAP discovery mode */
-  {
-#if 0
-    DM_SCAN_TYPE_ACTIVE                    /*! The scan type (active or passive) */
-#else
-    DM_SCAN_TYPE_PASSIVE                   /*! The scan type (active or passive) */
-#endif
-  }
-};
-
-#else /* USE_EXTENDED_ADV */
 static const appMasterCfg_t scannerMasterCfg =
 {
-  160,                                     /*! The scan interval, in 0.625 ms units */
-  160,                                     /*! The scan window, in 0.625 ms units  */
+  420,                                     /*! The scan interval, in 0.625 ms units */
+  420,                                     /*! The scan window, in 0.625 ms units  */
   0,                                       /*! The scan duration in ms */
   DM_DISC_MODE_NONE,                       /*! The GAP discovery mode */
-#if 1
-  DM_SCAN_TYPE_ACTIVE                      /*! The scan type (active or passive) */
-#else
-  DM_SCAN_TYPE_PASSIVE                     /*! The scan type (active or passive) */
-#endif
+#ifdef BTLE_APP_USE_ACTIVE_SCANNING
+  DM_SCAN_TYPE_ACTIVE
+#else /* BTLE_APP_USE_ACTIVE_SCANNING */
+  DM_SCAN_TYPE_PASSIVE
+#endif /* BTLE_APP_USE_ACTIVE_SCANNING */
+                                           /*!< The scan type (active or passive) */
 };
 
-#endif /* USE_EXTENDED_ADV */
+#else /* BTLE_APP_USE_LEGACY_API */
+/*! configurable parameters for extended master */
+static const uint8_t scannerExtMasterScanPhysCfg =
+  HCI_SCAN_PHY_LE_1M_BIT |
+  //HCI_SCAN_PHY_LE_2M_BIT |
+  //HCI_SCAN_PHY_LE_CODED_BIT |
+  0;
+static const appExtMasterCfg_t scannerExtMasterCfg =
+{
+  { 420, 420, 420 },                       /*! \brief The scan interval, in 0.625 ms units */
+  { 420, 420, 420 },                       /*! \brief The scan window, in 0.625 ms units.   Must be less than or equal to scan interval. */
+  0,                                       /*! \brief The scan duration in ms.  Set to zero or both duration and period to non-zero to scan until stopped. */
+  0,                                       /*! \brief The scan period, in 1.28 sec units.  Set to zero to disable periodic scanning. */
+  DM_DISC_MODE_NONE,                       /*! \brief The GAP discovery mode (general, limited, or none) */
+#ifdef BTLE_APP_USE_ACTIVE_SCANNING
+  {
+    DM_SCAN_TYPE_ACTIVE,
+    DM_SCAN_TYPE_ACTIVE,
+    DM_SCAN_TYPE_ACTIVE
+  }
+#else /* BTLE_APP_USE_ACTIVE_SCANNING */
+  {
+    DM_SCAN_TYPE_PASSIVE,
+    DM_SCAN_TYPE_PASSIVE,
+    DM_SCAN_TYPE_PASSIVE
+  }
+#endif /* BTLE_APP_USE_ACTIVE_SCANNING */
+                                           /*!< \brief The scan type (active or passive) */
+};
+
+#endif /* BTLE_APP_USE_LEGACY_API */
+
+/**************************************************************************************************
+  ATT Client Discovery Data
+**************************************************************************************************/
+
+/*! Discovery states:  enumeration of services to be discovered */
+enum
+{
+  SCANNER_DISC_GATT_SVC,      /*! GATT service */
+  SCANNER_DISC_GAP_SVC,       /*! GAP service */
+  SCANNER_DISC_WP_SVC,        /*! ARM Ltd. proprietary service */
+  SCANNER_DISC_SVC_MAX        /*! Discovery complete */
+};
+
+/**************************************************************************************************
+  ATT Client Configuration Data
+**************************************************************************************************/
 
 /*************************************************************************************************/
 /*!
- *  \fn     scannerDmCback
- *        
  *  \brief  Application DM callback.
  *
  *  \param  pDmEvt  DM callback event
@@ -111,23 +151,14 @@ static void scannerDmCback(dmEvt_t *pDmEvt)
 
   len = DmSizeOfEvt(pDmEvt);
 
-  reportLen = 0;
   if (pDmEvt->hdr.event == DM_SCAN_REPORT_IND)
   {
     reportLen = pDmEvt->scanReport.len;
   }
-#ifdef USE_EXTENDED_ADV
   else
   {
     reportLen = 0;
   }
-#else /* USE_EXTENDED_ADV */
-  else if (pDmEvt->hdr.event == DM_EXT_SCAN_REPORT_IND)
-  {
-    if (pDmEvt->extScanReport.pData)
-      reportLen = pDmEvt->extScanReport.len;
-  }
-#endif /* USE_EXTENDED_ADV */
 
   if ((pMsg = WsfMsgAlloc(len + reportLen)) != NULL)
   {
@@ -137,13 +168,6 @@ static void scannerDmCback(dmEvt_t *pDmEvt)
       pMsg->scanReport.pData = (uint8_t *) ((uint8_t *) pMsg + len);
       memcpy(pMsg->scanReport.pData, pDmEvt->scanReport.pData, reportLen);
     }
-#ifdef USE_EXTENDED_ADV
-    else if (pDmEvt->hdr.event == DM_EXT_SCAN_REPORT_IND)
-    {
-      pMsg->extScanReport.pData = (uint8_t *) ((uint8_t *) pMsg + len);
-      memcpy(pMsg->extScanReport.pData, pDmEvt->extScanReport.pData, reportLen);
-    }
-#endif /* USE_EXTENDED_ADV */
     WsfMsgSend(scannerCb.handlerId, pMsg);
   }
 }
@@ -159,7 +183,10 @@ static void scannerDmCback(dmEvt_t *pDmEvt)
 /*************************************************************************************************/
 static void scannerScanStart(dmEvt_t *pMsg)
 {
-  scannerCb.scanning = TRUE;
+  if (pMsg->hdr.status == HCI_SUCCESS)
+  {
+    scannerCb.scanning = TRUE;
+  }
 }
 
 /*************************************************************************************************/
@@ -173,7 +200,10 @@ static void scannerScanStart(dmEvt_t *pMsg)
 /*************************************************************************************************/
 static void scannerScanStop(dmEvt_t *pMsg)
 {
-  scannerCb.scanning = FALSE;
+  if (pMsg->hdr.status == HCI_SUCCESS)
+  {
+    scannerCb.scanning = FALSE;
+  }
 }
 
 /*************************************************************************************************/
@@ -193,7 +223,7 @@ static void scannerScanReport(dmEvt_t *pMsg)
     return;
   }
 
-  printf("scannerScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x\n", pMsg->scanReport.addrType,
+  printf("scannerScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x",pMsg->scanReport.addrType,
                                                                   pMsg->scanReport.addr[5],
                                                                   pMsg->scanReport.addr[4],
                                                                   pMsg->scanReport.addr[3],
@@ -201,29 +231,13 @@ static void scannerScanReport(dmEvt_t *pMsg)
                                                                   pMsg->scanReport.addr[1],
                                                                   pMsg->scanReport.addr[0]);
 
-  printf("  len %u, rssi %d, evtType %x, addrType %x", pMsg->scanReport.len, pMsg->scanReport.rssi, pMsg->scanReport.eventType, pMsg->scanReport.addrType);
-
-  if (pMsg->scanReport.pData[1] == DM_ADV_TYPE_LOCAL_NAME)
-  {
-    uint8_t name[32];
-    memset(name, 0, sizeof(name));
-    memcpy(name, &pMsg->scanReport.pData[2], pMsg->scanReport.pData[0]);
-    printf(" | %s\n", name);
-  }
-  else {
-    printf(", data %2u:", pMsg->scanReport.len);
-    int i;
-    for (i = 0; i < pMsg->scanReport.len; i++) {
-      printf(" %02x", pMsg->scanReport.pData[i]);
-    }
-    printf("\n");
-  }
+  printf("  len %u, rssi %d, evtType %x, addrType %x\n", pMsg->scanReport.len, pMsg->scanReport.rssi, pMsg->scanReport.eventType, pMsg->scanReport.addrType);
 }
 
-#ifdef USE_EXTENDED_ADV
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
 /*************************************************************************************************/
 /*!
- *  \brief  Handle an extended scan report.
+ *  \brief  Handle a scan report.
  *
  *  \param  pMsg    Pointer to DM callback event message.
  *
@@ -238,33 +252,17 @@ static void scannerExtScanReport(dmEvt_t *pMsg)
     return;
   }
 
-  printf("scannerExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x\n", pMsg->extScanReport.addrType,
-                                                                  pMsg->extScanReport.addr[5],
-                                                                  pMsg->extScanReport.addr[4],
-                                                                  pMsg->extScanReport.addr[3],
-                                                                  pMsg->extScanReport.addr[2],
-                                                                  pMsg->extScanReport.addr[1],
-                                                                  pMsg->extScanReport.addr[0]);
+  printf("scannerExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x", pMsg->extScanReport.addrType,
+                                                                      pMsg->extScanReport.addr[5],
+                                                                      pMsg->extScanReport.addr[4],
+                                                                      pMsg->extScanReport.addr[3],
+                                                                      pMsg->extScanReport.addr[2],
+                                                                      pMsg->extScanReport.addr[1],
+                                                                      pMsg->extScanReport.addr[0]);
 
-  printf("  len %u, rssi %d, evtType %x, addrType %x", pMsg->extScanReport.len, pMsg->extScanReport.rssi, pMsg->extScanReport.eventType, pMsg->extScanReport.addrType);
-
-  if (pMsg->extScanReport.pData[1] == DM_ADV_TYPE_LOCAL_NAME)
-  {
-    uint8_t name[32];
-    memset(name, 0, sizeof(name));
-    memcpy(name, &pMsg->extScanReport.pData[2], pMsg->extScanReport.pData[0]);
-    printf(" | %s\n", name);
-  }
-  else {
-    printf(", data %2u:", pMsg->extScanReport.len);
-    int i;
-    for (i = 0; i < pMsg->extScanReport.len; i++) {
-      printf(" %02x", pMsg->extScanReport.pData[i]);
-    }
-    printf("\n");
-  }
+  printf("  len %u, rssi %d, evtType %x, addrType %x\n", pMsg->extScanReport.len, pMsg->extScanReport.rssi, pMsg->extScanReport.eventType, pMsg->extScanReport.addrType);
 }
-#endif /* USE_EXTENDED_ADV */
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
 /*************************************************************************************************/
 /*!
@@ -275,35 +273,45 @@ static void scannerExtScanReport(dmEvt_t *pMsg)
  *  \return None.
  */
 /*************************************************************************************************/
-#ifdef USE_EXTENDED_ADV
 static void scannerSetup(dmEvt_t *pMsg)
 {
   scannerCb.scanning = FALSE;
- 
-  AppExtScanStart(
-      0x01, // Support PHY 1M
-      scannerExtMasterCfg.discMode,
-      scannerExtMasterCfg.scanType,
-      scannerExtMasterCfg.scanDuration,
-      scannerExtMasterCfg.scanPeriod);
-}
-#else /* USE_EXTENDED_ADV */
-static void scannerSetup(dmEvt_t *pMsg)
-{
+
+  testCb.timer.handlerId = scannerCb.handlerId;
+  testCb.timer.msg.event = TEST_TIMER_IND;
+  WsfTimerStartMs(&testCb.timer, 1000);
+
+  /* If this is defined to one, scanning will be limited to the peer */
 #if 0
-  /* If this is defined to one, scanning will be limited to the EvKit dats peer */
   DmDevWhiteListAdd(DM_ADDR_PUBLIC, (bdAddr_t){0x02, 0x00, 0x44, 0x8B, 0x05, 0x00});
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_SCAN, HCI_FILT_WHITE_LIST);
+  DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_INIT, HCI_FILT_WHITE_LIST);
 #endif
-
-  scannerCb.scanning = FALSE;
-
-  AppScanStart(scannerMasterCfg.discMode, scannerMasterCfg.scanType, scannerMasterCfg.scanDuration);
-
-  /* 0x3 : 1M and 2M PHYs */
-  DmSetDefaultPhy(0, 0x3, 0x3);
 }
-#endif /* USE_EXTENDED_ADV*/
+
+
+
+/*************************************************************************************************/
+static void testTimerHandler(void)
+{
+  testCb.counter++;
+
+  if (testCb.counter == 2)
+  {
+#ifdef BTLE_APP_USE_LEGACY_API
+    AppScanStart(scannerMasterCfg.discMode, scannerMasterCfg.scanType, scannerMasterCfg.scanDuration);
+#else /* BTLE_APP_USE_LEGACY_API */
+    AppExtScanStart(
+        scannerExtMasterScanPhysCfg,
+        scannerExtMasterCfg.discMode,
+        scannerExtMasterCfg.scanType,
+        scannerExtMasterCfg.scanDuration,
+        scannerExtMasterCfg.scanPeriod);
+#endif /* BTLE_APP_USE_LEGACY_API */
+  }
+
+  WsfTimerStartMs(&testCb.timer, 1000);
+}
 
 /*************************************************************************************************/
 /*!
@@ -321,6 +329,7 @@ static void scannerProcMsg(dmEvt_t *pMsg)
   switch(pMsg->hdr.event)
   {
     case DM_RESET_CMPL_IND:
+      DmSecGenerateEccKeyReq();
       scannerSetup(pMsg);
       uiEvent = APP_UI_RESET_CMPL;
       break;
@@ -329,62 +338,38 @@ static void scannerProcMsg(dmEvt_t *pMsg)
       scannerScanStart(pMsg);
       uiEvent = APP_UI_SCAN_START;
       break;
-         
+
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+    case DM_EXT_SCAN_START_IND:
+      scannerScanStart(pMsg);
+      uiEvent = APP_UI_EXT_SCAN_START_IND;
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
     case DM_SCAN_STOP_IND:
       scannerScanStop(pMsg);
       uiEvent = APP_UI_SCAN_STOP;
       break;
 
-#ifdef USE_EXTENDED_ADV
-    case DM_EXT_SCAN_START_IND:
-      scannerScanStart(pMsg);
-      uiEvent = APP_UI_SCAN_START;
-      break;
-         
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
     case DM_EXT_SCAN_STOP_IND:
       scannerScanStop(pMsg);
-      uiEvent = APP_UI_SCAN_STOP;
+      uiEvent = APP_UI_EXT_SCAN_STOP_IND;
       break;
-#endif /* USE_EXTENDED_ADV */
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
     case DM_SCAN_REPORT_IND:
       scannerScanReport(pMsg);
       break;
 
-#ifdef USE_EXTENDED_ADV
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
     case DM_EXT_SCAN_REPORT_IND:
       scannerExtScanReport(pMsg);
       break;
-#endif /* USE_EXTENDED_ADV */
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
-    case DM_CONN_OPEN_IND:
-      uiEvent = APP_UI_CONN_OPEN;
-      break;
-
-    case DM_CONN_CLOSE_IND:
-      uiEvent = APP_UI_CONN_CLOSE;
-      break;
-
-    case DM_SEC_PAIR_CMPL_IND:
-      uiEvent = APP_UI_SEC_PAIR_CMPL;
-      break;
-
-    case DM_SEC_PAIR_FAIL_IND:
-      uiEvent = APP_UI_SEC_PAIR_FAIL;
-      break;
-
-    case DM_SEC_ENCRYPT_IND:
-      uiEvent = APP_UI_SEC_ENCRYPT;
-      break;
-
-    case DM_SEC_ENCRYPT_FAIL_IND:
-      uiEvent = APP_UI_SEC_ENCRYPT_FAIL;
-      break;
-
-    case DM_SEC_AUTH_REQ_IND:
-      break;
-
-    default:
+    case TEST_TIMER_IND:
+      testTimerHandler();
       break;
   }
 
@@ -406,17 +391,17 @@ static void scannerProcMsg(dmEvt_t *pMsg)
 void ScannerHandlerInit(wsfHandlerId_t handlerId)
 {
   APP_TRACE_INFO0("ScannerHandlerInit");
-  
+
   /* store handler ID */
   scannerCb.handlerId = handlerId;
-  
+
   /* Set configuration pointers */
-#ifdef USE_EXTENDED_ADV
-  pAppExtMasterCfg = (appExtMasterCfg_t *) &scannerExtMasterCfg;
-#else /* USE_EXTENDED_ADV */
+#ifdef BTLE_APP_USE_LEGACY_API
   pAppMasterCfg = (appMasterCfg_t *) &scannerMasterCfg;
-#endif /* USE_EXTENDED_ADV */
-  
+#else /* BTLE_APP_USE_LEGACY_API */
+  pAppExtMasterCfg = (appExtMasterCfg_t *) &scannerExtMasterCfg;
+#endif /* BTLE_APP_USE_LEGACY_API */
+
   /* Initialize application framework */
   AppMasterInit();
 }
@@ -432,13 +417,22 @@ void ScannerHandlerInit(wsfHandlerId_t handlerId)
  */
 /*************************************************************************************************/
 void ScannerHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
-{ 
+{
   if (pMsg != NULL)
   {
-    APP_TRACE_INFO1("Scanner got evt 0x%x", pMsg->event);
+    if (pMsg->event != TEST_TIMER_IND)
+    {
+      APP_TRACE_INFO2("Scanner got evt 0x%x, param %u", pMsg->event, pMsg->param);
+    }
 
+    /* process ATT messages */
+    if (pMsg->event <= ATT_CBACK_END)
+    {
+      /* process discovery-related ATT messages */
+      AppDiscProcAttMsg((attEvt_t *) pMsg);
+    }
     /* process DM messages */
-    if ((pMsg->event >= DM_CBACK_START) && (pMsg->event <= DM_CBACK_END))
+    else if (pMsg->event <= DM_CBACK_END)
     {
       /* process advertising and connection-related messages */
       AppMasterProcDmMsg((dmEvt_t *) pMsg);
@@ -451,7 +445,7 @@ void ScannerHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
     }
 
     /* perform profile and user interface-related operations */
-    scannerProcMsg((dmEvt_t *) pMsg);    
+    scannerProcMsg((dmEvt_t *) pMsg);
   }
 }
 
@@ -463,11 +457,11 @@ void ScannerHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
  */
 /*************************************************************************************************/
 void ScannerStart(void)
-{  
+{
+
   /* Register for stack callbacks */
   DmRegister(scannerDmCback);
-  DmConnRegister(DM_CLIENT_ID_APP, scannerDmCback);
 
   /* Reset the device */
-  DmDevReset();  
+  DmDevReset();
 }

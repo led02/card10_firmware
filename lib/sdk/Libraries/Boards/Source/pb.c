@@ -79,6 +79,28 @@ int PB_RegisterCallback(unsigned int pb, pb_callback callback)
     return E_NO_ERROR;
 }
 
+/******************************************************************************/
+int PB_RegisterRiseFallCallback(unsigned int pb, pb_callback callback)
+{
+    MXC_ASSERT(pb < num_pbs);
+
+    if (callback) {
+        // Register callback
+        GPIO_RegisterCallback(&pb_pin[pb], callback, (void*)pb);
+
+        // Configure and enable interrupt
+        GPIO_IntConfig(&pb_pin[pb], GPIO_INT_EDGE, GPIO_INT_BOTH);
+        GPIO_IntEnable(&pb_pin[pb]);
+        NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pb_pin[pb].port));
+    } else {
+        // Disable interrupt and clear callback
+        GPIO_IntDisable(&pb_pin[pb]);
+        GPIO_RegisterCallback(&pb_pin[pb], NULL, NULL);
+    }
+
+    return E_NO_ERROR;
+}
+
 //******************************************************************************
 void GPIO0_IRQHandler(void)
 {

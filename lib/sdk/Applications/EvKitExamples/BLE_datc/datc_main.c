@@ -86,6 +86,7 @@ struct
   Configurable Parameters
 **************************************************************************************************/
 
+#ifdef BTLE_APP_USE_LEGACY_API
 /*! configurable parameters for master */
 static const appMasterCfg_t datcMasterCfg =
 {
@@ -93,8 +94,45 @@ static const appMasterCfg_t datcMasterCfg =
   420,                                     /*! The scan window, in 0.625 ms units  */
   0,                                       /*! The scan duration in ms */
   DM_DISC_MODE_NONE,                       /*! The GAP discovery mode */
-  DM_SCAN_TYPE_ACTIVE                      /*! The scan type (active or passive) */
+#ifdef BTLE_APP_USE_ACTIVE_SCANNING
+  DM_SCAN_TYPE_ACTIVE
+#else /* BTLE_APP_USE_ACTIVE_SCANNING */
+  DM_SCAN_TYPE_PASSIVE
+#endif /* BTLE_APP_USE_ACTIVE_SCANNING */
+                                           /*!< The scan type (active or passive) */
 };
+
+#else /* BTLE_APP_USE_LEGACY_API */
+/*! configurable parameters for extended master */
+static const uint8_t datcExtMasterScanPhysCfg =
+  HCI_SCAN_PHY_LE_1M_BIT |
+  //HCI_SCAN_PHY_LE_2M_BIT |
+  //HCI_SCAN_PHY_LE_CODED_BIT |
+  0;
+static const appExtMasterCfg_t datcExtMasterCfg =
+{
+  { 420, 420, 420 },                       /*! \brief The scan interval, in 0.625 ms units */
+  { 420, 420, 420 },                       /*! \brief The scan window, in 0.625 ms units.   Must be less than or equal to scan interval. */
+  0,                                       /*! \brief The scan duration in ms.  Set to zero or both duration and period to non-zero to scan until stopped. */
+  0,                                       /*! \brief The scan period, in 1.28 sec units.  Set to zero to disable periodic scanning. */
+  DM_DISC_MODE_NONE,                       /*! \brief The GAP discovery mode (general, limited, or none) */
+#ifdef BTLE_APP_USE_ACTIVE_SCANNING
+  {
+    DM_SCAN_TYPE_ACTIVE,
+    DM_SCAN_TYPE_ACTIVE,
+    DM_SCAN_TYPE_ACTIVE
+  }
+#else /* BTLE_APP_USE_ACTIVE_SCANNING */
+  {
+    DM_SCAN_TYPE_PASSIVE,
+    DM_SCAN_TYPE_PASSIVE,
+    DM_SCAN_TYPE_PASSIVE
+  }
+#endif /* BTLE_APP_USE_ACTIVE_SCANNING */
+                                           /*!< \brief The scan type (active or passive) */
+};
+
+#endif /* BTLE_APP_USE_LEGACY_API */
 
 /*! configurable parameters for security */
 static const appSecCfg_t datcSecCfg =
@@ -123,8 +161,8 @@ static const smpCfg_t datcSmpCfg =
 /*! Connection parameters */
 static const hciConnSpec_t datcConnCfg =
 {
-  40,                                     /*! Minimum connection interval in 1.25ms units */
-  40,                                     /*! Maximum connection interval in 1.25ms units */
+  6,                                      /*! Minimum connection interval in 1.25ms units */
+  6,                                      /*! Maximum connection interval in 1.25ms units */
   0,                                      /*! Connection latency */
   600,                                    /*! Supervision timeout in 10ms units */
   0,                                      /*! Minimum CE length, in 0.625 ms units */
@@ -355,7 +393,11 @@ static void datcScanStop(dmEvt_t *pMsg)
     /* Open connection */
     if (datcConnInfo.doConnect)
     {
+#ifdef BTLE_APP_USE_LEGACY_API
       testCb.connId = AppConnOpen(datcConnInfo.addrType, datcConnInfo.addr, datcConnInfo.dbHdl);
+#else
+      testCb.connId = AppExtConnOpen(datcExtMasterScanPhysCfg, datcConnInfo.addrType, datcConnInfo.addr, datcConnInfo.dbHdl);
+#endif
       datcConnInfo.doConnect = FALSE;
     }
   }
@@ -453,6 +495,119 @@ static void datcScanReport(dmEvt_t *pMsg)
   }
 }
 
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+/*************************************************************************************************/
+/*!
+ *  \brief  Handle a scan report.
+ *
+ *  \param  pMsg    Pointer to DM callback event message.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+static void datcExtScanReport(dmEvt_t *pMsg)
+{
+  uint8_t *pData;
+  appDbHdl_t dbHdl;
+  bool_t  connect = FALSE;
+
+  /* disregard if not scanning or autoconnecting */
+  if (!datcCb.scanning || !datcCb.autoConnect)
+  {
+    return;
+  }
+
+  printf("datcExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x\n",
+      pMsg->extScanReport.addrType,
+      pMsg->extScanReport.addr[5],
+      pMsg->extScanReport.addr[4],
+      pMsg->extScanReport.addr[3],
+      pMsg->extScanReport.addr[2],
+      pMsg->extScanReport.addr[1],
+      pMsg->extScanReport.addr[0]);
+
+  printf("  directedAddr ( %x : %02x:%02x:%02x:%02x:%02x:%02x )\n",
+      pMsg->extScanReport.directAddrType,
+      pMsg->extScanReport.directAddr[5],
+      pMsg->extScanReport.directAddr[4],
+      pMsg->extScanReport.directAddr[3],
+      pMsg->extScanReport.directAddr[2],
+      pMsg->extScanReport.directAddr[1],
+      pMsg->extScanReport.directAddr[0]);
+
+  printf("  evtType %x,\n", pMsg->extScanReport.eventType);
+  printf("  addrType %x,\n", pMsg->extScanReport.addrType);
+  printf("  priPhy %u,\n", pMsg->extScanReport.priPhy);
+  printf("  secPhy %u,\n", pMsg->extScanReport.secPhy);
+  printf("  advSid 0x%02x,\n", pMsg->extScanReport.advSid);
+  printf("  txPower %i,\n", pMsg->extScanReport.txPower);
+  printf("  rssi %d,\n", pMsg->extScanReport.rssi);
+  printf("  perAdvInter %i,\n", pMsg->extScanReport.perAdvInter);
+  printf("  directAddrType %x,\n", pMsg->extScanReport.directAddrType);
+  printf("  len %u,\n", pMsg->extScanReport.len);
+
+  if (pMsg->extScanReport.pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  {
+    uint8_t name[32];
+    memset(name, 0, sizeof(name));
+    memcpy(name, &pMsg->extScanReport.pData[2], pMsg->extScanReport.pData[0]);
+    printf(" | %s\n", name);
+  }
+  else {
+    printf(", data");
+    int i;
+    for (i = 0; i < pMsg->extScanReport.len; i++) {
+      printf(" %02x", pMsg->extScanReport.pData[i]);
+    }
+    printf("\n");
+  }
+
+  /* if we already have a bond with this device then connect to it */
+  if ((dbHdl = AppDbFindByAddr(pMsg->extScanReport.addrType, pMsg->extScanReport.addr)) != APP_DB_HDL_NONE)
+  {
+    /* if this is a directed advertisement where the initiator address is an RPA */
+    if (DM_RAND_ADDR_RPA(pMsg->extScanReport.directAddr, pMsg->extScanReport.directAddrType))
+    {
+      /* resolve direct address to see if it's addressed to us */
+      AppMasterResolveAddr(pMsg, dbHdl, APP_RESOLVE_DIRECT_RPA);
+    }
+    else
+    {
+      connect = TRUE;
+    }
+  }
+  /* if the peer device uses an RPA */
+  else if (DM_RAND_ADDR_RPA(pMsg->extScanReport.addr, pMsg->extScanReport.addrType))
+  {
+    /* resolve advertiser's RPA to see if we already have a bond with this device */
+    AppMasterResolveAddr(pMsg, APP_DB_HDL_NONE, APP_RESOLVE_ADV_RPA);
+  }
+  /* find vendor-specific advertising data */
+  else if ((pData = DmFindAdType(DM_ADV_TYPE_MANUFACTURER, pMsg->extScanReport.len,
+                                 pMsg->extScanReport.pData)) != NULL)
+  {
+    /* check length and vendor ID */
+    if (pData[DM_AD_LEN_IDX] >= 3 && BYTES_UINT16_CMP(&pData[DM_AD_DATA_IDX], HCI_ID_ARM))
+    {
+      connect = TRUE;
+    }
+  }
+
+  if (connect)
+  {
+    /* stop scanning and connect */
+    datcCb.autoConnect = FALSE;
+    AppExtScanStop();
+
+    /* Store peer information for connect on scan stop */
+    datcConnInfo.addrType = DmHostAddrType(pMsg->extScanReport.addrType);
+    memcpy(datcConnInfo.addr, pMsg->extScanReport.addr, sizeof(bdAddr_t));
+    datcConnInfo.dbHdl = dbHdl;
+    datcConnInfo.doConnect = TRUE;
+  }
+}
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
 /*************************************************************************************************/
 /*!
  *  \brief  Perform UI actions on connection open.
@@ -483,7 +638,16 @@ static void datcClose(dmEvt_t *pMsg)
   if (!datcCb.scanning)
   {
     datcCb.autoConnect = TRUE;
+#ifdef BTLE_APP_USE_LEGACY_API
     AppScanStart(datcMasterCfg.discMode, datcMasterCfg.scanType, datcMasterCfg.scanDuration);
+#else /* BTLE_APP_USE_LEGACY_API */
+    AppExtScanStart(
+        datcExtMasterScanPhysCfg,
+        datcExtMasterCfg.discMode,
+        datcExtMasterCfg.scanType,
+        datcExtMasterCfg.scanDuration,
+        datcExtMasterCfg.scanPeriod);
+#endif /* BTLE_APP_USE_LEGACY_API */
   }
 }
 
@@ -522,16 +686,13 @@ static void datcSetup(dmEvt_t *pMsg)
   WsfTimerStartMs(&testCb.timer, 1000);
   testCb.connectCount = 0x80000000;
 
-  /* If this is defined to one, scanning will be limited to the EvKit dats peer */
-#if 0
+  /* Scanning will be limited to the EvKit dats peer */
   DmDevWhiteListAdd(DM_ADDR_PUBLIC, (bdAddr_t){0x02, 0x00, 0x44, 0x8B, 0x05, 0x00});
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_SCAN, HCI_FILT_WHITE_LIST);
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_INIT, HCI_FILT_WHITE_LIST);
-#endif
 
-  /* 0x3 : 1M and 2M PHYs */
-  DmSetDefaultPhy(0, 0x3, 0x3);
-  testCb.phy = 0x1;
+  DmSetDefaultPhy(0, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT);
+  testCb.phy = HCI_PHY_LE_1M_BIT;
 
   DmConnSetConnSpec((hciConnSpec_t *) &datcConnCfg);
 }
@@ -676,7 +837,16 @@ static void testTimerHandler(void)
   if (testCb.counter == 2)
   {
     datcCb.autoConnect = TRUE;
+#ifdef BTLE_APP_USE_LEGACY_API
     AppScanStart(datcMasterCfg.discMode, datcMasterCfg.scanType, datcMasterCfg.scanDuration);
+#else /* BTLE_APP_USE_LEGACY_API */
+    AppExtScanStart(
+        datcExtMasterScanPhysCfg,
+        datcExtMasterCfg.discMode,
+        datcExtMasterCfg.scanType,
+        datcExtMasterCfg.scanDuration,
+        datcExtMasterCfg.scanPeriod);
+#endif /* BTLE_APP_USE_LEGACY_API */
   }
 
   if ((((testCb.counter - testCb.connectCount) % 5) == 0) &&
@@ -684,18 +854,19 @@ static void testTimerHandler(void)
       (datcCb.discState[testCb.connId-1] == DATC_DISC_SVC_MAX))
   {
     datcSendData(testCb.connId);
+    DmConnReadRssi(testCb.connId);
   }
 
   if ((((testCb.counter - testCb.connectCount) % 10) == 0) &&
       (testCb.connId != DM_CONN_ID_NONE) &&
       (datcCb.discState[testCb.connId-1] == DATC_DISC_SVC_MAX))
   {
-    if(testCb.phy == 0x1) {
+    if(testCb.phy == HCI_PHY_LE_1M_BIT) {
       /* Change from 1M to 2M PHY */
-      testCb.phy = 0x2;
+      testCb.phy = HCI_PHY_LE_2M_BIT;
     } else {
       /* Change from Coded to 1M PHY */
-      testCb.phy = 0x1;
+      testCb.phy = HCI_PHY_LE_1M_BIT;
     }
 
     DmSetPhy(testCb.connId, 0, testCb.phy, testCb.phy, 0);
@@ -723,6 +894,9 @@ static void datcProcMsg(dmEvt_t *pMsg)
       datcValueNtf((attEvt_t *) pMsg);
       break;
 
+    case ATTC_WRITE_CMD_RSP:
+      break;
+
     case DM_RESET_CMPL_IND:
       DmSecGenerateEccKeyReq();
       datcSetup(pMsg);
@@ -734,18 +908,42 @@ static void datcProcMsg(dmEvt_t *pMsg)
       uiEvent = APP_UI_SCAN_START;
       break;
 
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+    case DM_EXT_SCAN_START_IND:
+      datcScanStart(pMsg);
+      uiEvent = APP_UI_EXT_SCAN_START_IND;
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
     case DM_SCAN_STOP_IND:
       datcScanStop(pMsg);
       uiEvent = APP_UI_SCAN_STOP;
       break;
 
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+    case DM_EXT_SCAN_STOP_IND:
+      datcScanStop(pMsg);
+      uiEvent = APP_UI_EXT_SCAN_STOP_IND;
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
     case DM_SCAN_REPORT_IND:
       datcScanReport(pMsg);
       break;
 
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+    case DM_EXT_SCAN_REPORT_IND:
+      datcExtScanReport(pMsg);
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
     case DM_CONN_OPEN_IND:
       datcOpen(pMsg);
       uiEvent = APP_UI_CONN_OPEN;
+      break;
+
+    case DM_CONN_READ_RSSI_IND:
+      printf("Connection 0x%x RSSI: %d\n", pMsg->readRssi.handle, pMsg->readRssi.rssi);
       break;
 
     case DM_CONN_CLOSE_IND:
@@ -758,9 +956,6 @@ static void datcProcMsg(dmEvt_t *pMsg)
         case HCI_ERR_CONN_FAIL:         printf(" FAIL ESTABLISH\n");  break;
         case HCI_ERR_MIC_FAILURE:       printf(" MIC FAILURE\n");     break;
       }
-#if 0
-      WSF_ASSERT(0);
-#endif
       datcClose(pMsg);
       uiEvent = APP_UI_CONN_CLOSE;
       break;
@@ -816,6 +1011,13 @@ static void datcProcMsg(dmEvt_t *pMsg)
       testTimerHandler();
       break;
 
+    case DM_VENDOR_SPEC_IND:
+      break;
+
+    case DM_PHY_UPDATE_IND:
+      APP_TRACE_INFO2("DM_PHY_UPDATE_IND - RX: %d, TX: %d", pMsg->phyUpdate.rxPhy, pMsg->phyUpdate.txPhy);
+      break;
+
     default:
       break;
   }
@@ -846,7 +1048,11 @@ void DatcHandlerInit(wsfHandlerId_t handlerId)
   datcCb.hdlListLen = DATC_DISC_HDL_LIST_LEN;
 
   /* Set configuration pointers */
+#ifdef BTLE_APP_USE_LEGACY_API
   pAppMasterCfg = (appMasterCfg_t *) &datcMasterCfg;
+#else /* BTLE_APP_USE_LEGACY_API */
+  pAppExtMasterCfg = (appExtMasterCfg_t *) &datcExtMasterCfg;
+#endif /* BTLE_APP_USE_LEGACY_API */
   pAppSecCfg = (appSecCfg_t *) &datcSecCfg;
   pAppDiscCfg = (appDiscCfg_t *) &datcDiscCfg;
   pAppCfg = (appCfg_t *)&datcAppCfg;

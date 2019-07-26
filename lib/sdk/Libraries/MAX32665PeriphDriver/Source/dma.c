@@ -212,7 +212,9 @@ int DMA_ConfigChannel(int ch,
              (dstinc_en ? MXC_F_DMA_CFG_DSTINC : 0)   |
              (chdis_inten ? MXC_F_DMA_CFG_CHDIEN : 0) |
              (ctz_inten ? MXC_F_DMA_CFG_CTZIEN : 0)   |
-             prio |reqsel | tosel | pssel | srcwd | (dstwd << 2) |
+             prio |reqsel | tosel | pssel |
+             (srcwd << MXC_F_DMA_CFG_SRCWD_POS) |
+             (dstwd << MXC_F_DMA_CFG_DSTWD_POS) |
              (((burst_size - 1) << MXC_F_DMA_CFG_BRST_POS) & MXC_F_DMA_CFG_BRST));
     } else {
         return E_BAD_PARAM;

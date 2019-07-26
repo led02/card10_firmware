@@ -42,6 +42,7 @@
 #include "gcr_regs.h"
 #include "icc_regs.h"
 #include "pwrseq_regs.h"
+#include "simo_regs.h"
 
 // Backup mode entry point
 extern void Reset_Handler(void);
@@ -49,7 +50,7 @@ extern void Reset_Handler(void);
 extern void (* const __isr_vector[])(void);
 
 // Part defaults to HIRC/2 out of reset
-uint32_t SystemCoreClock = HIRC_FREQ >> 1; 
+uint32_t SystemCoreClock = HIRC_FREQ >> 1;
 
 __weak void SystemCoreClockUpdate(void)
 {
@@ -121,16 +122,16 @@ __weak void SystemInit(void)
      * table in flash. Initially, VTOR points to the ROM's table.
      */
     SCB->VTOR = (unsigned long)&__isr_vector;
-    
-    // Switch to fast clock on startup
-    MXC_GCR->clkcn &= ~(MXC_S_GCR_CLKCN_PSC_DIV128);
-    MXC_GCR->clkcn |= MXC_F_GCR_CLKCN_HIRC96M_EN;
-    while (!(MXC_GCR->clkcn & MXC_F_GCR_CLKCN_HIRC96M_RDY));
-    MXC_SETFIELD(MXC_GCR->clkcn, MXC_F_GCR_CLKCN_CLKSEL, MXC_S_GCR_CLKCN_CLKSEL_HIRC96);
-    
-    // Wait for clock switch and disable unused clocks
-    while (!(MXC_GCR->clkcn & MXC_F_GCR_CLKCN_CKRDY));
-    MXC_GCR->clkcn &= ~(MXC_F_GCR_CLKCN_HIRC_EN);
+
+    /* We'd like to switch to the fast clock, but can only do so if the 
+     * core's operating voltage (VregO_B) is high enough to support it
+     * Otherwise, we need to remain on the slow clock
+     */
+    if((MXC_SIMO->vrego_b > 48) && (MXC_SIMO->buck_out_ready & 0x2)) {
+        // Switch to fast clock on startup
+        MXC_GCR->clkcn &= ~(MXC_S_GCR_CLKCN_PSC_DIV128);
+        SYS_Clock_Select(SYS_CLOCK_HIRC96, MXC_TMR0);
+    }
 
     /* Enable FPU on Cortex-M4, which occupies coprocessor slots 10 & 11
      * Grant full access, per "Table B3-24 CPACR bit assignments".
@@ -209,5 +210,6 @@ void $Sub$$__main_after_scatterload(void)
 {
     SystemInit();
     $Super$$__main_after_scatterload();
+    while(1);
 }
 #endif /* __CC_ARM */

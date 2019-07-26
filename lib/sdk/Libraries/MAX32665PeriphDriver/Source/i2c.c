@@ -342,13 +342,13 @@ int I2C_MasterWrite(mxc_i2c_regs_t *i2c, uint8_t addr, const uint8_t* data, int 
     }
 
     // Wait for Done
-    while (!(i2c->int_fl0 & MXC_F_I2C_INT_FL0_DONE)) {}    
+    while (!(i2c->int_fl0 & (MXC_F_I2C_INT_FL0_DONE | I2C_ERROR))) {}    
 
     i2c->int_fl0 = MXC_F_I2C_INT_FL0_DONE;
 
     // Wait for Stop
     if (!restart) {
-        while (!(i2c->int_fl0 & MXC_F_I2C_INT_FL0_STOP)) {}
+        while (!(i2c->int_fl0 & (MXC_F_I2C_INT_FL0_STOP | I2C_ERROR))) {}
         
         i2c->int_fl0 = MXC_F_I2C_INT_FL0_STOP;
     }
@@ -424,7 +424,7 @@ int I2C_MasterRead(mxc_i2c_regs_t *i2c, uint8_t addr, uint8_t* data, int len, in
     }
 
     // Wait for Done
-    while (!(i2c->int_fl0 & MXC_F_I2C_INT_FL0_DONE)) {
+    while (!(i2c->int_fl0 & (MXC_F_I2C_INT_FL0_DONE | I2C_ERROR))) {
         
     }
     
@@ -432,7 +432,7 @@ int I2C_MasterRead(mxc_i2c_regs_t *i2c, uint8_t addr, uint8_t* data, int len, in
 
     // Wait for Stop
     if (!restart) {
-        while (!(i2c->int_fl0 & MXC_F_I2C_INT_FL0_STOP)) {
+        while (!(i2c->int_fl0 &( MXC_F_I2C_INT_FL0_STOP | I2C_ERROR))) {
             
         }
         
@@ -1036,4 +1036,21 @@ int I2C_AbortAsync(i2c_req_t *req)
     }
 
     return E_BAD_PARAM;
+}
+
+/* ************************************************************************* */
+int I2C_SetTimeout(mxc_i2c_regs_t *i2c, int us){
+    uint32_t timeout;
+    timeout = (PeripheralClock/1000000) * us;
+    if(timeout > 0xFFFF){
+        return E_BAD_PARAM;
+    }
+    i2c->timeout = timeout;
+    return E_NO_ERROR;
+}
+
+/* ************************************************************************* */
+void I2C_ClearTimeout (mxc_i2c_regs_t *i2c)
+{
+    i2c->timeout = 0;
 }

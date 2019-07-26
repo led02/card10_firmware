@@ -29,47 +29,46 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *
- * $Date: 2019-03-26 14:20:03 +0000 (Tue, 26 Mar 2019) $
- * $Revision: 41870 $
+ * $Date: 2019-07-12 10:56:57 -0500 (Fri, 12 Jul 2019) $
+ * $Revision: 44598 $
  *
  ******************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
+#include "mxc_config.h"
 #include "wsf_types.h"
 #include "wsf_os.h"
 #include "wsf_buf.h"
 #include "wsf_timer.h"
 #include "wsf_trace.h"
 #include "app_ui.h"
-#include "ll_api.h"
-#include "sch_api.h"
 #include "beacon_api.h"
-#include "mxc_config.h"
-#include "gcr_regs.h"
-#include "mcr_regs.h"
 #include "app_ui.h"
+#include "hci_vs.h"
 #include "hci_core.h"
 
 /**************************************************************************************************
   Macros
 **************************************************************************************************/
 
-/* Number of WSF buffer pools */
-#define WSF_BUF_POOLS              6
+/* Size of buffer for stdio functions */
+#define WSF_BUF_POOLS       6
+#define WSF_BUF_SIZE        0x1048
 
 /* Size of buffer for stdio functions */
-#define PRINTF_BUF_SIZE 128
+#define PRINTF_BUF_SIZE     128
 
 /**************************************************************************************************
   Local Variables
 **************************************************************************************************/
 
+uint32_t SystemHeapSize=WSF_BUF_SIZE;
+uint32_t SystemHeap[WSF_BUF_SIZE/4];
+uint32_t SystemHeapStart;
+
 /*! Buffer for stdio functions */
 char printf_buffer[PRINTF_BUF_SIZE];
-
-/*! Free memory for pool buffers (use word elements for word alignment). */
-static uint32_t mainBufMem[3584/sizeof(uint32_t)+96];
 
 /*! Default pool descriptor. */
 static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
@@ -79,7 +78,7 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
   {  64,  4 },
   { 128,  4 },
   { 256,  4 },
-  { 384,  4 }
+  { 512,  4 }
 };
 
 /**************************************************************************************************
@@ -90,21 +89,29 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
 extern void StackInitBeacon(void);
 
 /*************************************************************************************************/
+void PalSysAssertTrap(void)
+{
+    while(1) {}
+}
+
+/*************************************************************************************************/
 void SysTick_Handler(void)
 {
     WsfTimerUpdate(1);
 }
 
 /*************************************************************************************************/
-static void myTrace(const char *pStr, va_list args)
+static bool_t myTrace(const uint8_t *pBuf, uint32_t len)
 {
     extern uint8_t wsfCsNesting;
 
     if (wsfCsNesting == 0)
     {
-        vprintf(pStr, args);
-        printf("\r\n");
+        fwrite(pBuf, len, 1, stdout);
+        return TRUE;
     }
+
+    return FALSE;
 }
 
 /*************************************************************************************************/
@@ -116,47 +123,23 @@ static void myTrace(const char *pStr, va_list args)
 /*************************************************************************************************/
 static void WsfInit(void)
 {
-    WsfTimerInit();
-    WsfBufInit(sizeof(mainBufMem), (uint8_t*)mainBufMem, WSF_BUF_POOLS, mainPoolDesc);
-    WsfTraceRegister(myTrace);
-}
-
-/*************************************************************************************************/
-/*!
- *  \brief  Initialize platform.
- *
- *  \param  msPerTick   Milliseconds per timer tick.
- *
- *  \return None.
- */
-/*************************************************************************************************/
-void PlatformInit(void)
-{
-    /* Change the pullup on the RST pin to 25K */
-    MXC_MCR->ctrl = 0x202;
-
-    /* Set VREGO_D to 1.3V */
-    *((volatile uint32_t*)0x40004410) = 0x50;
-
-    /* Set TX LDO to 1.1V and enable LDO. Set RX LDO to 0.9V and enable LDO */
-    MXC_GCR->btleldocn = 0xD9; // TX 1.1V RX 0.9V
-
-    /* Power up the 32MHz XO */
-    MXC_GCR->clkcn |= MXC_F_GCR_CLKCN_X32M_EN;
-
-    /* Enable peripheral clocks */
-    MXC_GCR->perckcn0 &= ~(MXC_F_GCR_PERCKCN0_GPIO0D | MXC_F_GCR_PERCKCN0_GPIO1D);  // Clear GPIO0 and GPIO1 Disable
-    MXC_GCR->perckcn1 &= ~(MXC_F_GCR_PERCKCN1_BTLED | MXC_F_GCR_PERCKCN1_TRNGD );  // Clear BTLE and ICACHE0 disable
-
-    /* setup the systick */
+    uint32_t bytesUsed;
+    /* setup the systick for 1MS timer*/
     SysTick->LOAD = (SystemCoreClock / 1000) * WSF_MS_PER_TICK;
     SysTick->VAL = 0;
     SysTick->CTRL |= (SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
 
-#ifndef __IAR_SYSTEMS_ICC__
-    /* Added to prevent printf() and friends from using malloc() */
-    setvbuf(stdout, printf_buffer, _IOLBF, PRINTF_BUF_SIZE);
-#endif
+    WsfTimerInit();
+
+    SystemHeapStart = (uint32_t)&SystemHeap;
+    memset(SystemHeap, 0, sizeof(SystemHeap));
+    printf("SystemHeapStart = 0x%x\n", SystemHeapStart);
+    printf("SystemHeapSize = 0x%x\n", SystemHeapSize);
+    bytesUsed = WsfBufInit(WSF_BUF_POOLS, mainPoolDesc);
+    printf("bytesUsed = 0x%x\n", bytesUsed);
+    
+    WsfTraceRegisterHandler(myTrace);
+    WsfTraceEnable(TRUE);
 }
 
 /*
@@ -167,40 +150,16 @@ void PlatformInit(void)
  */
 void SetAddress(uint8_t event)
 {
-    uint8_t bdAddr[6] = {0x20, 0x05, 0x44, 0x8B, 0x05, 0x00};
+    uint8_t bdAddr[6] = {0x02, 0x00, 0x44, 0x8B, 0x05, 0x00};
     
     switch (event) {
-	case APP_UI_RESET_CMPL:
-	    printf("Setting address -- MAC %02X:%02X:%02X:%02X:%02X:%02X\n", bdAddr[5], bdAddr[4], bdAddr[3], bdAddr[2], bdAddr[1], bdAddr[0]);
-	    LlSetBdAddr((uint8_t*)&bdAddr);
-        LlGetBdAddr(hciCoreCb.bdAddr);
-	    break;
-	default:
-	    break;
+    case APP_UI_RESET_CMPL:
+        printf("Setting address -- MAC %02X:%02X:%02X:%02X:%02X:%02X\n", bdAddr[5], bdAddr[4], bdAddr[3], bdAddr[2], bdAddr[1], bdAddr[0]);
+        HciVsSetBdAddr(bdAddr);
+        break;
+    default:
+        break;
     }
-}
-
-/*************************************************************************************************/
-/*!
- *  \brief  Initialize MAC layer.
- *
- *  \param  None.
- *
- *  \return None.
- */
-/*************************************************************************************************/
-void MacInit(void)
-{
-    wsfHandlerId_t handlerId;
-
-    /* Initialize link layer. */
-    BbInit();
-    handlerId = WsfOsSetNextHandler(SchHandler);
-    SchInit(handlerId);
-    LlAdvSlaveInit();
-    LlConnSlaveInit();
-    handlerId = WsfOsSetNextHandler(LlHandler);
-    LlHandlerInit(handlerId);
 }
 
 /*************************************************************************************************/
@@ -216,11 +175,15 @@ void MacInit(void)
 /*************************************************************************************************/
 int main(void)
 {
+
+#ifndef __IAR_SYSTEMS_ICC__
+    setvbuf(stdout, printf_buffer, _IOLBF, PRINTF_BUF_SIZE);
+#endif
+
     printf("\n\n***** MAX32665 BLE Beacon *****\n");
 
-    PlatformInit();
+    /* Initialize Radio */
     WsfInit();
-    MacInit();
     StackInitBeacon();
     BeaconStart();
 

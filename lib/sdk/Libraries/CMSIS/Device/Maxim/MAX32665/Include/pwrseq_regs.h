@@ -177,9 +177,6 @@ typedef struct {
  #define MXC_F_PWRSEQ_LPCN_BGOFF_POS                    11 /**< LPCN_BGOFF Position */
  #define MXC_F_PWRSEQ_LPCN_BGOFF                        ((uint32_t)(0x1UL << MXC_F_PWRSEQ_LPCN_BGOFF_POS)) /**< LPCN_BGOFF Mask */
 
- #define MXC_F_PWRSEQ_LPCN_PORVDDCMD_POS                12 /**< LPCN_PORVDDCMD Position */
- #define MXC_F_PWRSEQ_LPCN_PORVDDCMD                    ((uint32_t)(0x1UL << MXC_F_PWRSEQ_LPCN_PORVDDCMD_POS)) /**< LPCN_PORVDDCMD Mask */
-
  #define MXC_F_PWRSEQ_LPCN_VDDCMD_POS                   20 /**< LPCN_VDDCMD Position */
  #define MXC_F_PWRSEQ_LPCN_VDDCMD                       ((uint32_t)(0x1UL << MXC_F_PWRSEQ_LPCN_VDDCMD_POS)) /**< LPCN_VDDCMD Mask */
 

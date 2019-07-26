@@ -26,6 +26,7 @@
 #include "wsf_buf.h"
 #include "wsf_assert.h"
 #include "hci_api.h"
+#include "hci_vs.h"
 #include "sec_api.h"
 #include "dm_api.h"
 #include "smp_api.h"
@@ -58,11 +59,23 @@ enum
 
 /*! configurable parameters for advertising */
 /* These intervals directly impact energy usage during the non-connected/advertising mode */
+#ifdef BTLE_APP_USE_LEGACY_API
 static const appAdvCfg_t datsAdvCfg =
 {
   { 1000,     0,     0},                  /*! Advertising durations in ms */
   {   96,   200,     0}                   /*! Advertising intervals in 0.625 ms units */
 };
+#else /* BTLE_APP_USE_LEGACY_API */
+static const appExtAdvCfg_t datsExtAdvCfg =
+{
+  {    0,     0,     0}, /*! Advertising durations for extended advertising in ms */
+  {   96,   200,     0}, /*! Advertising intervals for extended advertising in 0.625 ms units (20 ms to 10.24 s). */
+  {    0,     0,     0}, /*! Maximum number of extended advertising events controller will send prior to terminating extended advertising */
+  {    0,     0,     0}, /*! Whether to use legacy advertising PDUs with extended advertising. If set to TRUE then length of advertising data cannot exceed 31 octets. */
+  {    6,     0,     0}  /*! Advertising intervals for periodic advertising in 1.25 ms units (7.5 ms to 81.91875 s). */
+};
+
+#endif /* BTLE_APP_USE_LEGACY_API */
 
 /*! configurable parameters for slave */
 static const appSlaveCfg_t datsSlaveCfg =
@@ -125,6 +138,7 @@ static uint8_t localIrk[] =
   Advertising Data
 **************************************************************************************************/
 
+#ifdef BTLE_APP_USE_LEGACY_API
 /*! advertising data, discoverable mode */
 static const uint8_t datsAdvDataDisc[] =
 {
@@ -149,11 +163,54 @@ static const uint8_t datsScanDataDisc[] =
   'D',
   'a',
   't',
-  'a',
+  's',
   ' ',
   'T',
   'X'
 };
+
+#else /* BTLE_APP_USE_LEGACY_API */
+/*! extended advertising and scan data, discoverable mode */
+static const uint8_t datsExtAdvDataDisc[] =
+{
+  /*! flags */
+  2,                                      /*! length */
+  DM_ADV_TYPE_FLAGS,                      /*! AD type */
+  DM_FLAG_LE_GENERAL_DISC |               /*! flags */
+  DM_FLAG_LE_BREDR_NOT_SUP,
+
+  /*! manufacturer specific data */
+  3,                                      /*! length */
+  DM_ADV_TYPE_MANUFACTURER,               /*! AD type */
+  UINT16_TO_BYTES(HCI_ID_ARM),            /*! company ID */
+
+  /*! device name */
+  8,                                     /*! length */
+  DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
+  'D',
+  'a',
+  't',
+  's',
+  ' ',
+  'T',
+  'X'
+};
+
+static const uint8_t datsExtScanDataDisc[] =
+{
+  /*! device name */
+  8,                                     /*! length */
+  DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
+  'D',
+  'a',
+  't',
+  's',
+  ' ',
+  'T',
+  'X'
+};
+
+#endif /* BTLE_APP_USE_LEGACY_API */
 
 /**************************************************************************************************
   Client Characteristic Configuration Descriptors
@@ -343,13 +400,21 @@ static dmSecKey_t *datsGetPeerKey(dmEvt_t *pMsg)
 /*************************************************************************************************/
 static void datsPrivAddDevToResListInd(dmEvt_t *pMsg)
 {
+#ifndef BTLE_APP_USE_LEGACY_API
+  uint8_t addrZeros[BDA_ADDR_LEN] = { 0 };
+#endif /* BTLE_APP_USE_LEGACY_API */
+
   dmSecKey_t *pPeerKey;
 
   /* if peer IRK present */
   if ((pPeerKey = datsGetPeerKey(pMsg)) != NULL)
   {
     /* set advertising peer address */
+#ifdef BTLE_APP_USE_LEGACY_API
     AppSetAdvPeerAddr(pPeerKey->irk.addrType, pPeerKey->irk.bdAddr);
+#else /* BTLE_APP_USE_LEGACY_API */
+    AppExtSetAdvPeerAddr(DM_ADV_HANDLE_DEFAULT, HCI_ADDR_TYPE_PUBLIC, addrZeros);
+#endif /* BTLE_APP_USE_LEGACY_API */
   }
 }
 
@@ -377,7 +442,11 @@ static void datsPrivRemDevFromResListInd(dmEvt_t *pMsg)
       uint8_t addrZeros[BDA_ADDR_LEN] = { 0 };
 
       /* clear advertising peer address and its type */
+#ifdef BTLE_APP_USE_LEGACY_API
       AppSetAdvPeerAddr(HCI_ADDR_TYPE_PUBLIC, addrZeros);
+#else /* BTLE_APP_USE_LEGACY_API */
+      AppExtSetAdvPeerAddr(DM_ADV_HANDLE_DEFAULT, HCI_ADDR_TYPE_PUBLIC, addrZeros);
+#endif /* BTLE_APP_USE_LEGACY_API */
     }
   }
 }
@@ -409,25 +478,45 @@ void datsDisplayStackVersion(const char *pVersion)
 /*************************************************************************************************/
 static void datsSetup(dmEvt_t *pMsg)
 {
-  /* If this is defined to one, scan responses and connections limited to the EvKit dats peer */
-#if 0
+#ifndef BTLE_APP_USE_LEGACY_API
+  uint8_t advHandle;
+#endif /* BTLE_APP_USE_LEGACY_API */
+
+  /* Scan responses and connections limited to the EvKit dats peer */
   DmDevWhiteListAdd(DM_ADDR_PUBLIC, (bdAddr_t){0x02, 0x01, 0x44, 0x8B, 0x05, 0x00});
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_ADV, HCI_FILT_WHITE_LIST);
-#endif
 
   /* set advertising and scan response data for discoverable mode */
+#ifdef BTLE_APP_USE_LEGACY_API
   AppAdvSetData(APP_ADV_DATA_DISCOVERABLE, sizeof(datsAdvDataDisc), (uint8_t *) datsAdvDataDisc);
   AppAdvSetData(APP_SCAN_DATA_DISCOVERABLE, sizeof(datsScanDataDisc), (uint8_t *) datsScanDataDisc);
+#else /* BTLE_APP_USE_LEGACY_API */
+  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_ADV_DATA_DISCOVERABLE, sizeof(datsExtAdvDataDisc), (uint8_t *) datsExtAdvDataDisc, HCI_EXT_ADV_DATA_LEN);
+  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_SCAN_DATA_DISCOVERABLE, sizeof(datsExtScanDataDisc), (uint8_t *) datsExtScanDataDisc, HCI_EXT_ADV_DATA_LEN);
+#endif /* BTLE_APP_USE_LEGACY_API */
+ 
 
   /* set advertising and scan response data for connectable mode */
+#ifdef BTLE_APP_USE_LEGACY_API
   AppAdvSetData(APP_ADV_DATA_CONNECTABLE, sizeof(datsAdvDataDisc), (uint8_t *) datsAdvDataDisc);
   AppAdvSetData(APP_SCAN_DATA_CONNECTABLE, sizeof(datsScanDataDisc), (uint8_t *) datsScanDataDisc);
+#else /* BTLE_APP_USE_LEGACY_API */
+  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_ADV_DATA_CONNECTABLE, sizeof(datsExtAdvDataDisc), (uint8_t *) datsExtAdvDataDisc, HCI_EXT_ADV_DATA_LEN);
+  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_SCAN_DATA_CONNECTABLE, sizeof(datsExtScanDataDisc), (uint8_t *) datsExtScanDataDisc, HCI_EXT_ADV_DATA_LEN);
+#endif /* BTLE_APP_USE_LEGACY_API */
 
-  /* 0x3 : 1M and 2M PHYs */
-  DmSetDefaultPhy(0, 0x3, 0x3);
+  DmSetDefaultPhy(0, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT);
 
   /* start advertising; automatically set connectable/discoverable mode and bondable mode */
+#ifndef BTLE_APP_USE_LEGACY_API
+  advHandle = DM_ADV_HANDLE_DEFAULT;
+#endif /* BTLE_APP_USE_LEGACY_API */
+
+#ifdef BTLE_APP_USE_LEGACY_API
   AppAdvStart(APP_MODE_AUTO_INIT);
+#else /* BTLE_APP_USE_LEGACY_API */
+  AppExtAdvStart(1, &advHandle, APP_MODE_AUTO_INIT);
+#endif /* BTLE_APP_USE_LEGACY_API */
 }
 
 /*************************************************************************************************/
@@ -455,9 +544,21 @@ static void datsProcMsg(dmEvt_t *pMsg)
       uiEvent = APP_UI_ADV_START;
       break;
 
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+    case DM_ADV_SET_START_IND:
+      uiEvent = APP_UI_ADV_SET_START_IND;
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
     case DM_ADV_STOP_IND:
       uiEvent = APP_UI_ADV_STOP;
       break;
+
+#ifndef BTLE_APP_IGNORE_EXT_EVENTS
+     case DM_ADV_SET_STOP_IND:
+      uiEvent = APP_UI_ADV_SET_STOP_IND;
+      break;
+#endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
     case DM_CONN_OPEN_IND:
       uiEvent = APP_UI_CONN_OPEN;
@@ -534,6 +635,9 @@ static void datsProcMsg(dmEvt_t *pMsg)
     case DM_ADV_NEW_ADDR_IND:
       break;
 
+    case DM_VENDOR_SPEC_IND:
+      break;
+
     default:
       break;
   }
@@ -562,7 +666,11 @@ void DatsHandlerInit(wsfHandlerId_t handlerId)
 
   /* Set configuration pointers */
   pAppSlaveCfg = (appSlaveCfg_t *) &datsSlaveCfg;
+#ifdef BTLE_APP_USE_LEGACY_API
   pAppAdvCfg = (appAdvCfg_t *) &datsAdvCfg;
+#else /* BTLE_APP_USE_LEGACY_API */
+  pAppExtAdvCfg = (appExtAdvCfg_t *) &datsExtAdvCfg;
+#endif /* BTLE_APP_USE_LEGACY_API */
   pAppSecCfg = (appSecCfg_t *) &datsSecCfg;
   pAppUpdateCfg = (appUpdateCfg_t *) &datsUpdateCfg;
   pSmpCfg = (smpCfg_t *) &datsSmpCfg;

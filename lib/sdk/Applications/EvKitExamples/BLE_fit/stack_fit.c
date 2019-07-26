@@ -17,6 +17,8 @@
  */
 /*************************************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
 #include "wsf_types.h"
 #include "wsf_os.h"
 #include "util/bstream.h"
@@ -33,6 +35,56 @@
 #include "svc_dis.h"
 #include "svc_core.h"
 #include "sec_api.h"
+#include "ll_init_api.h"
+
+#define LL_IMPL_REV             0x2303
+
+#define LL_MEMORY_FOOTPRINT     0xC152
+
+uint8_t LlMem[LL_MEMORY_FOOTPRINT];
+
+const LlRtCfg_t _ll_cfg = {
+    /* Device */
+    /*compId*/                  LL_COMP_ID_ARM,
+    /*implRev*/                 LL_IMPL_REV,
+    /*btVer*/                   LL_VER_BT_CORE_SPEC_5_0,
+    /*_align32 */               0, // padding for alignment
+
+    /* Advertiser */
+    /*maxAdvSets*/              4, // 4 Extended Advertising Sets
+    /*maxAdvReports*/           8,
+    /*maxExtAdvDataLen*/        LL_MAX_ADV_DATA_LEN,
+    /*defExtAdvDataFrag*/       64,
+    /*auxDelayUsec*/            0,
+
+    /* Scanner */
+    /*maxScanReqRcvdEvt*/       4,
+    /*maxExtScanDataLen*/       LL_MAX_ADV_DATA_LEN,
+
+    /* Connection */
+    /*maxConn*/                 2,
+    /*numTxBufs*/               16,
+    /*numRxBufs*/               16,
+    /*maxAclLen*/               512,
+    /*defTxPwrLvl*/             0,
+    /*ceJitterUsec*/            0,
+
+    /* DTM */
+    /*dtmRxSyncMs*/             10000,
+
+    /* PHY */
+    /*phy2mSup*/                TRUE,
+    /*phyCodedSup*/             TRUE,
+    /*stableModIdxTxSup*/       FALSE,
+    /*stableModIdxRxSup*/       FALSE
+};
+
+const BbRtCfg_t _bb_cfg = {
+    /*clkPpm*/                  20,
+    /*rfSetupDelayUsec*/        BB_RF_SETUP_DELAY_US,
+    /*maxScanPeriodMsec*/       BB_MAX_SCAN_PERIOD_MS,
+    /*schSetupDelayUsec*/       BB_SCH_SETUP_DELAY_US
+};
 
 /*************************************************************************************************/
 /*!
@@ -44,21 +96,41 @@
 void StackInitFit(void)
 {
   wsfHandlerId_t handlerId;
-  uint8_t features[sizeof(uint64_t)];
-  uint8_t mask[sizeof(uint64_t)];
+
+#ifndef ENABLE_SDMA
+  uint32_t memUsed;
+
+  /* Initialize link layer. */
+  LlInitRtCfg_t ll_init_cfg =
+  {
+      .pBbRtCfg     = &_bb_cfg,
+      .wlSizeCfg    = 4,
+      .rlSizeCfg    = 4,
+      .plSizeCfg    = 4,
+      .pLlRtCfg     = &_ll_cfg,
+      .pFreeMem     = LlMem,
+      .freeMemAvail = LL_MEMORY_FOOTPRINT
+  };
+
+#ifdef DATS_APP_USE_LEGACY_API
+  memUsed = LlInitControllerExtInit(&ll_init_cfg);
+#else /* DATS_APP_USE_LEGACY_API */
+  memUsed = LlInitControllerExtInit(&ll_init_cfg);
+#endif /* DATS_APP_USE_LEGACY_API */
+  if(memUsed != LL_MEMORY_FOOTPRINT)
+  {
+      printf("Controller memory mismatch 0x%x != 0x%x\n", memUsed, 
+          LL_MEMORY_FOOTPRINT);
+  }
+#endif
+
+  handlerId = WsfOsSetNextHandler(HciHandler);
+  HciHandlerInit(handlerId);
 
   SecInit();
   SecAesInit();
   SecCmacInit();
   SecEccInit();
-
-  // Only use legacy API.
-  Uint64ToBstream(features, 0);
-  Uint64ToBstream(mask, HCI_LE_SUP_FEAT_LE_EXT_ADV);
-  HciVsSetFeatures(features, mask);
-
-  handlerId = WsfOsSetNextHandler(HciHandler);
-  HciHandlerInit(handlerId);
 
   handlerId = WsfOsSetNextHandler(DmHandler);
   DmDevVsInit(0);
@@ -68,6 +140,7 @@ void StackInitFit(void)
   DmSecInit();
   DmSecLescInit();
   DmPrivInit();
+  DmPhyInit();
   DmHandlerInit(handlerId);
 
   handlerId = WsfOsSetNextHandler(L2cSlaveHandler);

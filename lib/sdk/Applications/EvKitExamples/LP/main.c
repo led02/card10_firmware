@@ -49,8 +49,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *
- * $Date: 2018-10-15 21:49:29 +0000 (Mon, 15 Oct 2018) $
- * $Revision: 38520 $
+ * $Date: 2019-04-26 14:44:33 -0500 (Fri, 26 Apr 2019) $
+ * $Revision: 42977 $
  *
  **************************************************************************** */
 
@@ -210,7 +210,7 @@ void backup(void) {
     SIMO_setVregO_B(850);
     SIMO_setVregO_C(850);
 
-    LP_EnterBackupMode();
+    LP_EnterBackupMode(NULL);
 }
 
 void turnOffUnused(void) {

@@ -29,8 +29,8 @@
  # property whatsoever. Maxim Integrated Products, Inc. retains all
  # ownership rights.
  #
- # $Date: 2019-03-25 20:35:15 +0000 (Mon, 25 Mar 2019) $ 
- # $Revision: 41849 $
+ # $Date: 2019-04-24 16:56:03 -0500 (Wed, 24 Apr 2019) $ 
+ # $Revision: 42914 $
  #
  ###############################################################################
 
@@ -119,6 +119,9 @@ AFLAGS+=-D__HEAP_SIZE=$(HEAP_SIZE)
 endif
 ifneq "$(STACK_SIZE)" ""
 AFLAGS+=-D__STACK_SIZE=$(STACK_SIZE)
+endif
+ifneq "$(SRAM_SIZE)" ""
+AFLAGS+=-D__SRAM_SIZE=$(SRAM_SIZE)
 endif
 AFLAGS+=$(PROJ_AFLAGS)
 

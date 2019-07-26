@@ -2,7 +2,7 @@
 /*!
  *  \file
  *
- *  \brief  Stack initialization for datc.
+ *  \brief  Stack initialization for scanner.
  *
  *  Copyright (c) 2016-2017 ARM Ltd. All Rights Reserved.
  *  ARM Ltd. confidential and proprietary.
@@ -17,12 +17,12 @@
  */
 /*************************************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
 #include "wsf_types.h"
 #include "wsf_os.h"
 #include "util/bstream.h"
-
 #include "scanner_api.h"
-
 #include "hci_handler.h"
 #include "dm_handler.h"
 #include "l2c_handler.h"
@@ -35,8 +35,57 @@
 #include "svc_dis.h"
 #include "svc_core.h"
 #include "sec_api.h"
+#include "ll_init_api.h"
 
-#include "app_config.h"
+
+#define LL_IMPL_REV             0x2303
+
+#define LL_MEMORY_FOOTPRINT     0xc152
+
+uint8_t LlMem[LL_MEMORY_FOOTPRINT];
+
+const LlRtCfg_t _ll_cfg = {
+    /* Device */
+    /*compId*/                  LL_COMP_ID_ARM,
+    /*implRev*/                 LL_IMPL_REV,
+    /*btVer*/                   LL_VER_BT_CORE_SPEC_5_0,
+    /*_align32 */               0, // padding for alignment
+
+    /* Advertiser */
+    /*maxAdvSets*/              4, // 4 Extended Advertising Sets
+    /*maxAdvReports*/           8,
+    /*maxExtAdvDataLen*/        LL_MAX_ADV_DATA_LEN,
+    /*defExtAdvDataFrag*/       64,
+    /*auxDelayUsec*/            0,
+
+    /* Scanner */
+    /*maxScanReqRcvdEvt*/       4,
+    /*maxExtScanDataLen*/       LL_MAX_ADV_DATA_LEN,
+
+    /* Connection */
+    /*maxConn*/                 2,
+    /*numTxBufs*/               16,
+    /*numRxBufs*/               16,
+    /*maxAclLen*/               512,
+    /*defTxPwrLvl*/             0,
+    /*ceJitterUsec*/            0,
+
+    /* DTM */
+    /*dtmRxSyncMs*/             10000,
+
+    /* PHY */
+    /*phy2mSup*/                TRUE,
+    /*phyCodedSup*/             TRUE,
+    /*stableModIdxTxSup*/       FALSE,
+    /*stableModIdxRxSup*/       FALSE
+};
+
+const BbRtCfg_t _bb_cfg = {
+    /*clkPpm*/                  20,
+    /*rfSetupDelayUsec*/        BB_RF_SETUP_DELAY_US,
+    /*maxScanPeriodMsec*/       BB_MAX_SCAN_PERIOD_MS,
+    /*schSetupDelayUsec*/       BB_SCH_SETUP_DELAY_US
+};
 
 /*************************************************************************************************/
 /*!
@@ -49,7 +98,32 @@ void StackInitScanner(void)
 {
   wsfHandlerId_t handlerId;
 
+#ifndef ENABLE_SDMA
+  uint32_t memUsed;
+
+  /* Initialize link layer. */
+  LlInitRtCfg_t ll_init_cfg =
+  {
+      .pBbRtCfg     = &_bb_cfg,
+      .wlSizeCfg    = 4,
+      .rlSizeCfg    = 4,
+      .plSizeCfg    = 4,
+      .pLlRtCfg     = &_ll_cfg,
+      .pFreeMem     = LlMem,
+      .freeMemAvail = LL_MEMORY_FOOTPRINT
+  };
+
+  memUsed = LlInitControllerExtInit(&ll_init_cfg);
+  // memUsed = LlInitControllerInit(&ll_init_cfg);
+  if(memUsed != LL_MEMORY_FOOTPRINT)
+  {
+      printf("mem_used: 0x%x LL_MEMORY_FOOTPRINT: 0x%x\n", memUsed, 
+          LL_MEMORY_FOOTPRINT);
+  }
+#endif
+
   SecInit();
+  SecRandInit();
   SecAesInit();
   SecCmacInit();
   SecEccInit();
@@ -60,16 +134,17 @@ void StackInitScanner(void)
   handlerId = WsfOsSetNextHandler(DmHandler);
   DmDevVsInit(0);
   DmDevPrivInit();
-#ifdef USE_EXTENDED_ADV
-  DmExtScanInit();
-  DmConnInit();
-  DmExtConnMasterInit();
-#else /* USE_EXTENDED_ADV */
+#ifdef BTLE_APP_USE_LEGACY_API
   DmScanInit();
   DmConnInit();
   DmConnMasterInit();
-#endif /* USE_EXTENDED_ADV */
+#else /* BTLE_APP_USE_LEGACY_API */
+  DmExtScanInit();
+  DmConnInit();
+  DmExtConnMasterInit();
+#endif /* BTLE_APP_USE_LEGACY_API */
   DmSecInit();
+  DmPhyInit();
   DmSecLescInit();
   DmPrivInit();
   DmHandlerInit(handlerId);
@@ -82,6 +157,7 @@ void StackInitScanner(void)
   AttsInit();
   AttsIndInit();
   AttcInit();
+  AttsSignInit();
 
   handlerId = WsfOsSetNextHandler(SmpHandler);
   SmpHandlerInit(handlerId);

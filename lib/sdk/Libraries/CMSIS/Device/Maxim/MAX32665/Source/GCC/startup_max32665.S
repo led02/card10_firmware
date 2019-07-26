@@ -39,6 +39,22 @@
 
     .section .stack
     .align 3
+
+    /* Default SRAM size is 560kB, use 448kB if ECC enabled */
+    .globl  SRAM_SIZE
+#ifdef __SRAM_SIZE
+    .equ    SRAM_SIZE, __SRAM_SIZE
+#else
+    /* 560kB */
+    .equ    SRAM_SIZE, 0x8C000
+#endif
+
+    /* Define SDMA_SIZE to enable the loading of the SDMA image */
+#ifdef __SDMA_SIZE
+    .global SDMA_SIZE
+    .equ    SDMA_SIZE, __SDMA_SIZE
+#endif
+
     .globl  Stack_Size
 #ifdef __STACK_SIZE
     .equ    Stack_Size, __STACK_SIZE
@@ -236,6 +252,40 @@ Reset_Handler:
     str    r0, [r2, r3]
     bgt    .LC0
 .LC1:
+#endif
+
+#ifdef __SDMA_SIZE
+/*     Loop to copy data from read only SDMA memory to RAM. The ranges
+ *      of copy from/to are specified by following symbols evaluated in
+ *      linker script.
+ *      __load_sdma: Where data sections are saved.
+ *      _sdma /_esdma: RAM address range that data should be
+ *      copied to. Both must be aligned to 4 bytes boundary.  */
+
+    ldr    r1, =__load_sdma
+    ldr    r2, =_sdma
+    ldr    r3, =_esdma
+
+#if 0
+/* Here are two copies of loop implemenations. First one favors code size
+ * and the second one favors performance. Default uses the first one.
+ * Change to "#if 0" to use the second one */
+.LC0_sdma:
+    cmp     r2, r3
+    ittt    lt
+    ldrlt   r0, [r1], #4
+    strlt   r0, [r2], #4
+    blt    .LC0_sdma
+#else
+    subs    r3, r2
+    ble    .LC1_sdma
+.LC0_sdma:
+    subs    r3, #4
+    ldr    r0, [r1, r3]
+    str    r0, [r2, r3]
+    bgt    .LC0_sdma
+.LC1_sdma:
+#endif
 #endif
 
 /*

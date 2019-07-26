@@ -1,0 +1,45 @@
+#! armcc -E 
+#include "./RTE/_Flash_Debug/RTE_Components.h"
+
+LR_IROM1 0x10000000 0x00100000  {    ; load region size_region
+  ER_IROM1 0x10000000 0x00100000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  
+  #if BLE_SDMA
+  ER_OTP  0x20000000 0x00000040 {
+   .ANY (.otp)
+  }	  
+  ER_ARM_SHARED 0x20000040 0x00000200{
+   .ANY (.arm_shared)
+  } 
+  ER_SDMA_SHARED 0x20000240 0x00000200{
+   .ANY (.sdma_shared)
+  } 
+  #if BLE_SDMA_ADV
+	ER_SDMA 0x20000440 0x00027000{
+	.ANY (.sdma_code)
+	}
+	RW_IRAM1 0x20027440 0x00058BC0 {  ; RW data
+	.ANY (+RW +ZI)
+	}
+  #else
+	ER_SDMA 0x20000440 0x0002E000{
+	.ANY (.sdma_code)
+	}
+	RW_IRAM1 0x2002E440 0x00051BC0 {  ; RW data
+	.ANY (+RW +ZI)
+	}
+  #endif
+#else  
+	
+  RW_IRAM1 0x20000000 0x00080000  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+#endif
+}
+
+	

@@ -1,5 +1,5 @@
 ################################################################################
- # Copyright (C) 2016 Maxim Integrated Products, Inc., All Rights Reserved.
+ # Copyright (C) 2019 Maxim Integrated Products, Inc., All Rights Reserved.
  #
  # Permission is hereby granted, free of charge, to any person obtaining a
  # copy of this software and associated documentation files (the "Software"),
@@ -95,6 +95,9 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 
 # Point this variable to a linker file to override the default file
 # LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld
+
+# Tell the compiler to use smaller SRAM size when ECC is enabled
+SRAM_SIZE=0x70000
 
 ################################################################################
 # Include external library makefiles here

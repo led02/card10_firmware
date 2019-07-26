@@ -29,8 +29,8 @@
  # property whatsoever. Maxim Integrated Products, Inc. retains all
  # ownership rights.
  #
- # $Date: 2019-03-29 18:02:50 +0000 (Fri, 29 Mar 2019) $ 
- # $Revision: 42007 $
+ # $Date: 2019-05-30 14:18:39 -0500 (Thu, 30 May 2019) $ 
+ # $Revision: 43594 $
  #
  ###############################################################################
 
@@ -57,11 +57,11 @@ BOARD=EvKit_V1
 endif
 
 # This is the path to the CMSIS root directory
-#ifeq "$(MAXIM_PATH)" ""
+ifeq "$(MAXIM_PATH)" ""
 LIBS_DIR=../../../Libraries
-#else
+else
 LIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/Libraries)
-#endif
+endif
 CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)
@@ -78,7 +78,7 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 
 # Specify the target revision to override default
 # "A2" in ASCII
-# TARGET_REV=0x4132
+#TARGET_REV=0x4132
 
 # Use this variables to specify and alternate tool path
 #TOOL_DIR=/opt/gcc-arm-none-eabi-4_8-2013q4/bin
@@ -90,10 +90,11 @@ PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
 # Point this variable to a startup file to override the default file
 #STARTUPFILE=start.S
 
-MXC_OPTIMIZE=-O1
+# Set MXC_OPTIMIZE to override the default optimization level
+#MXC_OPTIMIZE_CFLAGS=-Og
 
 # Point this variable to a linker file to override the default file
-# LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld
+#LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/$(TARGET_LC).ld
 
 ################################################################################
 # Include external library makefiles here

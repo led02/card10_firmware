@@ -56,6 +56,14 @@ extern "C" {
  * @ingroup periphlibs
  * @{
  */
+
+typedef enum {
+	RETAIN_NONE= MXC_S_PWRSEQ_LPCN_RAMRET_DIS,
+	RETAIN_32k = MXC_S_PWRSEQ_LPCN_RAMRET_EN1,
+	RETAIN_64k = MXC_S_PWRSEQ_LPCN_RAMRET_EN2,
+	RETAIN_ALL = MXC_S_PWRSEQ_LPCN_RAMRET_EN3,
+} ram_retained_t;
+
 /**
  * @brief      Enables the selected GPIO port and its selected pins to wake up the device from any low power mode.  
  *             Call this function multiple times to enable pins on multiple ports.  This function does not configure
@@ -344,6 +352,12 @@ void LP_PowerFailMonitorEnable(void);
 void LP_PowerFailMonitorDisable(void);
 
 /**
+ * @brief Enables the selected amount of RAM retention in backup mode
+ *        Using any RAM retention removes the ability to shut down VcoreB
+ */
+void LP_SetRAMRetention(ram_retained_t ramRetained);
+
+/**
  * @brief      Places the device into SLEEP mode.  This function returns once any interrupt occurs. 
  */
 void LP_EnterSleepMode(void);
@@ -356,8 +370,12 @@ void LP_EnterDeepSleepMode(void);
 /**
  * @brief      Places the device into BACKUP mode.  CPU state is not maintained in this mode, so this function never returns.  
  *             Instead, the device will restart once an RTC or external interrupt occur. 
+ * @param  	   func 	Function that backup mode returns to, if null, the part will return to Reset_Handler
+ * @note 	   When returning from backup mode, depending on the RAM retention settings the processor
+ * 			   could have no state information. It will not have a valid stack pointer. 
+ * 			   This function also uses MXC_PWRSEQ->gp0 and gp1.
  */
-void LP_EnterBackupMode(void);
+void LP_EnterBackupMode(void* func(void));
 
 /**
  * @brief      Places the device into Shutdown mode.  CPU state is not maintained in this mode, so this function never returns.  
