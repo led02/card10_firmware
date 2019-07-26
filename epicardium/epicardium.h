@@ -48,6 +48,15 @@ typedef unsigned int size_t;
 #define API_DISP_RECT          0x16
 #define API_DISP_CIRC          0x17
 #define API_DISP_PIXEL         0x18
+
+#define API_FILE_OPEN          0x30
+#define API_FILE_CLOSE         0x31
+#define API_FILE_READ          0x32
+#define API_FILE_WRITE         0x34
+#define API_FILE_FLUSH         0x35
+#define API_FILE_SEEK          0x36 //NYI
+#define API_FILE_TELL          0x37 //NYI
+#define API_FILE_STAT          0x38
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -438,5 +447,69 @@ API(API_LIGHT_SENSOR_GET, int epic_light_sensor_get(uint16_t* value));
  *      - ``-EBUSY``: The timer stop could not be scheduled.
  */
 API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
+
+/**
+ * File
+ * ====
+ * Except for :c:func:`epic_file_open`, which models C stdio's ``fopen``
+ * function, ``close``, ``read`` and ``write`` model `close(2)`_, `read(2)`_ and
+ * `write(2)`_.  All file-related functions return >= ``0`` on success and
+ * ``-Exyz`` on failure, with error codes from errno.h (``EIO``, ``EINVAL``
+ * etc.)
+ *
+ * .. _close(2): http://man7.org/linux/man-pages/man2/close.2.html
+ * .. _read(2): http://man7.org/linux/man-pages/man2/read.2.html
+ * .. _write(2): http://man7.org/linux/man-pages/man2/write.2.html
+ */
+
+/** */
+API(
+	API_FILE_OPEN,
+	int epic_file_open(const char* filename, const char* modeString)
+);
+
+/** */
+API(API_FILE_CLOSE, int epic_file_close(int fd));
+
+/** */
+API(API_FILE_READ, int epic_file_read(int fd, void* buf, size_t nbytes));
+
+/** */
+API(
+	API_FILE_WRITE,
+	int epic_file_write(int fd, const void* buf, size_t nbytes)
+);
+
+/** */
+API(API_FILE_FLUSH, int epic_file_flush(int fd));
+
+/** */
+enum epic_stat_type {
+	/** */
+	EPICSTAT_FILE,
+	/** */
+	EPICSTAT_DIR,
+};
+
+/** */
+typedef struct epic_stat_t {
+	/** */
+	enum epic_stat_type type;
+} epic_stat_t;
+
+/**
+ * stat path
+ *
+ * This does not follow posix convention, but rather takes
+ * a path as parameter. This aligns more with libff's API and
+ * also this has been implemented for python import support, which
+ * passes the filename as well.
+ *
+ * :param const char* filename: path to stat
+ * :param epic_stat_t* stat: pointer to result
+ *
+ * :return: `0` on success, negative on error
+ */
+API(API_FILE_STAT, int epic_file_stat(const char* path, epic_stat_t* stat));
 
 #endif /* _EPICARDIUM_H */

@@ -76,3 +76,4 @@ typedef long mp_off_t;
 /* For some reason, we need to define readline history manually */
 #define MICROPY_PORT_ROOT_POINTERS \
     const char *readline_hist[16];
+
