@@ -118,8 +118,8 @@ int main(void)
 			core1_start(info.isr_vector);
 		}
 	} else {
-			LOG_INFO("startup", "Starting pycardium on core1 ...");
-			core1_start((void *)0x10080000);
+		LOG_INFO("startup", "Starting pycardium on core1 ...");
+		core1_start((void *)0x10080000);
 	}
 
 

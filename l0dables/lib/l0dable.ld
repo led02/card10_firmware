@@ -45,10 +45,10 @@ SECTIONS {
         . = ALIGN(4);
         *(.data*)
 
-		. = ALIGN(4);
-		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP(*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
 
 
         . = ALIGN(4);
@@ -79,7 +79,7 @@ SECTIONS {
         CARD10_STACK_LIMIT = .;
     } :data
 
-	/* Limit based on current limitations of l0dable setup - only uses core1 RAM. */
+    /* Limit based on current limitations of l0dable setup - only uses core1 RAM. */
     ASSERT(. < 0x40000, "Exceeded available RAM")
 
     /DISCARD/ :
@@ -90,7 +90,7 @@ SECTIONS {
         *(.ARM.attributes)
         /* Original interpreter path from gcc/ld - nuke. */
         *(.interp)
-		/* Dynamic linking section - nuke, we're not a .so and nothing is going to link against us. */
-		*(.dynamic)
+        /* Dynamic linking section - nuke, we're not a .so and nothing is going to link against us. */
+        *(.dynamic)
     }
 }
