@@ -82,9 +82,9 @@ static const msc_cfg_t msc_cfg = {
 };
 
 static const msc_idstrings_t ids = {
-	"MAXIM",       /* Vendor string.  Maximum of 8 bytes */
-	"MSC Example", /* Product string.  Maximum of 16 bytes */
-	"1.0"          /* Version string.  Maximum of 4 bytes */
+	"CCC",    /* Vendor string.  Maximum of 8 bytes */
+	"card10", /* Product string.  Maximum of 16 bytes */
+	"1.0"     /* Version string.  Maximum of 4 bytes */
 };
 
 /* Functions to control "disk" memory. See msc.h for definitions. */
