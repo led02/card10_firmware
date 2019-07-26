@@ -52,6 +52,8 @@
 #include "descriptors.h"
 #include "mscmem.h"
 #include "card10.h"
+#include "display.h"
+#include "GUI_Paint.h"
 
 /***** Definitions *****/
 #define EVENT_ENUM_COMP MAXUSB_NUM_EVENTS
@@ -110,6 +112,17 @@ void delay_us(unsigned int usec)
 {
 	/* mxc_delay() takes unsigned long, so can't use it directly */
 	mxc_delay(usec);
+}
+
+void bootloader_dirty(void)
+{
+	Paint_DrawString_EN(0, 16 * 3, "Writing.", &Font16, 0x0000, 0xf000);
+	LCD_Update();
+}
+void bootloader_clean(void)
+{
+	Paint_DrawString_EN(0, 16 * 3, "Ready.  ", &Font16, 0x0000, 0xffff);
+	LCD_Update();
 }
 
 /******************************************************************************/

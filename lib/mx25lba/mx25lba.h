@@ -52,5 +52,6 @@ uint32_t mx25_size(void);
 int mx25_read(uint32_t lba, uint8_t* buffer);
 int mx25_write(uint32_t lba, uint8_t* buffer);
 int mx25_ready(void);
+int mx25_sync(void);
 
 #endif  /* __MX25_H__ */
