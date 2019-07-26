@@ -451,26 +451,50 @@ API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
 /**
  * File
  * ====
- * 
- * Except for epic_open, which models C stdio's fopen function, close, read and write
- * model close (3), read (3) and write(3)
- * All file-related functions return >= 0 on success and -Exyz on failure, with error
- * codes from errno.h (EIO, EINVAL etc.)
- * 
+ * Except for :c:func:`epic_open`, which models C stdio's ``fopen`` function,
+ * ``close``, ``read`` and ``write`` model `close(2)`_, `read(2)`_ and
+ * `write(2)`_.  All file-related functions return >= ``0`` on success and
+ * ``-Exyz`` on failure, with error codes from errno.h (``EIO``, ``EINVAL``
+ * etc.)
+ *
+ * .. _close(2): http://man7.org/linux/man-pages/man2/close.2.html
+ * .. _read(2): http://man7.org/linux/man-pages/man2/read.2.html
+ * .. _write(2): http://man7.org/linux/man-pages/man2/write.2.html
  */
-API(API_FILE_OPEN,  int32_t epic_open(const char* filename, const char* modeString));
+
+/** */
+API(
+	API_FILE_OPEN,
+	int32_t epic_open(const char* filename, const char* modeString)
+);
+
+/** */
 API(API_FILE_CLOSE, int32_t epic_close(int32_t fd));
+
+/** */
 API(API_FILE_READ,  int32_t epic_read(int32_t fd, void* buf, uint32_t nbytes));
-API(API_FILE_WRITE, int32_t epic_write(int32_t fd, const void* buf, uint32_t nbytes));
+
+/** */
+API(
+	API_FILE_WRITE,
+	int32_t epic_write(int32_t fd, const void* buf, uint32_t nbytes)
+);
+
+/** */
 API(API_FILE_FLUSH, int32_t epic_flush(int32_t fd));
 
+/** */
 enum epic_stat_type {
-    EPICSTAT_FILE,
-    EPICSTAT_DIR,
+	/** */
+	EPICSTAT_FILE,
+	/** */
+	EPICSTAT_DIR,
 };
 
+/** */
 typedef struct epic_stat_t {
-    enum epic_stat_type type;
+	/** */
+	enum epic_stat_type type;
 } epic_stat_t;
 
 /**
