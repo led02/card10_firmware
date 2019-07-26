@@ -31,7 +31,7 @@ int main(void)
     int h = 0;
 
     // Release core1
-    core1_start();
+    core1_start((void *)0x10080000);
 
     while (1) {
         #define NUM     15

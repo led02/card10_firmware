@@ -9,6 +9,7 @@
 #include "pmic.h"
 #include "leds.h"
 #include "api/dispatcher.h"
+#include "l0der/l0der.h"
 #include "modules/modules.h"
 #include "modules/log.h"
 #include "modules/stream.h"
@@ -99,8 +100,16 @@ int main(void)
 	LOG_INFO("startup", "Initializing dispatcher ...");
 	api_dispatcher_init();
 
-	LOG_INFO("startup", "Starting core1 payload ...");
-	core1_start();
+	LOG_INFO("startup", "Testing l0der ...");
+	struct l0dable_info info;
+	int res = l0der_load_path("blinky.elf", &info);
+	if (res != 0) {
+		LOG_ERR("startup", "l0der failed: %d\n", res);
+	} else {
+		LOG_INFO("startup", "Starting core1 payload ...");
+		core1_start(info.isr_vector);
+	}
+
 
 	LOG_INFO("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
