@@ -1,26 +1,44 @@
+		/*
+		 * C Runtime for l0dable.
+		 *
+		 * Also known as a startup file.
+		 *
+		 * We provide the following to l0dables:
+		 *  - a 8k stack.
+		 *  - calling GCC initializers.
+		 *  - an ISR vector.
+		 */
+
 		.syntax unified
 		.arch armv7-m
 
+		/*
+		 * ISR Vector.
+		 *
+		 * All of the following (apart from Reset_Handler, which calls main())
+		 * are backed by weak referenced symbols, which you can override just
+         * by defining them in C code.
+		 */
 		.section .data
 		.align 2
-		.globl isr_vector
-isr_vector:
+		.globl __isr_vector
+__isr_vector:
 		.long    CARD10_STACK_LIMIT            /* Top of Stack */
-		.long    Reset_Handler         /* Reset Handler */
-		.long    NMI_Handler           /* NMI Handler */
-		.long    HardFault_Handler     /* Hard Fault Handler */
-		.long    MemManage_Handler     /* MPU Fault Handler */
-		.long    BusFault_Handler      /* Bus Fault Handler */
-		.long    UsageFault_Handler    /* Usage Fault Handler */
-		.long    0                     /* Reserved */
-		.long    0                     /* Reserved */
-		.long    0                     /* Reserved */
-		.long    0                     /* Reserved */
-		.long    SVC_Handler           /* SVCall Handler */
-		.long    0                     /* Reserved */ /* @TODO: Is this the Debug Montior Interrupt? */
-		.long    0                     /* Reserved */
-		.long    PendSV_Handler        /* PendSV Handler */
-		.long    SysTick_Handler       /* SysTick Handler */
+		.long    Reset_Handler                 /* Reset Handler */
+		.long    NMI_Handler                   /* NMI Handler */
+		.long    HardFault_Handler             /* Hard Fault Handler */
+		.long    MemManage_Handler             /* MPU Fault Handler */
+		.long    BusFault_Handler              /* Bus Fault Handler */
+		.long    UsageFault_Handler            /* Usage Fault Handler */
+		.long    0                             /* Reserved */
+		.long    0                             /* Reserved */
+		.long    0                             /* Reserved */
+		.long    0                             /* Reserved */
+		.long    SVC_Handler                   /* SVCall Handler */
+		.long    0                             /* Reserved */ /* @TODO: Is this the Debug Montior Interrupt? */
+		.long    0                             /* Reserved */
+		.long    PendSV_Handler                /* PendSV Handler */
+		.long    SysTick_Handler               /* SysTick Handler */
 		
 		/* Device-specific Interrupts */
 		.long    PF_IRQHandler                 /* 0x10  0x0040  16: Power Fail */
@@ -46,7 +64,7 @@ isr_vector:
 		.long    ADC_IRQHandler                /* 0x24  0x0090  36: ADC */
 		.long    RSV21_IRQHandler              /* 0x25  0x0094  37: Reserved */
 		.long    RSV22_IRQHandler              /* 0x26  0x0098  38: Reserved */
-		.long    FLC0_IRQHandler                /* 0x27  0x009C  39: Flash Controller */
+		.long    FLC0_IRQHandler               /* 0x27  0x009C  39: Flash Controller */
 		.long    GPIO0_IRQHandler              /* 0x28  0x00A0  40: GPIO0 */
 		.long    GPIO1_IRQHandler              /* 0x29  0x00A4  41: GPIO2 */
 		.long    RSV26_IRQHandler              /* 0x2A  0x00A8  42: GPIO3 */
@@ -107,7 +125,7 @@ isr_vector:
 		.long    WDT2_IRQHandler               /* 0x61  0x0184  97: Watchdog Timer 2 */
 		.long    ECC_IRQHandler                /* 0x62  0x0188  98: Error Correction */
 		.long    DVS_IRQHandler                /* 0x63  0x018C  99: DVS Controller */
-		.long    SIMO_IRQHandler               /* 0x64 0x0190  100: SIMO Controller */
+		.long    SIMO_IRQHandler               /* 0x64  0x0190  100: SIMO Controller */
 		.long    RPU_IRQHandler                /* 0x65  0x0194  101: RPU */ /* @TODO: Is this correct? */
 		.long    AUDIO_IRQHandler              /* 0x66  0x0198  102: Audio subsystem */
 		.long    FLC1_IRQHandler               /* 0x67  0x019C  103: Flash Control 1 */
@@ -119,28 +137,43 @@ isr_vector:
 		.long    HTMR0_IRQHandler              /* 0x6D  0x01B4  109: HTmr */
 		.long    HTMR1_IRQHandler              /* 0x6E  0x01B8  109: HTmr */
 
-
+		/*
+		 * Reset_Handler, or, l0dable entrypoint.
+		 */
 		.text
 		.thumb
 		.thumb_func
 		.align 2
 Reset_Handler:
-		// Set stack according to limits from linker script.
+		/* Set stack according to limits from linker script. */
 		ldr r0, =CARD10_STACK_LIMIT
 		mov sp, r0
 
-		// Jump to C code
+		/* Call system initialization from l0dables/lib/hardware.c. */
+		blx SystemInit
+
+		/* Call GCC constructors. */
+		ldr r0, =__libc_init_array
+		blx r0
+
+		/* Jump to C code */
 		ldr r0, =main
 		blx r0
 
-		// Spin
-		// TODO(q3k): let epicardium know we're done
+		/*
+		 * Spin forever.
+		 * TODO(q3k): let epicardium know we're done.
+		 */
 .spin:
 		bl .spin
 
-		// Macro to define default handlers. Default handler
-		// will be weak symbol and just dead loops. They can be
-		// overwritten by other handlers.
+		.globl _init
+_init:
+		bx lr
+
+		/* Macro to define default handlers. Default handler
+		 * will be weak symbol and just dead loops. They can be
+		 * overwritten by other handlers. */
 		.macro    def_irq_handler    handler_name
 		.align 1
 		.thumb_func
@@ -151,9 +184,9 @@ Reset_Handler:
 		.size    \handler_name, . - \handler_name
 		.endm
 
-
-		// Default ISRs.
-
+		/*
+		 * Declare all default ISRs.
+		 */
 		def_irq_handler    NMI_Handler
 		def_irq_handler    HardFault_Handler
 		def_irq_handler    MemManage_Handler

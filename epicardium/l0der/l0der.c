@@ -1,5 +1,6 @@
 #include "l0der/l0der.h"
 
+#include <alloca.h>
 #include <stdio.h>
 #include <string.h>
 #include <ff.h>
@@ -7,6 +8,25 @@
 #include "epicardium.h"
 #include "l0der/elf.h"
 #include "modules/log.h"
+
+/*
+ * l0der is, in reality, a boneless operating-system style ELF loader.
+ *
+ * To implement it, we parse an ELF file somewhat defensively, trying to
+ * not DoS ourselves by overallocating RAM (no heap allocations, no recursion).
+ * 
+ * Currently we support only relocatable, PIE binaries. Adding support for
+ * static ELFs would be trivial, however we want to keep the possibility to
+ * shuffle around memory areas in future versions of card10 (possibly giving
+ * l0dables more RAM than 256k) without having to recompile all l0dables. We
+ * are also keeping the opportunity to have separate loading schemes in the
+ * future, for instance:
+ *  - l0dables running next to pycardium, without unloading it
+ *  - multiple l0dables running next to each other (TSR-style)
+ *
+ * Thus, we use PIE l0dables to keep these possibilities open and not write down
+ * a memory map in stone.
+ */
 
 /*
  * Read an ELF header, check E_IDENT.
@@ -59,20 +79,31 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
 }
 
 /*
- * Read an ELF program header header.
+ * Read bytes from file at a given offset.
+ *
+ * :param FIL* fp: file pointer to read from
+ * :param uint32_t address: address from which to read
+ * :param void *data: buffer into which to read
+ * :param size_t count: amount of bytes to read
+ * :returns: ``0`` on success or a negative value on error.  Possible errors:
+ * 
+ *    - ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
  */
-static int _read_program_header(FIL *fp, uint32_t phdr_addr, Elf32_Phdr *phdr)
-{
+static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count) {
 	FRESULT fres;
 
-	if ((fres = f_lseek(fp, phdr_addr)) != FR_OK) {
-		LOG_ERR("l0der", "_read_program_header: could not seek to 0x%lx: %d", phdr_addr, fres);
+	if ((fres = f_lseek(fp, address)) != FR_OK) {
+		LOG_ERR("l0der", "_seek_and_read: could not seek to 0x%lx: %d", address, fres);
 		return -EIO;
 	}
 
 	unsigned int read;
-	if ((fres = f_read(fp, phdr, sizeof(Elf32_Phdr), &read)) != FR_OK || read < sizeof(Elf32_Phdr)) {
-		LOG_ERR("l0der", "_read_program_header: could not read phdr: %d", fres);
+	if ((fres = f_read(fp, data, count, &read)) != FR_OK || read < count) {
+		if (fres == FR_OK) {
+			LOG_ERR("l0der", "_seek_and_read: could not read: wanted %d bytes, got %d", count, read);
+		} else {
+			LOG_ERR("l0der", "_seek_and_read: could not read: %d", fres);
+		}
 		return -EIO;
 	}
 
@@ -82,23 +113,17 @@ static int _read_program_header(FIL *fp, uint32_t phdr_addr, Elf32_Phdr *phdr)
 /*
  * Read an ELF program header header.
  */
+static int _read_program_header(FIL *fp, uint32_t phdr_addr, Elf32_Phdr *phdr)
+{
+	return _seek_and_read(fp, phdr_addr, phdr, sizeof(Elf32_Phdr));
+}
+
+/*
+ * Read an ELF section header header.
+ */
 static int _read_section_header(FIL *fp, uint32_t shdr_addr, Elf32_Shdr *shdr)
 {
-	FRESULT fres;
-
-	if ((fres = f_lseek(fp, shdr_addr)) != FR_OK) {
-		LOG_ERR("l0der", "_read_section_header: could not seek to 0x%lx: %d", shdr_addr, fres);
-		return -EIO;
-	}
-
-	unsigned int read;
-	if ((fres = f_read(fp, shdr, sizeof(Elf32_Shdr), &read)) != FR_OK || read < sizeof(Elf32_Shdr)) {
-		LOG_ERR("l0der", "_read_section_header: could not read shdr (0x%x bytes) at %08lx: %d, got 0x%x bytes",
-				sizeof(Elf32_Shdr), shdr_addr, fres, read);
-		return -EIO;
-	}
-
-	return 0;
+	return _seek_and_read(fp, shdr_addr, shdr, sizeof(Elf32_Shdr));
 }
 
 /*
@@ -165,30 +190,25 @@ static int _check_section_header(FIL *fp, Elf32_Shdr *shdr) {
 	return 0;
 }
 
+/*
+ * Interpreter expected in l0dable PIE binaries.
+ */
 static const char *_interpreter = "card10-l0dable";
 
+/*
+ * Check that the given INTERP program header contains the correct interpreter string.
+ */
 static int _check_interp(FIL *fp, Elf32_Phdr *phdr)
 {
-	uint32_t buffer_size = 64;
-	char interp[buffer_size];
+	int res;
+	uint32_t buffer_size = strlen(_interpreter) + 1;
+	char *interp = alloca(buffer_size);
 	memset(interp, 0, buffer_size);
 
-	if (phdr->p_filesz > buffer_size) {
-		LOG_ERR("l0der", "_check_interp: interpreter size too large");
-		return -1;
+	if ((res = _seek_and_read(fp, phdr->p_offset, interp, buffer_size)) != FR_OK) {
+		return res;
 	}
 
-	FRESULT fres;
-	if ((fres = f_lseek(fp, phdr->p_offset)) != FR_OK) {
-		LOG_ERR("l0der", "_check_interp: could not seek to 0x%lx: %d", phdr->p_offset, fres);
-		return -1;
-	}
-
-	unsigned int read; // unused (we don't care if the read gets truncated)
-	if ((fres = f_read(fp, interp, buffer_size, &read)) != FR_OK) {
-		LOG_ERR("l0der", "_check_interp: could not read segment %d", fres);
-		return -1;
-	}
 
 	if (strncmp(interp, _interpreter, strlen(_interpreter)) != 0) {
 		LOG_ERR("l0der", "_check_interp: invalid interpreter, want card10-l0dable");
@@ -198,6 +218,11 @@ static int _check_interp(FIL *fp, Elf32_Phdr *phdr)
 	return 0;
 }
 
+/*
+ * Calculate address at which binary should be loaded.
+ *
+ * Currently this means trying to fit it into core1 RAM.
+ */
 static int _get_load_addr(uint32_t image_start, uint32_t image_limit, void **load)
 {
 	uint32_t image_size = image_limit - image_start;
@@ -218,6 +243,11 @@ static int _get_load_addr(uint32_t image_start, uint32_t image_limit, void **loa
 	return 0;
 }
 
+/*
+ * Load a program segment into memory.
+ *
+ * Segment must be a LOAD segment.
+ */
 static int _load_segment(FIL *fp, void *image_load_addr, Elf32_Phdr *phdr)
 {
 	uint32_t segment_start = (uint32_t)image_load_addr + phdr->p_vaddr;
@@ -227,23 +257,17 @@ static int _load_segment(FIL *fp, void *image_load_addr, Elf32_Phdr *phdr)
 			segment_start, segment_limit, phdr->p_filesz);
 	memset((void *)segment_start, 0, phdr->p_memsz);
 
-	FRESULT fres;
-	unsigned int read;
-
-	if ((fres = f_lseek(fp, phdr->p_offset)) != FR_OK) {
-		LOG_ERR("l0der", "_load_segment: seek failed: %d", fres);
-		return -EIO;
-	}
-
-	if ((fres = f_read(fp, (void *)segment_start, phdr->p_filesz, &read)) != FR_OK || read != phdr->p_filesz) {
-		LOG_ERR("l0der", "_load_segment: read failed");
-		return -EIO;
-	}
-
-	return 0;
+	return _seek_and_read(fp, phdr->p_offset, (void*)segment_start, phdr->p_filesz);
 }
 
-static int _run_relocations(FIL *fp, void *load_addr, Elf32_Ehdr *hdr) {
+/*
+ * Apply dynamic relocations from ELF.
+ *
+ * Currently, we only support R_ARM_RELATIVE relocations. These seem to be
+ * the only one used when making 'standard' PIE binaries on RAM. However, other
+ * kinds might have to be implemented in the future.
+ */
+static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint32_t image_limit, Elf32_Ehdr *hdr) {
 	int res;
 	FRESULT fres;
 	Elf32_Shdr shdr;
@@ -296,8 +320,12 @@ static int _run_relocations(FIL *fp, void *load_addr, Elf32_Ehdr *hdr) {
 						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address must be 4-byte aligned");
 						return -ENOEXEC;
 					}
-					// TODO(q3k): check whether offset is contained in binary.
 					volatile uint32_t *addr = (uint32_t *)(rel.r_offset + load_addr);
+					if ((uint32_t)addr < image_start || (uint32_t)addr >= image_limit) {
+						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address is outside image boundaries");
+						return -ENOEXEC;
+					}
+
 					*addr += (uint32_t)load_addr;
 					break;
 				default:
@@ -310,6 +338,9 @@ static int _run_relocations(FIL *fp, void *load_addr, Elf32_Ehdr *hdr) {
 	return 0;
 }
 
+/*
+ * Load a l0dable PIE binary.
+ */
 static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
@@ -363,12 +394,14 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	}
 
 	if (status_interp != 0) {
+		// Expected interpreter string was not found.
 		LOG_ERR("l0der", "_load_pie: not a card10 l0dable");
 		return -ENOEXEC;
 	}
 
 
 	if (image_limit < image_start) {
+		// We didn't find any LOAD segment.
 		LOG_ERR("l0der", "_load_pie: no loadable segments");
 		return -ENOEXEC;
 	}
@@ -401,7 +434,7 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 	// Run relocations.
 	
-	if ((res = _run_relocations(fp, load_addr, hdr)) != 0) {
+	if ((res = _run_relocations(fp, load_addr, image_start, image_limit, hdr)) != 0) {
 		return res;
 	}
 

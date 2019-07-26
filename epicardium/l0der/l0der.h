@@ -22,6 +22,11 @@ struct l0dable_info {
  *
  * :param const char *path: Path of l0dable on FAT filesystem.
  * :param l0dable_info l0dable: Information about loaded l0dable.
- * :returns: ``0`` on success or a negative value on error.
+ * :returns: ``0`` on success or a negative value on error.  Possible errors:
+ *
+ *    - ``-ENOENT``: l0dable not present at given path.
+ *    - ``-EIO``: Read failed: l0dable corrupted or truncated.
+ *    - ``-ENOEXEC``: Corrupted/invalid l0dable.
+ *    - ``-ENOMEM``: l0dable too large to fit in RAM.
  */
 int l0der_load_path(const char *path, struct l0dable_info *l0dable);

@@ -1,80 +1,65 @@
-#include "max32665.h"
-#include "mxc_sys.h"
-#include "gcr_regs.h"
-#include "icc_regs.h"
-#include "pwrseq_regs.h"
-
 #include "epicardium.h"
 
-uint32_t SystemCoreClock = HIRC_FREQ >> 1; 
-volatile uint32_t tombstone = 0;
+#include <math.h>
 
-void SystemCoreClockUpdate(void)
-{
-    uint32_t base_freq, div, clk_src;
+int levels[11] = {0};
+int levels_display[11] = {0};
 
-    // Determine the clock source and frequency
-    clk_src = (MXC_GCR->clkcn & MXC_F_GCR_CLKCN_CLKSEL);
-    switch (clk_src)
-    {
-        case MXC_S_GCR_CLKCN_CLKSEL_HIRC:
-            base_freq = HIRC_FREQ;
-            break;
-        case MXC_S_GCR_CLKCN_CLKSEL_XTAL32M:
-            base_freq = XTAL32M_FREQ;
-            break;
-        case MXC_S_GCR_CLKCN_CLKSEL_LIRC8:
-            base_freq = LIRC8_FREQ;
-            break;
-        case MXC_S_GCR_CLKCN_CLKSEL_HIRC96:
-            base_freq = HIRC96_FREQ;
-            break;
-        case MXC_S_GCR_CLKCN_CLKSEL_HIRC8:
-            base_freq = HIRC8_FREQ;
-            break;
-        case MXC_S_GCR_CLKCN_CLKSEL_XTAL32K:
-            base_freq = XTAL32K_FREQ;
-            break;
-        default:
-	    // Values 001 and 111 are reserved, and should never be encountered.
-	    base_freq = HIRC_FREQ;
-            break;
+// From https://learn.adafruit.com/led-tricks-gamma-correction/the-quick-fix
+const uint8_t gamma8[] = {
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
+    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
+    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
+  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
+  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
+  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
+  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+
+void fade() {
+    for (int i = 0; i < 11; i++) {
+        int level = gamma8[levels[i]];
+        if (levels_display[i] > 0) {
+            epic_leds_set(i, level, 0, 0);
+            if (level == 0) {
+                levels_display[i] = 0;
+            }
+        }
+        if (levels[i] > 0) {
+            levels[i]--;
+        }
     }
-    // Clock divider is retrieved to compute system clock
-    div = (MXC_GCR->clkcn & MXC_F_GCR_CLKCN_PSC) >> MXC_F_GCR_CLKCN_PSC_POS;
-
-    SystemCoreClock = base_freq >> div;
 }
 
+/* 
+ * main() is called when l0dable is loaded and executed.
+ */
 int main(void) {
-    tombstone = 0x10;
-    // Enable FPU.
-    SCB->CPACR |= SCB_CPACR_CP10_Msk | SCB_CPACR_CP11_Msk;
-    __DSB();
-    __ISB();
-    tombstone = 0x11;
-
-    // Enable ICache1 Clock
-    MXC_GCR->perckcn1 &= ~(1 << 22);
-    tombstone = 0x12;
-
-    // Invalidate cache and wait until ready
-    MXC_ICC1->invalidate = 1;
-    while (!(MXC_ICC1->cache_ctrl & MXC_F_ICC_CACHE_CTRL_CACHE_RDY));
-    tombstone = 0x13;
-
-    // Enable Cache
-    MXC_ICC1->cache_ctrl |= MXC_F_ICC_CACHE_CTRL_CACHE_EN;
-    tombstone = 0x14;
-
-    SystemCoreClockUpdate();
-    tombstone = 0x15;
-
-    /* TMR5 is used to notify on keyboard interrupt */
-    //NVIC_EnableIRQ(TMR5_IRQn);
-    tombstone = 0x16;
-
-    epic_leds_set(0, 255, 255, 255);
-    tombstone = 0x17;
-    for (;;) {}
+    // l0dables are running on a separate, exclusive-to-l0dables core.
+    // Busy-waiting will not block the main operating system on core0 from
+    // running - but it will drain batteries.
+    for (;;) {
+        for (int i = 0; i < 11; i++) {
+            levels[i] = 255;
+            levels_display[i] = 1;
+            for (int j = 0; j < 64; j++) {
+                fade();
+            }
+        }
+        for (int i = 9; i > 0; i--) {
+            levels[i] = 255;
+            levels_display[i] = 1;
+            for (int j = 0; j < 64; j++) {
+                fade();
+            }
+        }
+    }
 }
