@@ -46,24 +46,22 @@
 /**
  * GPIO config
 **/
-//extern const gpio_cfg_t DEV_RST_PIN;
 extern const gpio_cfg_t DEV_DC_PIN;
-//extern const gpio_cfg_t DEV_CS_PIN;
-//extern const gpio_cfg_t DEV_BL_PIN;
+
 /**
  * GPIO read and write
 **/
 #define DEV_Digital_Write(_pin, _value) GPIO_OutPut(&_pin, _value == 0? 0 : _pin.mask)
-//#define DEV_Digital_Read(_pin) HAL_GPIO_ReadPin(_pin)
 
 
 /**
  * SPI
 **/
 void lcd_write(uint8_t* data, int size);
-//#define DEV_SPI_WRITE(_dat)  HAL_SPI_Transmit(&hspi1, (uint8_t *)&_dat, 1, 500);
+void display_set_reset_pin(uint8_t state);
 #define DEV_SPI_WRITE(_dat) lcd_write(&_dat, 1)
-
+#define DEV_RESET_LOW() display_set_reset_pin(0)
+#define DEV_RESET_HIGH() display_set_reset_pin(1)
 /**
  * delay x ms
 **/

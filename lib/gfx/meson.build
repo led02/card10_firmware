@@ -9,8 +9,6 @@ sources = files(
   './GUI_DEV/DEV_Config.c',
   './GUI_DEV/GUI_Paint.c',
   './LCD/LCD_Driver.c',
-  './display.c',
-
   './Fonts/font8.c',
   './Fonts/font12.c',
   './Fonts/font12CN.c',

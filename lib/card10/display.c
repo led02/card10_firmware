@@ -3,11 +3,12 @@
 
 #include "gpio.h"
 #include "tmr.h"
+#include "portexpander.h"
+#include "MAX77650-Arduino-Library.h"
 
 #include <stdint.h>
 #include <stdio.h>
 /***** Globals *****/
-//const gpio_cfg_t DEV_RST_PIN = {PORT_0, PIN_28, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 const gpio_cfg_t DEV_DC_PIN = {PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE};
 
 // Parameters for PWM output
@@ -70,10 +71,24 @@ void PWM_Output(void)
     printf("PWM started.\n");
 }
 
+void display_set_reset_pin(uint8_t state)
+{
+    if(!portexpander_detected()) {
+        MAX77650_setDO(state ? true:false);
+    } else {
+        portexpander_set(4, state);
+    }
+}
 
 void display_init(void)
 {
-    //GPIO_Config(&DEV_RST_PIN);
+    if(!portexpander_detected()) {
+        // Open-drain
+        MAX77650_setDRV(false);
+        // Output
+        MAX77650_setDIR(false);
+    }
+
     GPIO_Config(&DEV_DC_PIN);
 
     PWM_Output();
