@@ -203,7 +203,7 @@ int get_fat_object(int i, enum FatObjectType expected, struct FatObject **res)
 	return 0;
 }
 
-int32_t epic_file_open(const char *filename, const char *modeString)
+int epic_file_open(const char *filename, const char *modeString)
 {
 	struct FatObject *o = NULL;
 	const char *mode_s  = modeString;
@@ -255,7 +255,7 @@ int32_t epic_file_open(const char *filename, const char *modeString)
 	return i;
 }
 
-int32_t epic_file_close(int32_t fd)
+int epic_file_close(int fd)
 {
 	int res;
 	struct FatObject *o;
@@ -273,7 +273,7 @@ int32_t epic_file_close(int32_t fd)
 	return 0;
 }
 
-int32_t epic_file_read(int32_t fd, void *buf, uint32_t nbytes)
+int epic_file_read(int fd, void *buf, size_t nbytes)
 {
 	unsigned int nread = 0;
 
@@ -292,7 +292,7 @@ int32_t epic_file_read(int32_t fd, void *buf, uint32_t nbytes)
 	return nread;
 }
 
-int32_t epic_file_write(int32_t fd, const void *buf, uint32_t nbytes)
+int epic_file_write(int fd, const void *buf, size_t nbytes)
 {
 	unsigned int nwritten = 0;
 
@@ -310,7 +310,7 @@ int32_t epic_file_write(int32_t fd, const void *buf, uint32_t nbytes)
 	return nwritten;
 }
 
-int32_t epic_file_flush(int32_t fd)
+int epic_file_flush(int fd)
 {
 	int res;
 	struct FatObject *o;
@@ -326,7 +326,7 @@ int32_t epic_file_flush(int32_t fd)
 	return 0;
 }
 
-int32_t epic_file_stat(const char *filename, epic_stat_t *stat)
+int epic_file_stat(const char *filename, epic_stat_t *stat)
 {
 	int res;
 	FILINFO finfo;

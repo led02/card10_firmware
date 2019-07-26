@@ -465,23 +465,23 @@ API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
 /** */
 API(
 	API_FILE_OPEN,
-	int32_t epic_file_open(const char* filename, const char* modeString)
+	int epic_file_open(const char* filename, const char* modeString)
 );
 
 /** */
-API(API_FILE_CLOSE, int32_t epic_file_close(int32_t fd));
+API(API_FILE_CLOSE, int epic_file_close(int fd));
 
 /** */
-API(API_FILE_READ,  int32_t epic_file_read(int32_t fd, void* buf, uint32_t nbytes));
+API(API_FILE_READ, int epic_file_read(int fd, void* buf, size_t nbytes));
 
 /** */
 API(
 	API_FILE_WRITE,
-	int32_t epic_file_write(int32_t fd, const void* buf, uint32_t nbytes)
+	int epic_file_write(int fd, const void* buf, size_t nbytes)
 );
 
 /** */
-API(API_FILE_FLUSH, int32_t epic_file_flush(int32_t fd));
+API(API_FILE_FLUSH, int epic_file_flush(int fd));
 
 /** */
 enum epic_stat_type {
@@ -510,6 +510,6 @@ typedef struct epic_stat_t {
  *
  * :return: `0` on success, negative on error
  */
-API(API_FILE_STAT, int32_t epic_file_stat(const char* path, epic_stat_t* stat));
+API(API_FILE_STAT, int epic_file_stat(const char* path, epic_stat_t* stat));
 
 #endif /* _EPICARDIUM_H */
