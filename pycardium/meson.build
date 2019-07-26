@@ -1,6 +1,7 @@
 name = 'pycardium'
 
 modsrc = files(
+  'modules/bhi160-sys.c',
   'modules/buttons.c',
   'modules/fat_file.c',
   'modules/fat_reader_import.c',

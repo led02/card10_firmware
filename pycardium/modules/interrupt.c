@@ -85,6 +85,8 @@ static const mp_rom_map_elem_t interrupt_module_globals_table[] = {
 	/* Interrupt Numbers */
 	{ MP_ROM_QSTR(MP_QSTR_RTC_ALARM),
 	  MP_OBJ_NEW_SMALL_INT(EPIC_INT_RTC_ALARM) },
+	{ MP_ROM_QSTR(MP_QSTR_BHI160_ACCELEROMETER),
+	  MP_OBJ_NEW_SMALL_INT(EPIC_INT_BHI160_ACCELEROMETER) },
 };
 static MP_DEFINE_CONST_DICT(
 	interrupt_module_globals, interrupt_module_globals_table

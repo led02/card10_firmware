@@ -57,8 +57,13 @@ Q(vibrate)
 Q(set_callback)
 Q(enable_callback)
 Q(disable_callback)
-Q(BHI160)
+Q(BHI160_ACCELEROMETER)
 Q(RTC_ALARM)
+
+/* bhi160 */
+Q(sys_bhi160)
+Q(enable_sensor)
+Q(read_sensor)
 
 /* display */
 Q(sys_display)

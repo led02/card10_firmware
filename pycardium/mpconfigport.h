@@ -45,6 +45,7 @@ int mp_hal_trng_read_int(void);
 #define MICROPY_PY_UERRNO                   (1)
 
 /* Modules */
+#define MODULE_BHI160_ENABLED               (1)
 #define MODULE_BME680_ENABLED               (1)
 #define MODULE_BUTTONS_ENABLED              (1)
 #define MODULE_DISPLAY_ENABLED              (1)

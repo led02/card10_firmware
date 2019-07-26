@@ -11,6 +11,7 @@
 #include "semphr.h"
 #include "queue.h"
 
+#include "api/interrupt-sender.h"
 #include "epicardium.h"
 #include "modules/log.h"
 #include "modules/modules.h"
@@ -211,6 +212,9 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 			&data_vector,
 			BHI160_MUTEX_WAIT_MS
 		);
+		if (sensor_id == VS_ID_ACCELEROMETER_WAKEUP) {
+			api_interrupt_trigger(EPIC_INT_BHI160_ACCELEROMETER);
+		}
 		break;
 	default:
 		break;
