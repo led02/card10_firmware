@@ -38,9 +38,9 @@ static void LCD_Reset(void)
 {
 	//DEV_Digital_Write(DEV_CS_PIN,0);
 	DEV_Delay_ms(20);
-    DEV_RESET_LOW();
+	DEV_RESET_LOW();
 	DEV_Delay_ms(20);
-    DEV_RESET_HIGH();
+	DEV_RESET_HIGH();
 	DEV_Delay_ms(20);
 }
 
@@ -59,29 +59,29 @@ void LCD_SetBacklight(UWORD Value)
 function:
 		Write register address and data
 *******************************************************************************/
-void LCD_WriteData_Byte(UBYTE da) 
-{	
-	//DEV_Digital_Write(DEV_CS_PIN,0);
-	DEV_Digital_Write(DEV_DC_PIN,1);
-	DEV_SPI_WRITE(da);  
-	//DEV_Digital_Write(DEV_CS_PIN,1);
-}  
-
- void LCD_WriteData_Word(UWORD da)
+void LCD_WriteData_Byte(UBYTE da)
 {
-	UBYTE i=(da>>8)&0xff;
 	//DEV_Digital_Write(DEV_CS_PIN,0);
-	DEV_Digital_Write(DEV_DC_PIN,1);
+	DEV_Digital_Write(DEV_DC_PIN, 1);
+	DEV_SPI_WRITE(da);
+	//DEV_Digital_Write(DEV_CS_PIN,1);
+}
+
+void LCD_WriteData_Word(UWORD da)
+{
+	UBYTE i = (da >> 8) & 0xff;
+	//DEV_Digital_Write(DEV_CS_PIN,0);
+	DEV_Digital_Write(DEV_DC_PIN, 1);
 	DEV_SPI_WRITE(i);
-    uint8_t tmp = da;
+	uint8_t tmp = da;
 	DEV_SPI_WRITE(tmp);
 	//DEV_Digital_Write(DEV_CS_PIN,1);
-}	  
+}
 
-void LCD_WriteReg(UBYTE da)	 
-{	
+void LCD_WriteReg(UBYTE da)
+{
 	//DEV_Digital_Write(DEV_CS_PIN,0);
-	DEV_Digital_Write(DEV_DC_PIN,0);
+	DEV_Digital_Write(DEV_DC_PIN, 0);
 	DEV_SPI_WRITE(da);
 	//DEV_Digital_Write(DEV_CS_PIN,1);
 }
@@ -94,100 +94,100 @@ void LCD_Init(void)
 {
 	LCD_Reset();
 
-	//************* Start Initial Sequence **********// 
-	LCD_WriteReg(0x11);//Sleep exit 
-	DEV_Delay_ms (120);
-  LCD_WriteReg(0x21); 
-  LCD_WriteReg(0x21); 
+	//************* Start Initial Sequence **********//
+	LCD_WriteReg(0x11); //Sleep exit
+	DEV_Delay_ms(120);
+	LCD_WriteReg(0x21);
+	LCD_WriteReg(0x21);
 
-  LCD_WriteReg(0xB1); 
-  LCD_WriteData_Byte(0x05);
-  LCD_WriteData_Byte(0x3A);
-  LCD_WriteData_Byte(0x3A);
+	LCD_WriteReg(0xB1);
+	LCD_WriteData_Byte(0x05);
+	LCD_WriteData_Byte(0x3A);
+	LCD_WriteData_Byte(0x3A);
 
-  LCD_WriteReg(0xB2);
-  LCD_WriteData_Byte(0x05);
-  LCD_WriteData_Byte(0x3A);
-  LCD_WriteData_Byte(0x3A);
+	LCD_WriteReg(0xB2);
+	LCD_WriteData_Byte(0x05);
+	LCD_WriteData_Byte(0x3A);
+	LCD_WriteData_Byte(0x3A);
 
-  LCD_WriteReg(0xB3); 
-  LCD_WriteData_Byte(0x05);  
-  LCD_WriteData_Byte(0x3A);
-  LCD_WriteData_Byte(0x3A);
-  LCD_WriteData_Byte(0x05);
-  LCD_WriteData_Byte(0x3A);
-  LCD_WriteData_Byte(0x3A);
+	LCD_WriteReg(0xB3);
+	LCD_WriteData_Byte(0x05);
+	LCD_WriteData_Byte(0x3A);
+	LCD_WriteData_Byte(0x3A);
+	LCD_WriteData_Byte(0x05);
+	LCD_WriteData_Byte(0x3A);
+	LCD_WriteData_Byte(0x3A);
 
-  LCD_WriteReg(0xB4);
-  LCD_WriteData_Byte(0x03);
+	LCD_WriteReg(0xB4);
+	LCD_WriteData_Byte(0x03);
 
-  LCD_WriteReg(0xC0);
-  LCD_WriteData_Byte(0x62);
-  LCD_WriteData_Byte(0x02);
-  LCD_WriteData_Byte(0x04);
+	LCD_WriteReg(0xC0);
+	LCD_WriteData_Byte(0x62);
+	LCD_WriteData_Byte(0x02);
+	LCD_WriteData_Byte(0x04);
 
-  LCD_WriteReg(0xC1);
-  LCD_WriteData_Byte(0xC0);
+	LCD_WriteReg(0xC1);
+	LCD_WriteData_Byte(0xC0);
 
-  LCD_WriteReg(0xC2);
-  LCD_WriteData_Byte(0x0D);
-  LCD_WriteData_Byte(0x00);
+	LCD_WriteReg(0xC2);
+	LCD_WriteData_Byte(0x0D);
+	LCD_WriteData_Byte(0x00);
 
-  LCD_WriteReg(0xC3);
-  LCD_WriteData_Byte(0x8D);
-  LCD_WriteData_Byte(0x6A);   
+	LCD_WriteReg(0xC3);
+	LCD_WriteData_Byte(0x8D);
+	LCD_WriteData_Byte(0x6A);
 
-  LCD_WriteReg(0xC4);
-  LCD_WriteData_Byte(0x8D); 
-  LCD_WriteData_Byte(0xEE); 
+	LCD_WriteReg(0xC4);
+	LCD_WriteData_Byte(0x8D);
+	LCD_WriteData_Byte(0xEE);
 
-  LCD_WriteReg(0xC5);  /*VCOM*/
-  LCD_WriteData_Byte(0x0E);    
+	LCD_WriteReg(0xC5); /*VCOM*/
+	LCD_WriteData_Byte(0x0E);
 
-  LCD_WriteReg(0xE0);
-  LCD_WriteData_Byte(0x10);
-  LCD_WriteData_Byte(0x0E);
-  LCD_WriteData_Byte(0x02);
-  LCD_WriteData_Byte(0x03);
-  LCD_WriteData_Byte(0x0E);
-  LCD_WriteData_Byte(0x07);
-  LCD_WriteData_Byte(0x02);
-  LCD_WriteData_Byte(0x07);
-  LCD_WriteData_Byte(0x0A);
-  LCD_WriteData_Byte(0x12);
-  LCD_WriteData_Byte(0x27);
-  LCD_WriteData_Byte(0x37);
-  LCD_WriteData_Byte(0x00);
-  LCD_WriteData_Byte(0x0D);
-  LCD_WriteData_Byte(0x0E);
-  LCD_WriteData_Byte(0x10);
+	LCD_WriteReg(0xE0);
+	LCD_WriteData_Byte(0x10);
+	LCD_WriteData_Byte(0x0E);
+	LCD_WriteData_Byte(0x02);
+	LCD_WriteData_Byte(0x03);
+	LCD_WriteData_Byte(0x0E);
+	LCD_WriteData_Byte(0x07);
+	LCD_WriteData_Byte(0x02);
+	LCD_WriteData_Byte(0x07);
+	LCD_WriteData_Byte(0x0A);
+	LCD_WriteData_Byte(0x12);
+	LCD_WriteData_Byte(0x27);
+	LCD_WriteData_Byte(0x37);
+	LCD_WriteData_Byte(0x00);
+	LCD_WriteData_Byte(0x0D);
+	LCD_WriteData_Byte(0x0E);
+	LCD_WriteData_Byte(0x10);
 
-  LCD_WriteReg(0xE1);
-  LCD_WriteData_Byte(0x10);
-  LCD_WriteData_Byte(0x0E);
-  LCD_WriteData_Byte(0x03);
-  LCD_WriteData_Byte(0x03);
-  LCD_WriteData_Byte(0x0F);
-  LCD_WriteData_Byte(0x06);
-  LCD_WriteData_Byte(0x02);
-  LCD_WriteData_Byte(0x08);
-  LCD_WriteData_Byte(0x0A);
-  LCD_WriteData_Byte(0x13);
-  LCD_WriteData_Byte(0x26);
-  LCD_WriteData_Byte(0x36);
-  LCD_WriteData_Byte(0x00);
-  LCD_WriteData_Byte(0x0D);
-  LCD_WriteData_Byte(0x0E);
-  LCD_WriteData_Byte(0x10);
+	LCD_WriteReg(0xE1);
+	LCD_WriteData_Byte(0x10);
+	LCD_WriteData_Byte(0x0E);
+	LCD_WriteData_Byte(0x03);
+	LCD_WriteData_Byte(0x03);
+	LCD_WriteData_Byte(0x0F);
+	LCD_WriteData_Byte(0x06);
+	LCD_WriteData_Byte(0x02);
+	LCD_WriteData_Byte(0x08);
+	LCD_WriteData_Byte(0x0A);
+	LCD_WriteData_Byte(0x13);
+	LCD_WriteData_Byte(0x26);
+	LCD_WriteData_Byte(0x36);
+	LCD_WriteData_Byte(0x00);
+	LCD_WriteData_Byte(0x0D);
+	LCD_WriteData_Byte(0x0E);
+	LCD_WriteData_Byte(0x10);
 
-  LCD_WriteReg(0x3A); 
-  LCD_WriteData_Byte(0x05);
+	LCD_WriteReg(0x3A);
+	LCD_WriteData_Byte(0x05);
 
-  LCD_WriteReg(0x36);
-  LCD_WriteData_Byte(0xA8);//
+	LCD_WriteReg(0x36);
+	LCD_WriteData_Byte(0xA8); //
 
-  LCD_WriteReg(0x29); 
-} 
+	LCD_WriteReg(0x29);
+}
 
 /******************************************************************************
 function:	Set the cursor position
@@ -197,22 +197,22 @@ parameter	:
 	  Xend  :		End UWORD coordinates
 	  Yend  :		End UWORD coordinatesen
 ******************************************************************************/
-void LCD_SetCursor(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD  Yend)
-{ 
+void LCD_SetCursor(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend)
+{
 	Xstart = Xstart + 1;
-	Xend = Xend + 1;
+	Xend   = Xend + 1;
 	Ystart = Ystart + 26;
-	Yend = Yend+26;
+	Yend   = Yend + 26;
 	LCD_WriteReg(0x2a);
-	LCD_WriteData_Byte(Xstart>>8);
+	LCD_WriteData_Byte(Xstart >> 8);
 	LCD_WriteData_Byte(Xstart);
-	LCD_WriteData_Byte(Xend >>8);
-	LCD_WriteData_Byte(Xend );
+	LCD_WriteData_Byte(Xend >> 8);
+	LCD_WriteData_Byte(Xend);
 
 	LCD_WriteReg(0x2b);
-	LCD_WriteData_Byte(Ystart>>8);
+	LCD_WriteData_Byte(Ystart >> 8);
 	LCD_WriteData_Byte(Ystart);
-	LCD_WriteData_Byte(Yend>>8);
+	LCD_WriteData_Byte(Yend >> 8);
 	LCD_WriteData_Byte(Yend);
 
 	LCD_WriteReg(0x2C);
@@ -244,16 +244,17 @@ parameter	:
 	  Yend  :		End UWORD coordinates
 	  color :		Set the color
 ******************************************************************************/
-void LCD_ClearWindow(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,UWORD color)
-{          
-	UWORD i,j; 
-	LCD_SetCursor(Xstart, Ystart, Xend-1,Yend-1);
-	for(i = Ystart; i <= Yend-1; i++){													   	 	
-		for(j = Xstart; j <= Xend-1; j++){
+void LCD_ClearWindow(
+	UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD color
+) {
+	UWORD i, j;
+	LCD_SetCursor(Xstart, Ystart, Xend - 1, Yend - 1);
+	for (i = Ystart; i <= Yend - 1; i++) {
+		for (j = Xstart; j <= Xend - 1; j++) {
 			LCD_WriteData_Word(color);
 		}
-	} 					  	    
-}  
+	}
+}
 
 /******************************************************************************
 function: Set the color of an area
@@ -264,10 +265,11 @@ parameter	:
 	  Yend  :		End UWORD coordinates
 	  Color :		Set the color
 ******************************************************************************/
-void LCD_SetWindowColor(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,UWORD  Color)
-{
-	LCD_SetCursor( Xstart,Ystart,Xend,Yend);
-	LCD_WriteData_Word(Color); 	    
+void LCD_SetWindowColor(
+	UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD Color
+) {
+	LCD_SetCursor(Xstart, Ystart, Xend, Yend);
+	LCD_WriteData_Word(Color);
 }
 
 /******************************************************************************
@@ -281,35 +283,34 @@ parameter	:
 void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
 {
 	LCD_SetCursor(x,y,x,y);
-	LCD_WriteData_Word(Color); 	    
-} 
+	LCD_WriteData_Word(Color);
+}
 #endif
 
 void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
 {
-    screen[y][x][0] = (Color >> 8);
-    screen[y][x][1] = (Color & 0xFF);
+	screen[y][x][0] = (Color >> 8);
+	screen[y][x][1] = (Color & 0xFF);
 }
 
 void LCD_Clear(UWORD Color)
 {
-	UWORD i,j;
-	for(i = 0; i < LCD_WIDTH; i++){
-		for(j = 0; j < LCD_HEIGHT; j++){
+	UWORD i, j;
+	for (i = 0; i < LCD_WIDTH; i++) {
+		for (j = 0; j < LCD_HEIGHT; j++) {
 			LCD_SetUWORD(i, j, Color);
 		}
-	 }
+	}
 }
 
 void LCD_Set(uint8_t *data, int len)
 {
-	LCD_SetCursor(0,0,160-1,80-1);
-	DEV_Digital_Write(DEV_DC_PIN,1);
-    lcd_write(data, len);
+	LCD_SetCursor(0, 0, 160 - 1, 80 - 1);
+	DEV_Digital_Write(DEV_DC_PIN, 1);
+	lcd_write(data, len);
 }
 
 void LCD_Update(void)
 {
-    LCD_Set((uint8_t*)screen, sizeof(screen));
+	LCD_Set((uint8_t *)screen, sizeof(screen));
 }
-
