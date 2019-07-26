@@ -216,6 +216,19 @@ void card10_poll(void)
 	pmic_poll();
 }
 
+void card10_reset(void)
+{
+	printf("Resetting ...\n");
+	/*
+        * Give the UART fifo time to clear.
+        * TODO: Do this properly
+        */
+	for (int i = 0; i < 0x1000000; i++) {
+		__asm volatile("nop");
+	}
+	MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+}
+
 void GPIO0_IRQHandler(void)
 {
 	GPIO_Handler(PORT_0);

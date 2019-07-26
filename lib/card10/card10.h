@@ -13,4 +13,5 @@ void core1_start(void);
 void core1_stop(void);
 
 void card10_poll(void);
+void card10_reset(void);
 #endif

@@ -114,11 +114,17 @@ void delay_us(unsigned int usec)
 	mxc_delay(usec);
 }
 
+void bootloader_stop(void)
+{
+	card10_reset();
+}
+
 void bootloader_dirty(void)
 {
 	Paint_DrawString_EN(0, 16 * 3, "Writing.", &Font16, 0x0000, 0xf000);
 	LCD_Update();
 }
+
 void bootloader_clean(void)
 {
 	Paint_DrawString_EN(0, 16 * 3, "Ready.  ", &Font16, 0x0000, 0xffff);

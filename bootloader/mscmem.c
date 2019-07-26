@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "mx25lba.h"
 
+void bootloader_stop(void);
 void bootloader_dirty(void);
 void bootloader_clean(void);
 
@@ -50,7 +51,9 @@ int mscmem_start()
 int mscmem_stop()
 {
 	printf("%s\n", __func__);
-	return mx25_stop();
+	int ret = mx25_stop();
+	bootloader_stop();
+	return ret;
 }
 
 /******************************************************************************/
