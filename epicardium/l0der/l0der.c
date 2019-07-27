@@ -33,6 +33,8 @@ struct _pie_load_info {
 	// Addresses within ELF file.
 	uint32_t image_start;
 	uint32_t image_limit;
+	// Highest alignment request for a segment.
+	uint32_t strictest_alignment;
 
 	/// Populated by _get_load_addr
 	// Load address of ELF file.
@@ -259,6 +261,12 @@ static int _get_load_addr(struct _pie_load_info *li)
 	li->image_load_start = li->load_address + li->image_start;
 	li->image_load_limit = li->load_address + li->image_limit;
 
+	// Ensure within alignment requests.
+	if ((li->load_address % li->strictest_alignment) != 0) {
+		LOG_ERR("l0der", "_get_load_addr: too strict alignment request for %ld bytes", li->strictest_alignment);
+		return -ENOEXEC;
+	}
+
 	// Place stack at top of core1 memory range.
 	li->stack_top = core1_mem_limit;
 
@@ -378,7 +386,7 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
-	struct _pie_load_info li;
+	struct _pie_load_info li = {0};
 
 	// First pass over program headers: sanity check sizes and calculate
 	// memory image bounds. l0der currently only supports loading the image into
@@ -410,9 +418,12 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 		if (phdr.p_type == PT_LOAD) {
 			// Check alignment request.
-			if (phdr.p_align > 4) {
+			if ((phdr.p_vaddr % phdr.p_align) != 0) {
 				LOG_ERR("l0der", "_load_pie: phdr %d alignment too strict", i);
 				return -ENOEXEC;
+			}
+			if (phdr.p_align > li.strictest_alignment) {
+				li.strictest_alignment = phdr.p_align;
 			}
 
 			uint32_t mem_start = phdr.p_vaddr;
