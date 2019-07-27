@@ -10,9 +10,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="193.0201mm"
-   height="112.18587mm"
-   viewBox="0 0 193.0201 112.18587"
+   width="177.69194mm"
+   height="85.845795mm"
+   viewBox="0 0 177.69194 85.845797"
    version="1.1"
    id="svg1036"
    sodipodi:docname="overview.svg"
@@ -148,21 +148,42 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="254.67554"
-     inkscape:cy="190.35742"
+     inkscape:cx="311.42364"
+     inkscape:cy="97.652686"
      inkscape:document-units="mm"
-     inkscape:current-layer="g8661"
+     inkscape:current-layer="a4682"
      showgrid="false"
      inkscape:pagecheckerboard="true"
      inkscape:window-width="1920"
      inkscape:window-height="1020"
-     inkscape:window-x="0"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-top="5"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5">
+    <sodipodi:guide
+       position="0,0"
+       orientation="0,671.59159"
+       id="guide992"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="177.69194,0"
+       orientation="-324.45655,0"
+       id="guide994"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="177.69194,85.845794"
+       orientation="0,-671.59159"
+       id="guide996"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="0,85.845794"
+       orientation="324.45655,0"
+       id="guide998"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
   <metadata
      id="metadata1033">
     <rdf:RDF>
@@ -171,7 +192,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -180,16 +201,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline"
-     transform="translate(-2.3373782,-73.326953)">
+     transform="translate(-15.576497,-73.626997)">
     <g
        id="g8661">
       <rect
-         y="73.453064"
-         x="2.4634895"
-         height="111.93365"
-         width="192.76787"
-         id="rect6184"
-         style="fill:#fbfbfb;fill-opacity:1;stroke:#000000;stroke-width:0.25222266;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:1;stroke:#020000;stroke-width:0.52916667;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1000"
+         width="177.69194"
+         height="85.845795"
+         x="15.576497"
+         y="73.626999" />
       <g
          transform="translate(10.849283,-15.686012)"
          id="g6159">
@@ -301,19 +322,19 @@
              xlink:title="Epicardium">
             <text
                xml:space="preserve"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#0000ee;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#d10069;fill-opacity:1;stroke:none;stroke-width:0.26458332;opacity:1;"
                x="40.307911"
                y="111.83552"
                id="text6791"><tspan
                  sodipodi:role="line"
                  x="40.307911"
                  y="111.83552"
-                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:monospace;-inkscape-font-specification:monospace;fill:#0000ee;fill-opacity:1;stroke-width:0.26458332"
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:monospace;-inkscape-font-specification:monospace;fill:#d10069;fill-opacity:1;stroke-width:0.26458332;"
                  id="tspan6793">Epicardium</tspan><tspan
                  sodipodi:role="line"
                  x="40.307911"
                  y="119.77302"
-                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611107px;font-family:monospace;-inkscape-font-specification:monospace;fill:#0000ee;fill-opacity:1;stroke-width:0.26458332"
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611107px;font-family:monospace;-inkscape-font-specification:monospace;fill:#d10069;fill-opacity:1;stroke-width:0.26458332;"
                  id="tspan1028">(core 0)</tspan></text>
           </a>
         </g>
@@ -393,7 +414,7 @@
              xlink:title="Pycardium">
             <text
                xml:space="preserve"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#0000ee;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#428bca;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
                x="147.18329"
                y="111.80997"
                id="text6799"><tspan
@@ -401,11 +422,11 @@
                  id="tspan6797"
                  x="147.18329"
                  y="111.80997"
-                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:monospace;-inkscape-font-specification:monospace;fill:#0000ee;fill-opacity:1;stroke-width:0.26458332">Pycardium</tspan><tspan
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:monospace;-inkscape-font-specification:monospace;fill:#428bca;fill-opacity:1;stroke-width:0.26458332;">Pycardium</tspan><tspan
                  sodipodi:role="line"
                  x="147.18329"
                  y="119.74747"
-                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611107px;font-family:monospace;-inkscape-font-specification:monospace;fill:#0000ee;fill-opacity:1;stroke-width:0.26458332"
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.58611107px;font-family:monospace;-inkscape-font-specification:monospace;fill:#428bca;fill-opacity:1;stroke-width:0.26458332;"
                  id="tspan1032">(core 1)</tspan></text>
           </a>
         </g>
@@ -421,41 +442,6 @@
            y="84.910851"
            x="104.47012"
            sodipodi:role="line">MAX32666</tspan></text>
-      <path
-         style="display:inline;fill:none;stroke:#b7b7b7;stroke-width:3.5999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleOutS)"
-         d="M 19.222455,122.34974 H 10.72299 v 46.42197 h 23.044261"
-         id="path5043-2"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cccc" />
-      <g
-         id="g8371"
-         transform="translate(-11.900687,-20.587525)"
-         style="stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none">
-        <rect
-           transform="scale(-1,1)"
-           style="display:inline;fill:#f3f3f3;fill-opacity:1;stroke:#000000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           id="rect1634-9"
-           width="20.587021"
-           height="20.587021"
-           x="-73.88205"
-           y="179.16779" />
-        <text
-           id="text8363"
-           y="188.57161"
-           x="63.567005"
-           style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none"
-           xml:space="preserve"><tspan
-             style="stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none"
-             y="188.57161"
-             x="63.567005"
-             id="tspan8361"
-             sodipodi:role="line">Bluetooth</tspan><tspan
-             id="tspan8365"
-             style="stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none"
-             y="192.98134"
-             x="63.567005"
-             sodipodi:role="line">Core</tspan></text>
-      </g>
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
