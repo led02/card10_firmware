@@ -9,4 +9,5 @@ ble_sources = files(
   'app/common/app_ui.c',
   'uart.c',
   'card10.c',
+  'filetransfer.c',
 )
