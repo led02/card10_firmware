@@ -48,16 +48,16 @@ int main(void) {
     // running - but it will drain batteries.
     for (;;) {
         for (int i = 0; i < 11; i++) {
-            levels[i] = 255;
+            levels[i] = 128;
             levels_display[i] = 1;
-            for (int j = 0; j < 64; j++) {
+            for (int j = 0; j < 32; j++) {
                 fade();
             }
         }
         for (int i = 9; i > 0; i--) {
-            levels[i] = 255;
+            levels[i] = 128;
             levels_display[i] = 1;
-            for (int j = 0; j < 64; j++) {
+            for (int j = 0; j < 32; j++) {
                 fade();
             }
         }
