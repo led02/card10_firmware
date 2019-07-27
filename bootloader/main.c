@@ -205,10 +205,11 @@ int main(void)
 	 */
 	pmic_set_button_callback(pmic_button);
 
-	bootloader_display_header();
+	bootloader_display_init();
 
 	// If the button is pressed, we go into MSC mode.
 	if (PB_Get(3)) {
+		bootloader_display_header();
 		bootloader_display_line(2, "USB activated.", 0xffff);
 		bootloader_display_line(3, "Ready.", 0xffff);
 		run_usbmsc();
@@ -224,36 +225,42 @@ int main(void)
 		int res = check_integrity();
 		if (res == -ENOENT) {
 			printf("card10.bin not found!\n");
-			bootloader_display_line(
-				2, "card10.bin not found", 0xffff
-			);
 		} else if (res == -EINVAL) {
 			printf("card10.bin CRC is invalid!\n");
+			bootloader_display_header();
 			bootloader_display_line(
 				2, "Integrity check failed", 0xffff
 			);
+
+			bootloader_display_line(4, "Trying to boot", 0xffff);
 		} else if (res == 0) {
 			printf("Found valid application image\n");
 			if (is_update_needed()) {
 				printf("Trying to update firmware from external flash\n");
+				bootloader_display_header();
 				bootloader_display_line(
-					4, "Updating ...", 0xffff
+					3, "Updating ...", 0xffff
 				);
 				erase_partition();
 				flash_partition();
+				bootloader_display_line(
+					4, "Trying to boot", 0xffff
+				);
 			} else {
 				printf("No update needed\n");
 			}
 		}
 	} else {
+		bootloader_display_header();
 		bootloader_display_line(
 			2, "Failed to mount filesystem", 0xffff
 		);
 		printf("Failed to mount the external flash\n");
+
+		bootloader_display_line(4, "Trying to boot", 0xffff);
 	}
 
 	printf("Trying to boot\n");
-	bootloader_display_line(4, "Trying to boot", 0xffff);
 
 	boot((uintptr_t *)PARTITION_START);
 

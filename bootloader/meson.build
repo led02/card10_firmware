@@ -1,5 +1,18 @@
 name = 'bootloader'
 
+splash_screen = custom_target(
+  'splash-screen.h',
+  output: 'splash-screen.h',
+  input: 'splash-screen.png',
+  command: [
+    python3,
+    meson.current_source_dir() + '../tools/bootloader-image.py',
+    '-n', 'splash',
+    '@INPUT@',
+    '@OUTPUT@',
+  ],
+)
+
 executable(
   name + '.elf',
   'main.c',
@@ -7,6 +20,7 @@ executable(
   'bootloader-display.c',
   'bootloader-usb.c',
   'crc16-ccitt.c',
+  splash_screen,
   dependencies: [
     libcard10,
     max32665_startup_boot,
