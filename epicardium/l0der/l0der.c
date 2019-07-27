@@ -28,6 +28,22 @@
  * a memory map in stone.
  */
 
+struct _pie_load_info {
+	/// Populated by _load_pie
+	// Addresses within ELF file.
+	uint32_t image_start;
+	uint32_t image_limit;
+
+	/// Populated by _get_load_addr
+	// Load address of ELF file.
+	uint32_t load_address;
+	// Addresses within memory of ELF file.
+	uint32_t image_load_start;
+	uint32_t image_load_limit;
+	// Stack top.
+	uint32_t stack_top;
+};
+
 /*
  * Read an ELF header, check E_IDENT.
  */
@@ -223,9 +239,9 @@ static int _check_interp(FIL *fp, Elf32_Phdr *phdr)
  *
  * Currently this means trying to fit it into core1 RAM.
  */
-static int _get_load_addr(uint32_t image_start, uint32_t image_limit, void **load)
+static int _get_load_addr(struct _pie_load_info *li)
 {
-	uint32_t image_size = image_limit - image_start;
+	uint32_t image_size = li->image_limit - li->image_start;
 
 	// ref: Documentation/memorymap.rst
 	uint32_t core1_mem_start = 0x20040000;
@@ -238,7 +254,24 @@ static int _get_load_addr(uint32_t image_start, uint32_t image_limit, void **loa
 		return -ENOMEM;
 	}
 
-	*load = (void *)core1_mem_start;
+	// Place image at bottom of core1 memory range.
+	li->load_address = core1_mem_start;
+	li->image_load_start = li->load_address + li->image_start;
+	li->image_load_limit = li->load_address + li->image_limit;
+
+	// Place stack at top of core1 memory range.
+	li->stack_top = core1_mem_limit;
+
+	// Check that there is enough stack space.
+	uint32_t stack_space = li->stack_top - li->image_load_limit;
+	if (stack_space < 8192) {
+		LOG_WARN("l0der", "_get_load_addr: low stack space (%ld bytes)", stack_space);
+	} else if (stack_space < 256) {
+		LOG_ERR("l0der", "_get_load_addr: low stack space (%ld bytes), cannot continue", stack_space);
+		return -ENOMEM;
+	}
+
+	LOG_INFO("l0der", "Stack at %08lx, %ld bytes available", li->stack_top, stack_space);
 
 	return 0;
 }
@@ -248,9 +281,9 @@ static int _get_load_addr(uint32_t image_start, uint32_t image_limit, void **loa
  *
  * Segment must be a LOAD segment.
  */
-static int _load_segment(FIL *fp, void *image_load_addr, Elf32_Phdr *phdr)
+static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
 {
-	uint32_t segment_start = (uint32_t)image_load_addr + phdr->p_vaddr;
+	uint32_t segment_start = li->load_address + phdr->p_vaddr;
 	uint32_t segment_limit = segment_start + phdr->p_memsz;
 
 	LOG_INFO("l0der", "Segment %08lx-%08lx: 0x%lx bytes from file",
@@ -267,14 +300,11 @@ static int _load_segment(FIL *fp, void *image_load_addr, Elf32_Phdr *phdr)
  * the only one used when making 'standard' PIE binaries on RAM. However, other
  * kinds might have to be implemented in the future.
  */
-static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint32_t image_limit, Elf32_Ehdr *hdr) {
+static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr) {
 	int res;
 	FRESULT fres;
 	Elf32_Shdr shdr;
 	Elf32_Rel rel;
-
-	uint32_t load_start = image_start + (uint32_t)load_addr;
-	uint32_t load_limit = image_limit + (uint32_t)load_addr;
 
 	// Go through all relocation sections.
 	for (int i = 0; i < hdr->e_shnum; i++) {
@@ -323,14 +353,14 @@ static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint
 						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address must be 4-byte aligned");
 						return -ENOEXEC;
 					}
-					volatile uint32_t *addr = (uint32_t *)(rel.r_offset + load_addr);
-					if ((uint32_t)addr < load_start || (uint32_t)addr >= load_limit) {
+					volatile uint32_t *addr = (uint32_t *)(rel.r_offset + li->load_address);
+					if ((uint32_t)addr < li->image_load_start || (uint32_t)addr >= li->image_load_limit) {
 						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address (%08lx) is outside image boundaries",
 								(uint32_t)addr);
 						return -ENOEXEC;
 					}
 
-					*addr += (uint32_t)load_addr;
+					*addr += li->load_address;
 					break;
 				default:
 					LOG_ERR("l0der", "_run_relocations: unsupported relocation type %d", type);
@@ -348,6 +378,7 @@ static int _run_relocations(FIL *fp, void *load_addr, uint32_t image_start, uint
 static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
+	struct _pie_load_info li;
 
 	// First pass over program headers: sanity check sizes and calculate
 	// memory image bounds. l0der currently only supports loading the image into
@@ -355,8 +386,8 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	// we need to ensure that all the LOADable segments can fit within this
 	// range.
 	
-	uint32_t image_start = 0xFFFFFFFF;
-	uint32_t image_limit = 0x0;
+	li.image_start = 0xffffffff;
+	li.image_limit = 0x0;
 
 	Elf32_Phdr phdr;
 
@@ -388,11 +419,11 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 			uint32_t mem_limit = phdr.p_vaddr + phdr.p_memsz;
 
 			// Record memory usage.
-			if (mem_start < image_start) {
-				image_start = mem_start;
+			if (mem_start < li.image_start) {
+				li.image_start = mem_start;
 			}
-			if (mem_limit > image_limit) {
-				image_limit = mem_limit;
+			if (mem_limit > li.image_limit) {
+				li.image_limit = mem_limit;
 			}
 		}
 	}
@@ -404,20 +435,19 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	}
 
 
-	if (image_limit < image_start) {
+	if (li.image_limit < li.image_start) {
 		// We didn't find any LOAD segment.
 		LOG_ERR("l0der", "_load_pie: no loadable segments");
 		return -ENOEXEC;
 	}
 
-	LOG_INFO("l0der", "Image bounds %08lx - %08lx", image_start, image_limit);
+	LOG_INFO("l0der", "Image bounds %08lx - %08lx", li.image_start, li.image_limit);
 
-	void *load_addr;
-	if ((res = _get_load_addr(image_start, image_limit, &load_addr)) != 0) {
+	if ((res = _get_load_addr(&li)) != 0) {
 		return res;
 	}
 
-	LOG_INFO("l0der", "Loading at %08lx", (uint32_t)load_addr);
+	LOG_INFO("l0der", "Loading at %08lx", li.load_address);
 
 	// Second pass through program headers: load all LOAD segments.
 	
@@ -431,22 +461,25 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 			continue;
 		}
 
-		if ((res = _load_segment(fp, load_addr, &phdr)) != 0) {
+		if ((res = _load_segment(fp, &li, &phdr)) != 0) {
 			return res;
 		}
 	}
 
 	// Run relocations.
 	
-	if ((res = _run_relocations(fp, load_addr, image_start, image_limit, hdr)) != 0) {
+	if ((res = _run_relocations(fp, &li, hdr)) != 0) {
 		return res;
 	}
 
-	uint32_t image_entrypoint = (uint32_t)load_addr + hdr->e_entry;
+	uint32_t image_entrypoint = li.load_address + hdr->e_entry;
 	LOG_INFO("l0der", "Entrypoint (ISR Vector) at %08lx", image_entrypoint);
 
-	info->isr_vector = (void *)image_entrypoint;
+    // Setup stack
+	uint32_t *isr = (uint32_t *)image_entrypoint;
+	isr[0] = li.stack_top;
 
+	info->isr_vector = (void *)image_entrypoint;
 	return 0;
 }
 

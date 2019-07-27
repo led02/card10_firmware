@@ -71,14 +71,6 @@ SECTIONS {
         *(COMMON)
     } :data
 
-    . = ALIGN(4096);
-    .stack : 
-    {
-        CARD10_STACK_START = .;
-        . += 8192;
-        CARD10_STACK_LIMIT = .;
-    } :data
-
     /* Limit based on current limitations of l0dable setup - only uses core1 RAM. */
     ASSERT(. < 0x40000, "Exceeded available RAM")
 

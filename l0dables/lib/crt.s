@@ -23,7 +23,7 @@
 		.align 2
 		.globl __isr_vector
 __isr_vector:
-		.long    CARD10_STACK_LIMIT            /* Top of Stack */
+		.long    0                             /* Top of Stack, overriden by l0der at load time */
 		.long    Reset_Handler                 /* Reset Handler */
 		.long    NMI_Handler                   /* NMI Handler */
 		.long    HardFault_Handler             /* Hard Fault Handler */
@@ -145,10 +145,6 @@ __isr_vector:
 		.thumb_func
 		.align 2
 Reset_Handler:
-		/* Set stack according to limits from linker script. */
-		ldr r0, =CARD10_STACK_LIMIT
-		mov sp, r0
-
 		/* Call system initialization from l0dables/lib/hardware.c. */
 		blx SystemInit
 
