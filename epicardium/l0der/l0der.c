@@ -112,7 +112,7 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
  * :param size_t count: amount of bytes to read
  * :returns: ``0`` on success or a negative value on error.  Possible errors:
  * 
- *    - ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
+ *	- ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
  */
 static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count) {
 	FRESULT fres;
@@ -566,7 +566,6 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	}
 
 	// Run relocations.
-	
 	if ((res = _run_relocations(fp, &li, hdr)) != 0) {
 		return res;
 	}
@@ -574,7 +573,7 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	uint32_t image_entrypoint = li.load_address + hdr->e_entry;
 	LOG_INFO("l0der", "Entrypoint (ISR Vector) at %08lx", image_entrypoint);
 
-    // Setup stack
+	// Setup stack
 	uint32_t *isr = (uint32_t *)image_entrypoint;
 	isr[0] = li.stack_top;
 
