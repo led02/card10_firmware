@@ -23,6 +23,7 @@ int main(void)
 		gc_init(&__HeapBase + 1024 * 10, &__HeapLimit);
 
 		mp_init();
+		pyexec_file_if_exists("main.py");
 		pyexec_friendly_repl();
 		mp_deinit();
 	}
