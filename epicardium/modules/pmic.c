@@ -4,6 +4,7 @@
 #include "gcr_regs.h"
 #include "pmic.h"
 #include "MAX77650-Arduino-Library.h"
+#include "card10.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -52,15 +53,7 @@ void vPmicTask(void *pvParameters)
 		if (int_flag & MAX77650_INT_nEN_R) {
 			/* Button was pressed */
 			if (count < PMIC_PRESS_SLEEP) {
-				LOG_INFO("pmic", "Reset");
-				/*
-				 * Give the UART fifo time to clear.
-				 * TODO: Do this properly
-				 */
-				for (int i = 0; i < 0x1000000; i++) {
-					__asm volatile("nop");
-				}
-				MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+				card10_reset();
 			}
 
 			count = 0;
