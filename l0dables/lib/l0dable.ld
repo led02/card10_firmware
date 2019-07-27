@@ -71,6 +71,9 @@ SECTIONS {
         *(COMMON)
     } :data
 
+    /* Used by hardware.c as start of heap. */
+    __heap_start = .;
+
     /* Limit based on current limitations of l0dable setup - only uses core1 RAM. */
     ASSERT(. < 0x40000, "Exceeded available RAM")
 

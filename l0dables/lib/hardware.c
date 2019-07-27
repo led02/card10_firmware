@@ -9,6 +9,9 @@
  * initialization before main() gets called.
  */
 
+#include <stddef.h>
+#include "epicardium.h"
+
 #include "max32665.h"
 #include "mxc_sys.h"
 #include "gcr_regs.h"
@@ -71,4 +74,39 @@ __weak void SystemInit() {
 	MXC_ICC1->cache_ctrl |= MXC_F_ICC_CACHE_CTRL_CACHE_EN;
 
 	SystemCoreClockUpdate();
+}
+
+// newlib syscall to allow printf to work.
+long _write(int fd, const char *buf, size_t cnt)
+{
+	/*
+	 * Only print one line at a time.  Insert `\r` between lines so
+	 * they are properly displayed on the serial console.
+	 */
+	size_t i, last = 0;
+	for (i = 0; i < cnt; i++) {
+		if (buf[i] == '\n') {
+			epic_uart_write_str(&buf[last], i - last);
+			epic_uart_write_str("\r", 1);
+			last = i;
+		}
+	}
+	if (last != i) {
+		epic_uart_write_str(&buf[last], cnt - last);
+	}
+	return cnt;
+}
+
+// newlib syscall to allow for a heap
+extern uint32_t __heap_start;
+uint32_t _sbrk(int incr)
+{
+	static char *brk = NULL;
+	if (brk == NULL) {
+		brk = (char *)&__heap_start;
+	}
+
+	char *prev_brk = brk;
+	brk += incr;
+	return (uint32_t)prev_brk;
 }
