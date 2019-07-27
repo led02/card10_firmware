@@ -57,6 +57,8 @@ typedef unsigned int size_t;
 #define API_FILE_SEEK          0x36
 #define API_FILE_TELL          0x37
 #define API_FILE_STAT          0x38
+
+#define API_RTC_GET_SECONDS    0x40
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -517,5 +519,17 @@ typedef struct epic_stat_t {
  * :return: `0` on success, negative on error
  */
 API(API_FILE_STAT, int epic_file_stat(const char* path, epic_stat_t* stat));
+
+/**
+ * RTC
+ * ===
+ */
+
+/**
+ * Read the current RTC value.
+ *
+ * :return: Unix time in seconds
+ */
+API(API_RTC_GET_SECONDS, uint32_t epic_rtc_get_seconds(void));
 
 #endif /* _EPICARDIUM_H */

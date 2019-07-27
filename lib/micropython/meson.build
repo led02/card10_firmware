@@ -177,6 +177,7 @@ micropython_additional_sources = files(
   'micropython/lib/utils/stdout_helpers.c',
   'micropython/lib/utils/pyexec.c',
   'micropython/lib/mp-readline/readline.c',
+  'micropython/lib/timeutils/timeutils.c'
 )
 
 micropython_extmod_sources = files(

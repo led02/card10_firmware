@@ -21,6 +21,7 @@ Q(ticks_us)
 Q(ticks_cpu)
 Q(ticks_add)
 Q(ticks_diff)
+Q(localtime)
 
 /* vibra */
 Q(vibra)
