@@ -70,6 +70,21 @@ typedef struct {
 
 #define SHT_RELA 4
 #define SHT_REL 9
+#define SHT_DYNSYM 11
+
+typedef struct {
+	Elf32_Word		st_name;
+	Elf32_Addr		st_value;
+	Elf32_Word		st_size;
+	unsigned char	st_info;
+	unsigned char	st_other;
+	Elf32_Half		st_shndx;
+} Elf32_Sym;
+
+#define ELF32_ST_BIND(i) ((i)>>4)
+#define ELF32_ST_TYPE(i) ((i)&0xf)
+
+#define STB_WEAK 2
 
 typedef struct {
 	Elf32_Addr	r_offset;
@@ -79,7 +94,7 @@ typedef struct {
 #define ELF32_R_SYM(i) ((i)>>8)
 #define ELF32_R_TYPE(i) ((unsigned char)(i))
 
-#define R_ARM_RELATIVE 23
+#define R_ARM_RELATIVE  0x17
 
 typedef struct {
 	Elf32_Word	p_type;

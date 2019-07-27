@@ -28,6 +28,8 @@
  * a memory map in stone.
  */
 
+#define WEAK_SYMBOL_MAX 128
+
 struct _pie_load_info {
 	/// Populated by _load_pie
 	// Addresses within ELF file.
@@ -35,6 +37,11 @@ struct _pie_load_info {
 	uint32_t image_limit;
 	// Highest alignment request for a segment.
 	uint32_t strictest_alignment;
+
+	/// Populated by _parse_dynamic_symbols
+	// List of weak symbols for which relocations can be ignored.
+	uint32_t weak_symbols[WEAK_SYMBOL_MAX];
+	uint32_t weak_symbol_count;
 
 	/// Populated by _get_load_addr
 	// Load address of ELF file.
@@ -302,6 +309,67 @@ static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
 }
 
 /*
+ * Parse dynamic symbol sections.
+ */
+static int _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr) {
+	int res;
+	FRESULT fres;
+	Elf32_Shdr shdr;
+	Elf32_Sym sym;
+
+	// Go through all dynamic symbol sections.
+	for (int i = 0; i < hdr->e_shnum; i++) {
+		uint32_t shdr_addr = hdr->e_shoff + (i * hdr->e_shentsize);
+		if ((res = _read_section_header(fp, shdr_addr, &shdr)) != 0) {
+			return res;
+		}
+
+		if (shdr.sh_type != SHT_DYNSYM) {
+			continue;
+		}
+
+		if ((res = _check_section_header(fp, &shdr)) != 0) {
+			return res;
+		}
+
+		if ((shdr.sh_size % sizeof(Elf32_Sym)) != 0) {
+			LOG_ERR("l0der", "_parse_dynamic_symbols: SHT_DYN section with invalid size: %ld", shdr.sh_size);
+			return -EIO;
+		}
+		uint32_t sym_count = shdr.sh_size / sizeof(Elf32_Sym);
+
+
+		// Read symbols one by one.
+		if ((fres = f_lseek(fp, shdr.sh_offset)) != FR_OK) {
+			LOG_ERR("l0der", "_parse_dynamic_symbols: seek to first relocation (at 0x%lx) failed", shdr.sh_offset);
+			return -EIO;
+		}
+
+		for (int j = 0; j < sym_count; j++) {
+			unsigned int read;
+			if ((fres = f_read(fp, &sym, sizeof(Elf32_Sym), &read)) != FR_OK || read != sizeof(Elf32_Sym)) {
+				LOG_ERR("l0der", "__parse_dynamic_symbols: symbol read failed: %d", fres);
+				return -EIO;
+			}
+
+			uint32_t bind = ELF32_ST_BIND(sym.st_info);
+			if (bind != STB_WEAK) {
+				continue;
+			}
+
+			if (li->weak_symbol_count >= WEAK_SYMBOL_MAX) {
+				LOG_ERR("l0der", "__parse_dynamic_symbols: too many weak symbols (limit: %d)", WEAK_SYMBOL_MAX);
+				return -ENOMEM;
+			}
+
+			li->weak_symbols[li->weak_symbol_count++] = j;
+		}
+	}
+
+	return 0;
+}
+
+/*
  * Apply dynamic relocations from ELF.
  *
  * Currently, we only support R_ARM_RELATIVE relocations. These seem to be
@@ -354,9 +422,27 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 				return -EIO;
 			}
 
+			uint32_t sym = ELF32_R_SYM(rel.r_info);
 			uint8_t type = ELF32_R_TYPE(rel.r_info);
+
+			// Skip relocations that are for weak symbols.
+			// (ie., do not resolve relocation - they default to a safe NULL)
+			uint8_t skip = 0;
+			if (sym != 0) {
+				for (int k = 0; k < li->weak_symbol_count; k++) {
+					if (li->weak_symbols[k] == sym) {
+						skip = 1;
+						break;
+					}
+				}
+			}
+			if (skip) {
+				continue;
+			}
+
 			switch (type) {
 				case R_ARM_RELATIVE:
+					// Relocate.
 					if ((rel.r_offset % 4) != 0) {
 						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address must be 4-byte aligned");
 						return -ENOEXEC;
@@ -388,11 +474,8 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	int res;
 	struct _pie_load_info li = {0};
 
-	// First pass over program headers: sanity check sizes and calculate
-	// memory image bounds. l0der currently only supports loading the image into
-	// the core1 address space, that is from 0x1008_0000 to 0x1010_0000. Thus,
-	// we need to ensure that all the LOADable segments can fit within this
-	// range.
+	// First pass over program headers: sanity check sizes, calculate image
+	// size bounds, check alignment.
 	
 	li.image_start = 0xffffffff;
 	li.image_limit = 0x0;
@@ -475,6 +558,11 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 		if ((res = _load_segment(fp, &li, &phdr)) != 0) {
 			return res;
 		}
+	}
+
+	// Load dynamic symbols.
+	if ((res = _parse_dynamic_symbols(fp, &li, hdr)) != 0) {
+		return res;
 	}
 
 	// Run relocations.
