@@ -40,13 +40,9 @@ the output of
    ls -lh build/pycardium/*@@frozen.c@*/
 
 If your module contains some kind of big lookup-table or data-block, consider
-pushing that into external flash.
-
-.. todo::
-
-   External flash is not yet accessible by Pycardium (ref `#11`_).
-
-   .. _#11: https://git.card10.badge.events.ccc.de/card10/firmware/issues/11
+pushing that into external flash.  You can then read the data using standard
+Python ``open()`` and if you need to decode it, use the ``ustruct`` or ``ujson``
+module.
 
 Creating a new C module
 -----------------------

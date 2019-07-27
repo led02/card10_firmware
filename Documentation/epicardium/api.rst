@@ -1,3 +1,5 @@
+.. _epicardium_api:
+
 Epicardium API
 ==============
 

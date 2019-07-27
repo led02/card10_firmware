@@ -45,15 +45,16 @@ Pycardium is our MicroPython fork.  Its purpose is to make it as easy as
 possible to interact with card10.  If you are interested in working on
 Pycardium, take a look at the :ref:`pycardium_guide` guide.
 
-\*cardium
----------
-.. warning::
-
-   We have not yet been able to determine if card10 will have had the abilities
-   described in this section.  And if yes, how they will have been implemented.
-
+L0dables
+--------
 Next to Pycardium, other bare-metal code can also run on core 1.  For example,
-a Rustcardium or Cccardium.
+a Rustcardium or C-cardium.  These l0dables must be compiled using our special
+linker script and should link against the api-caller library so they can
+interface with the :ref:`epicardium_api`.
+
+.. todo::
+
+   Provide more details how this works
 
 Program Flow Diagram
 --------------------

@@ -18,22 +18,18 @@ If you did everything correctly, the bootloader will display:
 .. code-block:: text
 
    Bootloader
-   Jul 12 2019
+   Jul 28 2019
    USB activated.
-    Waiting.
+   Ready.
 
 On your host, you should now see an 8MB flash-device appear.  You can now drop
 the firmware's ``.bin`` (from ``build/pycardium/pycardium_epicardium.bin`` in
 most cases) into this flash-storage.  You **must** call the file ``card10.bin``
 for the bootloader to use it.
 
-Afterwards **eject** the flash device and reboot card10.  You should now see
-your new firmware boot up!
-
-.. warning::
-
-   **You must EJECT the flash device!**  ``umount`` & ``sync`` is **not**
-   enough and will result in the bootloader not loading the new binary.
+The bootloader will then display ``Writing.`` in red while it is actually
+writing the file to external flash.  Please wait until it displays ``Ready.``
+again before resetting card10 by pressing the power button again.
 
 Flash Using Debugger
 --------------------

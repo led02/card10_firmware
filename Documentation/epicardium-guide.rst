@@ -93,8 +93,8 @@ formatted, don't be afraid to do so.
 
 .. warning::
 
-   When writing you calls, **never** make assumptions about which FreeRTOS task
-   you are running in.  While all calls from core 1 will end up in the
+   When writing your calls, **never** make assumptions about which FreeRTOS
+   task you are running in.  While all calls from core 1 will end up in the
    "Dispatcher" task, other FreeRTOS tasks might might call your code at any
    time just as well.
 
