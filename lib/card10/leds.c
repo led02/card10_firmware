@@ -1,4 +1,5 @@
 #include "gpio.h"
+#include "portexpander.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -202,6 +203,14 @@ void leds_init(void)
 
     for(int i=0; i<NUM_LEDS; i++) {
         leds[i][3] = 8;
+    }
+
+    if(portexpander_detected()) {
+        // Turn on LEDs
+        // TODO: only turn on LEDs if value != 0,0,0 && dim > 0
+        portexpander_set(0, 0);
+        portexpander_set(1, 0);
+        portexpander_set(2, 0);
     }
 
     leds_update();
