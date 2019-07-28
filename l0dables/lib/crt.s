@@ -4,9 +4,10 @@
 		 * Also known as a startup file.
 		 *
 		 * We provide the following to l0dables:
-		 *  - a 8k stack.
 		 *  - calling GCC initializers.
 		 *  - an ISR vector.
+		 *
+		 * The stack is provided by l0der.
 		 */
 
 		.syntax unified
@@ -39,11 +40,11 @@ __isr_vector:
 		.long    0                             /* Reserved */
 		.long    PendSV_Handler                /* PendSV Handler */
 		.long    SysTick_Handler               /* SysTick Handler */
-		
+
 		/* Device-specific Interrupts */
 		.long    PF_IRQHandler                 /* 0x10  0x0040  16: Power Fail */
 		.long    WDT0_IRQHandler               /* 0x11  0x0044  17: Watchdog 0 */
-		.long    USB_IRQHandler                /* 0x12  0x0048  18: USB */
+		.long    DefaultHandler                /* 0x12  0x0048  18: USB, used by core0, unoverridable */
 		.long    RTC_IRQHandler                /* 0x13  0x004C  19: RTC */
 		.long    TRNG_IRQHandler               /* 0x14  0x0050  20: True Random Number Generator */
 		.long    TMR0_IRQHandler               /* 0x15  0x0054  21: Timer 0 */
@@ -55,7 +56,7 @@ __isr_vector:
 		.long    RSV11_IRQHandler              /* 0x1B  0x006C  27: Reserved */
 		.long    RSV12_IRQHandler              /* 0x1C  0x0070  28: Reserved */
 		.long    I2C0_IRQHandler               /* 0x1D  0x0074  29: I2C0 */
-		.long    UART0_IRQHandler              /* 0x1E  0x0078  30: UART 0 */
+		.long    DefaultHandler                /* 0x1E  0x0078  30: UART 0, used by core0, unoverridable */
 		.long    UART1_IRQHandler              /* 0x1F  0x007C  31: UART 1 */
 		.long    SPI1_IRQHandler               /* 0x20  0x0080  32: SPI1 */
 		.long    SPI2_IRQHandler               /* 0x21  0x0084  33: SPI2 */
@@ -65,8 +66,8 @@ __isr_vector:
 		.long    RSV21_IRQHandler              /* 0x25  0x0094  37: Reserved */
 		.long    RSV22_IRQHandler              /* 0x26  0x0098  38: Reserved */
 		.long    FLC0_IRQHandler               /* 0x27  0x009C  39: Flash Controller */
-		.long    GPIO0_IRQHandler              /* 0x28  0x00A0  40: GPIO0 */
-		.long    GPIO1_IRQHandler              /* 0x29  0x00A4  41: GPIO2 */
+		.long    DefaultHandler                /* 0x28  0x00A0  40: GPIO0, used by core0, unoverridable */
+		.long    DefaultHandler                /* 0x29  0x00A4  41: GPIO2, used by core0, unoverridable */
 		.long    RSV26_IRQHandler              /* 0x2A  0x00A8  42: GPIO3 */
 		.long    TPU_IRQHandler                /* 0x2B  0x00AC  43: Crypto */
 		.long    DMA0_IRQHandler               /* 0x2C  0x00B0  44: DMA0 */
@@ -133,7 +134,7 @@ __isr_vector:
 		.long    RSV89_IRQHandler              /* 0x69  0x01A4  105: UART 4 */
 		.long    RSV90_IRQHandler              /* 0x6A  0x01A8  106: UART 5 */
 		.long    RSV91_IRQHandler              /* 0x6B  0x01AC  107: Camera IF */
-		.long    RSV92_IRQHandler              /* 0x6C  0x01B0  108: I3C */ 
+		.long    RSV92_IRQHandler              /* 0x6C  0x01B0  108: I3C */
 		.long    HTMR0_IRQHandler              /* 0x6D  0x01B4  109: HTmr */
 		.long    HTMR1_IRQHandler              /* 0x6E  0x01B8  109: HTmr */
 
@@ -157,27 +158,33 @@ Reset_Handler:
 		blx r0
 
 		/*
-		 * Spin forever.
+		 * C code done, spin forever.
 		 * TODO(q3k): let epicardium know we're done.
 		 */
 .spin:
 		bl .spin
 
+		/*
+		 * Used by __libc_init_array.
+		 */
 		.globl _init
 _init:
 		bx lr
 
-		/* Macro to define default handlers. Default handler
-		 * will be weak symbol and just dead loops. They can be
-		 * overwritten by other handlers. */
-		.macro    def_irq_handler    handler_name
-		.align 1
+		/*
+		 * The default handler for all IRQs just spins forwever.
+		 * TODO(q3k): let epicardium know we've reached an infinite loop due to
+		 *            an exception and/or unhandled IRQ, perhaps by splitting
+		 *            DefaultHandler into multiple handlers that report different
+		 *            error conditions to epicardium (eg. unhandled IRQ, fault, ...)
+		 */
 		.thumb_func
-		.weak    \handler_name
-		.type    \handler_name, %function
-\handler_name :
-		b    .
-		.size    \handler_name, . - \handler_name
+		.type DefaultHandler, %function
+DefaultHandler:
+		b .
+
+		.macro    def_irq_handler    handler_name
+		.weakref \handler_name, DefaultHandler
 		.endm
 
 		/*
@@ -191,11 +198,9 @@ _init:
 		def_irq_handler    SVC_Handler
 		def_irq_handler    DebugMon_Handler
 		def_irq_handler    PendSV_Handler
-		def_irq_handler    Default_Handler
 
 		def_irq_handler    PF_IRQHandler
 		def_irq_handler    WDT0_IRQHandler
-		def_irq_handler    USB_IRQHandler
 		def_irq_handler    RTC_IRQHandler
 		def_irq_handler    TRNG_IRQHandler
 		def_irq_handler    TMR0_IRQHandler
@@ -203,11 +208,9 @@ _init:
 		def_irq_handler    TMR2_IRQHandler
 		def_irq_handler    TMR3_IRQHandler
 		def_irq_handler    TMR4_IRQHandler
-		def_irq_handler    TMR5_IRQHandler
 		def_irq_handler    RSV11_IRQHandler
 		def_irq_handler    RSV12_IRQHandler
 		def_irq_handler    I2C0_IRQHandler
-		def_irq_handler    UART0_IRQHandler
 		def_irq_handler    UART1_IRQHandler
 		def_irq_handler    SPI1_IRQHandler
 		def_irq_handler    SPI2_IRQHandler
@@ -217,8 +220,6 @@ _init:
 		def_irq_handler    RSV21_IRQHandler
 		def_irq_handler    RSV22_IRQHandler
 		def_irq_handler    FLC0_IRQHandler
-		def_irq_handler    GPIO0_IRQHandler
-		def_irq_handler    GPIO1_IRQHandler
 		def_irq_handler    RSV26_IRQHandler
 		def_irq_handler    TPU_IRQHandler
 		def_irq_handler    DMA0_IRQHandler
@@ -291,4 +292,4 @@ _init:
 
 		.section .cinterp
 		.asciz "card10-l0dable"
-		.byte 
+		.byte

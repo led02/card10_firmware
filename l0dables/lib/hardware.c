@@ -18,7 +18,7 @@
 #include "icc_regs.h"
 #include "pwrseq_regs.h"
 
-uint32_t SystemCoreClock = HIRC_FREQ >> 1; 
+uint32_t SystemCoreClock = HIRC_FREQ >> 1;
 
 void SystemCoreClockUpdate(void)
 {
@@ -79,10 +79,8 @@ __weak void SystemInit() {
 // newlib syscall to allow printf to work.
 long _write(int fd, const char *buf, size_t cnt)
 {
-	/*
-	 * Only print one line at a time.  Insert `\r` between lines so
-	 * they are properly displayed on the serial console.
-	 */
+	// Only print one line at a time.  Insert `\r` between lines so
+	// they are properly displayed on the serial console.
 	size_t i, last = 0;
 	for (i = 0; i < cnt; i++) {
 		if (buf[i] == '\n') {
@@ -91,9 +89,7 @@ long _write(int fd, const char *buf, size_t cnt)
 			last = i;
 		}
 	}
-	if (last != i) {
-		epic_uart_write_str(&buf[last], cnt - last);
-	}
+	epic_uart_write_str(&buf[last], cnt - last);
 	return cnt;
 }
 
@@ -104,6 +100,24 @@ uint32_t _sbrk(int incr)
 	static char *brk = NULL;
 	if (brk == NULL) {
 		brk = (char *)&__heap_start;
+	}
+
+	// Ensure we don't overflow the heap by checking agsinst the current stack
+	// pointer (the heap grows towards the stack, and vice-versa).
+	//
+	// This is only a last-ditch attempt at saving ourselves from memory
+	// corruption. It doesn't prevent the stack from growing into the heap
+	// first.
+
+	void *sp;
+	__asm__ __volatile__ ("mov %0, sp" : "=r"(sp));
+
+	// Require a 'safe margin' of 4k between the heap and stack.
+	uint32_t stack_bottom = (uint32_t)sp - 4096;
+
+	if (((uint32_t)brk + incr) > stack_bottom) {
+		errno = ENOMEM;
+		return (uint32_t)-1;
 	}
 
 	char *prev_brk = brk;

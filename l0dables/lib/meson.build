@@ -2,7 +2,7 @@ l0dable_startup_lib = static_library(
   'l0dable-startup',
   'crt.s',
   'hardware.c',
-  dependencies: [periphdriver, api_caller],
+  dependencies: [api_caller],
   pic: true,
 )
 
