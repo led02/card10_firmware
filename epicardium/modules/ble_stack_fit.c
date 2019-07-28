@@ -17,6 +17,18 @@
  */
 /*************************************************************************************************/
 
+/*
+ * This file initializes the different components of the whole BLE stack. This inlucdes link level,
+ * HCI, security, etc...
+ *
+ * This file has been copied from lib/sdk/Applications/EvKitExamples/BLE_fit/stack_fit.c
+ *
+ * NOTE: Different stack_*.c files in the SDK initialize different components. We have to
+ * be very carefull to intitialize all needed components here. Think e.g. SecRandInit() ...
+ *
+ * Many components are related to the role of the device. Different components need to be
+ * initialized for central and peripheral roles.
+ */
 #include <stdio.h>
 #include <string.h>
 #include "wsf_types.h"
@@ -37,8 +49,10 @@
 #include "sec_api.h"
 #include "ll_init_api.h"
 
+/* TODO: card10: Where does this number come from? Is there any documentation? */
 #define LL_IMPL_REV             0x2303
 
+/* TODO: card10: Where does this number come from? Is there any documentation? */
 #define LL_MEMORY_FOOTPRINT     0xC152
 
 uint8_t LlMem[LL_MEMORY_FOOTPRINT];
@@ -97,6 +111,7 @@ void StackInitFit(void)
 {
   wsfHandlerId_t handlerId;
 
+/* card10: We do not use the SDMA HCI at the moment. The block below is not compiled. */
 #ifndef ENABLE_SDMA
   uint32_t memUsed;
 
@@ -124,6 +139,14 @@ void StackInitFit(void)
   }
 #endif
 
+
+  /* card10:
+   * These calls register a queue for callbacks in the OS abstraction
+   * and then pass a handle down to modules which uses them to
+   * internally handle callbacks.
+   *
+   * No idea why the modules don't call WsfOsSetNextHandler()
+   * internally ... */
   handlerId = WsfOsSetNextHandler(HciHandler);
   HciHandlerInit(handlerId);
 
@@ -159,6 +182,9 @@ void StackInitFit(void)
   SmprScInit();
   HciSetMaxRxAclLen(100);
 
+  /* card10:
+   * Here it gets weird: application logic and stack are
+   * mixed a lot. */
   handlerId = WsfOsSetNextHandler(AppHandler);
   AppHandlerInit(handlerId);
 
