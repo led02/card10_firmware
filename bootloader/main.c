@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #define GPIO_PORT_IN PORT_1
 #define GPIO_PIN_IN PIN_6
@@ -30,25 +31,25 @@
 DIR dir;
 FATFS FatFs;
 
-bool mount(void)
+int mount(void)
 {
 	FRESULT res;
 	res = f_mount(&FatFs, "/", 0);
 	if (res != FR_OK) {
 		printf("f_mount error %d\n", res);
-		return false;
+		return -1;
 	}
 
 	res = f_opendir(&dir, "0:");
 	if (res != FR_OK) {
 		printf("f_opendir error %d\n", res);
-		return false;
+		return -1;
 	}
 
-	return true;
+	return 0;
 }
 
-bool check_integrity(void)
+int check_integrity(void)
 {
 	FIL file;
 	UINT readbytes;
@@ -58,9 +59,8 @@ bool check_integrity(void)
 
 	res = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
 	if (res != FR_OK) {
-		bootloader_display_line(2, "card10.bin not found", 0xffff);
 		printf("f_open error %d\n", res);
-		return false;
+		return -ENOENT;
 	}
 
 	uint16_t crcval = 0;
@@ -76,13 +76,12 @@ bool check_integrity(void)
 
 	f_close(&file);
 
-	if (crcval == 0) {
-		return true;
-	} else {
-		bootloader_display_line(2, "Integrity check failed", 0xffff);
+	if (crcval != 0) {
 		printf("CRC check failed. Final CRC: %d\n", crcval);
-		return false;
+		return -EINVAL;
 	}
+
+	return 0;
 }
 
 bool is_update_needed(void)
@@ -221,8 +220,19 @@ int main(void)
 			;
 	}
 
-	if (mount()) {
-		if (check_integrity()) {
+	if (mount() == 0) {
+		int res = check_integrity();
+		if (res == -ENOENT) {
+			printf("card10.bin not found!\n");
+			bootloader_display_line(
+				2, "card10.bin not found", 0xffff
+			);
+		} else if (res == -EINVAL) {
+			printf("card10.bin CRC is invalid!\n");
+			bootloader_display_line(
+				2, "Integrity check failed", 0xffff
+			);
+		} else if (res == 0) {
 			printf("Found valid application image\n");
 			if (is_update_needed()) {
 				printf("Trying to update firmware from external flash\n");
@@ -234,8 +244,6 @@ int main(void)
 			} else {
 				printf("No update needed\n");
 			}
-		} else {
-			printf("Integrity check failed\n");
 		}
 	} else {
 		bootloader_display_line(
