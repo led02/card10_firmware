@@ -95,7 +95,11 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 2,
 		    &dispatcher_task_id) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "API Dispatcher");
+		LOG_CRIT(
+			"startup",
+			"Failed to create %s task!",
+			"API Dispatcher"
+		);
 		abort();
 	}
 
@@ -114,15 +118,15 @@ int main(void)
 		if (res != 0) {
 			LOG_ERR("startup", "l0der failed: %d\n", res);
 		} else {
-			LOG_INFO("startup", "Starting %s on core1 ...", l0dable);
+			LOG_INFO(
+				"startup", "Starting %s on core1 ...", l0dable
+			);
 			core1_start(info.isr_vector);
 		}
 	} else {
 		LOG_INFO("startup", "Starting pycardium on core1 ...");
 		core1_start((void *)0x10080000);
 	}
-
-
 
 	LOG_INFO("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();

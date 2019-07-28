@@ -72,10 +72,8 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
 		return -1;
 	}
 
-	if (hdr->e_ident[0] != ELFMAG0 ||
-		hdr->e_ident[1] != ELFMAG1 ||
-		hdr->e_ident[2] != ELFMAG2 ||
-		hdr->e_ident[3] != ELFMAG3) {
+	if (hdr->e_ident[0] != ELFMAG0 || hdr->e_ident[1] != ELFMAG1 ||
+	    hdr->e_ident[2] != ELFMAG2 || hdr->e_ident[3] != ELFMAG3) {
 		LOG_ERR("l0der", "_read_elf_header: not an ELF file");
 		return -1;
 	}
@@ -114,20 +112,29 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
  * 
  *	- ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
  */
-static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count) {
+static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count)
+{
 	FRESULT fres;
 
 	if ((fres = f_lseek(fp, address)) != FR_OK) {
-		LOG_ERR("l0der", "_seek_and_read: could not seek to 0x%lx: %d", address, fres);
+		LOG_ERR("l0der",
+			"_seek_and_read: could not seek to 0x%lx: %d",
+			address,
+			fres);
 		return -EIO;
 	}
 
 	unsigned int read;
 	if ((fres = f_read(fp, data, count, &read)) != FR_OK || read < count) {
 		if (fres == FR_OK) {
-			LOG_ERR("l0der", "_seek_and_read: could not read: wanted %d bytes, got %d", count, read);
+			LOG_ERR("l0der",
+				"_seek_and_read: could not read: wanted %d bytes, got %d",
+				count,
+				read);
 		} else {
-			LOG_ERR("l0der", "_seek_and_read: could not read: %d", fres);
+			LOG_ERR("l0der",
+				"_seek_and_read: could not read: %d",
+				fres);
 		}
 		return -EIO;
 	}
@@ -157,7 +164,8 @@ static int _read_section_header(FIL *fp, uint32_t shdr_addr, Elf32_Shdr *shdr)
  * This function ensures basic memory sanity of a program header / segment.
  * It ensures that it points to a file region that is contained within the file fully.
  */
-static int _check_program_header(FIL *fp, Elf32_Phdr *phdr) {
+static int _check_program_header(FIL *fp, Elf32_Phdr *phdr)
+{
 	size_t size = f_size(fp);
 
 	// Check file size/offset.
@@ -168,14 +176,16 @@ static int _check_program_header(FIL *fp, Elf32_Phdr *phdr) {
 		return -ENOEXEC;
 	}
 	if (file_limit > size) {
-		LOG_ERR("l0der", "_check_program_header: extends past end of file");
+		LOG_ERR("l0der",
+			"_check_program_header: extends past end of file");
 		return -ENOEXEC;
 	}
 
-	if (phdr->p_type == PT_LOAD) {	
+	if (phdr->p_type == PT_LOAD) {
 		// Check mem/file size.
 		if (phdr->p_filesz > phdr->p_memsz) {
-			LOG_ERR("l0der", "_check_program_header: file size larger than memory size");
+			LOG_ERR("l0der",
+				"_check_program_header: file size larger than memory size");
 			return -ENOEXEC;
 		}
 
@@ -183,7 +193,8 @@ static int _check_program_header(FIL *fp, Elf32_Phdr *phdr) {
 		uint32_t mem_limit = phdr->p_vaddr + phdr->p_memsz;
 
 		if (mem_limit < mem_start) {
-			LOG_ERR("l0der", "_check_program_header: mem size overflow");
+			LOG_ERR("l0der",
+				"_check_program_header: mem size overflow");
 			return -ENOEXEC;
 		}
 	}
@@ -197,7 +208,8 @@ static int _check_program_header(FIL *fp, Elf32_Phdr *phdr) {
  * This function ensures basic memory sanity of a section header.
  * It ensures that it points to a file region that is contained within the file fully.
  */
-static int _check_section_header(FIL *fp, Elf32_Shdr *shdr) {
+static int _check_section_header(FIL *fp, Elf32_Shdr *shdr)
+{
 	size_t size = f_size(fp);
 
 	// Check file size/offset.
@@ -208,7 +220,8 @@ static int _check_section_header(FIL *fp, Elf32_Shdr *shdr) {
 		return -ENOEXEC;
 	}
 	if (file_limit > size) {
-		LOG_ERR("l0der", "_check_section_header: extends past end of file");
+		LOG_ERR("l0der",
+			"_check_section_header: extends past end of file");
 		return -ENOEXEC;
 	}
 
@@ -227,16 +240,17 @@ static int _check_interp(FIL *fp, Elf32_Phdr *phdr)
 {
 	int res;
 	uint32_t buffer_size = strlen(_interpreter) + 1;
-	char *interp = alloca(buffer_size);
+	char *interp         = alloca(buffer_size);
 	memset(interp, 0, buffer_size);
 
-	if ((res = _seek_and_read(fp, phdr->p_offset, interp, buffer_size)) != FR_OK) {
+	if ((res = _seek_and_read(fp, phdr->p_offset, interp, buffer_size)) !=
+	    FR_OK) {
 		return res;
 	}
 
-
 	if (strncmp(interp, _interpreter, strlen(_interpreter)) != 0) {
-		LOG_ERR("l0der", "_check_interp: invalid interpreter, want card10-l0dable");
+		LOG_ERR("l0der",
+			"_check_interp: invalid interpreter, want card10-l0dable");
 		return -1;
 	}
 
@@ -255,22 +269,26 @@ static int _get_load_addr(struct _pie_load_info *li)
 	// ref: Documentation/memorymap.rst
 	uint32_t core1_mem_start = 0x20040000;
 	uint32_t core1_mem_limit = 0x20080000;
-	uint32_t core1_mem_size = core1_mem_limit - core1_mem_start;
+	uint32_t core1_mem_size  = core1_mem_limit - core1_mem_start;
 
 	if (image_size > core1_mem_size) {
-		LOG_ERR("l0der", "_get_load_addr: image too large (need 0x%08lx bytes, have %08lx",
-				image_size, core1_mem_size);
+		LOG_ERR("l0der",
+			"_get_load_addr: image too large (need 0x%08lx bytes, have %08lx",
+			image_size,
+			core1_mem_size);
 		return -ENOMEM;
 	}
 
 	// Place image at bottom of core1 memory range.
-	li->load_address = core1_mem_start;
+	li->load_address     = core1_mem_start;
 	li->image_load_start = li->load_address + li->image_start;
 	li->image_load_limit = li->load_address + li->image_limit;
 
 	// Ensure within alignment requests.
 	if ((li->load_address % li->strictest_alignment) != 0) {
-		LOG_ERR("l0der", "_get_load_addr: too strict alignment request for %ld bytes", li->strictest_alignment);
+		LOG_ERR("l0der",
+			"_get_load_addr: too strict alignment request for %ld bytes",
+			li->strictest_alignment);
 		return -ENOEXEC;
 	}
 
@@ -280,13 +298,24 @@ static int _get_load_addr(struct _pie_load_info *li)
 	// Check that there is enough stack space.
 	uint32_t stack_space = li->stack_top - li->image_load_limit;
 	if (stack_space < 8192) {
-		LOG_WARN("l0der", "_get_load_addr: low stack space (%ld bytes)", stack_space);
+		LOG_WARN(
+			"l0der",
+			"_get_load_addr: low stack space (%ld bytes)",
+			stack_space
+		);
 	} else if (stack_space < 256) {
-		LOG_ERR("l0der", "_get_load_addr: low stack space (%ld bytes), cannot continue", stack_space);
+		LOG_ERR("l0der",
+			"_get_load_addr: low stack space (%ld bytes), cannot continue",
+			stack_space);
 		return -ENOMEM;
 	}
 
-	LOG_INFO("l0der", "Stack at %08lx, %ld bytes available", li->stack_top, stack_space);
+	LOG_INFO(
+		"l0der",
+		"Stack at %08lx, %ld bytes available",
+		li->stack_top,
+		stack_space
+	);
 
 	return 0;
 }
@@ -301,17 +330,26 @@ static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
 	uint32_t segment_start = li->load_address + phdr->p_vaddr;
 	uint32_t segment_limit = segment_start + phdr->p_memsz;
 
-	LOG_INFO("l0der", "Segment %08lx-%08lx: 0x%lx bytes from file",
-			segment_start, segment_limit, phdr->p_filesz);
+	LOG_INFO(
+		"l0der",
+		"Segment %08lx-%08lx: 0x%lx bytes from file",
+		segment_start,
+		segment_limit,
+		phdr->p_filesz
+	);
 	memset((void *)segment_start, 0, phdr->p_memsz);
 
-	return _seek_and_read(fp, phdr->p_offset, (void*)segment_start, phdr->p_filesz);
+	return _seek_and_read(
+		fp, phdr->p_offset, (void *)segment_start, phdr->p_filesz
+	);
 }
 
 /*
  * Parse dynamic symbol sections.
  */
-static int _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr) {
+static int
+_parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
+{
 	int res;
 	FRESULT fres;
 	Elf32_Shdr shdr;
@@ -333,22 +371,30 @@ static int _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr
 		}
 
 		if ((shdr.sh_size % sizeof(Elf32_Sym)) != 0) {
-			LOG_ERR("l0der", "_parse_dynamic_symbols: SHT_DYN section with invalid size: %ld", shdr.sh_size);
+			LOG_ERR("l0der",
+				"_parse_dynamic_symbols: SHT_DYN section with invalid size: %ld",
+				shdr.sh_size);
 			return -EIO;
 		}
 		uint32_t sym_count = shdr.sh_size / sizeof(Elf32_Sym);
 
-
 		// Read symbols one by one.
 		if ((fres = f_lseek(fp, shdr.sh_offset)) != FR_OK) {
-			LOG_ERR("l0der", "_parse_dynamic_symbols: seek to first relocation (at 0x%lx) failed", shdr.sh_offset);
+			LOG_ERR("l0der",
+				"_parse_dynamic_symbols: seek to first relocation (at 0x%lx) failed",
+				shdr.sh_offset);
 			return -EIO;
 		}
 
 		for (int j = 0; j < sym_count; j++) {
 			unsigned int read;
-			if ((fres = f_read(fp, &sym, sizeof(Elf32_Sym), &read)) != FR_OK || read != sizeof(Elf32_Sym)) {
-				LOG_ERR("l0der", "__parse_dynamic_symbols: symbol read failed: %d", fres);
+			if ((fres = f_read(
+				     fp, &sym, sizeof(Elf32_Sym), &read)) !=
+				    FR_OK ||
+			    read != sizeof(Elf32_Sym)) {
+				LOG_ERR("l0der",
+					"__parse_dynamic_symbols: symbol read failed: %d",
+					fres);
 				return -EIO;
 			}
 
@@ -358,7 +404,9 @@ static int _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr
 			}
 
 			if (li->weak_symbol_count >= WEAK_SYMBOL_MAX) {
-				LOG_ERR("l0der", "__parse_dynamic_symbols: too many weak symbols (limit: %d)", WEAK_SYMBOL_MAX);
+				LOG_ERR("l0der",
+					"__parse_dynamic_symbols: too many weak symbols (limit: %d)",
+					WEAK_SYMBOL_MAX);
 				return -ENOMEM;
 			}
 
@@ -376,7 +424,8 @@ static int _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr
  * the only one used when making 'standard' PIE binaries on RAM. However, other
  * kinds might have to be implemented in the future.
  */
-static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr) {
+static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
+{
 	int res;
 	FRESULT fres;
 	Elf32_Shdr shdr;
@@ -391,7 +440,8 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 
 		// We don't support RELA (relocation with addend) sections (yet?).
 		if (shdr.sh_type == SHT_RELA) {
-			LOG_ERR("l0der", "_run_relocations: found unsupported SHT_RELA section, bailing");
+			LOG_ERR("l0der",
+				"_run_relocations: found unsupported SHT_RELA section, bailing");
 			return -ENOEXEC;
 		}
 
@@ -404,21 +454,30 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 		}
 
 		if ((shdr.sh_size % sizeof(Elf32_Rel)) != 0) {
-			LOG_ERR("l0der", "_run_relocations: SHT_REL section with invalid size: %ld", shdr.sh_size);
+			LOG_ERR("l0der",
+				"_run_relocations: SHT_REL section with invalid size: %ld",
+				shdr.sh_size);
 			return -EIO;
 		}
 		uint32_t reloc_count = shdr.sh_size / sizeof(Elf32_Rel);
 
 		// Read relocations one by one.
 		if ((fres = f_lseek(fp, shdr.sh_offset)) != FR_OK) {
-			LOG_ERR("l0der", "_run_relocations: seek to first relocation (at 0x%lx) failed", shdr.sh_offset);
+			LOG_ERR("l0der",
+				"_run_relocations: seek to first relocation (at 0x%lx) failed",
+				shdr.sh_offset);
 			return -EIO;
 		}
 
 		for (int j = 0; j < reloc_count; j++) {
 			unsigned int read;
-			if ((fres = f_read(fp, &rel, sizeof(Elf32_Rel), &read)) != FR_OK || read != sizeof(Elf32_Rel)) {
-				LOG_ERR("l0der", "_run_relocations: relocation read failed: %d", fres);
+			if ((fres = f_read(
+				     fp, &rel, sizeof(Elf32_Rel), &read)) !=
+				    FR_OK ||
+			    read != sizeof(Elf32_Rel)) {
+				LOG_ERR("l0der",
+					"_run_relocations: relocation read failed: %d",
+					fres);
 				return -EIO;
 			}
 
@@ -429,7 +488,8 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 			// (ie., do not resolve relocation - they default to a safe NULL)
 			uint8_t skip = 0;
 			if (sym != 0) {
-				for (int k = 0; k < li->weak_symbol_count; k++) {
+				for (int k = 0; k < li->weak_symbol_count;
+				     k++) {
 					if (li->weak_symbols[k] == sym) {
 						skip = 1;
 						break;
@@ -441,24 +501,31 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 			}
 
 			switch (type) {
-				case R_ARM_RELATIVE:
-					// Relocate.
-					if ((rel.r_offset % 4) != 0) {
-						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address must be 4-byte aligned");
-						return -ENOEXEC;
-					}
-					volatile uint32_t *addr = (uint32_t *)(rel.r_offset + li->load_address);
-					if ((uint32_t)addr < li->image_load_start || (uint32_t)addr >= li->image_load_limit) {
-						LOG_ERR("l0der", "_run_relocations: R_ARM_RELATIVE address (%08lx) is outside image boundaries",
-								(uint32_t)addr);
-						return -ENOEXEC;
-					}
-
-					*addr += li->load_address;
-					break;
-				default:
-					LOG_ERR("l0der", "_run_relocations: unsupported relocation type %d", type);
+			case R_ARM_RELATIVE:
+				// Relocate.
+				if ((rel.r_offset % 4) != 0) {
+					LOG_ERR("l0der",
+						"_run_relocations: R_ARM_RELATIVE address must be 4-byte aligned");
 					return -ENOEXEC;
+				}
+				volatile uint32_t *addr =
+					(uint32_t
+						 *)(rel.r_offset + li->load_address);
+				if ((uint32_t)addr < li->image_load_start ||
+				    (uint32_t)addr >= li->image_load_limit) {
+					LOG_ERR("l0der",
+						"_run_relocations: R_ARM_RELATIVE address (%08lx) is outside image boundaries",
+						(uint32_t)addr);
+					return -ENOEXEC;
+				}
+
+				*addr += li->load_address;
+				break;
+			default:
+				LOG_ERR("l0der",
+					"_run_relocations: unsupported relocation type %d",
+					type);
+				return -ENOEXEC;
 			}
 		}
 	}
@@ -472,11 +539,11 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
-	struct _pie_load_info li = {0};
+	struct _pie_load_info li = { 0 };
 
 	// First pass over program headers: sanity check sizes, calculate image
 	// size bounds, check alignment.
-	
+
 	li.image_start = 0xffffffff;
 	li.image_limit = 0x0;
 
@@ -502,7 +569,9 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 		if (phdr.p_type == PT_LOAD) {
 			// Check alignment request.
 			if ((phdr.p_vaddr % phdr.p_align) != 0) {
-				LOG_ERR("l0der", "_load_pie: phdr %d alignment too strict", i);
+				LOG_ERR("l0der",
+					"_load_pie: phdr %d alignment too strict",
+					i);
 				return -ENOEXEC;
 			}
 			if (phdr.p_align > li.strictest_alignment) {
@@ -528,14 +597,18 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 		return -ENOEXEC;
 	}
 
-
 	if (li.image_limit < li.image_start) {
 		// We didn't find any LOAD segment.
 		LOG_ERR("l0der", "_load_pie: no loadable segments");
 		return -ENOEXEC;
 	}
 
-	LOG_INFO("l0der", "Image bounds %08lx - %08lx", li.image_start, li.image_limit);
+	LOG_INFO(
+		"l0der",
+		"Image bounds %08lx - %08lx",
+		li.image_start,
+		li.image_limit
+	);
 
 	if ((res = _get_load_addr(&li)) != 0) {
 		return res;
@@ -544,7 +617,7 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 	LOG_INFO("l0der", "Loading at %08lx", li.load_address);
 
 	// Second pass through program headers: load all LOAD segments.
-	
+
 	for (int i = 0; i < hdr->e_phnum; i++) {
 		uint32_t phdr_addr = hdr->e_phoff + (i * hdr->e_phentsize);
 		if ((res = _read_program_header(fp, phdr_addr, &phdr)) != 0) {
@@ -575,7 +648,7 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 	// Setup stack
 	uint32_t *isr = (uint32_t *)image_entrypoint;
-	isr[0] = li.stack_top;
+	isr[0]        = li.stack_top;
 
 	info->isr_vector = (void *)image_entrypoint;
 	return 0;
@@ -585,9 +658,12 @@ int l0der_load_path(const char *path, struct l0dable_info *info)
 {
 	FIL fh;
 
-	FRESULT fres = f_open(&fh, path, FA_OPEN_EXISTING|FA_READ);
+	FRESULT fres = f_open(&fh, path, FA_OPEN_EXISTING | FA_READ);
 	if (fres != FR_OK) {
-		LOG_ERR("l0der", "l0der_load_path: could not open ELF file %s: %d", path, fres);
+		LOG_ERR("l0der",
+			"l0der_load_path: could not open ELF file %s: %d",
+			path,
+			fres);
 		return -ENOENT;
 	}
 
@@ -608,7 +684,8 @@ int l0der_load_path(const char *path, struct l0dable_info *info)
 	uint32_t ph_start = hdr.e_phoff;
 	uint32_t ph_limit = hdr.e_phoff + (hdr.e_phnum * hdr.e_phentsize);
 	if (ph_limit < ph_start) {
-		LOG_ERR("l0der", "l0der_load_path: invalid program header count/size: overflow");
+		LOG_ERR("l0der",
+			"l0der_load_path: invalid program header count/size: overflow");
 		return -ENOEXEC;
 	}
 	if (ph_limit - ph_start == 0) {
@@ -616,39 +693,47 @@ int l0der_load_path(const char *path, struct l0dable_info *info)
 		return -ENOEXEC;
 	}
 	if (ph_limit > size) {
-		LOG_ERR("l0der", "l0der_load_path: program header table extends past end of file");
+		LOG_ERR("l0der",
+			"l0der_load_path: program header table extends past end of file");
 		return -ENOEXEC;
 	}
 	if (hdr.e_phentsize < sizeof(Elf32_Phdr)) {
-		LOG_ERR("l0der", "l0der_load_path: invalid program header table entry size");
+		LOG_ERR("l0der",
+			"l0der_load_path: invalid program header table entry size");
 		return -ENOEXEC;
 	}
 
 	// Sanitize sections.
-	
+
 	uint32_t sh_start = hdr.e_shoff;
 	uint32_t sh_limit = hdr.e_shoff + (hdr.e_shnum + hdr.e_shentsize);
 	if (sh_limit < sh_start) {
-		LOG_ERR("l0der", "l0der_load_path: invalid section header count/size: overflow");
+		LOG_ERR("l0der",
+			"l0der_load_path: invalid section header count/size: overflow");
 		return -ENOEXEC;
 	}
 	if (sh_limit > size) {
-		LOG_ERR("l0der", "l0der_load_path: section header table extends past end of file");
+		LOG_ERR("l0der",
+			"l0der_load_path: section header table extends past end of file");
 		return -ENOEXEC;
 	}
 	if (hdr.e_shentsize < sizeof(Elf32_Shdr)) {
-		LOG_ERR("l0der", "l0der_load_path: invalid section header table entry size");
+		LOG_ERR("l0der",
+			"l0der_load_path: invalid section header table entry size");
 		return -ENOEXEC;
 	}
 
 	// Check whether it's something that we can load.
 
-	if (hdr.e_type == ET_DYN && hdr.e_machine == EM_ARM && hdr.e_version == EV_CURRENT) {
+	if (hdr.e_type == ET_DYN && hdr.e_machine == EM_ARM &&
+	    hdr.e_version == EV_CURRENT) {
 		LOG_INFO("l0der", "Loading PIE l0dable %s ...", path);
 		res = _load_pie(&fh, &hdr, info);
 		goto done;
 	} else {
-		LOG_ERR("l0der", "l0der_load_path: %s: not an ARM PIE, cannot load.", path);
+		LOG_ERR("l0der",
+			"l0der_load_path: %s: not an ARM PIE, cannot load.",
+			path);
 		res = -ENOEXEC;
 		goto done;
 	}

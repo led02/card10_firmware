@@ -26,30 +26,29 @@ void SystemCoreClockUpdate(void)
 
 	// Determine the clock source and frequency
 	clk_src = (MXC_GCR->clkcn & MXC_F_GCR_CLKCN_CLKSEL);
-	switch (clk_src)
-	{
-		case MXC_S_GCR_CLKCN_CLKSEL_HIRC:
-			base_freq = HIRC_FREQ;
-			break;
-		case MXC_S_GCR_CLKCN_CLKSEL_XTAL32M:
-			base_freq = XTAL32M_FREQ;
-			break;
-		case MXC_S_GCR_CLKCN_CLKSEL_LIRC8:
-			base_freq = LIRC8_FREQ;
-			break;
-		case MXC_S_GCR_CLKCN_CLKSEL_HIRC96:
-			base_freq = HIRC96_FREQ;
-			break;
-		case MXC_S_GCR_CLKCN_CLKSEL_HIRC8:
-			base_freq = HIRC8_FREQ;
-			break;
-		case MXC_S_GCR_CLKCN_CLKSEL_XTAL32K:
-			base_freq = XTAL32K_FREQ;
-			break;
-		default:
+	switch (clk_src) {
+	case MXC_S_GCR_CLKCN_CLKSEL_HIRC:
+		base_freq = HIRC_FREQ;
+		break;
+	case MXC_S_GCR_CLKCN_CLKSEL_XTAL32M:
+		base_freq = XTAL32M_FREQ;
+		break;
+	case MXC_S_GCR_CLKCN_CLKSEL_LIRC8:
+		base_freq = LIRC8_FREQ;
+		break;
+	case MXC_S_GCR_CLKCN_CLKSEL_HIRC96:
+		base_freq = HIRC96_FREQ;
+		break;
+	case MXC_S_GCR_CLKCN_CLKSEL_HIRC8:
+		base_freq = HIRC8_FREQ;
+		break;
+	case MXC_S_GCR_CLKCN_CLKSEL_XTAL32K:
+		base_freq = XTAL32K_FREQ;
+		break;
+	default:
 		// Values 001 and 111 are reserved, and should never be encountered.
 		base_freq = HIRC_FREQ;
-			break;
+		break;
 	}
 	// Clock divider is retrieved to compute system clock
 	div = (MXC_GCR->clkcn & MXC_F_GCR_CLKCN_PSC) >> MXC_F_GCR_CLKCN_PSC_POS;
@@ -57,7 +56,8 @@ void SystemCoreClockUpdate(void)
 	SystemCoreClock = base_freq >> div;
 }
 
-__weak void SystemInit() {
+__weak void SystemInit()
+{
 	// Enable FPU.
 	SCB->CPACR |= SCB_CPACR_CP10_Msk | SCB_CPACR_CP11_Msk;
 	__DSB();
@@ -68,15 +68,16 @@ __weak void SystemInit() {
 
 	// Invalidate cache and wait until ready
 	MXC_ICC1->invalidate = 1;
-	while (!(MXC_ICC1->cache_ctrl & MXC_F_ICC_CACHE_CTRL_CACHE_RDY));
+	while (!(MXC_ICC1->cache_ctrl & MXC_F_ICC_CACHE_CTRL_CACHE_RDY))
+		;
 
 	// Enable Cache
 	MXC_ICC1->cache_ctrl |= MXC_F_ICC_CACHE_CTRL_CACHE_EN;
 
 	SystemCoreClockUpdate();
 
-    // Enable API interrupt.
-  	NVIC_EnableIRQ(TMR5_IRQn);
+	// Enable API interrupt.
+	NVIC_EnableIRQ(TMR5_IRQn);
 }
 
 // newlib syscall to allow printf to work.
@@ -113,7 +114,7 @@ uint32_t _sbrk(int incr)
 	// first.
 
 	void *sp;
-	__asm__ __volatile__ ("mov %0, sp" : "=r"(sp));
+	__asm__ __volatile__("mov %0, sp" : "=r"(sp));
 
 	// Require a 'safe margin' of 4k between the heap and stack.
 	uint32_t stack_bottom = (uint32_t)sp - 4096;
