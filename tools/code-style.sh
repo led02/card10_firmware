@@ -41,8 +41,7 @@ for source_file in "$@"; do
     # Check if file is actually one which we want to check
     rel_path="$(realpath --relative-to="$script_dir/.." "$source_file")"
     if [[ ( "$rel_path" == lib/* && "$rel_path" != lib/card10/* ) ||
-          ( "$rel_path" == openocd/* ) ||
-          ( "$rel_path" == ble/* ) ]]; then
+          ( "$rel_path" == openocd/* ) ]]; then
         echo " - Ignoring $source_file"
         continue
     fi
