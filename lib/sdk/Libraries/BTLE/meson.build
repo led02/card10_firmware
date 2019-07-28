@@ -50,7 +50,7 @@ sources = files(
 'stack/ble-profiles/sources/apps/watch/watch_main.c',
 'stack/ble-profiles/sources/apps/datc/datc_main.c',
 'stack/ble-profiles/sources/apps/gluc/gluc_main.c',
-'stack/ble-profiles/sources/apps/fit/fit_main.c',
+#'stack/ble-profiles/sources/apps/fit/fit_main.c',
 'stack/ble-profiles/sources/apps/cycling/cycling_main.c',
 'stack/ble-profiles/sources/apps/sensor/sensor_main.c',
 'stack/ble-profiles/sources/apps/app/app_disc.c',
