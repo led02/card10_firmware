@@ -74,6 +74,9 @@ __weak void SystemInit() {
 	MXC_ICC1->cache_ctrl |= MXC_F_ICC_CACHE_CTRL_CACHE_EN;
 
 	SystemCoreClockUpdate();
+
+    // Enable API interrupt.
+  	NVIC_EnableIRQ(TMR5_IRQn);
 }
 
 // newlib syscall to allow printf to work.
