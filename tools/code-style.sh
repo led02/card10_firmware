@@ -56,6 +56,5 @@ for source_file in "$@"; do
         black -q "$source_file"
     else
         echo " - Ignoring $source_file" >&2
-        continue
-    fi
+	fi
 done
