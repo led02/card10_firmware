@@ -1,11 +1,10 @@
+#include "bootloader.h"
+
 #include "mscmem.h"
-#include <string.h>
-#include <stdio.h>
 #include "mx25lba.h"
 
-void bootloader_stop(void);
-void bootloader_dirty(void);
-void bootloader_clean(void);
+#include <string.h>
+#include <stdio.h>
 
 static int dirty = 0;
 

@@ -1,33 +1,33 @@
-#include <stdio.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include <string.h>
+#include "bootloader.h"
 
-#include "mxc_config.h"
-#include "mxc_sys.h"
-#include "mxc_delay.h"
-#include "flc.h"
-#include "icc.h"
-#include "i2c.h"
-#include "crc.h"
-#include "board.h"
-#include "led.h"
-#include "ff.h"
-#include "crc16-ccitt.h"
-#include "pb.h"
-#include "display.h"
 #include "GUI_Paint.h"
 #include "card10.h"
-
+#include "display.h"
+#include "led.h"
+#include "pb.h"
 #include "pmic.h"
+
+#include "board.h"
+#include "crc.h"
+#include "crc16-ccitt.h"
+#include "ff.h"
+#include "flc.h"
+#include "i2c.h"
+#include "icc.h"
+#include "mxc_config.h"
+#include "mxc_delay.h"
+#include "mxc_sys.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 #define GPIO_PORT_IN PORT_1
 #define GPIO_PIN_IN PIN_6
 
 #define PARTITION_START (0x10000000 + 64 * 1024)
 #define PARTITION_END (0x10000000 + 1024 * 1024 - 1)
-
-extern void run_usbmsc(void);
 
 DIR dir;
 FATFS FatFs;
@@ -220,6 +220,9 @@ int main(void)
 	printf("\n\nBootloader\n");
 	card10_init();
 
+	/*
+	 * Make the power/reset button restart card10.
+	 */
 	pmic_set_button_callback(pmic_button);
 
 	Paint_DrawString_EN(0, 16 * 0, "Bootloader", &Font16, 0x0000, 0xffff);

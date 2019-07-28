@@ -38,22 +38,26 @@
  * @brief   USB Mass Storage Class
  */
 
-#include <stdio.h>
-#include <stddef.h>
+#include "bootloader.h"
+#include "descriptors.h"
+
+#include "display.h"
+#include "GUI_Paint.h"
+#include "card10.h"
+#include "led.h"
+
 #include "mxc_config.h"
 #include "mxc_sys.h"
 #include "mxc_delay.h"
 #include "board.h"
-#include "led.h"
 #include "usb.h"
 #include "usb_event.h"
 #include "enumerate.h"
 #include "msc.h"
-#include "descriptors.h"
 #include "mscmem.h"
-#include "card10.h"
-#include "display.h"
-#include "GUI_Paint.h"
+
+#include <stdio.h>
+#include <stddef.h>
 
 /***** Definitions *****/
 #define EVENT_ENUM_COMP MAXUSB_NUM_EVENTS
