@@ -41,8 +41,6 @@
 #include "bootloader.h"
 #include "descriptors.h"
 
-#include "display.h"
-#include "GUI_Paint.h"
 #include "card10.h"
 #include "led.h"
 
@@ -125,14 +123,12 @@ void bootloader_stop(void)
 
 void bootloader_dirty(void)
 {
-	Paint_DrawString_EN(0, 16 * 3, "Writing.", &Font16, 0x0000, 0xf000);
-	LCD_Update();
+	bootloader_display_line(3, "Writing.", 0xf000);
 }
 
 void bootloader_clean(void)
 {
-	Paint_DrawString_EN(0, 16 * 3, "Ready.  ", &Font16, 0x0000, 0xffff);
-	LCD_Update();
+	bootloader_display_line(3, "Ready.  ", 0xffff);
 }
 
 /******************************************************************************/

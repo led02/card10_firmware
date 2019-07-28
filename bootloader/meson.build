@@ -4,6 +4,7 @@ executable(
   name + '.elf',
   'main.c',
   'mscmem.c',
+  'bootloader-display.c',
   'bootloader-usb.c',
   'crc16-ccitt.c',
   dependencies: [

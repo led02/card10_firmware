@@ -1,8 +1,6 @@
 #include "bootloader.h"
 
-#include "GUI_Paint.h"
 #include "card10.h"
-#include "display.h"
 #include "led.h"
 #include "pb.h"
 #include "pmic.h"
@@ -60,16 +58,7 @@ bool check_integrity(void)
 
 	res = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
 	if (res != FR_OK) {
-		Paint_DrawString_EN(
-			0,
-			16 * 2,
-			"card10.bin not found",
-			&Font16,
-			0x0000,
-			0xffff
-		);
-		LCD_Update();
-
+		bootloader_display_line(2, "card10.bin not found", 0xffff);
 		printf("f_open error %d\n", res);
 		return false;
 	}
@@ -90,15 +79,7 @@ bool check_integrity(void)
 	if (crcval == 0) {
 		return true;
 	} else {
-		Paint_DrawString_EN(
-			0,
-			16 * 2,
-			"Integrity check failed",
-			&Font16,
-			0x0000,
-			0xffff
-		);
-		LCD_Update();
+		bootloader_display_line(2, "Integrity check failed", 0xffff);
 		printf("CRC check failed. Final CRC: %d\n", crcval);
 		return false;
 	}
@@ -225,20 +206,12 @@ int main(void)
 	 */
 	pmic_set_button_callback(pmic_button);
 
-	Paint_DrawString_EN(0, 16 * 0, "Bootloader", &Font16, 0x0000, 0xffff);
-	Paint_DrawString_EN(0, 16 * 1, __DATE__, &Font16, 0x0000, 0xffff);
-
-	LCD_Update();
+	bootloader_display_header();
 
 	// If the button is pressed, we go into MSC mode.
 	if (PB_Get(3)) {
-		Paint_DrawString_EN(
-			0, 16 * 2, "USB activated.", &Font16, 0x0000, 0xffff
-		);
-		Paint_DrawString_EN(
-			0, 16 * 3, "Ready.", &Font16, 0x0000, 0xffff
-		);
-		LCD_Update();
+		bootloader_display_line(2, "USB activated.", 0xffff);
+		bootloader_display_line(3, "Ready.", 0xffff);
 		run_usbmsc();
 
 		// If we return, don't try to boot. Maybe rather trigger a software reset.
@@ -252,16 +225,10 @@ int main(void)
 		if (check_integrity()) {
 			printf("Found valid application image\n");
 			if (is_update_needed()) {
-				printf("Trying to update application from external flash\n");
-				Paint_DrawString_EN(
-					0,
-					16 * 4,
-					"Updating...",
-					&Font16,
-					0x0000,
-					0xffff
+				printf("Trying to update firmware from external flash\n");
+				bootloader_display_line(
+					4, "Updating ...", 0xffff
 				);
-				LCD_Update();
 				erase_partition();
 				flash_partition();
 			} else {
@@ -271,25 +238,15 @@ int main(void)
 			printf("Integrity check failed\n");
 		}
 	} else {
-		Paint_DrawString_EN(
-			0,
-			16 * 2,
-			"Failed to mount file system",
-			&Font16,
-			0x0000,
-			0xffff
+		bootloader_display_line(
+			2, "Failed to mount filesystem", 0xffff
 		);
-		LCD_Update();
 		printf("Failed to mount the external flash\n");
 	}
 
 	printf("Trying to boot\n");
-	Paint_DrawString_EN(
-		0, 16 * 4, "Trying to boot", &Font16, 0x0000, 0xffff
-	);
-	LCD_Update();
-	//while(1);
-	// boot partition
+	bootloader_display_line(4, "Trying to boot", 0xffff);
+
 	boot((uintptr_t *)PARTITION_START);
 
 	while (1) {
