@@ -116,7 +116,7 @@ sources = files(
 'stack/ble-profiles/sources/services/svc_rscs.c',
 'stack/ble-profiles/sources/services/svc_hts.c',
 'stack/ble-profiles/sources/services/svc_temp.c',
-'stack/ble-profiles/sources/services/svc_core.c',
+#'stack/ble-profiles/sources/services/svc_core.c',
 'stack/ble-profiles/sources/services/svc_hid.c',
 'stack/ble-profiles/sources/services/svc_scpss.c',
 'stack/ble-profiles/sources/services/svc_hrs.c',
