@@ -53,9 +53,9 @@ class Color(_ColorTuple):
             # Cyan
             color.from_hex(0x00ffff)
         """
-        red = (color & 0xff0000) >> 16
-        green = (color & 0x00ff00) >> 8
-        blue = (color & 0x0000ff)
+        red = (color & 0xFF0000) >> 16
+        green = (color & 0x00FF00) >> 8
+        blue = color & 0x0000FF
         return cls(red, green, blue)
 
     @classmethod
@@ -85,11 +85,14 @@ class Color(_ColorTuple):
         Code via https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative
 
         """
+
         def f(n):
             k = (n + (hue / 60)) % 6
-            return value - (value * saturation * max(min(k, 4-k, 1), 0))
+            return value - (value * saturation * max(min(k, 4 - k, 1), 0))
+
         def f2(x):
             return round(f(x) * 255)
+
         return cls(f2(5), f2(3), f2(1))
 
     @classmethod
@@ -120,20 +123,23 @@ class Color(_ColorTuple):
 
         """
         a = saturation * min(lightness, 1 - lightness)
+
         def f(n):
-            k = (n + hue/30) % 12
-            return lightness - (a * max(min(k-3, 9-k, 1), -1))
+            k = (n + hue / 30) % 12
+            return lightness - (a * max(min(k - 3, 9 - k, 1), -1))
+
         def f2(x):
             return round(f(x) * 255)
+
         return cls(f2(0), f2(8), f2(4))
 
     def __to_hsx(self, hsv=True):
         """
         Code via https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
         """
-        xr = self.red   / 255
+        xr = self.red / 255
         xg = self.green / 255
-        xb = self.blue  / 255
+        xb = self.blue / 255
         if xr == xg and xr == xb:
             h = 0
             c_max = xr
@@ -164,7 +170,7 @@ class Color(_ColorTuple):
             v = c_max
             return [round(h), round(s, 2), round(v, 2)]
         else:
-            l = ((c_max + c_min) / 2)
+            l = (c_max + c_min) / 2
             if x_max == 0:
                 s = 0
             elif x_min == 1:
@@ -217,9 +223,9 @@ class Color(_ColorTuple):
         if sat < 0:
             sat = 0
         rv = from_fn(hsx[0], sat, hsx[2])
-        self.red   = rv.red
+        self.red = rv.red
         self.green = rv.green
-        self.blue  = rv.blue
+        self.blue = rv.blue
 
     def __change_vlx(self, change, to_fn, from_fn):
         hsx = to_fn()
@@ -229,9 +235,9 @@ class Color(_ColorTuple):
         if vlx < 0:
             vlx = 0
         rv = from_fn(hsx[0], hsx[1], vlx)
-        self.red   = rv.red
+        self.red = rv.red
         self.green = rv.green
-        self.blue  = rv.blue
+        self.blue = rv.blue
 
     def change_hue(self, change):
         """
@@ -257,9 +263,9 @@ class Color(_ColorTuple):
         hue = hsx[0] + change
         hue = hue % 360
         rv = self.from_hsl(hue, hsx[1], hsx[2])
-        self.red   = rv.red
+        self.red = rv.red
         self.green = rv.green
-        self.blue  = rv.blue
+        self.blue = rv.blue
 
     def change_saturation_hsv(self, change):
         """
@@ -418,9 +424,9 @@ class Color(_ColorTuple):
             other = float(other)
         except ValueError:
             return NotImplemented
-        r = self.red   * other
+        r = self.red * other
         g = self.green * other
-        b = self.blue  * other
+        b = self.blue * other
         return self.__get_bounded(round(r), round(g), round(b))
 
     def __add__(self, other):
@@ -447,9 +453,9 @@ class Color(_ColorTuple):
         """
         if not isinstance(other, Color):
             return NotImplemented
-        r = self.red   + other.red
+        r = self.red + other.red
         g = self.green + other.green
-        b = self.blue  + other.blue
+        b = self.blue + other.blue
         return self.__get_bounded(r, g, b)
 
     def __sub__(self, other):
@@ -476,18 +482,17 @@ class Color(_ColorTuple):
         """
         if not isinstance(other, Color):
             return NotImplemented
-        r = self.red   - other.red
+        r = self.red - other.red
         g = self.green - other.green
-        b = self.blue  - other.blue
+        b = self.blue - other.blue
         return self.__get_bounded(r, g, b)
 
     def __str__(self):
         # Return the color in hex
-        return "#{:02x}{:02x}{:02x}".format(
-            self.red, self.green, self.blue
-        )
+        return "#{:02x}{:02x}{:02x}".format(self.red, self.green, self.blue)
 
 
+# fmt: off
 Color.BLACK   = Color.from_hex(0x000000)
 Color.WHITE   = Color.from_hex(0xffffff)
 Color.RED     = Color.from_hex(0xff0000)
@@ -496,6 +501,7 @@ Color.YELLOW  = Color.from_hex(0xffff00)
 Color.BLUE    = Color.from_hex(0x0000ff)
 Color.MAGENTA = Color.from_hex(0xff00ff)
 Color.CYAN    = Color.from_hex(0x00ffff)
+# fmt: on
 
 
 # Add the colors and constructors to the module for convenience
@@ -506,9 +512,5 @@ Color.CYAN    = Color.from_hex(0x00ffff)
 #    colors.BLACK
 #    colors.from_hex(0xc6c6c6)
 globals().update(
-    {
-        n: getattr(Color, n)
-        for n in dir(Color)
-        if n.startswith("from") or n.isupper()
-    }
+    {n: getattr(Color, n) for n in dir(Color) if n.startswith("from") or n.isupper()}
 )

@@ -1,5 +1,6 @@
 from color import Color
 
+# fmt: off
 ALICEBLUE            = Color.from_hex(0xf0f8ff)
 ANTIQUEWHITE         = Color.from_hex(0xfaebd7)
 AQUA                 = Color.from_hex(0x00ffff)
@@ -140,3 +141,4 @@ WHITE                = Color.from_hex(0xffffff)
 WHITESMOKE           = Color.from_hex(0xf5f5f5)
 YELLOW               = Color.from_hex(0xffff00)
 YELLOWGREEN          = Color.from_hex(0x9acd32)
+# fmt: on

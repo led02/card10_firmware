@@ -1,6 +1,7 @@
 import sys_display
 import color
 
+
 class Display:
     """
     The display class provides methods to allow the lcd display
@@ -144,6 +145,7 @@ class Display:
 
         sys_display.circ(x, y, rad, col, filled, size)
         return self
+
 
 open = Display.open
 close = Display.close
