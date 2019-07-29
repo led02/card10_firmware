@@ -49,8 +49,22 @@ int puts(const char *s)
 /* Used by mp_hal_move_cursor_back() */
 int snprintf(char *str, size_t size, const char *format, ...)
 {
-	/* TODO: What should we do with this? */
-	return -EIO;
+	/*
+	 * There is one known place where snprintf is used:  The
+	 * mp_hal_move_cursor_back() function from mp-readline.
+	 * This stub implementation just implements printf for
+	 * that one case.
+	 */
+	if (format[0] != '\x1B' || size != 6) {
+		return -EIO;
+	}
+
+	va_list ap;
+	va_start(ap, format);
+	printf("\x1B[%uD", va_arg(ap, unsigned int));
+	va_end(ap);
+
+	return -1;
 }
 
 /* Use by assert() */
