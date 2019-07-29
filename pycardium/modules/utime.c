@@ -15,6 +15,7 @@
 static mp_obj_t time_time(void)
 {
 	mp_int_t seconds;
+	/* MicroPython has its epoch at 2000-01-01. Our RTC is in UTC */
 	seconds = epic_rtc_get_seconds() - 946684800UL;
 	return mp_obj_new_int(seconds);
 }
