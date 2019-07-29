@@ -54,8 +54,8 @@ typedef unsigned int size_t;
 #define API_FILE_READ          0x32
 #define API_FILE_WRITE         0x34
 #define API_FILE_FLUSH         0x35
-#define API_FILE_SEEK          0x36 //NYI
-#define API_FILE_TELL          0x37 //NYI
+#define API_FILE_SEEK          0x36
+#define API_FILE_TELL          0x37
 #define API_FILE_STAT          0x38
 /* clang-format on */
 
@@ -482,6 +482,12 @@ API(
 
 /** */
 API(API_FILE_FLUSH, int epic_file_flush(int fd));
+
+/** */
+API(API_FILE_SEEK, int epic_file_seek(int fd, long offset, int whence));
+
+/** */
+API(API_FILE_TELL, int epic_file_tell(int fd));
 
 /** */
 enum epic_stat_type {

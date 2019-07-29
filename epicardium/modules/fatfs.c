@@ -326,6 +326,43 @@ int epic_file_flush(int fd)
 	return 0;
 }
 
+int epic_file_seek(int fd, long offset, int whence)
+{
+	int res;
+	struct FatObject *o;
+	res = get_fat_object(fd, FO_File, &o);
+	if (res) {
+		return -res;
+	}
+
+	switch (whence) {
+	case SEEK_SET:
+		res = f_lseek(&o->file, offset);
+		return -fresult_to_errno_table[res];
+	case SEEK_CUR:
+		res = f_lseek(&o->file, f_tell(&o->file) + offset);
+		return -fresult_to_errno_table[res];
+	case SEEK_END:
+		res = f_lseek(&o->file, f_size(&o->file) + offset);
+		return -fresult_to_errno_table[res];
+	default:
+		return -EINVAL;
+	}
+	return 0;
+}
+
+int epic_file_tell(int fd)
+{
+	int res;
+	struct FatObject *o;
+	res = get_fat_object(fd, FO_File, &o);
+	if (res) {
+		return -1;
+	}
+
+	return f_tell(&o->file);
+}
+
 int epic_file_stat(const char *filename, epic_stat_t *stat)
 {
 	int res;
