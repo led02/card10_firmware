@@ -59,9 +59,10 @@ static int _read_elf_header(int fd, Elf32_Ehdr *hdr)
 {
 	int res;
 
-    epic_file_seek(fd, 0, SEEK_SET);
+	epic_file_seek(fd, 0, SEEK_SET);
 
-	if ((res = epic_file_read(fd, hdr, sizeof(Elf32_Ehdr))) != sizeof(Elf32_Ehdr)) {
+	if ((res = epic_file_read(fd, hdr, sizeof(Elf32_Ehdr))) !=
+	    sizeof(Elf32_Ehdr)) {
 		LOG_ERR("l0der", "_read_elf_header: read failed: %d", res);
 		return res;
 	}
@@ -119,7 +120,7 @@ static int _seek_and_read(int fd, uint32_t address, void *data, size_t count)
 	}
 
 	if ((res = epic_file_read(fd, data, count)) != count) {
-		LOG_ERR("l0der","_seek_and_read: could not read: %d", res);
+		LOG_ERR("l0der", "_seek_and_read: could not read: %d", res);
 		return res;
 	}
 
@@ -327,9 +328,9 @@ static int _load_segment(int fd, struct _pie_load_info *li, Elf32_Phdr *phdr)
 /*
  * Parse dynamic symbol sections.
  */
-static int
-_parse_dynamic_symbols(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr)
-{
+static int _parse_dynamic_symbols(
+	int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr
+) {
 	int res;
 	Elf32_Shdr shdr;
 	Elf32_Sym sym;
@@ -368,7 +369,7 @@ _parse_dynamic_symbols(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *
 		for (int j = 0; j < sym_count; j++) {
 			if ((res = epic_file_read(
 				     fd, &sym, sizeof(Elf32_Sym))) !=
-				     sizeof(Elf32_Sym)) {
+			    sizeof(Elf32_Sym)) {
 				LOG_ERR("l0der",
 					"__parse_dynamic_symbols: symbol read failed: %d",
 					res);
@@ -401,7 +402,8 @@ _parse_dynamic_symbols(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *
  * the only one used when making 'standard' PIE binaries on RAM. However, other
  * kinds might have to be implemented in the future.
  */
-static int _run_relocations(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr)
+static int
+_run_relocations(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 {
 	int res;
 	Elf32_Shdr shdr;
@@ -448,7 +450,7 @@ static int _run_relocations(int fd, int size, struct _pie_load_info *li, Elf32_E
 		for (int j = 0; j < reloc_count; j++) {
 			if ((res = epic_file_read(
 				     fd, &rel, sizeof(Elf32_Rel))) !=
-				     sizeof(Elf32_Rel)) {
+			    sizeof(Elf32_Rel)) {
 				LOG_ERR("l0der",
 					"_run_relocations: relocation read failed: %d",
 					res);
@@ -510,7 +512,8 @@ static int _run_relocations(int fd, int size, struct _pie_load_info *li, Elf32_E
 /*
  * Load a l0dable PIE binary.
  */
-static int _load_pie(int fd, int size, Elf32_Ehdr *hdr, struct l0dable_info *info)
+static int
+_load_pie(int fd, int size, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
 	struct _pie_load_info li = { 0 };
