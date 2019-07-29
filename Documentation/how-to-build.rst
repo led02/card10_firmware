@@ -32,6 +32,7 @@ Dependencies
   of meson in their repositories.  Instead, you'll probably save yourself a lot
   of headaches by installing meson from ``pip3 install --user meson``.
 * **python3-crc16**: Install with ``pip3 install --user crc16``.
+* **python3-pillow**: Python Image Library
 
 .. _ARM's GNU toolchain: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
