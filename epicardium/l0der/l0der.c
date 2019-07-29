@@ -3,7 +3,6 @@
 #include <alloca.h>
 #include <stdio.h>
 #include <string.h>
-#include <ff.h>
 
 #include "epicardium.h"
 #include "l0der/elf.h"
@@ -56,46 +55,41 @@ struct _pie_load_info {
 /*
  * Read an ELF header, check E_IDENT.
  */
-static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
+static int _read_elf_header(int fd, Elf32_Ehdr *hdr)
 {
-	f_lseek(fp, 0);
+	int res;
 
-	unsigned int read;
-	FRESULT fres = f_read(fp, hdr, sizeof(Elf32_Ehdr), &read);
-	if (fres != FR_OK) {
-		LOG_ERR("l0der", "_read_elf_header: f_read failed: %d", fres);
-		return -1;
-	}
+    epic_file_seek(fd, 0, SEEK_SET);
 
-	if (read != sizeof(Elf32_Ehdr)) {
-		LOG_ERR("l0der", "_read_elf_header: file truncated");
-		return -1;
+	if ((res = epic_file_read(fd, hdr, sizeof(Elf32_Ehdr))) != sizeof(Elf32_Ehdr)) {
+		LOG_ERR("l0der", "_read_elf_header: read failed: %d", res);
+		return res;
 	}
 
 	if (hdr->e_ident[0] != ELFMAG0 || hdr->e_ident[1] != ELFMAG1 ||
 	    hdr->e_ident[2] != ELFMAG2 || hdr->e_ident[3] != ELFMAG3) {
 		LOG_ERR("l0der", "_read_elf_header: not an ELF file");
-		return -1;
+		return -ENOEXEC;
 	}
 
 	if (hdr->e_ident[4] != ELFCLASS32) {
 		LOG_ERR("l0der", "_read_elf_header: not a 32-bit ELF");
-		return -1;
+		return -ENOEXEC;
 	}
 
 	if (hdr->e_ident[5] != ELFDATA2LSB) {
 		LOG_ERR("l0der", "_read_elf_header: not a little-endian ELF");
-		return -1;
+		return -ENOEXEC;
 	}
 
 	if (hdr->e_ident[6] != EV_CURRENT) {
 		LOG_ERR("l0der", "_read_elf_header: not a v1 ELF");
-		return -1;
+		return -ENOEXEC;
 	}
 
 	if (hdr->e_ehsize < sizeof(Elf32_Ehdr)) {
 		LOG_ERR("l0der", "_raed_elf_header: header too small");
-		return -1;
+		return -ENOEXEC;
 	}
 
 	return 0;
@@ -104,7 +98,7 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
 /*
  * Read bytes from file at a given offset.
  *
- * :param FIL* fp: file pointer to read from
+ * :param int fd: file pointer to read from
  * :param uint32_t address: address from which to read
  * :param void *data: buffer into which to read
  * :param size_t count: amount of bytes to read
@@ -112,31 +106,21 @@ static int _read_elf_header(FIL *fp, Elf32_Ehdr *hdr)
  * 
  *	- ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
  */
-static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count)
+static int _seek_and_read(int fd, uint32_t address, void *data, size_t count)
 {
-	FRESULT fres;
+	int res;
 
-	if ((fres = f_lseek(fp, address)) != FR_OK) {
+	if ((res = epic_file_seek(fd, address, SEEK_SET)) != 0) {
 		LOG_ERR("l0der",
 			"_seek_and_read: could not seek to 0x%lx: %d",
 			address,
-			fres);
-		return -EIO;
+			res);
+		return res;
 	}
 
-	unsigned int read;
-	if ((fres = f_read(fp, data, count, &read)) != FR_OK || read < count) {
-		if (fres == FR_OK) {
-			LOG_ERR("l0der",
-				"_seek_and_read: could not read: wanted %d bytes, got %d",
-				count,
-				read);
-		} else {
-			LOG_ERR("l0der",
-				"_seek_and_read: could not read: %d",
-				fres);
-		}
-		return -EIO;
+	if ((res = epic_file_read(fd, data, count)) != count) {
+		LOG_ERR("l0der","_seek_and_read: could not read: %d", res);
+		return res;
 	}
 
 	return 0;
@@ -145,17 +129,17 @@ static int _seek_and_read(FIL *fp, uint32_t address, void *data, size_t count)
 /*
  * Read an ELF program header header.
  */
-static int _read_program_header(FIL *fp, uint32_t phdr_addr, Elf32_Phdr *phdr)
+static int _read_program_header(int fd, uint32_t phdr_addr, Elf32_Phdr *phdr)
 {
-	return _seek_and_read(fp, phdr_addr, phdr, sizeof(Elf32_Phdr));
+	return _seek_and_read(fd, phdr_addr, phdr, sizeof(Elf32_Phdr));
 }
 
 /*
  * Read an ELF section header header.
  */
-static int _read_section_header(FIL *fp, uint32_t shdr_addr, Elf32_Shdr *shdr)
+static int _read_section_header(int fd, uint32_t shdr_addr, Elf32_Shdr *shdr)
 {
-	return _seek_and_read(fp, shdr_addr, shdr, sizeof(Elf32_Shdr));
+	return _seek_and_read(fd, shdr_addr, shdr, sizeof(Elf32_Shdr));
 }
 
 /*
@@ -164,10 +148,8 @@ static int _read_section_header(FIL *fp, uint32_t shdr_addr, Elf32_Shdr *shdr)
  * This function ensures basic memory sanity of a program header / segment.
  * It ensures that it points to a file region that is contained within the file fully.
  */
-static int _check_program_header(FIL *fp, Elf32_Phdr *phdr)
+static int _check_program_header(int fd, int size, Elf32_Phdr *phdr)
 {
-	size_t size = f_size(fp);
-
 	// Check file size/offset.
 	uint32_t file_start = phdr->p_offset;
 	uint32_t file_limit = phdr->p_offset + phdr->p_filesz;
@@ -208,10 +190,8 @@ static int _check_program_header(FIL *fp, Elf32_Phdr *phdr)
  * This function ensures basic memory sanity of a section header.
  * It ensures that it points to a file region that is contained within the file fully.
  */
-static int _check_section_header(FIL *fp, Elf32_Shdr *shdr)
+static int _check_section_header(int fd, int size, Elf32_Shdr *shdr)
 {
-	size_t size = f_size(fp);
-
 	// Check file size/offset.
 	uint32_t file_start = shdr->sh_offset;
 	uint32_t file_limit = shdr->sh_offset + shdr->sh_size;
@@ -236,15 +216,15 @@ static const char *_interpreter = "card10-l0dable";
 /*
  * Check that the given INTERP program header contains the correct interpreter string.
  */
-static int _check_interp(FIL *fp, Elf32_Phdr *phdr)
+static int _check_interp(int fd, Elf32_Phdr *phdr)
 {
 	int res;
 	uint32_t buffer_size = strlen(_interpreter) + 1;
 	char *interp         = alloca(buffer_size);
 	memset(interp, 0, buffer_size);
 
-	if ((res = _seek_and_read(fp, phdr->p_offset, interp, buffer_size)) !=
-	    FR_OK) {
+	if ((res = _seek_and_read(fd, phdr->p_offset, interp, buffer_size)) !=
+	    0) {
 		return res;
 	}
 
@@ -325,7 +305,7 @@ static int _get_load_addr(struct _pie_load_info *li)
  *
  * Segment must be a LOAD segment.
  */
-static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
+static int _load_segment(int fd, struct _pie_load_info *li, Elf32_Phdr *phdr)
 {
 	uint32_t segment_start = li->load_address + phdr->p_vaddr;
 	uint32_t segment_limit = segment_start + phdr->p_memsz;
@@ -340,7 +320,7 @@ static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
 	memset((void *)segment_start, 0, phdr->p_memsz);
 
 	return _seek_and_read(
-		fp, phdr->p_offset, (void *)segment_start, phdr->p_filesz
+		fd, phdr->p_offset, (void *)segment_start, phdr->p_filesz
 	);
 }
 
@@ -348,17 +328,16 @@ static int _load_segment(FIL *fp, struct _pie_load_info *li, Elf32_Phdr *phdr)
  * Parse dynamic symbol sections.
  */
 static int
-_parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
+_parse_dynamic_symbols(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 {
 	int res;
-	FRESULT fres;
 	Elf32_Shdr shdr;
 	Elf32_Sym sym;
 
 	// Go through all dynamic symbol sections.
 	for (int i = 0; i < hdr->e_shnum; i++) {
 		uint32_t shdr_addr = hdr->e_shoff + (i * hdr->e_shentsize);
-		if ((res = _read_section_header(fp, shdr_addr, &shdr)) != 0) {
+		if ((res = _read_section_header(fd, shdr_addr, &shdr)) != 0) {
 			return res;
 		}
 
@@ -366,7 +345,7 @@ _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 			continue;
 		}
 
-		if ((res = _check_section_header(fp, &shdr)) != 0) {
+		if ((res = _check_section_header(fd, size, &shdr)) != 0) {
 			return res;
 		}
 
@@ -379,23 +358,21 @@ _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 		uint32_t sym_count = shdr.sh_size / sizeof(Elf32_Sym);
 
 		// Read symbols one by one.
-		if ((fres = f_lseek(fp, shdr.sh_offset)) != FR_OK) {
+		if ((res = epic_file_seek(fd, shdr.sh_offset, SEEK_SET)) != 0) {
 			LOG_ERR("l0der",
 				"_parse_dynamic_symbols: seek to first relocation (at 0x%lx) failed",
 				shdr.sh_offset);
-			return -EIO;
+			return res;
 		}
 
 		for (int j = 0; j < sym_count; j++) {
-			unsigned int read;
-			if ((fres = f_read(
-				     fp, &sym, sizeof(Elf32_Sym), &read)) !=
-				    FR_OK ||
-			    read != sizeof(Elf32_Sym)) {
+			if ((res = epic_file_read(
+				     fd, &sym, sizeof(Elf32_Sym))) !=
+				     sizeof(Elf32_Sym)) {
 				LOG_ERR("l0der",
 					"__parse_dynamic_symbols: symbol read failed: %d",
-					fres);
-				return -EIO;
+					res);
+				return res;
 			}
 
 			uint32_t bind = ELF32_ST_BIND(sym.st_info);
@@ -424,17 +401,16 @@ _parse_dynamic_symbols(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
  * the only one used when making 'standard' PIE binaries on RAM. However, other
  * kinds might have to be implemented in the future.
  */
-static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
+static int _run_relocations(int fd, int size, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 {
 	int res;
-	FRESULT fres;
 	Elf32_Shdr shdr;
 	Elf32_Rel rel;
 
 	// Go through all relocation sections.
 	for (int i = 0; i < hdr->e_shnum; i++) {
 		uint32_t shdr_addr = hdr->e_shoff + (i * hdr->e_shentsize);
-		if ((res = _read_section_header(fp, shdr_addr, &shdr)) != 0) {
+		if ((res = _read_section_header(fd, shdr_addr, &shdr)) != 0) {
 			return res;
 		}
 
@@ -449,7 +425,7 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 			continue;
 		}
 
-		if ((res = _check_section_header(fp, &shdr)) != 0) {
+		if ((res = _check_section_header(fd, size, &shdr)) != 0) {
 			return res;
 		}
 
@@ -457,28 +433,26 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 			LOG_ERR("l0der",
 				"_run_relocations: SHT_REL section with invalid size: %ld",
 				shdr.sh_size);
-			return -EIO;
+			return -ENOEXEC;
 		}
 		uint32_t reloc_count = shdr.sh_size / sizeof(Elf32_Rel);
 
 		// Read relocations one by one.
-		if ((fres = f_lseek(fp, shdr.sh_offset)) != FR_OK) {
+		if ((res = epic_file_seek(fd, shdr.sh_offset, SEEK_SET)) != 0) {
 			LOG_ERR("l0der",
 				"_run_relocations: seek to first relocation (at 0x%lx) failed",
 				shdr.sh_offset);
-			return -EIO;
+			return res;
 		}
 
 		for (int j = 0; j < reloc_count; j++) {
-			unsigned int read;
-			if ((fres = f_read(
-				     fp, &rel, sizeof(Elf32_Rel), &read)) !=
-				    FR_OK ||
-			    read != sizeof(Elf32_Rel)) {
+			if ((res = epic_file_read(
+				     fd, &rel, sizeof(Elf32_Rel))) !=
+				     sizeof(Elf32_Rel)) {
 				LOG_ERR("l0der",
 					"_run_relocations: relocation read failed: %d",
-					fres);
-				return -EIO;
+					res);
+				return res;
 			}
 
 			uint32_t sym = ELF32_R_SYM(rel.r_info);
@@ -536,7 +510,7 @@ static int _run_relocations(FIL *fp, struct _pie_load_info *li, Elf32_Ehdr *hdr)
 /*
  * Load a l0dable PIE binary.
  */
-static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
+static int _load_pie(int fd, int size, Elf32_Ehdr *hdr, struct l0dable_info *info)
 {
 	int res;
 	struct _pie_load_info li = { 0 };
@@ -553,16 +527,16 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 	for (int i = 0; i < hdr->e_phnum; i++) {
 		uint32_t phdr_addr = hdr->e_phoff + (i * hdr->e_phentsize);
-		if ((res = _read_program_header(fp, phdr_addr, &phdr)) != 0) {
+		if ((res = _read_program_header(fd, phdr_addr, &phdr)) != 0) {
 			return res;
 		}
 
-		if ((res = _check_program_header(fp, &phdr)) != 0) {
+		if ((res = _check_program_header(fd, size, &phdr)) != 0) {
 			return res;
 		}
 
 		if (phdr.p_type == PT_INTERP) {
-			status_interp = _check_interp(fp, &phdr);
+			status_interp = _check_interp(fd, &phdr);
 			continue;
 		}
 
@@ -620,7 +594,7 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 	for (int i = 0; i < hdr->e_phnum; i++) {
 		uint32_t phdr_addr = hdr->e_phoff + (i * hdr->e_phentsize);
-		if ((res = _read_program_header(fp, phdr_addr, &phdr)) != 0) {
+		if ((res = _read_program_header(fd, phdr_addr, &phdr)) != 0) {
 			return res;
 		}
 
@@ -628,18 +602,18 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 			continue;
 		}
 
-		if ((res = _load_segment(fp, &li, &phdr)) != 0) {
+		if ((res = _load_segment(fd, &li, &phdr)) != 0) {
 			return res;
 		}
 	}
 
 	// Load dynamic symbols.
-	if ((res = _parse_dynamic_symbols(fp, &li, hdr)) != 0) {
+	if ((res = _parse_dynamic_symbols(fd, size, &li, hdr)) != 0) {
 		return res;
 	}
 
 	// Run relocations.
-	if ((res = _run_relocations(fp, &li, hdr)) != 0) {
+	if ((res = _run_relocations(fd, size, &li, hdr)) != 0) {
 		return res;
 	}
 
@@ -656,26 +630,29 @@ static int _load_pie(FIL *fp, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 int l0der_load_path(const char *path, struct l0dable_info *info)
 {
-	FIL fh;
-
-	FRESULT fres = f_open(&fh, path, FA_OPEN_EXISTING | FA_READ);
-	if (fres != FR_OK) {
+	int fd, res;
+	if ((fd = epic_file_open(path, "rb")) < 0) {
 		LOG_ERR("l0der",
 			"l0der_load_path: could not open ELF file %s: %d",
 			path,
-			fres);
-		return -ENOENT;
+			fd);
+		return fd;
 	}
 
-	int size = f_size(&fh);
+	if ((res = epic_file_seek(fd, 0, SEEK_END)) != 0) {
+		return res;
+	}
 
-	int res = 0;
+	int size = epic_file_tell(fd);
+
+	if ((res = epic_file_seek(fd, 0, SEEK_SET)) != 0) {
+		return res;
+	}
 
 	// Load ELF header and ensure it's somewhat sane.
 
 	Elf32_Ehdr hdr;
-	if (_read_elf_header(&fh, &hdr) != 0) {
-		res = -EINVAL;
+	if ((res = _read_elf_header(fd, &hdr)) != 0) {
 		goto done;
 	}
 
@@ -728,7 +705,7 @@ int l0der_load_path(const char *path, struct l0dable_info *info)
 	if (hdr.e_type == ET_DYN && hdr.e_machine == EM_ARM &&
 	    hdr.e_version == EV_CURRENT) {
 		LOG_INFO("l0der", "Loading PIE l0dable %s ...", path);
-		res = _load_pie(&fh, &hdr, info);
+		res = _load_pie(fd, size, &hdr, info);
 		goto done;
 	} else {
 		LOG_ERR("l0der",
@@ -739,6 +716,6 @@ int l0der_load_path(const char *path, struct l0dable_info *info)
 	}
 
 done:
-	f_close(&fh);
+	epic_file_close(fd);
 	return res;
 }
