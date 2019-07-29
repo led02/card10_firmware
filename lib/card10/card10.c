@@ -57,11 +57,18 @@ void card10_init(void)
 	pmic_set_led(2, 0);
 	TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
-	RTC_EnableRTCE(MXC_RTC);
+	while (RTC_EnableRTCE(MXC_RTC) == E_BUSY)
+		;
+
 	// Enable 32 kHz output
-	RTC_SquareWave(
-		MXC_RTC, SQUARE_WAVE_ENABLED, F_32KHZ, NOISE_IMMUNE_MODE, NULL
-	);
+	while (RTC_SquareWave(
+		       MXC_RTC,
+		       SQUARE_WAVE_ENABLED,
+		       F_32KHZ,
+		       NOISE_IMMUNE_MODE,
+		       NULL) == E_BUSY
+	)
+		;
 
 	if (RTC_GetSecond() < 1546300800UL) {
 		while (RTC_Init(MXC_RTC, 1546300800UL, 0, NULL) == E_BUSY)
