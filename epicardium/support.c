@@ -27,9 +27,11 @@ void pre_idle_sleep(TickType_t xExpectedIdleTime)
 		 * TODO: Ensure this is actually correct and does not have any
 		 * race conditions.
 		 */
-		__asm volatile("dsb" ::: "memory");
-		__asm volatile("wfe");
-		__asm volatile("isb");
+		if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) == 0) {
+			__asm volatile("dsb" ::: "memory");
+			__asm volatile("wfe");
+			__asm volatile("isb");
+		}
 	}
 }
 
