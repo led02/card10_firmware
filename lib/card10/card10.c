@@ -69,7 +69,7 @@ void card10_init(void)
 		       NULL) == E_BUSY
 	)
 		;
-
+	/* If we don't have a valid time yet, set it to 2019-01-01 */
 	if (RTC_GetSecond() < 1546300800UL) {
 		while (RTC_Init(MXC_RTC, 1546300800UL, 0, NULL) == E_BUSY)
 			;
