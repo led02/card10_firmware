@@ -9,6 +9,6 @@ RUN set -e -x ;\
         python3-pip ;\
     apt-get install -y -t stretch-backports \
         meson ;\
-    pip3 install crc16 ;\
+    pip3 install crc16 pillow ;\
     rm -rf /var/lib/apt/lists
 

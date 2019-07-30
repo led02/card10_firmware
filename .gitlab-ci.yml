@@ -1,5 +1,5 @@
 # maintained by q3k, built using docker/build-env
-image: "registry.k0.hswaw.net/q3k/card10-build-env:20190725-110707Z-4f3bf2a"
+image: "registry.k0.hswaw.net/q3k/card10-build-env:20190729-231409Z-635fb98"
 
 build:
     stage: build
@@ -7,6 +7,9 @@ build:
         - ./bootstrap.sh
         - ninja -C build/
         - arm-none-eabi-size build/bootloader/bootloader.elf build/epicardium/epicardium.elf build/pycardium/pycardium.elf
+    only:
+        - merge_requests
+        - master
 
 lint:
     stage: test
