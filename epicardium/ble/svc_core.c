@@ -58,7 +58,7 @@ static const uint8_t gapValSvc[] = {UINT16_TO_BYTES(ATT_UUID_GAP_SERVICE)};
 static const uint16_t gapLenSvc = sizeof(gapValSvc);
 
 /* device name characteristic */
-static const uint8_t gapValDnCh[] = {ATT_PROP_READ, UINT16_TO_BYTES(GAP_DN_HDL), UINT16_TO_BYTES(ATT_UUID_DEVICE_NAME)};
+static const uint8_t gapValDnCh[] = {ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(GAP_DN_HDL), UINT16_TO_BYTES(ATT_UUID_DEVICE_NAME)};
 static const uint16_t gapLenDnCh = sizeof(gapValDnCh);
 
 /* device name */
