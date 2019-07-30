@@ -27,6 +27,7 @@
 #include "svc_core.h"
 #include "svc_ch.h"
 #include "svc_cfg.h"
+#include "wsf_assert.h"
 
 /**************************************************************************************************
   Macros
@@ -79,6 +80,9 @@ static const uint16_t gapLenCarCh = sizeof(gapValCarCh);
 /* central address resolution */
 static uint8_t gapValCar[] = {FALSE};
 static const uint16_t gapLenCar = sizeof(gapValCar);
+#if 0
+/* TODO card10:
+ * Enable these if "privacy" is enabled. See svc_core.h lien 38 */
 
 /* resolvable private address only characteristic */
 static const uint8_t gapValRpaoCh[] = {ATT_PROP_READ, UINT16_TO_BYTES(GAP_RPAO_HDL), UINT16_TO_BYTES(ATT_UUID_RPAO)};
@@ -87,6 +91,7 @@ static const uint16_t gapLenRpaoCh = sizeof(gapValRpaoCh);
 /* resolvable private address only */
 static uint8_t gapValRpao[] = {0};
 static const uint16_t gapLenRpao = sizeof(gapValRpao);
+#endif
 
 /* Attribute list for GAP group */
 static const attsAttr_t gapList[] =
@@ -147,6 +152,9 @@ static const attsAttr_t gapList[] =
     0,
     ATTS_PERMIT_READ
   },
+#if 0
+/* TODO card10:
+ * Enable these if "privacy" is enabled. See svc_core.h lien 38 */
   {
     attChUuid,
     (uint8_t *) gapValRpaoCh,
@@ -163,6 +171,7 @@ static const attsAttr_t gapList[] =
     0,
     ATTS_PERMIT_READ
   }
+#endif
 };
 
 /* GAP group structure */
@@ -176,6 +185,7 @@ static attsGroup_t svcGapGroup =
   GAP_END_HDL
 };
 
+WSF_CT_ASSERT(((sizeof(gapList) / sizeof(gapList[0])) == GAP_END_HDL - GAP_START_HDL + 1));
 /**************************************************************************************************
  GATT group
 **************************************************************************************************/
@@ -243,6 +253,8 @@ static attsGroup_t svcGattGroup =
   GATT_START_HDL,
   GATT_END_HDL
 };
+
+WSF_CT_ASSERT(((sizeof(gattList) / sizeof(gattList[0])) == GATT_END_HDL - GATT_START_HDL + 1));
 
 /*************************************************************************************************/
 /*!

@@ -33,6 +33,8 @@ extern "C" {
  Handle Ranges
 **************************************************************************************************/
 /** \name GAP Service Handles
+ * TODO card10:
+ * WTF!
  * \note GAP -- RPAO characterstic added only when DM Privacy enabled
  */
 /**@{*/

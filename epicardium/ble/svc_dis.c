@@ -24,6 +24,7 @@
  */
 #include "wsf_types.h"
 #include "att_api.h"
+#include "wsf_assert.h"
 #include "wsf_trace.h"
 #include "util/bstream.h"
 #include "svc_dis.h"
@@ -306,6 +307,7 @@ static attsGroup_t svcDisGroup =
   DIS_END_HDL
 };
 
+WSF_CT_ASSERT(((sizeof(disList) / sizeof(disList[0])) == DIS_END_HDL - DIS_START_HDL + 1));
 /*************************************************************************************************/
 /*!
  *  \brief  Add the services to the attribute server.
