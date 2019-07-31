@@ -1,4 +1,4 @@
-#include "mphalport.h"
+#include "interrupt.h"
 
 #include "api/common.h"
 #include "epicardium.h"
@@ -25,7 +25,7 @@ void epic_isr_default_handler(api_int_id_t id)
 	}
 }
 
-static mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
+mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 	if (callback_obj != mp_const_none &&
@@ -41,7 +41,7 @@ static mp_obj_t mp_interrupt_set_callback(mp_obj_t id_in, mp_obj_t callback_obj)
 	return mp_const_none;
 }
 
-static mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
+mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 
@@ -52,7 +52,7 @@ static mp_obj_t mp_interrupt_enable_callback(mp_obj_t id_in)
 	return mp_const_none;
 }
 
-static mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
+mp_obj_t mp_interrupt_disable_callback(mp_obj_t id_in)
 {
 	api_int_id_t id = mp_obj_get_int(id_in);
 
