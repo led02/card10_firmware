@@ -34,6 +34,7 @@ Q(set_callback)
 Q(enable_callback)
 Q(disable_callback)
 Q(BHI160)
+Q(RTC_ALARM)
 
 /* display */
 Q(sys_display)

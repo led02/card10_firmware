@@ -65,3 +65,22 @@ alarm.
          utime.alarm(alarm, minute_timer)
 
       minute_timer(None)
+
+   Alternatively, you can register a callback using the interrupt module and
+   then call :py:func:`utime.alarm` without a ``callback`` parameter:
+
+   .. code-block:: python
+
+      import interrupt, utime
+
+      def 5_second_timer(x):
+         current = utime.time()
+         print("Current: " + str(current))
+         alarm = (current // 10) * 10 + 5
+         utime.alarm(alarm)
+
+      # This time, we need to register and enable the callback manually
+      interrupt.set_callback(interrupt.RTC_ALARM, 5_second_timer)
+      interrupt.enable_callback(interrupt.RTC_ALARM)
+
+      5_second_timer(None)
