@@ -2,13 +2,27 @@
 #include "modules/log.h"
 #include "api/interrupt-sender.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "rtc.h"
 
 #include <stdint.h>
 
 uint32_t epic_rtc_get_seconds(void)
 {
-	return RTC_GetSecond();
+	uint32_t sec, subsec;
+
+	/*
+	 * TODO:  Find out what causes the weird behavior of this function.  The
+	 *        time needed for this call seems to depend on the frequency at
+	 *        which it is called.
+	 */
+	while (RTC_GetTime(&sec, &subsec) == E_BUSY) {
+		vTaskDelay(pdMS_TO_TICKS(4));
+	}
+
+	return sec;
 }
 
 void RTC_IRQHandler(void)
