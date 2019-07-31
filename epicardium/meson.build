@@ -66,12 +66,15 @@ freertos = static_library(
 
 subdir('modules/')
 
+subdir('l0der/')
+
 elf = executable(
   name + '.elf',
   'cdcacm.c',
   'main.c',
   'support.c',
   module_sources,
+  l0der_sources,
   dependencies: [libcard10, max32665_startup_core0, maxusb, libff13],
   link_with: [api_dispatcher_lib, freertos],
   link_whole: [max32665_startup_core0_lib, board_card10_lib, newlib_heap_lib],
