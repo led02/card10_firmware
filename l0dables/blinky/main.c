@@ -44,7 +44,7 @@ void fade()
 	}
 }
 
-/* 
+/*
  * main() is called when l0dable is loaded and executed.
  */
 int main(void)

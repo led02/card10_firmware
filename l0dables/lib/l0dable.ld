@@ -35,7 +35,7 @@ SECTIONS {
     {
         *(.text*)
         *(.rodata*)
-        
+
         KEEP(*(.init))
         KEEP(*(.fini))
     } :text

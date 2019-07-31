@@ -13,7 +13,7 @@
  *
  * To implement it, we parse an ELF file somewhat defensively, trying to
  * not DoS ourselves by overallocating RAM (no heap allocations, no recursion).
- * 
+ *
  * Currently we support only relocatable, PIE binaries. Adding support for
  * static ELFs would be trivial, however we want to keep the possibility to
  * shuffle around memory areas in future versions of card10 (possibly giving
@@ -104,7 +104,7 @@ static int _read_elf_header(int fd, Elf32_Ehdr *hdr)
  * :param void *data: buffer into which to read
  * :param size_t count: amount of bytes to read
  * :returns: ``0`` on success or a negative value on error.  Possible errors:
- * 
+ *
  *	- ``-EIO``: Could not read from FAT - address out of bounds of not enough bytes available.
  */
 static int _seek_and_read(int fd, uint32_t address, void *data, size_t count)
