@@ -13,6 +13,7 @@ Q(TOP_RIGHT)
 
 /* utime */
 Q(utime)
+Q(alarm)
 Q(sleep)
 Q(sleep_ms)
 Q(sleep_us)

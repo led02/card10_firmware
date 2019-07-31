@@ -60,6 +60,7 @@ typedef unsigned int size_t;
 #define API_FILE_STAT          0x38
 
 #define API_RTC_GET_SECONDS    0x40
+#define API_RTC_SCHEDULE_ALARM 0x41
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -100,8 +101,11 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_BHI160_TEST            2
 API_ISR(EPIC_INT_BHI160_TEST, epic_isr_bhi160_test);
 
+/** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
+#define EPIC_INT_RTC_ALARM              3
+
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    3
+#define EPIC_INT_NUM                    4
 /* clang-format on */
 
 API_ISR(EPIC_INT_RESET, epic_isr_reset);
@@ -588,5 +592,24 @@ API(API_FILE_STAT, int epic_file_stat(const char* path, epic_stat_t* stat));
  * :return: Unix time in seconds
  */
 API(API_RTC_GET_SECONDS, uint32_t epic_rtc_get_seconds(void));
+
+/**
+ * Schedule the RTC alarm for the given timestamp.
+ *
+ * :param uint32_t timestamp: When to schedule the IRQ
+ * :return: `0` on success or a negative value if an error occured. Possible
+ *    errors:
+ *
+ *    - ``-EINVAL``: RTC is in a bad state
+ */
+API(API_RTC_SCHEDULE_ALARM, int epic_rtc_schedule_alarm(uint32_t timestamp));
+
+/**
+ * **Interrupt Service Routine**
+ *
+ * ``epic_isr_rtc_alarm()`` is called when the RTC alarm triggers.  The RTC alarm
+ * can be scheduled using :c:func:`epic_rtc_schedule_alarm`.
+ */
+API_ISR(EPIC_INT_RTC_ALARM, epic_isr_rtc_alarm);
 
 #endif /* _EPICARDIUM_H */

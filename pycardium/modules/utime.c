@@ -1,3 +1,4 @@
+#include "interrupt.h"
 #include "epicardium.h"
 
 #include "mxc_delay.h"
@@ -12,11 +13,13 @@
 // Needs to be after the stdint include ...
 #include "lib/timeutils/timeutils.h"
 
+/* MicroPython has its epoch at 2000-01-01. Our RTC is in UTC */
+#define EPOCH_OFFSET 946684800UL
+
 static mp_obj_t time_time(void)
 {
 	mp_int_t seconds;
-	/* MicroPython has its epoch at 2000-01-01. Our RTC is in UTC */
-	seconds = epic_rtc_get_seconds() - 946684800UL;
+	seconds = epic_rtc_get_seconds() - EPOCH_OFFSET;
 	return mp_obj_new_int(seconds);
 }
 MP_DEFINE_CONST_FUN_OBJ_0(time_time_obj, time_time);
@@ -26,7 +29,7 @@ static mp_obj_t time_localtime(size_t n_args, const mp_obj_t *args)
 	mp_int_t seconds;
 
 	if (n_args == 0 || args[0] == mp_const_none) {
-		seconds = epic_rtc_get_seconds() - 946684800UL;
+		seconds = epic_rtc_get_seconds() - EPOCH_OFFSET;
 	} else {
 		seconds = mp_obj_get_int(args[0]);
 	}
@@ -75,6 +78,26 @@ static mp_obj_t time_mktime(mp_obj_t tuple)
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(time_mktime_obj, time_mktime);
 
+/* Schedule an alarm */
+static mp_obj_t time_alarm(size_t n_args, const mp_obj_t *args)
+{
+	mp_int_t timestamp = mp_obj_get_int(args[0]) + EPOCH_OFFSET;
+	if (n_args == 2) {
+		/* If a callback was given, register it for the RTC Alarm */
+		mp_obj_t callback = args[1];
+		mp_obj_t irq_id   = MP_OBJ_NEW_SMALL_INT(EPIC_INT_RTC_ALARM);
+		mp_interrupt_set_callback(irq_id, callback);
+		mp_interrupt_enable_callback(irq_id);
+	}
+
+	int res = epic_rtc_schedule_alarm(timestamp);
+	if (res < 0) {
+		mp_raise_OSError(-res);
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(time_alarm_obj, 1, 2, time_alarm);
+
 static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_utime) },
 	{ MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&time_time_obj) },
@@ -83,6 +106,7 @@ static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_sleep), MP_ROM_PTR(&mp_utime_sleep_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_sleep_ms), MP_ROM_PTR(&mp_utime_sleep_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_sleep_us), MP_ROM_PTR(&mp_utime_sleep_us_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_alarm), MP_ROM_PTR(&time_alarm_obj) },
 #if 0
 	/* TODO: Implement those */
 	{MP_ROM_QSTR(MP_QSTR_ticks_ms), MP_ROM_PTR(&mp_utime_ticks_ms_obj)},
