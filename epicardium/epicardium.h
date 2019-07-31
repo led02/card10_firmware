@@ -48,6 +48,7 @@ typedef unsigned int size_t;
 #define API_DISP_RECT          0x16
 #define API_DISP_CIRC          0x17
 #define API_DISP_PIXEL         0x18
+#define API_DISP_FRAMEBUFFER   0x19
 
 #define API_FILE_OPEN          0x30
 #define API_FILE_CLOSE         0x31
@@ -249,6 +250,13 @@ API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
 /**
  * Display
  * =======
+ * The card10 has an LCD screen that can be accessed from user code.
+ *
+ * There are two main ways to access the display:
+ *  - immediate mode, where you ask epicardium to draw shapes and text for you
+ *  - framebuffer mode, where you provide epicardium with a memory range where
+ *    you already drew graphics whichever way you wanted, and epicardium will
+ *    copy them to the display.
  */
 
 /** Line-Style */
@@ -265,6 +273,40 @@ enum disp_fillstyle {
   FILLSTYLE_EMPTY = 0,
   /** */
   FILLSTYLE_FILLED = 1
+};
+
+/** Width of display in pixels */
+#define DISP_WIDTH 160
+
+/** Height of display in pixels */
+#define DISP_HEIGHT 80
+
+/** Raw framebuffer */
+union disp_framebuffer {
+  /**
+   * The frambuffer stores pixels as RGB565, but byte swapped.
+   * That is, for every (x, y) coordinate, there are two uint8_ts
+   * storing 16 bits of pixel data.
+   *
+   * TODO(q3k): document (x, y) in relation to chirality
+   *
+   * **Example: fill framebuffer with red**:
+   *
+   * .. code-block:: cpp
+   *
+   * 	union disp_framebuffer fb;
+   * 	uint16_t red = 0b1111100000000000;
+   * 	for (int y = 0; y < DISP_HEIGHT; y++) {
+   * 		for (int x = 0; x < DISP_WIDTH; x++) {
+   * 			fb.fb[y][x][0] = red >> 8;
+   * 			fb.fb[y][x][1] = red & 0xFF;
+   * 		}
+   * 	}
+   * 	epic_disp_framebuffer(&fb);
+   *
+   */
+  uint8_t fb[DISP_HEIGHT][DISP_WIDTH][2];
+  uint8_t raw[DISP_HEIGHT*DISP_WIDTH*2];
 };
 
 /**
@@ -288,6 +330,9 @@ API(API_DISP_CLOSE, int epic_disp_close());
 /**
  * Causes the changes that have been written to the framebuffer
  * to be shown on the display
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_UPDATE, int epic_disp_update());
 
@@ -411,6 +456,18 @@ API(API_DISP_CIRC,
 	    enum disp_fillstyle fillstyle,
 	    uint16_t pixelsize)
     );
+
+/**
+ * Immediately send the contents of a framebuffer to the display. This overrides
+ * anything drawn by immediate mode graphics and displayed using ``epic_disp_update``.
+ *
+ * :param fb: framebuffer to display
+ * :return: ``0`` on success or negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_FRAMEBUFFER, int epic_disp_framebuffer(union disp_framebuffer *fb));
+
 
 /**
  * Start continuous readout of the light sensor. Will read light level

@@ -119,10 +119,21 @@ int epic_disp_update()
 	int cl = check_lock();
 	if (cl < 0) {
 		return cl;
-	} else {
-		LCD_Update();
-		return 0;
 	}
+
+	LCD_Update();
+	return 0;
+}
+
+int epic_disp_framebuffer(union disp_framebuffer *fb)
+{
+	int cl = check_lock();
+	if (cl < 0) {
+		return cl;
+	}
+
+	LCD_Set(fb->raw, sizeof(fb->raw));
+	return 0;
 }
 
 int epic_disp_open()

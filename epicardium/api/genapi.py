@@ -15,13 +15,10 @@ MATCH_ISR_EXPANSION = re.compile(
     re.DOTALL | re.MULTILINE,
 )
 
-MATCH_DECLARATION = re.compile(
-    r"^(?P<typename>.*?)\s*\((?P<args>.*)\)$",
-    re.DOTALL,
-)
+MATCH_DECLARATION = re.compile(r"^(?P<typename>.*?)\s*\((?P<args>.*)\)$", re.DOTALL)
 
 MATCH_TYPENAME = re.compile(
-    r"^(?P<type>(?:const )?(?:struct |enum )?\w+[*\s]+)(?P<name>\w+)$",
+    r"^(?P<type>(?:const )?(?:struct |enum |union )?\w+[*\s]+)(?P<name>\w+)$"
 )
 
 
@@ -63,20 +60,24 @@ def parse_declarations(source):
             if arg is None:
                 bailout("Failed to parse argument '{}'", arg_str.strip())
 
-            args.append({
-                "type": arg.group("type").strip(),
-                "name": arg.group("name"),
-                "sizeof": "sizeof({})".format(arg.group("type").strip()),
-                "offset": sizeof(args),
-            })
+            args.append(
+                {
+                    "type": arg.group("type").strip(),
+                    "name": arg.group("name"),
+                    "sizeof": "sizeof({})".format(arg.group("type").strip()),
+                    "offset": sizeof(args),
+                }
+            )
 
-        declarations.append({
-            "id": id,
-            "return_type": typename.group("type").strip(),
-            "name": typename.group("name"),
-            "args": args,
-            "args_str": args_str,
-        })
+        declarations.append(
+            {
+                "id": id,
+                "return_type": typename.group("type").strip(),
+                "name": typename.group("name"),
+                "args": args,
+                "args_str": args_str,
+            }
+        )
 
     return declarations
 
@@ -88,10 +89,7 @@ def parse_interrupts(source):
         id = exp.group("id")
         isr = exp.group("isr")
 
-        interrupts.append({
-            "id": id,
-            "isr": isr,
-        })
+        interrupts.append({"id": id, "isr": isr})
 
     return interrupts
 
@@ -132,9 +130,7 @@ def main():
     declarations = parse_declarations(source)
     interrupts = parse_interrupts(source)
 
-    fmt_header = {
-        "header": os.path.basename(args.header)
-    }
+    fmt_header = {"header": os.path.basename(args.header)}
 
     # Generate Client {{{
     with open(args.client, "w") as f_client:

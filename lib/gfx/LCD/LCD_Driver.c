@@ -310,6 +310,11 @@ void LCD_Set(uint8_t *data, int len)
 	lcd_write(data, len);
 }
 
+uint8_t *LCD_Framebuffer(void)
+{
+    return (uint8_t*)screen;
+}
+
 void LCD_Update(void)
 {
 	LCD_Set((uint8_t *)screen, sizeof(screen));
