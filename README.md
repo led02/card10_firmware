@@ -17,6 +17,10 @@ Flasing with or without a debugger is described in detail in [How To Flash](http
 ## Debugger
 If you have a debugger, head over to our [Debugger](https://firmware.card10.badge.events.ccc.de/debugger.html) page to learn how to use it.
 
+# License
+
+Unless otherwise noted in a file, the contents of this repository are licensed under the MIT license. See [COPYING](COPYING) for more details.
+
 ---
 
 # Old README Contents:
