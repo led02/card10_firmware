@@ -60,11 +60,6 @@ static void enqueue_char(char chr)
 		api_interrupt_trigger(EPIC_INT_CTRL_C);
 	}
 
-	if (chr == 0x0e) {
-		/* Control-N */
-		api_interrupt_trigger(EPIC_INT_BHI160_TEST);
-	}
-
 	if (xQueueSend(read_queue, &chr, 100) == errQUEUE_FULL) {
 		/* Queue overran, wait a bit */
 		vTaskDelay(portTICK_PERIOD_MS * 50);

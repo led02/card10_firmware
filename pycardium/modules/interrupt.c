@@ -83,8 +83,6 @@ static const mp_rom_map_elem_t interrupt_module_globals_table[] = {
 	  MP_ROM_PTR(&interrupt_disable_callback_obj) },
 
 	/* Interrupt Numbers */
-	{ MP_ROM_QSTR(MP_QSTR_BHI160),
-	  MP_OBJ_NEW_SMALL_INT(EPIC_INT_BHI160_TEST) },
 	{ MP_ROM_QSTR(MP_QSTR_RTC_ALARM),
 	  MP_OBJ_NEW_SMALL_INT(EPIC_INT_RTC_ALARM) },
 };

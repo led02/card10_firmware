@@ -107,12 +107,8 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
 #define EPIC_INT_RTC_ALARM              3
 
-/* Debug interrupt, please ignore */
-#define EPIC_INT_BHI160_TEST            4
-API_ISR(EPIC_INT_BHI160_TEST, epic_isr_bhi160_test);
-
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    5
+#define EPIC_INT_NUM                    4
 /* clang-format on */
 
 API_ISR(EPIC_INT_RESET, epic_isr_reset);
