@@ -554,25 +554,46 @@ API(API_FILE_TELL, int epic_file_tell(int fd));
 
 /** */
 enum epic_stat_type {
-	/** */
+	/** basically NOENT 
+	 * although epic_file_stat returns an error for 'none', the type will still be set
+	 * to none additinally.
+	 * This is also used internally to track open FS objects, where we use ``EPICSTAT_NONE``
+	 * to mark free objects.
+	 */
+	EPICSTAT_NONE,
+	/** normal file */
 	EPICSTAT_FILE,
-	/** */
+	/** directory */
 	EPICSTAT_DIR,
 };
 
 /** */
 typedef struct epic_stat_t {
-	/** */
+	/** type: file, directory or none */
 	enum epic_stat_type type;
+	/* note about padding & placement of uint32_t size:
+	 * to accomodate for future expansion, we want padding at the end of
+	 * this struct. Since sizeof(enum epic_stat_type) can not be
+	 * assumed to be have a certain size,
+	 * we're placing uint32_t size here so we can be sure it will be at
+	 * offset 4, and therefore the layout of the other fields is predictable.
+	 */
+	/** size in bytes */
+	uint32_t size;
+	/** the FAT volume (will be needed later once we distinguish
+	 *  between system and user volume)*/
+	uint8_t volume;
+	uint8_t _reserved[9];
 } epic_stat_t;
+
+#ifndef __cplusplus
+#if defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+_Static_assert(sizeof(epic_stat_t) == 20, "");
+#endif
+#endif
 
 /**
  * stat path
- *
- * This does not follow posix convention, but rather takes
- * a path as parameter. This aligns more with libff's API and
- * also this has been implemented for python import support, which
- * passes the filename as well.
  *
  * :param const char* filename: path to stat
  * :param epic_stat_t* stat: pointer to result

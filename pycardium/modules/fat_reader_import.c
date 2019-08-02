@@ -4,14 +4,13 @@
 #include <py/reader.h>
 #include <py/lexer.h>
 
-/** ported from picropython's posic implementation */
+#define EPICFAT_READER_BUFFER_SIZE 128
 
 typedef struct _mp_reader_epicfat_t {
-	bool close_fd;
 	int fd;
 	size_t len;
 	size_t pos;
-	byte buf[20];
+	byte buf[EPICFAT_READER_BUFFER_SIZE];
 } mp_reader_epicfat_t;
 
 STATIC mp_uint_t mp_reader_epicfat_readbyte(void *data)
@@ -50,7 +49,7 @@ void mp_reader_new_file(mp_reader_t *reader, const char *filename)
 	}
 	mp_reader_epicfat_t *rp = m_new_obj(mp_reader_epicfat_t);
 	rp->fd                  = fd;
-	int n                   = epic_file_read(rp->fd, rp->buf, sizeof(rp->buf));
+	int n = epic_file_read(rp->fd, rp->buf, sizeof(rp->buf));
 	if (n < 0) {
 		epic_file_close(fd);
 	}
