@@ -27,40 +27,45 @@ typedef unsigned int size_t;
  */
 
 /* clang-format off */
-#define API_UART_WRITE         0x1
-#define API_UART_READ          0x2
-#define API_LEDS_SET           0x3
-#define API_VIBRA_SET          0x4
-#define API_VIBRA_VIBRATE      0x5
-#define API_STREAM_READ        0x6
-#define API_INTERRUPT_ENABLE   0x7
-#define API_INTERRUPT_DISABLE  0x8
-#define API_LIGHT_SENSOR_RUN   0x9
-#define API_LIGHT_SENSOR_GET   0xa
-#define API_LIGHT_SENSOR_STOP  0xb
+#define API_SYSTEM_EXIT             0x1 /* TODO */
+#define API_SYSTEM_EXEC             0x2 /* TODO */
+#define API_UART_WRITE              0x3
+#define API_UART_READ               0x4
+#define API_STREAM_READ             0x6
+#define API_INTERRUPT_ENABLE        0x7
+#define API_INTERRUPT_DISABLE       0x8
 
-#define API_DISP_OPEN          0x10
-#define API_DISP_CLOSE         0x11
-#define API_DISP_PRINT         0x12
-#define API_DISP_CLEAR         0x13
-#define API_DISP_UPDATE        0x14
-#define API_DISP_LINE          0x15
-#define API_DISP_RECT          0x16
-#define API_DISP_CIRC          0x17
-#define API_DISP_PIXEL         0x18
-#define API_DISP_FRAMEBUFFER   0x19
+#define API_DISP_OPEN              0x20
+#define API_DISP_CLOSE             0x21
+#define API_DISP_PRINT             0x22
+#define API_DISP_CLEAR             0x23
+#define API_DISP_UPDATE            0x24
+#define API_DISP_LINE              0x25
+#define API_DISP_RECT              0x26
+#define API_DISP_CIRC              0x27
+#define API_DISP_PIXEL             0x28
+#define API_DISP_FRAMEBUFFER       0x29
 
-#define API_FILE_OPEN          0x30
-#define API_FILE_CLOSE         0x31
-#define API_FILE_READ          0x32
-#define API_FILE_WRITE         0x34
-#define API_FILE_FLUSH         0x35
-#define API_FILE_SEEK          0x36
-#define API_FILE_TELL          0x37
-#define API_FILE_STAT          0x38
+#define API_FILE_OPEN              0x40
+#define API_FILE_CLOSE             0x41
+#define API_FILE_READ              0x42
+#define API_FILE_WRITE             0x44
+#define API_FILE_FLUSH             0x45
+#define API_FILE_SEEK              0x46
+#define API_FILE_TELL              0x47
+#define API_FILE_STAT              0x48
 
-#define API_RTC_GET_SECONDS    0x40
-#define API_RTC_SCHEDULE_ALARM 0x41
+#define API_RTC_GET_SECONDS        0x50
+#define API_RTC_SCHEDULE_ALARM     0x51
+
+#define API_LEDS_SET               0x60
+
+#define API_VIBRA_SET              0x70
+#define API_VIBRA_VIBRATE          0x71
+
+#define API_LIGHT_SENSOR_RUN       0x80
+#define API_LIGHT_SENSOR_GET       0x81
+#define API_LIGHT_SENSOR_STOP      0x82
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -97,15 +102,17 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_RESET                  0
 /** ``^C`` interrupt. See :c:func:`epic_isr_ctrl_c` for details.  */
 #define EPIC_INT_CTRL_C                 1
-/* Debug interrupt, please ignore */
-#define EPIC_INT_BHI160_TEST            2
-API_ISR(EPIC_INT_BHI160_TEST, epic_isr_bhi160_test);
-
+/** TODO */
+#define EPIC_INT_UART_RX                2
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
 #define EPIC_INT_RTC_ALARM              3
 
+/* Debug interrupt, please ignore */
+#define EPIC_INT_BHI160_TEST            4
+API_ISR(EPIC_INT_BHI160_TEST, epic_isr_bhi160_test);
+
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    4
+#define EPIC_INT_NUM                    5
 /* clang-format on */
 
 API_ISR(EPIC_INT_RESET, epic_isr_reset);
