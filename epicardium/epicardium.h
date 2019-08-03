@@ -280,8 +280,8 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
 API(API_STREAM_READ, int epic_stream_read(int sd, void *buf, size_t count));
 
 /**
- * Misc
- * ====
+ * Vibration Motor
+ * ===============
  */
 
 /**
@@ -303,11 +303,14 @@ API(API_VIBRA_VIBRATE, void epic_vibra_vibrate(int millis));
  * =======
  * The card10 has an LCD screen that can be accessed from user code.
  *
- * There are two main ways to access the display:
- *  - immediate mode, where you ask epicardium to draw shapes and text for you
- *  - framebuffer mode, where you provide epicardium with a memory range where
- *    you already drew graphics whichever way you wanted, and epicardium will
- *    copy them to the display.
+ * There are two ways to access the display:
+ *
+ *  - *immediate mode*, where you ask Epicardium to draw shapes and text for
+ *    you.  Most functions in this subsection are related to *immediate mode*.
+ *  - *framebuffer mode*, where you provide Epicardium with a memory range where
+ *    you already drew graphics whichever way you wanted and Epicardium will
+ *    copy them to the display.  To use *framebuffer mode*, use the
+ *    :c:func:`epic_disp_framebuffer` function.
  */
 
 /** Line-Style */
@@ -332,31 +335,33 @@ enum disp_fillstyle {
 /** Height of display in pixels */
 #define DISP_HEIGHT 80
 
-/** Raw framebuffer */
+/**
+ * Framebuffer
+ *
+ * The frambuffer stores pixels as RGB565, but byte swapped.  That is, for every ``(x, y)`` coordinate, there are two ``uint8_t``\ s storing 16 bits of pixel data.
+ *
+ * .. todo::
+ *
+ *    Document (x, y) in relation to chirality.
+ *
+ * **Example**: Fill framebuffer with red
+ *
+ * .. code-block:: cpp
+ *
+ * 	union disp_framebuffer fb;
+ * 	uint16_t red = 0b1111100000000000;
+ * 	for (int y = 0; y < DISP_HEIGHT; y++) {
+ * 		for (int x = 0; x < DISP_WIDTH; x++) {
+ * 			fb.fb[y][x][0] = red >> 8;
+ * 			fb.fb[y][x][1] = red & 0xFF;
+ * 		}
+ * 	}
+ * 	epic_disp_framebuffer(&fb);
+ */
 union disp_framebuffer {
-  /**
-   * The frambuffer stores pixels as RGB565, but byte swapped.
-   * That is, for every (x, y) coordinate, there are two uint8_ts
-   * storing 16 bits of pixel data.
-   *
-   * TODO(q3k): document (x, y) in relation to chirality
-   *
-   * **Example: fill framebuffer with red**:
-   *
-   * .. code-block:: cpp
-   *
-   * 	union disp_framebuffer fb;
-   * 	uint16_t red = 0b1111100000000000;
-   * 	for (int y = 0; y < DISP_HEIGHT; y++) {
-   * 		for (int x = 0; x < DISP_WIDTH; x++) {
-   * 			fb.fb[y][x][0] = red >> 8;
-   * 			fb.fb[y][x][1] = red & 0xFF;
-   * 		}
-   * 	}
-   * 	epic_disp_framebuffer(&fb);
-   *
-   */
+  /** Coordinate based access (as shown in the example above). */
   uint8_t fb[DISP_HEIGHT][DISP_WIDTH][2];
+  /** Raw byte-indexed access. */
   uint8_t raw[DISP_HEIGHT*DISP_WIDTH*2];
 };
 
