@@ -133,7 +133,7 @@ static void vTimerCallback(xTimerHandle pxTimer)
 {
     //printf("wake\n");
     int tick = xTaskGetTickCount();
-    printf("WsfTimerUpdate(%d)\n", tick - lasttick);
+    //printf("WsfTimerUpdate(%d)\n", tick - lasttick);
     WsfTimerUpdate(tick - lasttick);
     lasttick = tick;
     //printf("done\n");
@@ -169,6 +169,7 @@ static void scheduleTimer(void)
     bool_t          timerRunning;
     wsfTimerTicks_t time_to_next_expire;
 
+    vTimerCallback(NULL);
     time_to_next_expire = WsfTimerNextExpiration(&timerRunning);
 
     if(timerRunning) {
