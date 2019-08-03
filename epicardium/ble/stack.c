@@ -29,6 +29,8 @@
  * Many components are related to the role of the device. Different components need to be
  * initialized for central and peripheral roles.
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include <stdio.h>
 #include <string.h>
 #include "wsf_types.h"
@@ -184,3 +186,4 @@ void StackInit(void)
   /*TODO card10: Probably want to adjust this */
   HciSetMaxRxAclLen(100);
 }
+/* clang-format off */

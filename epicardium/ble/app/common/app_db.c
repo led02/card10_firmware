@@ -22,6 +22,8 @@
  *
  * Reason: we need to implement persistent storage for pairings
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include <string.h>
 #include "wsf_types.h"
 #include "wsf_assert.h"
@@ -708,3 +710,4 @@ void AppDbSetPeerRpao(appDbHdl_t hdl, bool_t peerRpao)
 {
   ((appDbRec_t *)hdl)->peerRpao = peerRpao;
 }
+/* clang-format on */

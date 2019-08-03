@@ -22,6 +22,8 @@
  *
  * Contains adaptions for the card10 (e.g. manufacturer name)
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include "wsf_types.h"
 #include "att_api.h"
 #include "wsf_assert.h"
@@ -331,3 +333,4 @@ void SvcDisRemoveGroup(void)
 {
   AttsRemoveGroup(DIS_START_HDL);
 }
+/* clang-format on */

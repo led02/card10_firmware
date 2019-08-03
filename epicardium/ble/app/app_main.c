@@ -22,6 +22,8 @@
  *
  * Reason: we need to correctly implement AppHandleNumericComparison
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include <string.h>
 #include "wsf_types.h"
 #include "wsf_msg.h"
@@ -418,3 +420,4 @@ void AppUpdatePrivacyMode(appDbHdl_t hdl)
     }
   }
 }
+/* clang-format on */

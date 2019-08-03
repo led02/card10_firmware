@@ -20,6 +20,8 @@
 /* card10:
  * copied from lib/sdk/Libraries/BTLE/stack/ble-profiles/sources/services/svc_core.c
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include "wsf_types.h"
 #include "att_api.h"
 #include "att_uuid.h"
@@ -344,3 +346,4 @@ void SvcCoreGapAddRpaoCh(void)
     svcGapGroup.endHandle = GAP_RPAO_HDL;
   }
 }
+/* clang-format on */

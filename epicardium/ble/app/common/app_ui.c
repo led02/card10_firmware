@@ -28,6 +28,8 @@
  * Reason: has several user interactions which we likley have to implement
  */
 
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 /**************************************************************************************************
   Global Variables
 **************************************************************************************************/
@@ -330,3 +332,4 @@ void AppUiBtnTest(uint8_t btn)
   }
 }
 
+/* clang-format on */

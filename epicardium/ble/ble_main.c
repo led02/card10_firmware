@@ -11,6 +11,8 @@
  * Fit -> Ble
  * FIT -> BLE
  */
+/* clang-format off */
+/* clang-formet turned off for easier diffing against orginal file */
 #include <string.h>
 #include "wsf_types.h"
 #include "util/bstream.h"
@@ -508,3 +510,4 @@ void BleStart(void)
   /* Reset the device */
   DmDevReset();
 }
+/* clang-format on */
