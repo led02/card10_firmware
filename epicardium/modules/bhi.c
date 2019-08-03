@@ -257,12 +257,7 @@ static int bhi160_fetch_fifo(void)
 		/* Handle all full packets received in this transfer */
 		uint8_t *fifo_ptr   = bhi160_fifo;
 		uint16_t bytes_left = bytes_read;
-		while (ret == BHY_SUCCESS &&
-		       bytes_left > sizeof(bhy_data_generic_t)) {
-			/*
-			 * TODO: sizeof(bhy_data_generic_t) is probably
-			 * incorrect and makes some measurements arrive late.
-			 */
+		while (bytes_left > 0) {
 			bhy_data_generic_t sensor_data;
 			bhy_data_type_t data_type;
 			ret = bhy_parse_next_fifo_packet(
@@ -274,6 +269,8 @@ static int bhi160_fetch_fifo(void)
 
 			if (ret == BHY_SUCCESS) {
 				bhi160_handle_packet(data_type, &sensor_data);
+			} else {
+				break;
 			}
 		}
 
