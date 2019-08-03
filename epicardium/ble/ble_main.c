@@ -220,6 +220,8 @@ static uint16_t fitRscmPeriod = FIT_DEFAULT_RSCM_PERIOD;
 /* Heart Rate Monitor feature flags */
 static uint8_t fitHrmFlags = CH_HRM_FLAGS_VALUE_8BIT | CH_HRM_FLAGS_ENERGY_EXP;
 
+
+static void FitHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg);
 /*************************************************************************************************/
 /*!
  *  \brief  Application DM callback.
@@ -661,12 +663,12 @@ static void fitProcMsg(fitMsg_t *pMsg)
  *  \return None.
  */
 /*************************************************************************************************/
-void FitHandlerInit(wsfHandlerId_t handlerId)
+static void FitHandlerInit(void)
 {
   APP_TRACE_INFO0("FitHandlerInit");
 
   /* store handler ID */
-  fitHandlerId = handlerId;
+  fitHandlerId =WsfOsSetNextHandler(FitHandler);
 
   /* Set configuration pointers */
   pAppAdvCfg = (appAdvCfg_t *) &fitAdvCfg;
@@ -681,11 +683,11 @@ void FitHandlerInit(wsfHandlerId_t handlerId)
   pSmpCfg = (smpCfg_t *) &fitSmpCfg;
 
   /* initialize heart rate profile sensor */
-  HrpsInit(handlerId, (hrpsCfg_t *) &fitHrpsCfg);
+  HrpsInit(fitHandlerId, (hrpsCfg_t *) &fitHrpsCfg);
   HrpsSetFlags(fitHrmFlags);
 
   /* initialize battery service server */
-  BasInit(handlerId, (basCfg_t *) &fitBasCfg);
+  BasInit(fitHandlerId, (basCfg_t *) &fitBasCfg);
 }
 
 /*************************************************************************************************/
@@ -698,7 +700,7 @@ void FitHandlerInit(wsfHandlerId_t handlerId)
  *  \return None.
  */
 /*************************************************************************************************/
-void FitHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
+static void FitHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
 {
   if (pMsg != NULL)
   {
@@ -727,6 +729,9 @@ void FitHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
 /*************************************************************************************************/
 void FitStart(void)
 {
+
+  FitHandlerInit();
+
   /* Register for stack callbacks */
   DmRegister(fitDmCback);
   DmConnRegister(DM_CLIENT_ID_APP, fitDmCback);

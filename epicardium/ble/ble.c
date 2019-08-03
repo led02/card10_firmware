@@ -4,7 +4,7 @@
 #include "wsf_timer.h"
 #include "wsf_trace.h"
 #include "app_ui.h"
-#include "fit/fit_api.h"
+#include "ble_api.h"
 #include "hci_vs.h"
 
 #include "att_defs.h"

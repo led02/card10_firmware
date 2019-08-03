@@ -34,7 +34,7 @@
 #include "wsf_types.h"
 #include "wsf_os.h"
 #include "util/bstream.h"
-#include "fit/fit_api.h"
+#include "ble_api.h"
 #include "hci_handler.h"
 #include "dm_handler.h"
 #include "l2c_handler.h"
@@ -187,7 +187,4 @@ void StackInitFit(void)
    * mixed a lot. */
   handlerId = WsfOsSetNextHandler(AppHandler);
   AppHandlerInit(handlerId);
-
-  handlerId = WsfOsSetNextHandler(FitHandler);
-  FitHandlerInit(handlerId);
 }
