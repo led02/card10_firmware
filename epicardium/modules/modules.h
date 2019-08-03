@@ -3,11 +3,11 @@
 
 /* ---------- FAT fs ------------------------------------------------------ */
 /* Number of bits to use for indexing into our internal pool of files/directories
- * This indirectly specifies the size of the pool as 1^EPIC_FAT_FD_INDEX_BITS
+ * This indirectly specifies the size of the pool as 2^EPIC_FAT_FD_INDEX_BITS
  * Increase if number of open file descriptors is not enough, but be aware of
  * memory usage of the pool!
  */
-#define EPIC_FAT_FD_INDEX_BITS 8
+#define EPIC_FAT_FD_INDEX_BITS 4
 #define EPIC_FAT_STATIC_SEMAPHORE 1
 void fatfs_init(void);
 
