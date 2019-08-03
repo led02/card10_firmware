@@ -47,6 +47,7 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
 /*! \brief  Stack initialization for app. */
 extern void StackInit(void);
 extern void AppInit(void);
+extern void bleuart_init(void);
 
 /*************************************************************************************************/
 void PalSysAssertTrap(void)

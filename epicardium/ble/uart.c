@@ -1,17 +1,9 @@
-#include "wsf_types.h"
-#include "wsf_os.h"
-#include "wsf_buf.h"
-#include "wsf_timer.h"
-#include "wsf_trace.h"
-#include "app_ui.h"
-#include "ble_api.h"
-#include "hci_vs.h"
+#include "modules/modules.h"
 
-#include "att_defs.h"
+#include "wsf_types.h"
 #include "util/bstream.h"
 #include "att_api.h"
 
-#include "modules/modules.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 
@@ -21,7 +13,7 @@
 
 
 #define UART_START_HDL                    0x800                /*!< \brief Service start handle. */
-#define UART_END_HDL                      (BATT_MAX_HDL - 1)  /*!< \brief Service end handle. */
+#define UART_END_HDL                      (UART_MAX_HDL - 1)  /*!< \brief Service end handle. */
 
 /**************************************************************************************************
  Handles
@@ -30,16 +22,17 @@
 /*! \brief UART Service Handles */
 enum
 {
-  UART_SVC_HDL = UART_START_HDL,        /*!< \brief UART service declaration */
+  UART_SVC_HDL = UART_START_HDL,       /*!< \brief UART service declaration */
   UART_RX_CH_HDL,                      /*!< \brief UART rx characteristic */
   UART_RX_HDL,                         /*!< \brief UART rx value */
   UART_TX_CH_HDL,                      /*!< \brief UART tx characteristic */
   UART_TX_HDL,                         /*!< \brief UART tx value */
   UART_TX_CH_CCC_HDL,                  /*!< \brief UART tx CCCD */
-  BATT_MAX_HDL                          /*!< \brief Maximum handle. */
+  UART_MAX_HDL                         /*!< \brief Maximum handle. */
 };
 /**@}*/
 
+/* clang-format off */
 static const uint8_t UARTSvc[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x01,0x00,0x40,0x6E};
 
 static const uint8_t uartRxCh[] = {ATT_PROP_WRITE, UINT16_TO_BYTES(UART_RX_HDL), 0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x02,0x00,0x40,0x6E};
@@ -47,7 +40,7 @@ const uint8_t attUartRxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93
 
 static const uint8_t uartTxCh[] = {ATT_PROP_READ | ATT_PROP_NOTIFY, UINT16_TO_BYTES(UART_TX_HDL), 0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
 const uint8_t attUartTxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
-/* Battery level client characteristic configuration */
+/* clang-format on */
 
 
 
@@ -55,7 +48,6 @@ static void *SvcUARTAddGroupDyn(void)
 {
   void *pSHdl;
   uint8_t initCcc[] = {UINT16_TO_BYTES(0x0000)};
-  uint8_t initUARTVal[] = {0x20};
 
   /* Create the service */
   pSHdl = AttsDynCreateGroup(UART_START_HDL, UART_END_HDL);
@@ -79,7 +71,7 @@ static void *SvcUARTAddGroupDyn(void)
     AttsDynAddAttrConst(pSHdl, attChUuid, uartTxCh, sizeof(uartTxCh), 0, ATTS_PERMIT_READ);
     /* UART tx value */
     /* TODO: do we need ATTS_SET_READ_CBACK ? */
-    AttsDynAddAttr(pSHdl, attUartTxChUuid, initUARTVal, sizeof(uint8_t), sizeof(uint8_t),
+    AttsDynAddAttr(pSHdl, attUartTxChUuid, NULL, 0, sizeof(uint8_t),
                    ATTS_SET_READ_CBACK, ATTS_PERMIT_READ);
     /* UART tx CCC descriptor */
     AttsDynAddAttr(pSHdl, attCliChCfgUuid, initCcc, sizeof(uint16_t), sizeof(uint16_t),
@@ -94,7 +86,6 @@ dmConnId_t active_connection = 0;
 static uint8_t UARTReadCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
                      uint16_t offset, attsAttr_t *pAttr)
 {
-  //AppHwBattRead(pAttr->pValue);
   printf("read callback\n");
   return ATT_SUCCESS;
 }

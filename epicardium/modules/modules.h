@@ -1,6 +1,7 @@
 #ifndef MODULES_H
 #define MODULES_H
 
+#include <stdint.h>
 /* ---------- FAT fs ------------------------------------------------------ */
 /* Number of bits to use for indexing into our internal pool of files/directories
  * This indirectly specifies the size of the pool as 2^EPIC_FAT_FD_INDEX_BITS
