@@ -606,11 +606,12 @@ API(API_FILE_TELL, int epic_file_tell(int fd));
 
 /** */
 enum epic_stat_type {
-	/** basically NOENT 
-	 * although epic_file_stat returns an error for 'none', the type will still be set
-	 * to none additinally.
-	 * This is also used internally to track open FS objects, where we use ``EPICSTAT_NONE``
-	 * to mark free objects.
+	/**
+	 * Basically ``ENOENT``. Although :c:func:`epic_file_stat` returns an
+	 * error for 'none', the type will still be set to none additionally.
+	 *
+	 * This is also used internally to track open FS objects, where we use
+	 * ``EPICSTAT_NONE`` to mark free objects.
 	 */
 	EPICSTAT_NONE,
 	/** normal file */
@@ -623,17 +624,25 @@ enum epic_stat_type {
 struct epic_stat {
 	/** Entity Type: file, directory or none */
 	enum epic_stat_type type;
-	/* note about padding & placement of uint32_t size:
-	 * to accomodate for future expansion, we want padding at the end of
-	 * this struct. Since sizeof(enum epic_stat_type) can not be
-	 * assumed to be have a certain size,
-	 * we're placing uint32_t size here so we can be sure it will be at
-	 * offset 4, and therefore the layout of the other fields is predictable.
+
+	/*
+	 * Note about padding & placement of uint32_t size:
+	 *
+	 *   To accomodate for future expansion, we want padding at the end of
+	 *   this struct. Since sizeof(enum epic_stat_type) can not be assumed
+	 *   to be have a certain size, we're placing uint32_t size here so we
+	 *   can be sure it will be at offset 4, and therefore the layout of the
+	 *   other fields is predictable.
 	 */
-	/** size in bytes */
+
+	/** Size in bytes. */
 	uint32_t size;
-	/** the FAT volume (will be needed later once we distinguish
-	 *  between system and user volume)*/
+
+	/**
+	 * Which FAT volume this entity resides on.
+	 *
+	 * (will be needed later once we distinguish between system and user volume)
+	 */
 	uint8_t volume;
 	uint8_t _reserved[9];
 };
@@ -647,10 +656,10 @@ _Static_assert(sizeof(struct epic_stat) == 20, "");
 /**
  * stat path
  *
- * :param const char* filename: path to stat
+ * :param char* filename: path to stat
  * :param epic_stat* stat: pointer to result
  *
- * :return: `0` on success, negative on error
+ * :return: ``0`` on success, negative on error
  */
 API(API_FILE_STAT, int epic_file_stat(
 	const char* path, struct epic_stat* stat
