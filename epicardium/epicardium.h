@@ -620,8 +620,8 @@ enum epic_stat_type {
 };
 
 /** */
-typedef struct epic_stat_t {
-	/** type: file, directory or none */
+struct epic_stat {
+	/** Entity Type: file, directory or none */
 	enum epic_stat_type type;
 	/* note about padding & placement of uint32_t size:
 	 * to accomodate for future expansion, we want padding at the end of
@@ -636,11 +636,11 @@ typedef struct epic_stat_t {
 	 *  between system and user volume)*/
 	uint8_t volume;
 	uint8_t _reserved[9];
-} epic_stat_t;
+};
 
 #ifndef __cplusplus
 #if defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
-_Static_assert(sizeof(epic_stat_t) == 20, "");
+_Static_assert(sizeof(struct epic_stat) == 20, "");
 #endif
 #endif
 
@@ -648,11 +648,13 @@ _Static_assert(sizeof(epic_stat_t) == 20, "");
  * stat path
  *
  * :param const char* filename: path to stat
- * :param epic_stat_t* stat: pointer to result
+ * :param epic_stat* stat: pointer to result
  *
  * :return: `0` on success, negative on error
  */
-API(API_FILE_STAT, int epic_file_stat(const char* path, epic_stat_t* stat));
+API(API_FILE_STAT, int epic_file_stat(
+	const char* path, struct epic_stat* stat
+));
 
 /**
  * RTC

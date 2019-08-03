@@ -280,7 +280,7 @@ int epic_file_tell(int fd)
 	return f_tell(&o->file);
 }
 
-int epic_file_stat(const char *filename, epic_stat_t *stat)
+int epic_file_stat(const char *filename, struct epic_stat *stat)
 {
 	int res;
 	FILINFO finfo;

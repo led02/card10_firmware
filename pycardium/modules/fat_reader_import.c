@@ -69,7 +69,7 @@ mp_lexer_t *mp_lexer_new_from_file(const char *filename)
 
 mp_import_stat_t mp_import_stat(const char *path)
 {
-	struct epic_stat_t stat;
+	struct epic_stat stat;
 
 	if (epic_file_stat(path, &stat) == 0) {
 		if (stat.type == EPICSTAT_FILE) {
