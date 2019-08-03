@@ -2,7 +2,7 @@
 /*!
  *  \file
  *
- *  \brief  Stack initialization for fit.
+ *  \brief  Stack initialization
  *
  *  Copyright (c) 2016-2017 ARM Ltd. All Rights Reserved.
  *  ARM Ltd. confidential and proprietary.
@@ -107,7 +107,7 @@ const BbRtCfg_t _bb_cfg = {
  *  \return     None.
  */
 /*************************************************************************************************/
-void StackInitFit(void)
+void StackInit(void)
 {
   wsfHandlerId_t handlerId;
 
@@ -134,8 +134,8 @@ void StackInitFit(void)
 #endif /* DATS_APP_USE_LEGACY_API */
   if(memUsed != LL_MEMORY_FOOTPRINT)
   {
-      printf("Controller memory mismatch 0x%x != 0x%x\n", memUsed, 
-          LL_MEMORY_FOOTPRINT);
+      printf("Controller memory mismatch 0x%x != 0x%x\n", (unsigned int)memUsed, 
+          (unsigned int)LL_MEMORY_FOOTPRINT);
   }
 #endif
 
@@ -180,11 +180,7 @@ void StackInitFit(void)
   SmpHandlerInit(handlerId);
   SmprInit();
   SmprScInit();
-  HciSetMaxRxAclLen(100);
 
-  /* card10:
-   * Here it gets weird: application logic and stack are
-   * mixed a lot. */
-  handlerId = WsfOsSetNextHandler(AppHandler);
-  AppHandlerInit(handlerId);
+  /*TODO card10: Probably want to adjust this */
+  HciSetMaxRxAclLen(100);
 }

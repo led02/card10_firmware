@@ -179,9 +179,9 @@ uint8_t appNumConns(uint8_t role)
  *  \return None.
  */
 /*************************************************************************************************/
-void AppHandlerInit(wsfHandlerId_t handlerId)
+void AppInit(void)
 {
-  appHandlerId = handlerId;
+  appHandlerId = WsfOsSetNextHandler(AppHandler);
 
   AppDbInit();
 }

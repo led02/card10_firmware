@@ -45,7 +45,8 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
 };
 
 /*! \brief  Stack initialization for app. */
-extern void StackInitFit(void);
+extern void StackInit(void);
+extern void AppInit(void);
 
 /*************************************************************************************************/
 void PalSysAssertTrap(void)
@@ -316,12 +317,14 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 static void ble_init(void)
 {
     WsfInit();
-    StackInitFit();
+    StackInit();
     setAddress();
+
     NVIC_SetPriority(BTLE_SFD_TO_IRQn, 2);
     NVIC_SetPriority(BTLE_TX_DONE_IRQn, 2);
     NVIC_SetPriority(BTLE_RX_RCVD_IRQn, 2);
-    FitStart();
+    AppInit();
+    BleStart();
 
     /* Add the UART service dynamically */
     AttsDynInit();
