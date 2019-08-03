@@ -43,88 +43,88 @@
 /******************************************************************************/
 int PB_Init(void)
 {
-    int retval = E_NO_ERROR;
-    unsigned int i;
+	int retval = E_NO_ERROR;
+	unsigned int i;
 
-    // If we have a port expander, its pins are already configured
-    if(!portexpander_detected()) {
-        // Enable pushbutton inputs
-        for (i = 0; i < num_pbs; i++) {
-            if (GPIO_Config(&pb_pin[i]) != E_NO_ERROR) {
-                retval = E_UNKNOWN;
-            }
-        }
-    }
+	// If we have a port expander, its pins are already configured
+	if (!portexpander_detected()) {
+		// Enable pushbutton inputs
+		for (i = 0; i < num_pbs; i++) {
+			if (GPIO_Config(&pb_pin[i]) != E_NO_ERROR) {
+				retval = E_UNKNOWN;
+			}
+		}
+	}
 
-    return retval;
+	return retval;
 }
 
 /******************************************************************************/
 int PB_RegisterCallback(unsigned int pb, pb_callback callback)
 {
-    MXC_ASSERT(pb < num_pbs);
+	MXC_ASSERT(pb < num_pbs);
 
-    // TODO: portexpander support
-    if (callback) {
-        // Register callback
-        GPIO_RegisterCallback(&pb_pin[pb], callback, (void*)pb);
+	// TODO: portexpander support
+	if (callback) {
+		// Register callback
+		GPIO_RegisterCallback(&pb_pin[pb], callback, (void *)pb);
 
-        // Configure and enable interrupt
-        GPIO_IntConfig(&pb_pin[pb], GPIO_INT_EDGE, GPIO_INT_FALLING);
-        GPIO_IntEnable(&pb_pin[pb]);
-        NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pb_pin[pb].port));
-    } else {
-        // Disable interrupt and clear callback
-        GPIO_IntDisable(&pb_pin[pb]);
-        GPIO_RegisterCallback(&pb_pin[pb], NULL, NULL);
-    }
+		// Configure and enable interrupt
+		GPIO_IntConfig(&pb_pin[pb], GPIO_INT_EDGE, GPIO_INT_FALLING);
+		GPIO_IntEnable(&pb_pin[pb]);
+		NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pb_pin[pb].port));
+	} else {
+		// Disable interrupt and clear callback
+		GPIO_IntDisable(&pb_pin[pb]);
+		GPIO_RegisterCallback(&pb_pin[pb], NULL, NULL);
+	}
 
-    return E_NO_ERROR;
+	return E_NO_ERROR;
 }
 
 //******************************************************************************
 void PB_IntEnable(unsigned int pb)
 {
-    // TODO: portexpander support
-    MXC_ASSERT(pb < num_pbs);
-    GPIO_IntEnable(&pb_pin[pb]);
+	// TODO: portexpander support
+	MXC_ASSERT(pb < num_pbs);
+	GPIO_IntEnable(&pb_pin[pb]);
 }
 
 //******************************************************************************
 void PB_IntDisable(unsigned int pb)
 {
-    // TODO: portexpander support
-    MXC_ASSERT(pb < num_pbs);
-    GPIO_IntDisable(&pb_pin[pb]);
+	// TODO: portexpander support
+	MXC_ASSERT(pb < num_pbs);
+	GPIO_IntDisable(&pb_pin[pb]);
 }
 
 //******************************************************************************
 void PB_IntClear(unsigned int pb)
 {
-    // TODO: portexpander support
-    MXC_ASSERT(pb < num_pbs);
-    GPIO_IntClr(&pb_pin[pb]);
+	// TODO: portexpander support
+	MXC_ASSERT(pb < num_pbs);
+	GPIO_IntClr(&pb_pin[pb]);
 }
 
 //******************************************************************************
 int PB_Get(unsigned int pb)
 {
-    static const uint8_t expander_pins[] = {5, 0x0, 3, 6};
-    MXC_ASSERT(pb < 4);
-    switch(pb) {
-        case 1:
-        case 3:
-        case 4:
-            if(portexpander_detected()) {
-                uint8_t port = portexpander_get();
-                return (port & (1 << expander_pins[pb-1])) == 0;
-            } else {
-                return GPIO_InGet(&pb_pin[pb-1]) == 0;
-            }
-            break;
-        case 2:
-            return MAX77650_getDebounceStatusnEN0();
-            break;
-    }
-    return 0;
+	static const uint8_t expander_pins[] = { 5, 0x0, 3, 6 };
+	MXC_ASSERT(pb < 4);
+	switch (pb) {
+	case 1:
+	case 3:
+	case 4:
+		if (portexpander_detected()) {
+			uint8_t port = portexpander_get();
+			return (port & (1 << expander_pins[pb - 1])) == 0;
+		} else {
+			return GPIO_InGet(&pb_pin[pb - 1]) == 0;
+		}
+		break;
+	case 2:
+		return MAX77650_getDebounceStatusnEN0();
+		break;
+	}
+	return 0;
 }
