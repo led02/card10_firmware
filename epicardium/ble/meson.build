@@ -6,5 +6,6 @@ ble_sources = files(
   'svc_core.c',
   'app/app_main.c',
   'app/common/app_db.c',
-  'app/common/app_ui.c'
+  'app/common/app_ui.c',
+  'uart.c'
 )
