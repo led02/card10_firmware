@@ -34,12 +34,12 @@
  *
  ******************************************************************************/
 
-#include <stddef.h>
 #include "mxc_config.h"
 #include "mxc_assert.h"
 #include "pb.h"
 #include "portexpander.h"
-
+#include "MAX77650-Arduino-Library.h"
+#include <stddef.h>
 /******************************************************************************/
 int PB_Init(void)
 {
@@ -123,7 +123,7 @@ int PB_Get(unsigned int pb)
             }
             break;
         case 2:
-            // TODO: read pmic button
+            return MAX77650_getDebounceStatusnEN0();
             break;
     }
     return 0;
