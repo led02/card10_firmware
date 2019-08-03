@@ -1,3 +1,5 @@
+#include "mphalport.h"
+
 #include "max32665.h"
 
 #include "lib/utils/pyexec.h"
@@ -13,11 +15,10 @@ extern void *__HeapBase, *__HeapLimit;
 
 int main(void)
 {
+	pycardium_hal_init();
+
 	mp_stack_set_top(&__StackTop);
 	mp_stack_set_limit((mp_int_t)&__StackLimit);
-
-	/* TMR5 is used to notify on keyboard interrupt */
-	NVIC_EnableIRQ(TMR5_IRQn);
 
 	while (1) {
 		gc_init(&__HeapBase + 1024 * 10, &__HeapLimit);

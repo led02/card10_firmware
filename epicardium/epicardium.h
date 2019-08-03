@@ -29,8 +29,9 @@ typedef unsigned int size_t;
 /* clang-format off */
 #define API_SYSTEM_EXIT             0x1 /* TODO */
 #define API_SYSTEM_EXEC             0x2 /* TODO */
-#define API_UART_WRITE              0x3
-#define API_UART_READ               0x4
+#define API_UART_WRITE_STR          0x3
+#define API_UART_READ_CHAR          0x4
+#define API_UART_READ_STR           0x5 /* TODO */
 #define API_STREAM_READ             0x6
 #define API_INTERRUPT_ENABLE        0x7
 #define API_INTERRUPT_DISABLE       0x8
@@ -102,7 +103,7 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_RESET                  0
 /** ``^C`` interrupt. See :c:func:`epic_isr_ctrl_c` for details.  */
 #define EPIC_INT_CTRL_C                 1
-/** TODO */
+/** UART Receive interrupt.  See :c:func:`epic_isr_uart_rx`. */
 #define EPIC_INT_UART_RX                2
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
 #define EPIC_INT_RTC_ALARM              3
@@ -129,19 +130,49 @@ API_ISR(EPIC_INT_RESET, epic_isr_reset);
  * :param str:  String to write.  Does not necessarily have to be NULL-terminated.
  * :param length:  Amount of bytes to print.
  */
-API(API_UART_WRITE, void epic_uart_write_str(const char *str, intptr_t length));
+API(API_UART_WRITE_STR, void epic_uart_write_str(
+	const char *str,
+	intptr_t length
+));
 
 /**
- * Blocking read a single character from any connected serial device.
- * ``epic_uart_read_chr`` only returns once one byte has been read.
  *
- * .. todo::
+ * Try reading a single character from any connected serial device.  If nothing
+ * is available, :c:func:`epic_uart_read_char` returns ``(-1)``.
  *
- *    This API function is currently in violation of the API rules.
- *
- * :return:  The byte.
+ * :return:  The byte or ``(-1)`` if no byte was available.
  */
-API(API_UART_READ, char epic_uart_read_chr(void));
+API(API_UART_READ_CHAR, int epic_uart_read_char(void));
+
+/**
+ * **Interrupt Service Routine**
+ *
+ * UART receive interrupt.  This interrupt is triggered whenever a new character
+ * becomes available on any connected UART device.  This function is weakly
+ * aliased to :c:func:`epic_isr_default` by default.
+ *
+ * **Example**:
+ *
+ * .. code-block:: cpp
+ *
+ *    void epic_isr_uart_rx(void)
+ *    {
+ *            char buffer[33];
+ *            int n = epic_uart_read_str(&buffer, sizeof(buffer) - 1);
+ *            buffer[n] = '\0';
+ *            printf("Got: %s\n", buffer);
+ *    }
+ *
+ *    int main(void)
+ *    {
+ *            epic_interrupt_enable(EPIC_INT_UART_RX);
+ *
+ *            while (1) {
+ *                    __WFI();
+ *            }
+ *    }
+ */
+API_ISR(EPIC_INT_UART_RX, epic_isr_uart_rx);
 
 /**
  * **Interrupt Service Routine**

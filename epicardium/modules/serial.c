@@ -1,5 +1,7 @@
-#include <stdint.h>
-#include <stdio.h>
+#include "epicardium.h"
+#include "api/interrupt-sender.h"
+#include "modules/log.h"
+#include "modules/modules.h"
 
 #include "max32665.h"
 #include "cdcacm.h"
@@ -9,9 +11,8 @@
 #include "task.h"
 #include "queue.h"
 
-#include "modules.h"
-#include "modules/log.h"
-#include "api/interrupt-sender.h"
+#include <stdint.h>
+#include <stdio.h>
 
 /* Task ID for the serial handler */
 TaskHandle_t serial_task_id = NULL;
@@ -31,13 +32,15 @@ void epic_uart_write_str(const char *str, intptr_t length)
 }
 
 /*
- * Blocking API-call to read a character from the queue.
+ * API-call to read a character from the queue.
  */
-char epic_uart_read_chr(void)
+int epic_uart_read_char(void)
 {
 	char chr;
-	xQueueReceive(read_queue, &chr, portMAX_DELAY);
-	return chr;
+	if (xQueueReceive(read_queue, &chr, 0) == pdTRUE) {
+		return (int)chr;
+	}
+	return (-1);
 }
 
 /* Interrupt handler needed for SDK UART implementation */
@@ -64,6 +67,8 @@ static void enqueue_char(char chr)
 		/* Queue overran, wait a bit */
 		vTaskDelay(portTICK_PERIOD_MS * 50);
 	}
+
+	api_interrupt_trigger(EPIC_INT_UART_RX);
 }
 
 void vSerialTask(void *pvParameters)

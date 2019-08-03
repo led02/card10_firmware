@@ -1,5 +1,5 @@
-#include "api/common.h"
 #include "epicardium.h"
+#include "api/common.h"
 
 #include "max32665.h"
 #include "mxc_delay.h"
@@ -20,6 +20,19 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Initialize everything for MicroPython */
+void pycardium_hal_init(void)
+{
+	/* TMR5 is used for interrupts from Epicardium */
+	NVIC_EnableIRQ(TMR5_IRQn);
+
+	/*
+	 * Enable UART RX Interrupt so Pycardium can sleep until
+	 * a character becomes available.
+	 */
+	epic_interrupt_enable(EPIC_INT_UART_RX);
+}
+
 /******************************************************************************
  * Serial Communication
  */
@@ -27,7 +40,11 @@
 /* Receive single character */
 int mp_hal_stdin_rx_chr(void)
 {
-	return (int)epic_uart_read_chr();
+	int chr;
+	while ((chr = epic_uart_read_char()) < 0) {
+		__WFI();
+	}
+	return chr;
 }
 
 /* Send a string */
