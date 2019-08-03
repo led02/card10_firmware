@@ -105,3 +105,12 @@ void portexpander_set(uint8_t pin, uint8_t value)
 		portexpander_write(PE_C_OUTPUT_PORT, output_state);
 	}
 }
+
+void portexpander_set_mask(uint8_t mask, uint8_t values)
+{
+	if (detected) {
+		output_state &= ~(mask & ~values);
+		output_state |= mask & values;
+		portexpander_write(PE_C_OUTPUT_PORT, output_state);
+	}
+}
