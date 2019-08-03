@@ -43,6 +43,22 @@ int epic_uart_read_char(void)
 	return (-1);
 }
 
+/*
+ * API-call to read data from the queue.
+ */
+int epic_uart_read_str(char *buf, size_t cnt)
+{
+	int i = 0;
+
+	for (i = 0; i < cnt; i++) {
+		if (xQueueReceive(read_queue, &buf[i], 0) != pdTRUE) {
+			break;
+		}
+	}
+
+	return i;
+}
+
 /* Interrupt handler needed for SDK UART implementation */
 void UART0_IRQHandler(void)
 {

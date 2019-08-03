@@ -31,7 +31,7 @@ typedef unsigned int size_t;
 #define API_SYSTEM_EXEC             0x2 /* TODO */
 #define API_UART_WRITE_STR          0x3
 #define API_UART_READ_CHAR          0x4
-#define API_UART_READ_STR           0x5 /* TODO */
+#define API_UART_READ_STR           0x5
 #define API_STREAM_READ             0x6
 #define API_INTERRUPT_ENABLE        0x7
 #define API_INTERRUPT_DISABLE       0x8
@@ -136,13 +136,26 @@ API(API_UART_WRITE_STR, void epic_uart_write_str(
 ));
 
 /**
+ * Try reading a single character from any connected serial device.
  *
- * Try reading a single character from any connected serial device.  If nothing
- * is available, :c:func:`epic_uart_read_char` returns ``(-1)``.
+ * If nothing is available, :c:func:`epic_uart_read_char` returns ``(-1)``.
  *
  * :return:  The byte or ``(-1)`` if no byte was available.
  */
 API(API_UART_READ_CHAR, int epic_uart_read_char(void));
+
+/**
+ * Read as many characters as possible from the UART queue.
+ *
+ * :c:func:`epic_uart_read_str` will not block if no new data is available.  For
+ * an example, see :c:func:`epic_isr_uart_rx`.
+ *
+ * :param char* buf: Buffer to be filled with incoming data.
+ * :param size_t cnt: Size of ``buf``.
+ * :returns: Number of bytes read.  Can be ``0`` if no data was available.
+ *    Might be a negative value if an error occured.
+ */
+API(API_UART_READ_STR, int epic_uart_read_str(char *buf, size_t cnt));
 
 /**
  * **Interrupt Service Routine**
