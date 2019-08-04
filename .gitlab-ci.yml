@@ -22,8 +22,8 @@ lint:
         - curl --fail https://annoyatron-prod.q3k.org/ping/mr?mr=${CI_MERGE_REQUEST_IID}
         - git remote rm card10 || true # old gitlab runners might have this remote.
         - git fetch https://git.card10.badge.events.ccc.de/card10/firmware.git master:card10/master
-        - git merge-base --fork-point card10/master || ( echo "Your change needs to be rebased against current master."; exit 1; )
-        - git diff --name-only $(git merge-base --fork-point card10/master)...HEAD | xargs tools/code-style.sh
+        - git merge-base card10/master HEAD || ( echo "Your change needs to be rebased against current master."; exit 1; )
+        - git diff --name-only --diff-filter=d card10/master...HEAD | xargs tools/code-style.sh
         - git diff --exit-code
     only:
         - merge_requests
