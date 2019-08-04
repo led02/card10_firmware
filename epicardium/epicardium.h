@@ -29,12 +29,15 @@ typedef unsigned int size_t;
 /* clang-format off */
 #define API_SYSTEM_EXIT             0x1 /* TODO */
 #define API_SYSTEM_EXEC             0x2 /* TODO */
-#define API_UART_WRITE_STR          0x3
-#define API_UART_READ_CHAR          0x4
-#define API_UART_READ_STR           0x5
-#define API_STREAM_READ             0x6
-#define API_INTERRUPT_ENABLE        0x7
-#define API_INTERRUPT_DISABLE       0x8
+
+#define API_INTERRUPT_ENABLE        0xA
+#define API_INTERRUPT_DISABLE       0xB
+
+#define API_UART_WRITE_STR         0x10
+#define API_UART_READ_CHAR         0x11
+#define API_UART_READ_STR          0x12
+
+#define API_STREAM_READ            0x1F
 
 #define API_DISP_OPEN              0x20
 #define API_DISP_CLOSE             0x21
