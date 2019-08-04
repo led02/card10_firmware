@@ -213,6 +213,13 @@ API_ISR(EPIC_INT_CTRL_C, epic_isr_ctrl_c);
 /**
  * Set one of card10's RGB LEDs to a certain color.
  *
+ * .. warning::
+ *
+ *    This API function is not yet stable and is this not part of the API
+ *    freeze.  Any binary using :c:func:`epic_leds_set` might stop working at
+ *    any time.  Once this warning is removed, the function can be considered
+ *    stable like the rest of the API.
+ *
  * :param led:  Which led to set.  0-10 are the leds on the top and 11-14 are the 4 "ambient" leds.
  * :param r:  Red component of the color.
  * :param g:  Green component of the color.
