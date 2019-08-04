@@ -22,7 +22,7 @@ void display_set_reset_pin(uint8_t state)
 	if (!portexpander_detected()) {
 		MAX77650_setDO(state ? true : false);
 	} else {
-		portexpander_set(4, state);
+		portexpander_out_put(PIN_4, state);
 	}
 }
 

@@ -116,7 +116,7 @@ int PB_Get(unsigned int pb)
 	case 3:
 	case 4:
 		if (portexpander_detected()) {
-			uint8_t port = portexpander_get();
+			uint8_t port = portexpander_in_get(0xFF);
 			return (port & (1 << expander_pins[pb - 1])) == 0;
 		} else {
 			return GPIO_InGet(&pb_pin[pb - 1]) == 0;
