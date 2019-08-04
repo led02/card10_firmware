@@ -117,6 +117,7 @@ static inline bool parse_mode(const char *mstring, int *mode)
 		case 'w': //fallthrough intentional
 		case 'a': //fallthrough intentional
 		case 'x': //fallthrough intentional
+		case 'b': //fallthrough intentional
 			break;
 		default:
 			return false;
