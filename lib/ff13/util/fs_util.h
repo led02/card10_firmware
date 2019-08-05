@@ -1,24 +1,15 @@
-#ifndef _FS_UTIL_H
-#define _FS_UTIL_H 1
+#pragma once
 
 #include <ff.h>
-
-#define FLEN 13
 
 typedef struct {
     DWORD total;
     DWORD free;
 } FS_USAGE;
 
-void fsInit(void);
-void fsReInit(void);
-
-int fsInfo(FATFS *fs);
-int fsUsage(FATFS *fs, FS_USAGE *fs_usage);
-int readFile(char * filename, void * data, int len);
-int readTextFile(char * filename, char * data, int len);
-int writeFile(char * filename, const void * data, int len);
-int getFileSize(char * filename);
-const char* f_get_rc_string (FRESULT rc);
-
-#endif /* _FS_UTIL_H */
+int fs_info(FATFS *fs);
+int fs_usage(FATFS *fs, FS_USAGE *fs_usage);
+int fs_read_file(char * filename, void * data, int len);
+int fs_read_text_file(char * filename, char * data, int len);
+int fs_write_file(char * filename, const void * data, int len);
+int fs_get_file_size(char * filename);
