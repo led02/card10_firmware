@@ -1,3 +1,8 @@
+# cordio-phy.a
+cc = meson.get_compiler('c')
+libcordiophy = cc.find_library('cordio-phy', dirs: meson.current_source_dir())
+
+
 includes = include_directories(
   'wsf/include',
   'stack/ble-host/include',
@@ -413,7 +418,7 @@ lib = static_library(
   'ble',
   sources,
   include_directories: includes,
-  dependencies: periphdriver,
+  dependencies: [periphdriver, libcordiophy],
   c_args: ['-w',
             '-DLHCI_ENABLE_VS=TRUE',
             '-DBB_CLK_RATE_HZ=1600000',
@@ -426,5 +431,5 @@ lib = static_library(
 ble = declare_dependency(
   include_directories: includes,
   link_with: lib,
-  dependencies: periphdriver,
+  dependencies: [periphdriver, libcordiophy],
 )
