@@ -10,6 +10,4 @@ module_sources = files(
   'vibra.c',
   'light_sensor.c',
   'rtc.c',
-  'ble.c',
-  'ble_stack_fit.c'
 )

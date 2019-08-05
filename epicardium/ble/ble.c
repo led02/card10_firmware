@@ -11,8 +11,9 @@
 #include "util/bstream.h"
 #include "att_api.h"
 
-#include "modules.h"
+#include "modules/modules.h"
 
+#include "fs_util.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 
