@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 test -d build/ && rm -r build/
 
 git submodule update --init ./lib/micropython
-meson --cross-file card10-cross.ini build/
+meson --cross-file card10-cross.ini build/ "$@"
 
 set +x
 

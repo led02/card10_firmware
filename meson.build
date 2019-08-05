@@ -21,6 +21,13 @@ add_global_arguments(
   language: 'c',
 )
 
+if get_option('debug_prints')
+  add_global_arguments(
+    ['-DLOG_ENABLE_DEBUG=1'],
+    language: 'c',
+  )
+endif
+
 add_global_link_arguments(
   '-Wl,--gc-sections',
   '-lm',

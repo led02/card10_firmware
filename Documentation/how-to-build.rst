@@ -58,6 +58,19 @@ can build with *ninja*.
 
 .. note::
 
+   If you intend to work on the firmware, you might want to enable debug output
+   in the firmware version you build.  You can do this by calling ``meson``
+   with additional arguments.  To do so, add you meson arguments to the
+   bootstrap call like this:
+
+   .. code-block:: shell-session
+
+      ./bootstrap.sh -Ddebug_prints=true
+
+   (``debug_prints`` is an option provided by our firmware)
+
+.. warning::
+
    Our build-system contains a few workarounds around short-comings in meson.
    These workarounds might break on some setups which we did not yet test.  If
    this is the case for you, please open an issue in our `issue tracker`_!
