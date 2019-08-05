@@ -124,7 +124,7 @@ def main():
 
     # Evaluate the preprocessor
     source = subprocess.check_output(
-        ["gcc", "-E", "-"], input=api_src.encode()
+        ["gcc", "-E", "-P", "-"], input=api_src.encode()
     ).decode()
 
     declarations = parse_declarations(source)
