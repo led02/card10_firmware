@@ -1,5 +1,5 @@
 # maintained by q3k, built using docker/build-env
-image: "registry.k0.hswaw.net/q3k/card10-build-env:20190729-231409Z-635fb98"
+image: "derq3k/card10-build-env:20190806-195837Z-f95b541-dirty"
 
 build:
     stage: build
@@ -13,7 +13,7 @@ build:
 
 lint:
     stage: test
-    image: "registry.k0.hswaw.net/q3k/card10-lint-env:20190728-233522Z-ded74f0-dirty"
+    image: "derq3k/card10-lint-env:20190806-201106Z-f95b541-dirty"
     script:
         # Annoyatron is maintained by q3k. Its job is to serve MR comments that are friendlier than just a failing pipeline.
         #  source code: https://git.card10.badge.events.ccc.de/q3k/annoyatron/
@@ -31,7 +31,7 @@ lint:
 pages:
     stage: deploy
     # maintaned by q3k, build using docker/deploy-env
-    image: "registry.k0.hswaw.net/q3k/card10-deploy-env:20190725-112709Z-4c5d8e8"
+    image: "derq3k/card10-deploy-env:20190806-200743Z-f95b541-dirty"
     script:
         - export LD_LIBRARY_PATH=$(llvm-config --libdir)
         - echo $LD_LIBRARY_PATH
