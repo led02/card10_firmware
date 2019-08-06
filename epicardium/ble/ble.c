@@ -1,3 +1,7 @@
+#include "modules/log.h"
+
+#include "fs_util.h"
+
 #include "wsf_types.h"
 #include "wsf_buf.h"
 #include "wsf_trace.h"
@@ -5,7 +9,6 @@
 #include "hci_vs.h"
 #include "att_api.h"
 
-#include "fs_util.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 
@@ -66,18 +69,19 @@ static bool_t myTrace(const uint8_t *pBuf, uint32_t len)
 /*************************************************************************************************/
 static void WsfInit(void)
 {
-	uint32_t bytesUsed;
+	uint32_t bytesUsed __attribute__((unused));
 	WsfTimerInit();
 
 	SystemHeapStart = (uint32_t)&SystemHeap;
 	memset(SystemHeap, 0, sizeof(SystemHeap));
 	//printf("SystemHeapStart = 0x%x\n", SystemHeapStart);
 	//printf("SystemHeapSize = 0x%x\n", SystemHeapSize);
-	bytesUsed = WsfBufInit(WSF_BUF_POOLS, mainPoolDesc);
-	printf("bytesUsed = %u\n", (unsigned int)bytesUsed);
 
 	WsfTraceRegisterHandler(myTrace);
 	WsfTraceEnable(TRUE);
+
+	bytesUsed = WsfBufInit(WSF_BUF_POOLS, mainPoolDesc);
+	APP_TRACE_INFO1("bytesUsed = %u", (unsigned int)bytesUsed);
 }
 /*************************************************************************************************/
 /* TODO: We need a source of MACs */
@@ -87,7 +91,7 @@ static void setAddress(void)
 	char buf[32];
 
 	fs_read_text_file("mac.txt", buf, sizeof(buf));
-	printf("mac file: %s\n", buf);
+	APP_TRACE_INFO1("mac file contents: %s", buf);
 	int a, b, c, d, e, f;
 	if (sscanf(buf, "%x:%x:%x:%x:%x:%x", &a, &b, &c, &d, &e, &f) == 6) {
 		bdAddr[0] = f;
@@ -98,13 +102,16 @@ static void setAddress(void)
 		bdAddr[5] = a;
 	}
 
-	printf("Setting address -- MAC %02X:%02X:%02X:%02X:%02X:%02X\n",
-	       bdAddr[5],
-	       bdAddr[4],
-	       bdAddr[3],
-	       bdAddr[2],
-	       bdAddr[1],
-	       bdAddr[0]);
+	LOG_INFO(
+		"ble",
+		"Setting MAC address to %02X:%02X:%02X:%02X:%02X:%02X",
+		bdAddr[5],
+		bdAddr[4],
+		bdAddr[3],
+		bdAddr[2],
+		bdAddr[1],
+		bdAddr[0]
+	);
 	HciVsSetBdAddr(bdAddr);
 }
 /*************************************************************************************************/
@@ -162,10 +169,10 @@ static void scheduleTimer(void)
 			);
 			//printf("insert done\n");
 		} else {
-			printf("could not create timer\n");
+			LOG_ERR("ble", "Could not create timer");
 		}
 	} else {
-		printf("No timer running\n");
+		APP_TRACE_INFO0("No timer running");
 	}
 }
 /*************************************************************************************************/
