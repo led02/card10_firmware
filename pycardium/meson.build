@@ -1,14 +1,14 @@
 name = 'pycardium'
 
 modsrc = files(
+  'modules/fat_file.c',
+  'modules/fat_reader_import.c',
   'modules/interrupt.c',
   'modules/leds.c',
+  'modules/light_sensor.c',
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
-  'modules/light_sensor.c',
-  'modules/fat_file.c',
-  'modules/fat_reader_import.c',
 )
 
 #################################

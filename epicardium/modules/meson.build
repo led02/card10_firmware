@@ -3,11 +3,11 @@ module_sources = files(
   'fatfs.c',
   'fatfs_fileops.c',
   'leds.c',
+  'light_sensor.c',
   'log.c',
   'pmic.c',
+  'rtc.c',
   'serial.c',
   'stream.c',
   'vibra.c',
-  'light_sensor.c',
-  'rtc.c',
 )
