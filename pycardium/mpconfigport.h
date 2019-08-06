@@ -1,6 +1,6 @@
 /* Hardware Name */
 #define MICROPY_HW_BOARD_NAME "card10"
-#define MICROPY_HW_MCU_NAME "max32665"
+#define MICROPY_HW_MCU_NAME "max32666"
 
 /* MicroPython Config Options */
 
