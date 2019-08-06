@@ -414,22 +414,40 @@ sources = files(
 'link_layer/controller/sources/common/sch/sch_list.c',
 )
 
+
+ble_compileargs = [
+  '-DWSF_ASSERT_ENABLED=TRUE',
+  '-DWSF_MS_PER_TICK=1',
+  '-DINIT_BROADCASTER',
+  '-DINIT_PERIPHERAL',
+  '-DINIT_ENCRYPTED',
+]
+
+if get_option('ble_trace')
+  ble_compileargs += [
+    '-DWSF_TRACE_ENABLED=TRUE',
+  ]
+endif
+
 lib = static_library(
   'ble',
   sources,
   include_directories: includes,
   dependencies: [periphdriver, libcordiophy],
-  c_args: ['-w',
-            '-DLHCI_ENABLE_VS=TRUE',
-            '-DBB_CLK_RATE_HZ=1600000',
-            '-DLCTR_CONN_NO_TIFS_REASSEMBLY=1',
-            '-DBB_ENABLE_INLINE_ENC_TX=1',
-            '-DBB_ENABLE_INLINE_DEC_RX=1',
-            '-DFORCE_PMU_WAKEUP=1']
+  c_args: [
+    '-w',
+    '-DLHCI_ENABLE_VS=TRUE',
+    '-DBB_CLK_RATE_HZ=1600000',
+    '-DLCTR_CONN_NO_TIFS_REASSEMBLY=1',
+    '-DBB_ENABLE_INLINE_ENC_TX=1',
+    '-DBB_ENABLE_INLINE_DEC_RX=1',
+    '-DFORCE_PMU_WAKEUP=1',
+  ] + ble_compileargs,
 )
 
 ble = declare_dependency(
   include_directories: includes,
   link_with: lib,
+  compile_args: ble_compileargs,
   dependencies: [periphdriver, libcordiophy],
 )
