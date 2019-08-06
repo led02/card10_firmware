@@ -23,51 +23,51 @@ Dependencies
 
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
 * **python3**:  For meson and various scripts needed for building.
-* **ninja**: Needed for meson.  If you install meson via *pip*, you need to
-  install ninja manually as well:
-
-  - Ubuntu / Debian: ``apt install ninja-build``
-  - Arch: ``pacman -S ninja``
-* **meson** (>0.43.0):  Unfortunately most distros only have very old versions
+* **meson** (>0.43.0) & **ninja**:  Unfortunately most distros only have very old versions
   of meson in their repositories.  Instead, you'll probably save yourself a lot
-  of headaches by installing meson from ``pip3 install --user meson``.
+  of headaches by installing meson from *pip*.
+
+   - Ubuntu / Debian:
+
+    .. code-block:: shell-session
+
+       apt install ninja-build
+       pip3 install --user meson
+
+   - Arch (has latest *meson* in the repos):
+
+    .. code-block:: shell-session
+
+       pacman -S meson
+
 * **python3-crc16**: Install with ``pip3 install --user crc16``.
-* **python3-pillow**: Python Image Library
+* **python3-pillow**: Python Image Library ``pip3 install --user PIL``.
 
 .. _ARM's GNU toolchain: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
 Cloning
 -------
-Clone the master branch of the git repository containing the firmware using the following command:
+Clone the ``master`` branch of the firmware repository:
 
 .. code-block:: shell-session
 
    $ git clone https://git.card10.badge.events.ccc.de/card10/firmware.git
 
-Building
---------
-Build using the following two commands:
+Build Configuration
+-------------------
+Initialize the build-system using
 
 .. code-block:: shell-session
 
    $ ./bootstrap.sh
-   $ ninja -C build/
 
-``bootstrap.sh`` initializes git submodules and runs *meson*.  Afterwards you
-can build with *ninja*.
+Additional arguments to ``bootstrap.sh`` will be passed to *meson*.  You can
+use this to for example, to enable one or more of the following optional
+firmware features:
 
-.. note::
-
-   If you intend to work on the firmware, you might want to enable debug output
-   in the firmware version you build.  You can do this by calling ``meson``
-   with additional arguments.  To do so, add you meson arguments to the
-   bootstrap call like this:
-
-   .. code-block:: shell-session
-
-      ./bootstrap.sh -Ddebug_prints=true
-
-   (``debug_prints`` is an option provided by our firmware)
+- ``-Ddebug_prints=true``: Print more verbose debugging log messages
+- ``-Dble_trace=true``: Enable BLE tracing.  This will output lots of status
+  info related to BLE.
 
 .. warning::
 
@@ -77,10 +77,18 @@ can build with *ninja*.
 
 .. _issue tracker: https://git.card10.badge.events.ccc.de/card10/firmware/issues
 
-If ninja succeeds, the binaries are in ``build/``.  They are available in two
-formats:  As an ``.elf`` which can be flashed using a debugger and as a
-``.bin`` which can be loaded using the provided bootloader.  Here is a list of
-the binaries:
+Building
+--------
+Build using *ninja*:
+
+.. code-block:: shell-session
+
+   $ ninja -C build/
+
+If ninja succeeds, the resulting binaries are in ``build/``.  They are
+available in two formats:  As an ``.elf`` which can be flashed using a debugger
+and as a ``.bin`` which can be loaded using the provided bootloader.  Here is a
+list of the binaries:
 
 - ``build/bootloader/bootloader.elf``: Our bootloader.  It should already be on
   your card10.  The bootloader can only be flashed using a debugger.
@@ -93,3 +101,5 @@ In order to do a rebuild you can issue a clean command to ninja via
 .. code-block:: shell-session
 
   $ ninja -C build/ -t clean
+
+Otherwise, rerunning ``./bootstrap.sh`` will also clean the build-directory.
