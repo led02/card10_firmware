@@ -111,7 +111,9 @@ static void wsfTimerRemove(wsfTimer_t *pTimer)
 {
   wsfTimer_t  *pElem;
   wsfTimer_t  *pPrev = NULL;
+  bool_t      newHead = FALSE;
 
+  /* TODO: why is there no lock here? */
   pElem = (wsfTimer_t *) wsfTimerTimerQueue.pHead;
 
   /* find timer in queue */
@@ -128,9 +130,20 @@ static void wsfTimerRemove(wsfTimer_t *pTimer)
   /* if timer found remove from queue */
   if (pElem != NULL)
   {
+    if (pElem == wsfTimerTimerQueue.pHead)
+    {
+      newHead = TRUE;
+    }
     WsfQueueRemove(&wsfTimerTimerQueue, pTimer, pPrev);
 
     pTimer->isStarted = FALSE;
+  }
+
+  if (newHead)
+  {
+    /* We have a new head. Notify the OS. */
+    /* TODO: Not sure if this should be inside a lock */
+    WsfTimerNotify();
   }
 }
 
@@ -179,6 +192,13 @@ static void wsfTimerInsert(wsfTimer_t *pTimer, wsfTimerTicks_t ticks)
 
   /* task schedule unlock */
   WsfTaskUnlock();
+
+  if(wsfTimerTimerQueue.pHead == pTimer)
+  {
+    /* The timer is new head. Notify the OS. */
+    /* TODO: Not sure if this should be inside the lock */
+    WsfTimerNotify();
+  }
 }
 
 /*************************************************************************************************/
@@ -379,6 +399,10 @@ wsfTimer_t *WsfTimerServiceExpired(wsfTaskId_t taskId)
     WsfTaskUnlock();
 
     WSF_TRACE_INFO1("Timer expired pTimer:0x%x", pElem);
+
+    /* We have a new head. Notify the OS. */
+    /* TODO: Not sure if this should be inside the lock */
+    WsfTimerNotify();
 
     /* return timer */
     return pElem;

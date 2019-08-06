@@ -216,6 +216,7 @@ void wsfOsDispatcher(void);
 /*************************************************************************************************/
 void WsfOsInit(void);
 
+void wsf_ble_signal_event(void);
 /*! \} */    /* WSF_OS_API */
 
 #ifdef __cplusplus

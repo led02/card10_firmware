@@ -1,3 +1,8 @@
+# cordio-phy.a
+cc = meson.get_compiler('c')
+libcordiophy = cc.find_library('cordio-phy', dirs: meson.current_source_dir())
+
+
 includes = include_directories(
   'wsf/include',
   'stack/ble-host/include',
@@ -45,7 +50,7 @@ sources = files(
 'stack/ble-profiles/sources/apps/watch/watch_main.c',
 'stack/ble-profiles/sources/apps/datc/datc_main.c',
 'stack/ble-profiles/sources/apps/gluc/gluc_main.c',
-'stack/ble-profiles/sources/apps/fit/fit_main.c',
+#'stack/ble-profiles/sources/apps/fit/fit_main.c',
 'stack/ble-profiles/sources/apps/cycling/cycling_main.c',
 'stack/ble-profiles/sources/apps/sensor/sensor_main.c',
 'stack/ble-profiles/sources/apps/app/app_disc.c',
@@ -54,11 +59,11 @@ sources = files(
 'stack/ble-profiles/sources/apps/app/app_master_ae.c',
 'stack/ble-profiles/sources/apps/app/app_slave_leg.c',
 'stack/ble-profiles/sources/apps/app/app_slave_ae.c',
-'stack/ble-profiles/sources/apps/app/app_main.c',
+#'stack/ble-profiles/sources/apps/app/app_main.c',
 'stack/ble-profiles/sources/apps/app/app_server.c',
 'stack/ble-profiles/sources/apps/app/app_master_leg.c',
-'stack/ble-profiles/sources/apps/app/common/app_db.c',
-'stack/ble-profiles/sources/apps/app/common/app_ui.c',
+#'stack/ble-profiles/sources/apps/app/common/app_db.c',
+#'stack/ble-profiles/sources/apps/app/common/app_ui.c',
 'stack/ble-profiles/sources/apps/app/common/app_hw.c',
 'stack/ble-profiles/sources/apps/app/app_terminal.c',
 'stack/ble-profiles/sources/apps/wdxs/wdxs_oad.c',
@@ -111,7 +116,7 @@ sources = files(
 'stack/ble-profiles/sources/services/svc_rscs.c',
 'stack/ble-profiles/sources/services/svc_hts.c',
 'stack/ble-profiles/sources/services/svc_temp.c',
-'stack/ble-profiles/sources/services/svc_core.c',
+#'stack/ble-profiles/sources/services/svc_core.c',
 'stack/ble-profiles/sources/services/svc_hid.c',
 'stack/ble-profiles/sources/services/svc_scpss.c',
 'stack/ble-profiles/sources/services/svc_hrs.c',
@@ -120,7 +125,7 @@ sources = files(
 'stack/ble-profiles/sources/services/svc_ipss.c',
 'stack/ble-profiles/sources/services/svc_wdxs.c',
 'stack/ble-profiles/sources/services/svc_uricfg.c',
-'stack/ble-profiles/sources/services/svc_dis.c',
+#'stack/ble-profiles/sources/services/svc_dis.c',
 'stack/ble-profiles/sources/services/svc_px.c',
 'stack/ble-profiles/sources/services/svc_batt.c',
 'stack/ble-profiles/sources/services/svc_wss.c',
@@ -409,22 +414,40 @@ sources = files(
 'link_layer/controller/sources/common/sch/sch_list.c',
 )
 
+
+ble_compileargs = [
+  '-DWSF_ASSERT_ENABLED=TRUE',
+  '-DWSF_MS_PER_TICK=1',
+  '-DINIT_BROADCASTER',
+  '-DINIT_PERIPHERAL',
+  '-DINIT_ENCRYPTED',
+]
+
+if get_option('ble_trace')
+  ble_compileargs += [
+    '-DWSF_TRACE_ENABLED=TRUE',
+  ]
+endif
+
 lib = static_library(
   'ble',
   sources,
   include_directories: includes,
-  dependencies: periphdriver,
-  c_args: ['-w',
-            '-DLHCI_ENABLE_VS=TRUE',
-            '-DBB_CLK_RATE_HZ=1600000',
-            '-DLCTR_CONN_NO_TIFS_REASSEMBLY=1',
-            '-DBB_ENABLE_INLINE_ENC_TX=1',
-            '-DBB_ENABLE_INLINE_DEC_RX=1',
-            '-DFORCE_PMU_WAKEUP=1']
+  dependencies: [periphdriver, libcordiophy],
+  c_args: [
+    '-w',
+    '-DLHCI_ENABLE_VS=TRUE',
+    '-DBB_CLK_RATE_HZ=1600000',
+    '-DLCTR_CONN_NO_TIFS_REASSEMBLY=1',
+    '-DBB_ENABLE_INLINE_ENC_TX=1',
+    '-DBB_ENABLE_INLINE_DEC_RX=1',
+    '-DFORCE_PMU_WAKEUP=1',
+  ] + ble_compileargs,
 )
 
 ble = declare_dependency(
   include_directories: includes,
   link_with: lib,
-  dependencies: periphdriver,
+  compile_args: ble_compileargs,
+  dependencies: [periphdriver, libcordiophy],
 )

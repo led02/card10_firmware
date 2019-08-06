@@ -5,3 +5,11 @@ option(
 
   description: 'Whether to print debug messages on the serial console'
 )
+
+option(
+  'ble_trace',
+  type: 'boolean',
+  value: false,
+
+  description: 'Whether to enable WSF TRACE prints',
+)

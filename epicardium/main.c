@@ -25,6 +25,8 @@
 
 TaskHandle_t dispatcher_task_id;
 
+void vBleTask(void *pvParameters);
+
 /*
  * API dispatcher task.  This task will sleep until an API call is issued and
  * then wake up to dispatch it.
@@ -100,6 +102,18 @@ int main(void)
 			"Failed to create %s task!",
 			"API Dispatcher"
 		);
+		abort();
+	}
+
+	/* BLE */
+	if (xTaskCreate(
+		    vBleTask,
+		    (const char *)"BLE",
+		    configMINIMAL_STACK_SIZE * 10,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
+		LOG_CRIT("startup", "Failed to create %s task!", "BLE");
 		abort();
 	}
 
