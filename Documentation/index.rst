@@ -48,6 +48,12 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    epicardium/api
    epicardium-guide
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Bluetooth
+
+   bluetooth/file-transfer
+
 Indices and tables
 ==================
 
