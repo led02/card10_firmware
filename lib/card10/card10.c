@@ -24,11 +24,7 @@
 #include <stdint.h>
 #include <string.h>
 
-/* XXX: The display supports max 15 Mhz, but we have stability issues at that rate.
- * Current suspicion is that the SDK is buggy.
- *
- * At 12 MHz things seem stable*/
-#define SPI_SPEED (12 * 1000 * 1000) // Bit Rate. Display has 15 MHz limit
+#define SPI_SPEED (15 * 1000 * 1000) // Bit Rate
 
 const gpio_cfg_t bhi_interrupt_pin = {
 	PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
@@ -82,14 +78,7 @@ void card10_init(void)
 	spi17y_master_cfg.ss0 = Enable;
 	spi17y_master_cfg.ss1 = Disable;
 	spi17y_master_cfg.ss2 = Disable;
-
 	if (SPI_Init(SPI0, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
-		printf("Error configuring SPI\n");
-		while (1)
-			;
-	}
-
-	if (SPI_Init(SPI2, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
 		printf("Error configuring SPI\n");
 		while (1)
 			;
