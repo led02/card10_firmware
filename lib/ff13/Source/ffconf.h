@@ -248,10 +248,10 @@
 /      lock control is independent of re-entrancy. */
 
 
-#define FF_FS_REENTRANT	1
+#define FF_FS_REENTRANT	0
 #define FF_FS_TIMEOUT	1000
 //in FreeRTOS, SemaphoreHandle_t is a typedef for QueueHandle_t, which is just a typedef for:
-#define FF_SYNC_t		struct QueueDefinition *
+//#define FF_SYNC_t		struct QueueDefinition *
 
 /* The option FF_FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different

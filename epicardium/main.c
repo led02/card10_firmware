@@ -15,6 +15,7 @@
 #include "modules/modules.h"
 #include "modules/log.h"
 #include "modules/stream.h"
+#include "modules/filesystem.h"
 #include "api/interrupt-sender.h"
 
 #include <Heart.h>

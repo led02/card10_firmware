@@ -8,6 +8,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"     /* FatFs lower layer API */
+#include <stdbool.h>
 
 /* Definitions of physical drive number for each drive */
 #define DEV_FLASH       0   /* Example: Map MMC/SD card to physical drive 1 */
@@ -19,6 +20,7 @@
 
 /*local vaiables*/
 static uint8_t rtc_en;
+static bool s_diskio_initialized = false;
 
 #if SDHC
 /* # of times to check for a card, should be > 1 to detect both SD and MMC */
@@ -57,12 +59,14 @@ DSTATUS disk_status (
     #define STA_PROTECT		0x04	/* Write protected */
 #endif
 
-    DSTATUS status = 0;
-    if(pdrv == 0) {
-        if(mx25_ready()) {
-            status = RES_OK;
-         }
-    }
+	DSTATUS status = 0;
+	if (!s_diskio_initialized) {
+		status = STA_NOINIT | STA_NODISK;
+	} else if (pdrv == 0) {
+		if (mx25_ready()) {
+			status = RES_OK;
+		}
+	}
 
 #if SDHC
     if(pdrv == 1) {
@@ -87,7 +91,8 @@ DSTATUS disk_initialize (
 {
     DSTATUS status = STA_NOINIT;
 
-    rtc_en = 0;
+	rtc_en               = 0;
+	s_diskio_initialized = true;
 #if (FF_FS_NORTC == 0)
     //Initialize RTC
     if (MXC_RTC->cn & MXC_F_RTC_CN_WE) {
@@ -123,7 +128,14 @@ DSTATUS disk_initialize (
     return status;
 }
 
-
+void disk_deinitialize()
+{
+	if (s_diskio_initialized) {
+		mx25_sync();
+		mx25_stop(); //XXX: or should we not?
+		s_diskio_initialized = false;
+	}
+}
 
 /*-----------------------------------------------------------------------*/
 /* Read Sector(s)                                                        */
@@ -138,7 +150,9 @@ DRESULT disk_read (
 {
     DRESULT status = RES_ERROR;
 
-    if(pdrv == 0) {
+    if (!s_diskio_initialized) {
+        status = STA_NOINIT | STA_NODISK;
+    } else if (pdrv == 0) {
         int sector_offset;
         status = RES_OK;
         for(sector_offset = 0; sector_offset < count; sector_offset++) {
@@ -174,7 +188,9 @@ DRESULT disk_write (
 {
     DRESULT status = RES_ERROR;
 
-    if(pdrv == 0) {
+    if (!s_diskio_initialized) {
+        status = STA_NOINIT | STA_NODISK;
+    } else if (pdrv == 0) {
         int sector_offset;
         status = RES_OK;
         for(sector_offset = 0; sector_offset < count; sector_offset++) {
@@ -212,7 +228,9 @@ DRESULT disk_ioctl (
 {
     DRESULT status = RES_PARERR;
 
-    if(pdrv == 0) {
+    if (!s_diskio_initialized) {
+        status = STA_NOINIT | STA_NODISK;
+    } else if (pdrv == 0) {
         switch(cmd) {
             case CTRL_SYNC:
                 /* Mandatory */

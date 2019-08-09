@@ -1,7 +1,6 @@
 module_sources = files(
   'display.c',
-  'fatfs.c',
-  'fatfs_fileops.c',
+  'fileops.c',
   'leds.c',
   'light_sensor.c',
   'log.c',

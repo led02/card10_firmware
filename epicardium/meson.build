@@ -74,6 +74,7 @@ elf = executable(
   'cdcacm.c',
   'main.c',
   'support.c',
+  'fs/filesystem_fat.c',
   module_sources,
   l0der_sources,
   ble_sources,

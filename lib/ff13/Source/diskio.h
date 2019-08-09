@@ -34,6 +34,7 @@ typedef enum {
 /* Prototypes for disk control functions */
 
 DSTATUS disk_initialize (BYTE pdrv);
+void disk_deinitialize(void);
 DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_write (BYTE pdrv, const BYTE* buff, DWORD sector, UINT count);
