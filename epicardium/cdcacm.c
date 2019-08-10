@@ -61,9 +61,9 @@
 #include <errno.h>
 
 /***** Definitions *****/
-#define EVENT_ENUM_COMP     MAXUSB_NUM_EVENTS
+#define EVENT_ENUM_COMP MAXUSB_NUM_EVENTS
 
-#define BUFFER_SIZE  64
+#define BUFFER_SIZE 64
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -89,128 +89,133 @@ static int usb_read_callback(void);
 
 /* This EP assignment must match the Configuration Descriptor */
 static const acm_cfg_t acm_cfg = {
-  1,                  /* EP OUT */
-  MXC_USBHS_MAX_PACKET, /* OUT max packet size */
-  2,                  /* EP IN */
-  MXC_USBHS_MAX_PACKET, /* IN max packet size */
-  3,                  /* EP Notify */
-  MXC_USBHS_MAX_PACKET, /* Notify max packet size */
+	1,                    /* EP OUT */
+	MXC_USBHS_MAX_PACKET, /* OUT max packet size */
+	2,                    /* EP IN */
+	MXC_USBHS_MAX_PACKET, /* IN max packet size */
+	3,                    /* EP Notify */
+	MXC_USBHS_MAX_PACKET, /* Notify max packet size */
 };
 
 static volatile int usb_read_complete;
 
 int usb_startup_cb()
 {
-    const sys_cfg_usbhs_t sys_usbhs_cfg = NULL;
-    return SYS_USBHS_Init(&sys_usbhs_cfg);
+	const sys_cfg_usbhs_t sys_usbhs_cfg = NULL;
+	return SYS_USBHS_Init(&sys_usbhs_cfg);
 }
 
 int usb_shutdown_cb()
 {
-    return SYS_USBHS_Shutdown();
+	return SYS_USBHS_Shutdown();
 }
 
 /* User-supplied function to delay usec micro-seconds */
 void delay_us(unsigned int usec)
 {
-    /* mxc_delay() takes unsigned long, so can't use it directly */
-    mxc_delay(usec);
+	/* mxc_delay() takes unsigned long, so can't use it directly */
+	mxc_delay(usec);
 }
-
 
 /******************************************************************************/
 int cdcacm_init(void)
 {
-    maxusb_cfg_options_t usb_opts;
+	maxusb_cfg_options_t usb_opts;
 
-    /* Initialize state */
-    configured = 0;
-    suspended = 0;
-    event_flags = 0;
-    remote_wake_en = 0;
+	/* Initialize state */
+	configured     = 0;
+	suspended      = 0;
+	event_flags    = 0;
+	remote_wake_en = 0;
 
-    /* Start out in full speed */
-    usb_opts.enable_hs = 0;
-    usb_opts.delay_us = delay_us; /* Function which will be used for delays */
-    usb_opts.init_callback = usb_startup_cb;
-    usb_opts.shutdown_callback = usb_shutdown_cb;
+	/* Start out in full speed */
+	usb_opts.enable_hs = 0;
+	usb_opts.delay_us =
+		delay_us; /* Function which will be used for delays */
+	usb_opts.init_callback     = usb_startup_cb;
+	usb_opts.shutdown_callback = usb_shutdown_cb;
 
-    /* Initialize the usb module */
-    if (usb_init(&usb_opts) != 0) {
-        LOG_ERR("cdcacm", "usb_init() failed");
-        return -EIO;
-    }
+	/* Initialize the usb module */
+	if (usb_init(&usb_opts) != 0) {
+		LOG_ERR("cdcacm", "usb_init() failed");
+		return -EIO;
+	}
 
-    /* Initialize the enumeration module */
-    if (enum_init() != 0) {
-        LOG_ERR("cdcacm", "enum_init() failed");
-        return -EIO;
-    }
+	/* Initialize the enumeration module */
+	if (enum_init() != 0) {
+		LOG_ERR("cdcacm", "enum_init() failed");
+		return -EIO;
+	}
 
-    /* Register enumeration data */
-    enum_register_descriptor(ENUM_DESC_DEVICE, (uint8_t*)&device_descriptor, 0);
-    enum_register_descriptor(ENUM_DESC_CONFIG, (uint8_t*)&config_descriptor, 0);
-    enum_register_descriptor(ENUM_DESC_STRING, lang_id_desc, 0);
-    enum_register_descriptor(ENUM_DESC_STRING, mfg_id_desc, 1);
-    enum_register_descriptor(ENUM_DESC_STRING, prod_id_desc, 2);
+	/* Register enumeration data */
+	enum_register_descriptor(
+		ENUM_DESC_DEVICE, (uint8_t *)&device_descriptor, 0
+	);
+	enum_register_descriptor(
+		ENUM_DESC_CONFIG, (uint8_t *)&config_descriptor, 0
+	);
+	enum_register_descriptor(ENUM_DESC_STRING, lang_id_desc, 0);
+	enum_register_descriptor(ENUM_DESC_STRING, mfg_id_desc, 1);
+	enum_register_descriptor(ENUM_DESC_STRING, prod_id_desc, 2);
 
-    /* Handle configuration */
-    enum_register_callback(ENUM_SETCONFIG, setconfig_callback, NULL);
+	/* Handle configuration */
+	enum_register_callback(ENUM_SETCONFIG, setconfig_callback, NULL);
 
-    /* Handle feature set/clear */
-    enum_register_callback(ENUM_SETFEATURE, setfeature_callback, NULL);
-    enum_register_callback(ENUM_CLRFEATURE, clrfeature_callback, NULL);
+	/* Handle feature set/clear */
+	enum_register_callback(ENUM_SETFEATURE, setfeature_callback, NULL);
+	enum_register_callback(ENUM_CLRFEATURE, clrfeature_callback, NULL);
 
-    /* Initialize the class driver */
-    if (acm_init(&config_descriptor.comm_interface_descriptor) != 0) {
-        LOG_ERR("cdcacm", "acm_init() failed");
-        return -EIO;
-    }
+	/* Initialize the class driver */
+	if (acm_init(&config_descriptor.comm_interface_descriptor) != 0) {
+		LOG_ERR("cdcacm", "acm_init() failed");
+		return -EIO;
+	}
 
-    /* Register callbacks */
-    usb_event_enable(MAXUSB_EVENT_NOVBUS, event_callback, NULL);
-    usb_event_enable(MAXUSB_EVENT_VBUS, event_callback, NULL);
-    acm_register_callback(ACM_CB_READ_READY, usb_read_callback);
-    usb_read_complete = 0;
+	/* Register callbacks */
+	usb_event_enable(MAXUSB_EVENT_NOVBUS, event_callback, NULL);
+	usb_event_enable(MAXUSB_EVENT_VBUS, event_callback, NULL);
+	acm_register_callback(ACM_CB_READ_READY, usb_read_callback);
+	usb_read_complete = 0;
 
-    /* Start with USB in low power mode */
-    usb_app_sleep();
-    /* TODO: Fix priority */
-    NVIC_SetPriority(USB_IRQn, 6);
-    NVIC_EnableIRQ(USB_IRQn);
+	/* Start with USB in low power mode */
+	usb_app_sleep();
+	/* TODO: Fix priority */
+	NVIC_SetPriority(USB_IRQn, 6);
+	NVIC_EnableIRQ(USB_IRQn);
 
-    return 0;
+	return 0;
 }
 
 int cdcacm_num_read_avail(void)
 {
-    return acm_canread();
+	return acm_canread();
 }
 
 uint8_t cdcacm_read(void)
 {
-    while(acm_canread() <= 0) {
-    }
+	while (acm_canread() <= 0) {
+	}
 
-    uint8_t buf;
-    acm_read(&buf, 1);
-    return buf;
+	uint8_t buf;
+	acm_read(&buf, 1);
+	return buf;
 }
 
 void cdcacm_write(uint8_t *data, int len)
 {
-    static int lockup_disable = 0;
-    if (acm_present() && !lockup_disable) {
-        int ret = acm_write(data, len);
-        if (ret < 0) {
-            LOG_ERR("cdcacm", "fifo lockup detected");
-            lockup_disable = 1;
-        } else if (ret != len) {
-            LOG_WARN("cdcacm", "write length mismatch, got %d", ret);
-        }
-    }
+	static int lockup_disable = 0;
+	if (acm_present() && !lockup_disable) {
+		int ret = acm_write(data, len);
+		if (ret < 0) {
+			LOG_ERR("cdcacm", "fifo lockup detected");
+			lockup_disable = 1;
+		} else if (ret != len) {
+			LOG_WARN(
+				"cdcacm", "write length mismatch, got %d", ret
+			);
+		}
+	}
 }
-
 
 /******************************************************************************/
 #if 0
@@ -243,109 +248,110 @@ static void echo_usb(void)
 /******************************************************************************/
 static int setconfig_callback(usb_setup_pkt *sud, void *cbdata)
 {
-    /* Confirm the configuration value */
-    if (sud->wValue == config_descriptor.config_descriptor.bConfigurationValue) {
-        configured = 1;
-        MXC_SETBIT(&event_flags, EVENT_ENUM_COMP);
-        return acm_configure(&acm_cfg); /* Configure the device class */
-    } else if (sud->wValue == 0) {
-        configured = 0;
-        return acm_deconfigure();
-    }
+	/* Confirm the configuration value */
+	if (sud->wValue ==
+	    config_descriptor.config_descriptor.bConfigurationValue) {
+		configured = 1;
+		MXC_SETBIT(&event_flags, EVENT_ENUM_COMP);
+		return acm_configure(&acm_cfg); /* Configure the device class */
+	} else if (sud->wValue == 0) {
+		configured = 0;
+		return acm_deconfigure();
+	}
 
-    return -1;
+	return -1;
 }
 
 /******************************************************************************/
 static int setfeature_callback(usb_setup_pkt *sud, void *cbdata)
 {
-    if(sud->wValue == FEAT_REMOTE_WAKE) {
-        remote_wake_en = 1;
-    } else {
-        // Unknown callback
-        return -1;
-    }
+	if (sud->wValue == FEAT_REMOTE_WAKE) {
+		remote_wake_en = 1;
+	} else {
+		// Unknown callback
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
 
 /******************************************************************************/
 static int clrfeature_callback(usb_setup_pkt *sud, void *cbdata)
 {
-    if(sud->wValue == FEAT_REMOTE_WAKE) {
-        remote_wake_en = 0;
-    } else {
-        // Unknown callback
-        return -1;
-    }
-    
-    return 0;
+	if (sud->wValue == FEAT_REMOTE_WAKE) {
+		remote_wake_en = 0;
+	} else {
+		// Unknown callback
+		return -1;
+	}
+
+	return 0;
 }
 
 /******************************************************************************/
 static void usb_app_sleep(void)
 {
-    /* TODO: Place low-power code here */
-    suspended = 1;
+	/* TODO: Place low-power code here */
+	suspended = 1;
 }
 
 /******************************************************************************/
 static void usb_app_wakeup(void)
 {
-    /* TODO: Place low-power code here */
-    suspended = 0;
+	/* TODO: Place low-power code here */
+	suspended = 0;
 }
 
 /******************************************************************************/
 static int event_callback(maxusb_event_t evt, void *data)
 {
-    /* Set event flag */
-    MXC_SETBIT(&event_flags, evt);
+	/* Set event flag */
+	MXC_SETBIT(&event_flags, evt);
 
-    switch (evt) {
-        case MAXUSB_EVENT_NOVBUS:
-            usb_event_disable(MAXUSB_EVENT_BRST);
-            usb_event_disable(MAXUSB_EVENT_SUSP);
-            usb_event_disable(MAXUSB_EVENT_DPACT);
-            usb_disconnect();
-            configured = 0;
-            enum_clearconfig();
-            acm_deconfigure();
-            usb_app_sleep();
-            break;
-        case MAXUSB_EVENT_VBUS:
-            usb_event_clear(MAXUSB_EVENT_BRST);
-            usb_event_enable(MAXUSB_EVENT_BRST, event_callback, NULL);
-            usb_event_clear(MAXUSB_EVENT_SUSP);
-            usb_event_enable(MAXUSB_EVENT_SUSP, event_callback, NULL);
-            usb_connect();
-            usb_app_sleep();
-            break;
-        case MAXUSB_EVENT_BRST:
-            usb_app_wakeup();
-            enum_clearconfig();
-            acm_deconfigure();
-            configured = 0;
-            suspended = 0;
-            break;
-        case MAXUSB_EVENT_SUSP:
-            usb_app_sleep();
-            break;
-        case MAXUSB_EVENT_DPACT:
-            usb_app_wakeup();
-            break;
-        default:
-            break;
-    }
+	switch (evt) {
+	case MAXUSB_EVENT_NOVBUS:
+		usb_event_disable(MAXUSB_EVENT_BRST);
+		usb_event_disable(MAXUSB_EVENT_SUSP);
+		usb_event_disable(MAXUSB_EVENT_DPACT);
+		usb_disconnect();
+		configured = 0;
+		enum_clearconfig();
+		acm_deconfigure();
+		usb_app_sleep();
+		break;
+	case MAXUSB_EVENT_VBUS:
+		usb_event_clear(MAXUSB_EVENT_BRST);
+		usb_event_enable(MAXUSB_EVENT_BRST, event_callback, NULL);
+		usb_event_clear(MAXUSB_EVENT_SUSP);
+		usb_event_enable(MAXUSB_EVENT_SUSP, event_callback, NULL);
+		usb_connect();
+		usb_app_sleep();
+		break;
+	case MAXUSB_EVENT_BRST:
+		usb_app_wakeup();
+		enum_clearconfig();
+		acm_deconfigure();
+		configured = 0;
+		suspended  = 0;
+		break;
+	case MAXUSB_EVENT_SUSP:
+		usb_app_sleep();
+		break;
+	case MAXUSB_EVENT_DPACT:
+		usb_app_wakeup();
+		break;
+	default:
+		break;
+	}
 
-    return 0;
+	return 0;
 }
 
 /******************************************************************************/
 static int usb_read_callback(void)
 {
-    usb_read_complete = 1;
-    return 0;
+	usb_read_complete = 1;
+	return 0;
 }
 
 /******************************************************************************/
@@ -355,13 +361,15 @@ static int usb_read_callback(void)
 extern TaskHandle_t serial_task_id;
 void USB_IRQHandler(void)
 {
-    usb_event_handler();
+	usb_event_handler();
 
-    if (serial_task_id != NULL) {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        vTaskNotifyGiveFromISR(serial_task_id, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    }
+	if (serial_task_id != NULL) {
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		vTaskNotifyGiveFromISR(
+			serial_task_id, &xHigherPriorityTaskWoken
+		);
+		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	}
 }
 
 /******************************************************************************/

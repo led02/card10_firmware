@@ -27,9 +27,9 @@ void pmic_interrupt_callback(void *_)
 
 void vPmicTask(void *pvParameters)
 {
-	int count = 0;
+	int count          = 0;
 	portTickType delay = portMAX_DELAY;
-	pmic_task_id = xTaskGetCurrentTaskHandle();
+	pmic_task_id       = xTaskGetCurrentTaskHandle();
 
 	while (1) {
 		ulTaskNotifyTake(pdTRUE, delay);
@@ -62,8 +62,11 @@ void vPmicTask(void *pvParameters)
 
 		/* TODO: Remove when all interrupts are handled */
 		if (int_flag & ~(MAX77650_INT_nEN_F | MAX77650_INT_nEN_R)) {
-			LOG_WARN("pmic", "Unhandled PMIC Interrupt: %x",
-			         int_flag);
+			LOG_WARN(
+				"pmic",
+				"Unhandled PMIC Interrupt: %x",
+				int_flag
+			);
 		}
 
 		if (delay != portMAX_DELAY) {
