@@ -18,10 +18,10 @@
 		 *
 		 * All of the following (apart from Reset_Handler, which calls main())
 		 * are backed by weak referenced symbols, which you can override just
-         * by defining them in C code.
+		 * by defining them in C code.
 		 */
-		.section .data
-		.align 2
+		.section .text.isr_vector
+		.align 7
 		.globl __isr_vector
 __isr_vector:
 		.long    0                             /* Top of Stack, overriden by l0der at load time */

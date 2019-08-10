@@ -33,6 +33,9 @@ SECTIONS {
 
     .text :
     {
+        /* The vector table needs 128 byte alignment */
+        . = ALIGN(128);
+        KEEP(*(.text.isr_vector))
         *(.text*)
         *(.rodata*)
 
