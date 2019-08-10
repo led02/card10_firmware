@@ -3,24 +3,26 @@
 #include "api/api_caller.h"
 #include "tmr_utils.h"
 
-void* api_call_start (uint32_t id, void* args, uint32_t size)
+void *api_call_start(uint32_t id, void *args, uint32_t size)
 {
 	// aquire semaphore
-	while (E_BUSY == SEMA_GetSema (API_CALL_SEMA)) ;
+	while (E_BUSY == SEMA_GetSema(API_CALL_SEMA))
+		;
 
-	ApiCallSpace->id = id;
+	ApiCallSpace->id        = id;
 	ApiCallSpace->returning = 0;
 	return ApiCallSpace->buf;
 }
 
-void* api_call_bother_dispatcher (void* buf)
+void *api_call_bother_dispatcher(void *buf)
 {
-	SEMA_FreeSema (API_CALL_SEMA);
+	SEMA_FreeSema(API_CALL_SEMA);
 	// TODO: set event
 
-	while(1) {
+	while (1) {
 		// aquire semaphore
-		while (E_BUSY == SEMA_GetSema (API_CALL_SEMA)) ;
+		while (E_BUSY == SEMA_GetSema(API_CALL_SEMA))
+			;
 		if (ApiCallSpace->returning == 1) {
 			break;
 		}

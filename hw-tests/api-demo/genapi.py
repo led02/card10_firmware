@@ -50,18 +50,19 @@ def main():
         f_client = cx.enter_context(open(args.client, "w"))
         f_server = cx.enter_context(open(args.server, "w"))
 
-        print('#include "{}"\n'.format(
-            os.path.basename(args.header)
-        ), file=f_client)
+        print('#include "{}"\n'.format(os.path.basename(args.header)), file=f_client)
 
-        print("""\
+        print(
+            """\
 #include "{}"
 
 void __api_dispatch_call(uint32_t id, void*buffer)
 {{
     switch (id) {{""".format(
-            os.path.basename(args.header)
-        ), file=f_server)
+                os.path.basename(args.header)
+            ),
+            file=f_server,
+        )
 
         for match in matcher.finditer(source):
             api_id = match.group("id")
@@ -100,9 +101,12 @@ void {cdecl}({cargs})
                 file=f_client,
             )
 
-            print("""\
+            print(
+                """\
     case {id}:
-        {cdecl}(""".format(id=api_id, cdecl=api_decl),
+        {cdecl}(""".format(
+                    id=api_id, cdecl=api_decl
+                ),
                 file=f_server,
             )
 
@@ -122,18 +126,17 @@ void {cdecl}({cargs})
                 print(
                     """\
             *({type}*)(buffer + {offset})""".format(
-                        type=ty,
-                        offset=" + ".join(api_args_sizes[:i]) if i > 0 else "0",
+                        type=ty, offset=" + ".join(api_args_sizes[:i]) if i > 0 else "0"
                     ),
                     file=f_server,
                     end="",
                 )
 
-            print("""
+            print(
+                """
         );
         break;""".format(
-                    cdecl=api_decl,
-                    args=", ".join(api_args_names),
+                    cdecl=api_decl, args=", ".join(api_args_names)
                 ),
                 file=f_server,
             )
@@ -154,14 +157,17 @@ void {cdecl}({cargs})
                 file=f_client,
             )
 
-        print("""\
+        print(
+            """\
     default:
         printf("Error: API function %x is unknown!!\\n", {id});
         break;
     }}
 }}""".format(
-            id=api_id,
-        ), file=f_server)
+                id=api_id
+            ),
+            file=f_server,
+        )
 
 
 if __name__ == "__main__":

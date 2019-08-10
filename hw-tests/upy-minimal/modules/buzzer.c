@@ -13,7 +13,7 @@ STATIC mp_obj_t buzzer_set(mp_obj_t state_obj)
 	if (state_obj == mp_const_true) {
 		printf("Buzzer ON!\n");
 		GPIO_OutSet(&motor_pin);
-	} else if (state_obj == mp_const_false){
+	} else if (state_obj == mp_const_false) {
 		printf("Buzzer OFF!\n");
 		GPIO_OutClr(&motor_pin);
 	} else {
@@ -36,8 +36,8 @@ STATIC MP_DEFINE_CONST_DICT(buzzer_module_globals, buzzer_module_globals_table);
 
 // Define module object.
 const mp_obj_module_t buzzer_module = {
-	.base = { &mp_type_module },
-	.globals = (mp_obj_dict_t*)&buzzer_module_globals,
+	.base    = { &mp_type_module },
+	.globals = (mp_obj_dict_t *)&buzzer_module_globals,
 };
 
 // Register the module to make it available in Python
