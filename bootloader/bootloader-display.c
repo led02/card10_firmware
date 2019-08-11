@@ -6,31 +6,18 @@
 #include "gfx.h"
 #include "display.h"
 
-/*
- * "Decompress" splash-screen image.  The algorithm works as follows:
- *
- * Each byte encodes up to 127 pixels in either white or black.  The most
- * significant bit determines the color, the remaining 7 bits determine the
- * amount.
- */
 static void bootloader_display_splash(void)
 {
-	int idx = 0;
-
-	Color white = gfx_color(&display_screen, WHITE);
-	Color black = gfx_color(&display_screen, BLACK);
-	for (int i = 0; i < sizeof(splash); i++) {
-		Color color    = (splash[i] & 0x80) ? white : black;
-		uint8_t length = splash[i] & 0x7f;
-
-		for (int j = 0; j < length; j++) {
-			uint16_t x = idx % 160;
-			uint16_t y = idx / 160;
-			gfx_setpixel(&display_screen, x, y, color);
-			idx++;
-		}
-	}
-
+	gfx_copy_region(
+		&display_screen,
+		0,
+		0,
+		160,
+		80,
+		GFX_RLE_MONO,
+		sizeof(splash),
+		(const void *)(splash)
+	);
 	gfx_update(&display_screen);
 }
 
