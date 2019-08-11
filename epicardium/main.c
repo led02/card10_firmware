@@ -6,6 +6,7 @@
 #include "max32665.h"
 #include "uart.h"
 #include "cdcacm.h"
+#include "gpio.h"
 
 #include "card10.h"
 #include "pmic.h"
@@ -51,7 +52,24 @@ int main(void)
 	LOG_INFO("startup", "Version " CARD10_VERSION);
 
 	card10_init();
-	card10_diag();
+#ifdef CARD10_DEBUG_CORE1
+	LOG_WARN("startup", "Core 1 Debugger Mode");
+	static const gpio_cfg_t swclk = {
+		PORT_0,
+		PIN_7,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+	static const gpio_cfg_t swdio = {
+		PORT_0,
+		PIN_6,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+
+	GPIO_Config(&swclk);
+	GPIO_Config(&swdio);
+#endif /* CARD10_DEBUG_CORE1 */
 
 	gfx_copy_region_raw(
 		&display_screen, 0, 0, 160, 80, 2, (const void *)(Heart)

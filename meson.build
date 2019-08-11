@@ -28,6 +28,13 @@ if get_option('debug_prints')
   )
 endif
 
+if get_option('debug_core1')
+  add_global_arguments(
+    ['-DCARD10_DEBUG_CORE1=1'],
+    language: 'c',
+  )
+endif
+
 add_global_link_arguments(
   '-Wl,--gc-sections',
   '-lm',

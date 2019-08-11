@@ -7,6 +7,14 @@ option(
 )
 
 option(
+  'debug_core1',
+  type: 'boolean',
+  value: false,
+
+  description: 'Enable core 1 debugging interface'
+)
+
+option(
   'ble_trace',
   type: 'boolean',
   value: false,
