@@ -27,6 +27,9 @@ void api_interrupt_init(void)
 	for (int i = 0; i < EPIC_INT_NUM; i++) {
 		int_enabled[i] = false;
 	}
+
+	/* Reset interrupt is always enabled */
+	int_enabled[EPIC_INT_RESET] = true;
 }
 
 int epic_interrupt_enable(api_int_id_t int_id)
@@ -41,7 +44,7 @@ int epic_interrupt_enable(api_int_id_t int_id)
 
 int epic_interrupt_disable(api_int_id_t int_id)
 {
-	if (int_id >= EPIC_INT_NUM) {
+	if (int_id >= EPIC_INT_NUM || int_id == EPIC_INT_RESET) {
 		return -EINVAL;
 	}
 
