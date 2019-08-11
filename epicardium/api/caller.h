@@ -27,3 +27,12 @@ void *_api_call_start(api_id_t id, uintptr_t size);
  *   - Pointer to a buffer containing the return value
  */
 void *_api_call_transact(void *buffer);
+
+/*
+ * Fetch arguments from the API buffer.  This function will only work properly
+ * directly after startup of core 1.  If api_fetch_args() is called after other
+ * calls have already happened, it will return -1.
+ *
+ * Otherwise it will return the length of data which was read.
+ */
+int api_fetch_args(char *buf, size_t cnt);

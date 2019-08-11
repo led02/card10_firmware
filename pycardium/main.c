@@ -1,4 +1,5 @@
 #include "epicardium.h"
+#include "api/caller.h"
 #include "mphalport.h"
 #include "card10-version.h"
 
@@ -24,9 +25,18 @@ static const char header[] =
 
 int main(void)
 {
-	epic_uart_write_str(header, sizeof(header));
+	char script_name[128] = { 0 };
+	int cnt = api_fetch_args(script_name, sizeof(script_name));
 
 	pycardium_hal_init();
+
+	epic_uart_write_str(header, sizeof(header));
+
+	if (cnt < 0) {
+		printf("pycardium: Error fetching args: %d\n", cnt);
+	} else if (cnt > 0) {
+		printf("  Loading %s ...\n", script_name);
+	}
 
 	mp_stack_set_top(&__StackTop);
 	mp_stack_set_limit((mp_int_t)&__StackLimit);
@@ -35,8 +45,13 @@ int main(void)
 		gc_init(&__HeapBase + 1024 * 10, &__HeapLimit);
 
 		mp_init();
-		pyexec_file_if_exists("main.py");
+
+		if (cnt > 0) {
+			pyexec_file_if_exists(script_name);
+		}
+
 		pyexec_friendly_repl();
+
 		mp_deinit();
 	}
 }

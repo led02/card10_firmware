@@ -1,7 +1,15 @@
-#include <stdlib.h>
-#include "sema.h"
 #include "api/dispatcher.h"
+
 #include "max32665.h"
+#include "sema.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+/* This function is defined by the generated dispatcher code */
+void __api_dispatch_call(api_id_t id, void *buffer);
+
+static volatile bool event_ready = false;
 
 int api_dispatcher_init()
 {
@@ -19,8 +27,6 @@ int api_dispatcher_init()
 
 	return ret;
 }
-
-static bool event_ready = false;
 
 bool api_dispatcher_poll_once()
 {
@@ -67,4 +73,16 @@ api_id_t api_dispatcher_exec()
 	__WFE();
 
 	return id;
+}
+
+void api_prepare_args(char *args)
+{
+	/*
+	 * The args are stored with an offset of 0x20 to make sure they won't
+	 * collide with any integer return value of API calls like epic_exec().
+	 */
+	API_CALL_MEM->id = 0;
+	for (int i = 0; i <= strlen(args); i++) {
+		API_CALL_MEM->buffer[i + 0x20] = args[i];
+	}
 }

@@ -53,3 +53,25 @@ void *_api_call_transact(void *buffer)
 
 	return API_CALL_MEM->buffer;
 }
+
+int api_fetch_args(char *buf, size_t cnt)
+{
+	if (API_CALL_MEM->id != 0) {
+		/*
+		 * When any call happened before the args are fetched, they are
+		 * overwritten and no longer accessible.
+		 */
+		return (-1);
+	}
+
+	if (API_CALL_MEM->buffer[0x20] == '\0') {
+		return 0;
+	}
+
+	int i;
+	for (i = 0; i < cnt && API_CALL_MEM->buffer[i + 0x20] != '\0'; i++) {
+		buf[i] = API_CALL_MEM->buffer[i + 0x20];
+	}
+
+	return i - 1;
+}
