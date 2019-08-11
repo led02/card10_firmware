@@ -10,5 +10,5 @@ void TMR5_IRQHandler(void)
 {
 	TMR_IntClear(MXC_TMR5);
 	__dispatch_isr(API_CALL_MEM->int_id);
-	API_CALL_MEM->int_id = 0;
+	API_CALL_MEM->int_id = (-1);
 }

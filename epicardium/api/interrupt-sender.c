@@ -11,8 +11,9 @@ int api_interrupt_trigger(api_int_id_t id)
 	}
 
 	if (int_enabled[id]) {
-		while (API_CALL_MEM->int_id)
+		while (API_CALL_MEM->int_id != (-1))
 			;
+
 		API_CALL_MEM->int_id = id;
 		TMR_TO_Start(MXC_TMR5, 1, 0);
 	}
@@ -21,7 +22,7 @@ int api_interrupt_trigger(api_int_id_t id)
 
 void api_interrupt_init(void)
 {
-	API_CALL_MEM->int_id = 0;
+	API_CALL_MEM->int_id = (-1);
 
 	for (int i = 0; i < EPIC_INT_NUM; i++) {
 		int_enabled[i] = false;
