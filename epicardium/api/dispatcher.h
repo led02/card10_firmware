@@ -28,3 +28,19 @@ api_id_t api_dispatcher_exec();
  * The data is a NULL-terminated string.
  */
 void api_prepare_args(char *args);
+
+/*********************************************************************
+ *                         core 1 control                            *
+ *********************************************************************/
+
+/* Startup core1 into a state where it is ready to receive a payload. */
+void core1_boot(void);
+
+/* Reset core 1 into a state where it can accept a new payload */
+void core1_reset(void);
+
+/* Load a payload into core 1 */
+void core1_load(void *ivt, char *args);
+
+/* core 1 reset stub.  See epicardium/api/control.c for details. */
+void __core1_reset(void);

@@ -15,8 +15,12 @@ int api_dispatcher_init()
 {
 	int ret;
 
-	ret                     = SEMA_Init(NULL);
-	API_CALL_MEM->call_flag = _API_FLAG_IDLE;
+	ret = SEMA_Init(NULL);
+	SEMA_FreeSema(_API_SEMAPHORE);
+	API_CALL_MEM->reset_stub = __core1_reset;
+	API_CALL_MEM->call_flag  = _API_FLAG_IDLE;
+	API_CALL_MEM->id         = 0;
+	API_CALL_MEM->int_id     = (-1);
 
 	/*
 	 * Enable TX events for both cores.

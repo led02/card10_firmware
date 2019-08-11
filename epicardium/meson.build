@@ -37,8 +37,9 @@ api_dispatcher_lib = static_library(
   'api-dispatcher',
   'api/dispatcher.c',
   'api/interrupt-sender.c',
+  'api/control.c',
   api[1], # Dispatcher
-  dependencies: periphdriver,
+  dependencies: [libcard10, periphdriver],
 )
 
 ##########################################################################

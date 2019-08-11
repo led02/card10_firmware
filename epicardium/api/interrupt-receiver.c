@@ -12,3 +12,10 @@ void TMR5_IRQHandler(void)
 	__dispatch_isr(API_CALL_MEM->int_id);
 	API_CALL_MEM->int_id = (-1);
 }
+
+/* Reset Handler */
+void __epic_isr_reset(void)
+{
+	API_CALL_MEM->int_id = (-1);
+	API_CALL_MEM->reset_stub();
+}

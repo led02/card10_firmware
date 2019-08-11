@@ -148,6 +148,8 @@ int main(void)
 	LOG_INFO("startup", "starting light sensor ...");
 	epic_light_sensor_run();
 
+	core1_boot();
+
 	/*
 	 * See if there's a l0dable.elf to run. If not, run pycardium.
 	 * This is temporary until epicardium gets a l0dable API from pycardium.
@@ -163,11 +165,11 @@ int main(void)
 			LOG_INFO(
 				"startup", "Starting %s on core1 ...", l0dable
 			);
-			core1_start(info.isr_vector);
+			core1_load(info.isr_vector, "");
 		}
 	} else {
-		LOG_INFO("startup", "Starting pycardium on core1 ...");
-		core1_start((void *)0x10080000);
+		LOG_INFO("startup", "Starting pycardium on core 1 ...");
+		core1_load((void *)0x10080000, "main.py");
 	}
 
 	LOG_INFO("startup", "Starting FreeRTOS ...");
