@@ -1,3 +1,5 @@
+.. py:module:: vibra
+
 ``vibra`` - Vibration Motor
 ===========================
 

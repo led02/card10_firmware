@@ -1,3 +1,5 @@
+.. py:module:: utime
+
 ``utime`` - Time
 ================
 The ``utime`` module loosely follows CPython's |time|_ module, but is heavily

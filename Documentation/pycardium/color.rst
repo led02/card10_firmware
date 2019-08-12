@@ -21,6 +21,8 @@ The color module also contains a few constanst for commonly used colors:
 .. py:data:: color.MAGENTA
 .. py:data:: color.CYAN
 
+.. py:module:: htmlcolor
+
 ``htmlcolor`` - Color Constants
 ===============================
 The ``htmlcolor`` module contains even more color constants.  Note

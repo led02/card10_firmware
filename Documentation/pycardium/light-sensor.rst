@@ -1,3 +1,5 @@
+.. py:module:: light_sensor
+
 ``light_sensor`` - Ambient Brightness
 =====================================
 On the harmonic board, there is an IR-LED which can be used in reverse as a
