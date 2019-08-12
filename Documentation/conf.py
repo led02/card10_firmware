@@ -20,9 +20,9 @@ project = "card10-firmware"
 copyright = "2019"
 
 # The full version, including alpha/beta/rc tags
-release = subprocess.check_output(
-    ["git", "describe", "--long", "--always"]
-).decode().strip()
+release = (
+    subprocess.check_output(["git", "describe", "--long", "--always"]).decode().strip()
+)
 release += "<br />"
 release += time.strftime("%F %R")
 version = release
@@ -55,11 +55,14 @@ exclude_patterns = ["output", "Thumbs.db", ".DS_Store", "hawkmoth"]
 # - python-sphinx-rtd-theme package (on Debian)
 try:
     import sphinx_rtd_theme
+
     html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
     pygments_style = "monokai"
 except ImportError:
-    logger.warning("The Sphinx \"sphinx_rtd_theme\" HTML theme was not found. Make sure you have the theme installed to produce pretty HTML output. Falling back to the default theme.")
+    logger.warning(
+        'The Sphinx "sphinx_rtd_theme" HTML theme was not found. Make sure you have the theme installed to produce pretty HTML output. Falling back to the default theme.'
+    )
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -68,9 +71,7 @@ except ImportError:
 html_static_path = ["static"]
 
 # Theme Options
-html_theme_options = {
-    "style_external_links": True,
-}
+html_theme_options = {"style_external_links": True}
 
 # Show "Edit on GitLab" links
 html_show_sourcelink = False
@@ -86,12 +87,7 @@ html_context = {
 # }}}
 
 # -- Options for Auto-Doc ---------------------------------------------------- {{{
-autodoc_mock_imports = [
-    "sys_display",
-    "ucollections",
-    "urandom",
-    "utime",
-]
+autodoc_mock_imports = ["sys_display", "ucollections", "urandom", "utime"]
 
 autodoc_member_order = "bysource"
 # }}}
@@ -101,6 +97,7 @@ has_hawkmoth = False
 try:
     # Attempt importing hawkmoth
     import hawkmoth  # noqa: F401
+
     extensions.append("hawkmoth")
 
     cautodoc_root = os.path.abspath("..")
@@ -108,7 +105,9 @@ try:
     has_hawkmoth = True
 except ImportError as e:
     if e.name == "clang":
-        logger.warning("hawkmoth requires the clang python module.  Documentation for Epicardium API will not be generated.")
+        logger.warning(
+            "hawkmoth requires the clang python module.  Documentation for Epicardium API will not be generated."
+        )
 # }}}
 
 
