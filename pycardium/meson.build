@@ -6,6 +6,7 @@ modsrc = files(
   'modules/interrupt.c',
   'modules/sys_leds.c',
   'modules/light_sensor.c',
+  'modules/os.c',
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
