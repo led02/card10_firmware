@@ -322,8 +322,15 @@ static void bleSetup(bleMsg_t *pMsg)
   AppAdvSetData(APP_ADV_DATA_CONNECTABLE, 0, NULL);
   AppAdvSetData(APP_SCAN_DATA_CONNECTABLE, 0, NULL);
 
+#if 0
+  /* TODO: card10: until we have an BLE dialog, be discoverable and bondable always */
   /* start advertising; automatically set connectable/discoverable mode and bondable mode */
   AppAdvStart(APP_MODE_AUTO_INIT);
+#else
+  /* enter discoverable and bondable mode mode by default */
+  AppSetBondable(TRUE);
+  AppAdvStart(APP_MODE_DISCOVERABLE);
+#endif
 }
 
 
