@@ -348,9 +348,9 @@ class Color(_ColorTuple):
             c = Color.from_hex(0xff0000)
             print(c)
             # #ff0000
-            c.change_value(-0.25)
+            c.change_lightness(0.2)
             print(c)
-            # #800000
+            # #ff6666
 
         """
         return self.__change_vlx(change, self.to_hsl, self.from_hsl)
