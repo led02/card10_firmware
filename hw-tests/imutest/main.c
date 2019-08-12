@@ -13,7 +13,8 @@
 #include "gpio.h"
 #include "bhy_uc_driver.h"
 #include "pmic.h"
-#include "GUI_DEV/GUI_Paint.h"
+#include "gfx.h"
+#include "display.h"
 
 #include "card10.h"
 
@@ -48,7 +49,7 @@ void draw_arrow(int angle, int color)
 	int x2 = x1 - sin * 30;
 	int y2 = y1 - cos * 30;
 
-	Paint_DrawLine(x1, y1, x2, y2, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+	gfx_thick_line(&display_screen, x1, y1, x2, y2, 2, color);
 
 	sin = sinf((angle - 140) * 2 * M_PI / 360.);
 	cos = cosf((angle - 140) * 2 * M_PI / 360.);
@@ -56,7 +57,7 @@ void draw_arrow(int angle, int color)
 	int x3 = x2 - sin * 10;
 	int y3 = y2 - cos * 10;
 
-	Paint_DrawLine(x2, y2, x3, y3, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+	gfx_thick_line(&display_screen, x2, y2, x3, y3, 2, color);
 
 	sin = sinf((angle + 140) * 2 * M_PI / 360.);
 	cos = cosf((angle + 140) * 2 * M_PI / 360.);
@@ -64,7 +65,7 @@ void draw_arrow(int angle, int color)
 	int x4 = x2 - sin * 10;
 	int y4 = y2 - cos * 10;
 
-	Paint_DrawLine(x2, y2, x4, y4, color, LINE_STYLE_SOLID, DOT_PIXEL_2X2);
+	gfx_thick_line(&display_screen, x2, y2, x4, y4, 2, color);
 }
 
 /***** Functions *****/
@@ -81,8 +82,12 @@ static void sensors_callback_orientation(
 	int angle = sensor_data->data_vector.x * 360 / 32768;
 
 	if (angle != prev) {
-		Paint_Clear(BLACK);
-		int colors[] = { RED, YELLOW, YELLOW, GREEN };
+		gfx_clear(&display_screen);
+
+		int colors[] = { gfx_color(&display_screen, RED),
+				 gfx_color(&display_screen, YELLOW),
+				 gfx_color(&display_screen, YELLOW),
+				 gfx_color(&display_screen, GREEN) };
 		int color    = colors[sensor_data->data_vector.status];
 		draw_arrow(sensor_data->data_vector.x * 360 / 32768, color);
 
@@ -91,12 +96,18 @@ static void sensors_callback_orientation(
 		//Paint_DrawString_EN(0, 0, buf, &Font12, BLACK, color);
 
 		sprintf(buf, "%3d", angle);
-		Paint_DrawString_EN(0, 30, buf, &Font24, BLACK, color);
-		Paint_DrawCircle(
-			57, 35, 4, color, DRAW_FILL_EMPTY, DOT_PIXEL_1X1
+		gfx_puts(
+			&Font24,
+			&display_screen,
+			0,
+			30,
+			buf,
+			color,
+			gfx_color(&display_screen, BLACK)
 		);
+		gfx_circle(&display_screen, 57, 35, 4, 2, color);
 
-		LCD_Update();
+		gfx_update(&display_screen);
 		prev = angle;
 	}
 }

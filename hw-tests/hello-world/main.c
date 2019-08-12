@@ -7,7 +7,8 @@
 #include "leds.h"
 #include "card10.h"
 
-#include "GUI_Paint.h"
+#include "gfx.h"
+#include "display.h"
 
 #include "tmr_utils.h"
 
@@ -29,8 +30,10 @@ int main(void)
 	card10_init();
 	card10_diag();
 
-	Paint_DrawImage(Heart, 0, 0, 160, 80);
-	LCD_Update();
+	gfx_copy_region_raw(
+		&display_screen, 0, 0, 160, 80, 2, (const void *)(Heart)
+	);
+	gfx_update(&display_screen);
 
 	for (int i = 0; i < 11; i++) {
 		//        leds_set_dim(i, 1);

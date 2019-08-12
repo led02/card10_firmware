@@ -28,6 +28,8 @@
 #
 ******************************************************************************/
 #include "LCD_Driver.h"
+#include "framebuffer.h"
+
 static uint8_t screen[LCD_HEIGHT][LCD_WIDTH][2];
 
 /*******************************************************************************
@@ -312,10 +314,45 @@ void LCD_Set(uint8_t *data, int len)
 
 uint8_t *LCD_Framebuffer(void)
 {
-    return (uint8_t*)screen;
+	return (uint8_t *)screen;
 }
 
 void LCD_Update(void)
 {
 	LCD_Set((uint8_t *)screen, sizeof(screen));
+}
+
+static Color
+lcd_fb_encode_color_rgb(struct framebuffer *fb, uint8_t r, uint8_t g, uint8_t b)
+{
+	r >>= (8 - 5);
+	g >>= (8 - 6);
+	b >>= (8 - 5);
+
+	// RGB565
+	Color o = 0;
+	o |= (r << 11);
+	o |= (g << 5);
+	o |= b;
+	return o;
+}
+
+static void lcd_fb_update(struct framebuffer *fb)
+{
+	LCD_Update();
+}
+
+static struct framebuffer framebuffer = { .data   = screen,
+					  .width  = LCD_WIDTH,
+					  .height = LCD_HEIGHT,
+					  .stride = LCD_WIDTH * LCD_HEIGHT * 2,
+					  .orientation = FB_O_180,
+
+					  .encode_color_rgb =
+						  lcd_fb_encode_color_rgb,
+					  .update = lcd_fb_update };
+
+struct framebuffer *LCD_framebuffer(void)
+{
+	return &framebuffer;
 }

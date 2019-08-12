@@ -1,11 +1,13 @@
 #include "epicardium.h"
 #include "tmr_utils.h"
 #include "gpio.h"
-#include "GUI_DEV/GUI_Paint.h"
 #include "Fonts/fonts.h"
 #include "tmr.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "gfx.h"
+#include "display.h"
+#include "LCD_Driver.h"
 
 static TaskHandle_t lock = NULL;
 
@@ -30,7 +32,7 @@ int epic_disp_print(
 	if (cl < 0) {
 		return cl;
 	} else {
-		Paint_DrawString_EN(posx, posy, pString, &Font20, bg, fg);
+		gfx_puts(&Font20, &display_screen, posx, posy, pString, fg, bg);
 		return 0;
 	}
 }
@@ -41,7 +43,7 @@ int epic_disp_clear(uint16_t color)
 	if (cl < 0) {
 		return cl;
 	} else {
-		LCD_Clear(color);
+		gfx_clear_to_color(&display_screen, color);
 		return 0;
 	}
 }
@@ -52,7 +54,7 @@ int epic_disp_pixel(uint16_t x, uint16_t y, uint16_t color)
 	if (cl < 0) {
 		return cl;
 	} else {
-		Paint_SetPixel(x, y, color);
+		gfx_setpixel(&display_screen, x, y, color);
 		return 0;
 	}
 }
@@ -70,8 +72,15 @@ int epic_disp_line(
 	if (cl < 0) {
 		return cl;
 	} else {
-		Paint_DrawLine(
-			xstart, ystart, xend, yend, color, linestyle, pixelsize
+		/* TODO add linestyle support to gfx code */
+		gfx_thick_line(
+			&display_screen,
+			xstart,
+			ystart,
+			xend,
+			yend,
+			pixelsize,
+			color
 		);
 		return 0;
 	}
@@ -87,14 +96,33 @@ int epic_disp_rect(
 	uint16_t pixelsize
 ) {
 	int cl = check_lock();
-	if (cl < 0) {
+	if (cl < 0)
 		return cl;
-	} else {
-		Paint_DrawRectangle(
-			xstart, ystart, xend, yend, color, fillstyle, pixelsize
+
+	switch (fillstyle) {
+	case FILLSTYLE_EMPTY:
+		gfx_rectangle(
+			&display_screen,
+			xstart,
+			ystart,
+			xend - xstart,
+			yend - ystart,
+			pixelsize,
+			color
 		);
-		return 0;
+		break;
+	case FILLSTYLE_FILLED:
+		gfx_rectangle_fill(
+			&display_screen,
+			xstart,
+			ystart,
+			xend - xstart,
+			yend - ystart,
+			color
+		);
+		break;
 	}
+	return 0;
 }
 
 int epic_disp_circ(
@@ -106,12 +134,19 @@ int epic_disp_circ(
 	uint16_t pixelsize
 ) {
 	int cl = check_lock();
-	if (cl < 0) {
+	if (cl < 0)
 		return cl;
-	} else {
-		Paint_DrawCircle(x, y, rad, color, fillstyle, pixelsize);
-		return 0;
+
+	switch (fillstyle) {
+	case FILLSTYLE_EMPTY:
+		gfx_circle(&display_screen, x, y, rad, pixelsize, color);
+		break;
+	case FILLSTYLE_FILLED:
+		gfx_circle_fill(&display_screen, x, y, rad, color);
+		break;
 	}
+
+	return 0;
 }
 
 int epic_disp_update()
@@ -121,7 +156,7 @@ int epic_disp_update()
 		return cl;
 	}
 
-	LCD_Update();
+	gfx_update(&display_screen);
 	return 0;
 }
 

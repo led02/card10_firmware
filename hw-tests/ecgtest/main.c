@@ -16,7 +16,9 @@
 #include "spi.h"
 #include "pb.h"
 #include "MAX30003.h"
-#include "GUI_DEV/GUI_Paint.h"
+#include "gfx.h"
+#include "LCD_Driver.h"
+#include "display.h"
 #include "pmic.h"
 #include "card10.h"
 #include <stdbool.h>
@@ -150,7 +152,7 @@ static uint8_t prev;
 
 static void clear(void)
 {
-	Paint_Clear(BLACK);
+	gfx_clear(&display_screen);
 	prev = Y_OFFSET;
 }
 
@@ -173,7 +175,7 @@ static void set(uint8_t index, int8_t val)
 	}
 
 	for (int i = min; i < max + 1; i++) {
-		LCD_SetUWORD(SIZE_X - index - 1, i, RED);
+		LCD_SetUWORD(SIZE_X - index - 1, i, 0xf800);
 	}
 
 	prev = pos;
@@ -199,7 +201,15 @@ void update(void)
 		ecg_switch,
 		internal_pull,
 		scale);
-	Paint_DrawString_EN(0, 0, buf, &Font8, 0x0000, 0xffff);
+	gfx_puts(
+		&Font8,
+		&display_screen,
+		0,
+		0,
+		buf,
+		gfx_color(&display_screen, WHITE),
+		gfx_color(&display_screen, BLACK)
+	);
 
 	for (int i = 0; i < SIZE_X; i++) {
 		set(i, (samples[i] / scale));

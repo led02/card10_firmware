@@ -31,6 +31,7 @@
 #define __LCD_DRIVER_H
 
 #include "DEV_Config.h"
+#include "framebuffer.h"
 
 #define LCD_WIDTH   160 //LCD width
 #define LCD_HEIGHT  80 //LCD height
@@ -51,5 +52,7 @@ uint8_t *LCD_Framebuffer(void);
 
 void LCD_Set(uint8_t *data, int len);
 void LCD_Update(void);
+
+struct framebuffer *LCD_framebuffer(void);
 
 #endif

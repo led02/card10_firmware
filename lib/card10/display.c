@@ -1,5 +1,7 @@
 #include "LCD/LCD_Driver.h"
-#include "GUI_DEV/GUI_Paint.h"
+#include "framebuffer.h"
+#include "gfx.h"
+#include "textbuffer.h"
 
 #include "gpio.h"
 #include "tmr.h"
@@ -10,6 +12,9 @@
 #include <stdio.h>
 /***** Globals *****/
 const gpio_cfg_t DEV_DC_PIN = { PORT_1, PIN_6, GPIO_FUNC_OUT, GPIO_PAD_NONE };
+
+struct gfx_region display_screen;
+struct txt_buffer display_textb;
 
 // Parameters for PWM output
 #define PORT_PWM PORT_0 // port
@@ -93,10 +98,8 @@ void display_init(void)
 	PWM_Output();
 	LCD_SetBacklight(500);
 	LCD_Init();
-	LCD_Clear(BLACK);
 
-	Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, 0, WHITE);
-
-	Paint_Clear(BLACK);
-	Paint_SetRotate(180);
+	display_screen = gfx_screen(LCD_framebuffer());
+	txt_init(&display_textb, &display_screen, &Font12);
+	gfx_clear(&display_screen);
 }

@@ -7,7 +7,6 @@ includes = include_directories(
 
 sources = files(
   './GUI_DEV/DEV_Config.c',
-  './GUI_DEV/GUI_Paint.c',
   './LCD/LCD_Driver.c',
   './Fonts/font8.c',
   './Fonts/font12.c',
@@ -16,6 +15,9 @@ sources = files(
   './Fonts/font20.c',
   './Fonts/font24.c',
   './Fonts/font24CN.c',
+  'framebuffer.c',
+  'gfx.c',
+  'textbuffer.c'
 )
 
 lib = static_library(

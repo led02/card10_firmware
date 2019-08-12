@@ -11,7 +11,9 @@
 #include "gpio.h"
 #include "bme680.h"
 #include "bosch.h"
-#include "GUI_DEV/GUI_Paint.h"
+#include "gfx.h"
+#include "framebuffer.h"
+#include "display.h"
 #include "Fonts/fonts.h"
 
 #include "card10.h"
@@ -73,6 +75,8 @@ int main(void)
 	/* Set the power mode */
 	rslt = bme680_set_sensor_mode(&gas_sensor);
 
+	Color white = gfx_color(&display_screen, WHITE);
+	Color black = gfx_color(&display_screen, BLACK);
 	while (1) {
 		TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
@@ -86,13 +90,13 @@ int main(void)
 
 		char buf[128];
 		sprintf(buf, "T: %.2Lf degC", data.temperature / 100.0l);
-		Paint_DrawString_EN(0, 0, buf, &Font16, 0x0000, 0xffff);
+		gfx_puts(&Font16, &display_screen, 0, 0, buf, white, black);
 
 		sprintf(buf, "P: %.2Lf hPa", data.pressure / 100.0l);
-		Paint_DrawString_EN(0, 16, buf, &Font16, 0x0000, 0xffff);
+		gfx_puts(&Font16, &display_screen, 0, 16, buf, white, black);
 
 		sprintf(buf, "H: %.2Lf %%rH", data.humidity / 1000.0l);
-		Paint_DrawString_EN(0, 32, buf, &Font16, 0x0000, 0xffff);
+		gfx_puts(&Font16, &display_screen, 0, 32, buf, white, black);
 
 		//printf("%.2f,%.2f,%.2f\n", data.temperature / 100.0f,
 		//    data.pressure / 100.0f, data.humidity / 1000.0f );
@@ -100,12 +104,18 @@ int main(void)
 		if (data.status & BME680_GASM_VALID_MSK) {
 			printf(", G: %ld ohms", data.gas_resistance);
 			sprintf(buf, "G: %ld ohms", data.gas_resistance);
-			Paint_DrawString_EN(
-				0, 48, buf, &Font16, 0x0000, 0xffff
+			gfx_puts(
+				&Font16,
+				&display_screen,
+				0,
+				48,
+				buf,
+				white,
+				black
 			);
 		}
 
-		LCD_Update();
+		gfx_update(&display_screen);
 
 		printf("\n");
 
