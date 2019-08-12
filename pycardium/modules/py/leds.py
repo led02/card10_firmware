@@ -25,7 +25,7 @@ def clear():
     sys_leds.set_all(values)
 
 
-def flashlight(on):
+def set_flashlight(on):
     """
     Turn on the bright side LED.
 
@@ -37,25 +37,7 @@ def flashlight(on):
     sys_leds.set_flashlight(on)
 
 
-def dim_top(value):
-    """
-    Set global brightness for top RGB LEDs.
-
-    :param int value: Brightness. Default = 1, range = 1...8
-    """
-    sys_leds.dim_top(value)
-
-
-def dim_bottom(value):
-    """
-    Set global brightness for bottom RGB LEDs.
-
-    :param int value: Brightness. Default = 8, range = 1...8
-    """
-    sys_leds.dim_bottom(value)
-
-
-def rocket(led, value):
+def set_rocket(led, value):
     """
     Set brightness of one of the rocket LEDs.
 
@@ -74,6 +56,24 @@ def rocket(led, value):
        supported right now).
     """
     sys_leds.set_rocket(led, value)
+
+
+def dim_top(value):
+    """
+    Set global brightness for top RGB LEDs.
+
+    :param int value: Brightness. Default = 1, range = 1...8
+    """
+    sys_leds.dim_top(value)
+
+
+def dim_bottom(value):
+    """
+    Set global brightness for bottom RGB LEDs.
+
+    :param int value: Brightness. Default = 8, range = 1...8
+    """
+    sys_leds.dim_bottom(value)
 
 
 def prep(led, color):
@@ -183,7 +183,7 @@ def gay(value=0.5):
     sys_leds.set_all_hsv(values)
 
 
-def powersave(eco=True):
+def set_powersave(eco=True):
     """
     Enable or disable powersave mode.
 
@@ -197,7 +197,7 @@ def powersave(eco=True):
     sys_leds.set_powersave(eco)
 
 
-def gamma(power=4.0):
+def set_gamma(power=4.0):
     """
     Applies same power function gamma correction to all RGB channels.
 
@@ -209,7 +209,7 @@ def gamma(power=4.0):
     sys_leds.update()
 
 
-def gamma_rgb(channel, power=4.0, gain=1.0):
+def set_gamma_rgb(channel, power=4.0, gain=1.0):
     """
     Applies power function gamma correction with optional amplification to a single RGB channel.
 
