@@ -24,7 +24,9 @@ def kitt(
     spectrum=[],
     halo=False,
 ):
-
+    """
+    LED Animation.
+    """
     kitt_table = [((-math.cos(math.pi * (x / 10.0))) + 1) / 2.0 for x in range(21)]
     kitt_table = [math.pow(x, power) * (1 - minimum) + minimum for x in kitt_table]
 
