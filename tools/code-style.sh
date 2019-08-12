@@ -41,7 +41,6 @@ formatter_blacklist=(
     lib/ff13/
     lib/FreeRTOS/
     lib/FreeRTOS-Plus/
-    lib/gfx/
     lib/micropython/
     lib/mx25lba/
     lib/sdk/
