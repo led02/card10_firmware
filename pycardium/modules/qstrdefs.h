@@ -5,7 +5,20 @@
 #endif
 
 /* leds */
-Q(leds)
+Q(sys_leds)
+Q(update)
+Q(set)
+Q(set_hsv)
+Q(prep)
+Q(prep_hsv)
+Q(set_all)
+Q(set_all_hsv)
+Q(set_flashlight)
+Q(set_rocket)
+Q(set_powersave)
+Q(set_gamma)
+Q(dim_top)
+Q(dim_bottom)
 Q(BOTTOM_LEFT)
 Q(BOTTOM_RIGHT)
 Q(TOP_LEFT)

@@ -106,6 +106,24 @@ void portexpander_set(uint8_t pin, uint8_t value)
 	}
 }
 
+void portexpander_prep(uint8_t pin, uint8_t value)
+{
+	if (pin < 8) {
+		if (value) {
+			output_state |= (1 << pin);
+		} else {
+			output_state &= ~(1 << pin);
+		}
+	}
+}
+
+void portexpander_update(void)
+{
+	if (detected) {
+		portexpander_write(PE_C_OUTPUT_PORT, output_state);
+	}
+}
+
 void portexpander_set_mask(uint8_t mask, uint8_t values)
 {
 	if (detected) {

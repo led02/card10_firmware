@@ -1,10 +1,14 @@
 #include "gpio.h"
 #include "portexpander.h"
-
+#include "max32665.h"
 #include <stdint.h>
 #include <string.h>
-
+#include <stdbool.h>
+#include <stdio.h>
 #define NUM_LEDS 15
+#define DEFAULT_DIM_TOP 1
+#define DEFAULT_DIM_BOTTOM 8
+#define MAX_DIM 8
 
 static const gpio_cfg_t rgb_dat_pin = {
 	PORT_1, PIN_14, GPIO_FUNC_OUT, GPIO_PAD_NONE
@@ -12,7 +16,13 @@ static const gpio_cfg_t rgb_dat_pin = {
 static const gpio_cfg_t rgb_clk_pin = {
 	PORT_1, PIN_15, GPIO_FUNC_OUT, GPIO_PAD_NONE
 };
-static uint8_t leds[NUM_LEDS][4];
+static uint8_t leds[NUM_LEDS][3];
+static uint8_t gamma_table[3][256];
+static uint8_t active_groups;
+static uint8_t bottom_dim; //index 11-14
+static uint8_t top_dim;    //index 0-10
+static bool powersave;
+static long powerup_wait_cycles = 500;
 
 /***** Functions *****/
 // *****************************************************************************
@@ -174,19 +184,45 @@ static void leds_stop(void)
 	shift(0xFF);
 }
 
-void leds_set_dim(uint8_t led, uint8_t dim)
+static uint8_t led_to_dim_value(uint8_t led)
 {
-	leds[led][3] = dim;
+	return (led < 11) ? top_dim : bottom_dim;
 }
 
-void leds_set(uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+void leds_set_dim_top(uint8_t value)
+{
+	top_dim = (value > MAX_DIM) ? MAX_DIM : value;
+}
+
+void leds_set_dim_bottom(uint8_t value)
+{
+	bottom_dim = (value > MAX_DIM) ? MAX_DIM : value;
+}
+
+void leds_prep(uint8_t led, uint8_t r, uint8_t g, uint8_t b)
 {
 	leds[led][0] = r;
 	leds[led][1] = g;
 	leds[led][2] = b;
 }
 
-void leds_set_hsv(uint8_t led, float h, float s, float v)
+#if 0
+//don't use, is buggy
+void leds_set_autodim(uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+{
+    if(led==NUM_LEDS){
+        leds_set(led,r,g,b);
+        return;
+    }
+    leds[led][3] = max(r,max(g,b));
+    float gain = (float)255/leds[led][3]; //might cause rounding->overflow errors might debug later idk~
+    leds[led][0] = (uint8_t)(r*gain);
+    leds[led][1] = (uint8_t)(g*gain);
+    leds[led][2] = (uint8_t)(b*gain);
+}
+#endif
+
+void leds_prep_hsv(uint8_t led, float h, float s, float v)
 {
 	hsv in       = { h, s, v };
 	rgb out      = hsv2rgb(in);
@@ -195,13 +231,119 @@ void leds_set_hsv(uint8_t led, float h, float s, float v)
 	leds[led][2] = out.b * 255;
 }
 
+static bool is_led_on(uint8_t led) // scheduled to be on after next update
+{
+	if (!led_to_dim_value(led)) {
+		return false;
+	}
+	for (int i = 0; i < 3; i++) {
+		if (leds[led][i] != 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+static uint8_t led_to_group(uint8_t led)
+{
+	if (led == 14) {
+		return 1;
+	} else if (led >= 11) {
+		return 2;
+	}
+	return 3;
+}
+
+static uint8_t
+check_privilege(void) //returns number of hierarchical groups with power
+{
+	for (int i = 0; i < NUM_LEDS; i++) {
+		if (is_led_on(i)) {
+			return led_to_group(i);
+		}
+	}
+	return 0;
+}
+
+static uint8_t power_pin_conversion(uint8_t group)
+{
+	if (group == 2) {
+		return 1;
+	}
+	if (group == 1) {
+		return 2;
+	}
+	return 0;
+}
+
+static void power_all(void)
+{
+	for (int i = 0; i < 3; i++) {
+		portexpander_prep(i, 0);
+	}
+	portexpander_update();
+}
+
+void leds_update_power(void)
+{
+	if (!powersave) {
+		return;
+	}
+	uint8_t new_groups =
+		check_privilege(); //there must be a prettier way to do this but meh
+	if (new_groups == active_groups) {
+		return;
+	}
+	for (int i = 0; i < 3; i++) {
+		if (i < new_groups) {
+			portexpander_prep(power_pin_conversion(i), 0);
+		} else {
+			portexpander_prep(power_pin_conversion(i), 1);
+		}
+	}
+	portexpander_update();
+	if (active_groups < new_groups) {
+		for (int i = 0; i < powerup_wait_cycles; i++) {
+			__NOP();
+		}
+	}
+	active_groups = new_groups;
+}
+
+void leds_powersave(bool eco)
+{
+	powersave = eco;
+	if (!powersave) {
+		power_all();
+	} else {
+		leds_update_power();
+	}
+}
+
 void leds_update(void)
 {
 	leds_start();
 	for (int i = NUM_LEDS - 1; i >= 0; i--) {
-		leds_shift(leds[i][0], leds[i][1], leds[i][2], leds[i][3]);
+		leds_shift(
+			gamma_table[0][leds[i][0]],
+			gamma_table[1][leds[i][1]],
+			gamma_table[2][leds[i][2]],
+			led_to_dim_value(i)
+		);
 	}
 	leds_stop();
+}
+
+void leds_flashlight(bool power)
+{
+	portexpander_set(7, (power) ? 0 : 1);
+}
+
+void leds_set_gamma_table(uint8_t rgb_channel, uint8_t table[256])
+{
+	for (int i = 0; i < 256; i++) {
+		gamma_table[rgb_channel][i] = table[i];
+	}
 }
 
 void leds_init(void)
@@ -214,17 +356,19 @@ void leds_init(void)
 
 	memset(leds, 0, sizeof(leds));
 
+	powersave  = TRUE;
+	top_dim    = DEFAULT_DIM_TOP;
+	bottom_dim = DEFAULT_DIM_BOTTOM;
 	for (int i = 0; i < NUM_LEDS; i++) {
-		leds[i][3] = 8;
+		for (int j = 0; j < 3; j++) {
+			leds[i][j] = 0;
+		}
 	}
-
-	if (portexpander_detected()) {
-		// Turn on LEDs
-		// TODO: only turn on LEDs if value != 0,0,0 && dim > 0
-		portexpander_set(0, 0);
-		portexpander_set(1, 0);
-		portexpander_set(2, 0);
+	for (int i = 0; i < 256; i++) {
+		for (int j = 0; j < 3; j++) {
+			int k             = (i * (1 + i) + 255) >> 8;
+			gamma_table[j][i] = (k * (k + 1) + 255) >> 8;
+		}
 	}
-
 	leds_update();
 }

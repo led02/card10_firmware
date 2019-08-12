@@ -5,10 +5,12 @@
 #include <errno.h>
 
 #ifndef __SPHINX_DOC
-/* stddef.h is not recognized by hawkmoth for some odd reason */
+/* Some headers are not recognized by hawkmoth for some odd reason */
 #include <stddef.h>
+#include <stdbool.h>
 #else
 typedef unsigned int size_t;
+typedef _Bool bool;
 #endif /* __SPHINX_DOC */
 
 /*
@@ -63,6 +65,18 @@ typedef unsigned int size_t;
 #define API_RTC_SCHEDULE_ALARM     0x51
 
 #define API_LEDS_SET               0x60
+#define API_LEDS_SET_HSV           0x61
+#define API_LEDS_PREP              0x62
+#define API_LEDS_PREP_HSV          0x63
+#define API_LEDS_UPDATE            0x64
+#define API_LEDS_SET_POWERSAVE     0x65
+#define API_LEDS_SET_ROCKET        0x66
+#define API_LEDS_SET_FLASHLIGHT    0x67
+#define API_LEDS_DIM_TOP           0x68
+#define API_LEDS_DIM_BOTTOM        0x69
+#define API_LEDS_SET_ALL           0x6a
+#define API_LEDS_SET_ALL_HSV       0x6b
+#define API_LEDS_SET_GAMMA_TABLE   0x6c
 
 #define API_VIBRA_SET              0x70
 #define API_VIBRA_VIBRATE          0x71
@@ -211,21 +225,168 @@ API_ISR(EPIC_INT_CTRL_C, epic_isr_ctrl_c);
  */
 
 /**
- * Set one of card10's RGB LEDs to a certain color.
+ * Set one of card10's RGB LEDs to a certain color in RGB format.
  *
- * .. warning::
+ * This function is rather slow when setting multiple LEDs, use
+ * :c:func:`leds_set_all` or :c:func:`leds_prep` + :c:func:`leds_update`
+ * instead.
  *
- *    This API function is not yet stable and is this not part of the API
- *    freeze.  Any binary using :c:func:`epic_leds_set` might stop working at
- *    any time.  Once this warning is removed, the function can be considered
- *    stable like the rest of the API.
- *
- * :param led:  Which led to set.  0-10 are the leds on the top and 11-14 are the 4 "ambient" leds.
- * :param r:  Red component of the color.
- * :param g:  Green component of the color.
- * :param b:  Blue component of the color.
+ * :param int led:  Which LED to set.  0-10 are the LEDs on the top and 11-14
+ *    are the 4 "ambient" LEDs.
+ * :param uint8_t r:  Red component of the color.
+ * :param uint8_t g:  Green component of the color.
+ * :param uint8_t b:  Blue component of the color.
  */
 API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
+
+/**
+ * Set one of card10's RGB LEDs to a certain color in HSV format.
+ *
+ * This function is rather slow when setting multiple LEDs, use
+ * :c:func:`leds_set_all_hsv` or :c:func:`leds_prep_hsv` + :c:func:`leds_update`
+ * instead.
+ *
+ * :param int led:  Which LED to set.  0-10 are the LEDs on the top and 11-14 are the 4 "ambient" LEDs.
+ * :param float h:  Hue component of the color. (0 <= h < 360)
+ * :param float s:  Saturation component of the color. (0 <= s <= 1)
+ * :param float v:  Value/Brightness component of the color. (0 <= v <= 0)
+ */
+API(API_LEDS_SET_HSV, void epic_leds_set_hsv(int led, float h, float s, float v));
+
+/**
+ * Set multiple of card10's RGB LEDs to a certain color in RGB format.
+ *
+ * The first ``len`` leds are set, the remaining ones are not modified.
+ *
+ * :param uint8_t[len][r,g,b] pattern:  Array with RGB Values with 0 <= len <=
+ *    15. 0-10 are the LEDs on the top and 11-14 are the 4 "ambient" LEDs.
+ * :param uint8_t len: Length of 1st dimension of ``pattern``, see above.
+ */
+API(API_LEDS_SET_ALL, void epic_leds_set_all(uint8_t *pattern, uint8_t len));
+
+/**
+ * Set multiple of card10's RGB LEDs to a certain color in HSV format.
+ *
+ * The first ``len`` led are set, the remaining ones are not modified.
+ *
+ * :param uint8_t[len][h,s,v] pattern:  Array of format with HSV Values with 0
+ *    <= len <= 15.  0-10 are the LEDs on the top and 11-14 are the 4 "ambient"
+ *    LEDs. (0 <= h < 360, 0 <= s <= 1, 0 <= v <= 1)
+ * :param uint8_t len: Length of 1st dimension of ``pattern``, see above.
+ */
+API(API_LEDS_SET_ALL_HSV, void epic_leds_set_all_hsv(float *pattern, uint8_t len));
+
+/**
+ * Prepare one of card10's RGB LEDs to be set to a certain color in RGB format.
+ *
+ * Use :c:func:`leds_update` to apply changes.
+ *
+ * :param int led:  Which LED to set.  0-10 are the LEDs on the top and 11-14
+ *    are the 4 "ambient" LEDs.
+ * :param uint8_t r:  Red component of the color.
+ * :param uint8_t g:  Green component of the color.
+ * :param uint8_t b:  Blue component of the color.
+ */
+API(API_LEDS_PREP, void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b));
+
+/**
+ * Prepare one of card10's RGB LEDs to be set to a certain color in HSV format.
+ *
+ * Use :c:func:`leds_update` to apply changes.
+ *
+ * :param int led:  Which LED to set.  0-10 are the LEDs on the top and 11-14
+ *    are the 4 "ambient" LEDs.
+ * :param uint8_t h:  Hue component of the color. (float, 0 <= h < 360)
+ * :param uint8_t s:  Saturation component of the color. (float, 0 <= s <= 1)
+ * :param uint8_t v:  Value/Brightness component of the color. (float, 0 <= v <= 0)
+ */
+API(API_LEDS_PREP_HSV, void epic_leds_prep_hsv(int led, float h, float s, float v));
+
+/**
+ * Set global brightness for top RGB LEDs.
+ *
+ * Aside from PWM, the RGB LEDs' overall brightness can be controlled with a
+ * current limiter independently to achieve a higher resolution at low
+ * brightness which can be set with this function.
+ *
+ * :param uint8_t value:  Global brightness of top LEDs. (1 <= value <= 8, default = 1)
+ */
+API(API_LEDS_DIM_BOTTOM, void epic_leds_dim_bottom(uint8_t value));
+
+/**
+ * Set global brightness for bottom RGB LEDs.
+ *
+ * Aside from PWM, the RGB LEDs' overall brightness can be controlled with a
+ * current limiter independently to achieve a higher resolution at low
+ * brightness which can be set with this function.
+ *
+ * :param uint8_t value:  Global brightness of bottom LEDs. (1 <= value <= 8, default = 8)
+ */
+API(API_LEDS_DIM_TOP, void epic_leds_dim_top(uint8_t value));
+
+/**
+ * Enables or disables powersave mode.
+ *
+ * Even when set to zero, the RGB LEDs still individually consume ~1mA.
+ * Powersave intelligently switches the supply power in groups. This introduces
+ * delays in the magnitude of ~10µs, so it can be disabled for high speed
+ * applications such as POV.
+ *
+ * :param bool eco:  Activates powersave if true, disables it when false. (default = True)
+ */
+API(API_LEDS_SET_POWERSAVE, void epic_leds_set_powersave(bool eco));
+
+/**
+ * Updates the RGB LEDs with changes that have been set with :c:func:`leds_prep`
+ * or :c:func:`leds_prep_hsv`.
+ *
+ * The LEDs can be only updated in bulk, so using this approach instead of
+ * :c:func:`leds_set` or :c:func:`leds_set_hsv` significantly reduces the load
+ * on the corresponding hardware bus.
+ */
+API(API_LEDS_UPDATE, void epic_leds_update(void));
+
+/**
+ * Set the brightness of one of the rocket LEDs.
+ *
+ * :param int led:  Which LED to set.
+ *
+ *    +-------+--------+----------+
+ *    |   ID  | Color  | Location |
+ *    +=======+========+==========+
+ *    | ``0`` | Blue   | Left     |
+ *    +-------+--------+----------+
+ *    | ``1`` | Yellow | Top      |
+ *    +-------+--------+----------+
+ *    | ``2`` | Green  | Right    |
+ *    +-------+--------+----------+
+ * :param uint8_t value:  Brightness of LED (only two brightness levels are
+ *    supported right now).
+ */
+API(API_LEDS_SET_ROCKET, void epic_leds_set_rocket(int led, uint8_t value));
+
+/**
+ * Turn on the bright side LED which can serve as a flashlight if worn on the left wrist or as a rad tattoo illuminator if worn on the right wrist.
+ *
+ *:param bool power:  Side LED on if true.
+ */
+API(API_LEDS_SET_FLASHLIGHT, void epic_set_flashlight(bool power));
+
+/**
+ * Set gamma lookup table for individual rgb channels.
+ *
+ * Since the RGB LEDs' subcolor LEDs have different peak brightness and the
+ * linear scaling introduced by PWM is not desireable for color accurate work,
+ * custom lookup tables for each individual color channel can be loaded into the
+ * Epicardium's memory with this function.
+ *
+ * :param uint8_t rgb_channel:  Color whose gamma table is to be updated, 0->Red, 1->Green, 2->Blue.
+ * :param uint8_t[256] gamma_table: Gamma lookup table. (default = 4th order power function rounded up)
+ */
+API(API_LEDS_SET_GAMMA_TABLE, void epic_leds_set_gamma_table(
+	uint8_t rgb_channel,
+	uint8_t *gamma_table
+));
 
 /**
  * Sensor Data Streams

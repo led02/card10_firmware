@@ -33,7 +33,7 @@ int main(void)
 	LCD_Update();
 
 	for (int i = 0; i < 11; i++) {
-		leds_set_dim(i, 1);
+		//        leds_set_dim(i, 1);
 	}
 
 	int __attribute__((unused)) h = 0;
