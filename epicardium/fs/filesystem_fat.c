@@ -96,6 +96,7 @@ void fatfs_init()
 #else
 	s_globalLock = xSemaphoreCreateMutex();
 #endif
+	s_globalFileSystem.generationCount = 1;
 	fatfs_attach();
 }
 
