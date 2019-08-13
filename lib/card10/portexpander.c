@@ -188,19 +188,6 @@ bool portexpander_detected(void)
 	return detected;
 }
 
-void portexpander_set(uint8_t pin, uint8_t value)
-{
-	if (detected && pin < 8) {
-		if (value) {
-			output_state |= (1 << pin);
-		} else {
-			output_state &= ~(1 << pin);
-		}
-
-		portexpander_write(PE_C_OUTPUT_PORT, output_state);
-	}
-}
-
 /* ************************************************************************** */
 void portexpander_out_set(uint8_t mask)
 {
@@ -219,28 +206,10 @@ void portexpander_out_clr(uint8_t mask)
 	}
 }
 
-void portexpander_prep(uint8_t pin, uint8_t value)
-{
-	if (pin < 8) {
-		if (value) {
-			output_state |= (1 << pin);
-		} else {
-			output_state &= ~(1 << pin);
-		}
-	}
-}
-
 /* ************************************************************************** */
 uint8_t portexpander_out_get(uint8_t mask)
 {
 	return output_state & mask;
-}
-
-void portexpander_update(void)
-{
-	if (detected) {
-		portexpander_write(PE_C_OUTPUT_PORT, output_state);
-	}
 }
 
 /* ************************************************************************** */

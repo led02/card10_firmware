@@ -6,10 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void portexpander_set(uint8_t pin, uint8_t value);
-void portexpander_prep(uint8_t pin, uint8_t value);
-void portexpander_update(void);
-
 /**
  * Structure type for configuring the portexpander.
  */
