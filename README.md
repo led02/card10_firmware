@@ -11,6 +11,9 @@ If you want to help us ensure the card10 will have been exactly as we reconstruc
 ## How To Build
 A full guide for building is available in the docs as [How To Build](https://firmware.card10.badge.events.ccc.de/how-to-build.html).
 
+Last Artifacts from Gitlab-CI: [![pipeline status](https://git.card10.badge.events.ccc.de/card10/firmware/badges/master/pipeline.svg)](https://git.card10.badge.events.ccc.de/card10/firmware/-/jobs/artifacts/master/browse/build/?job=release)
+
+
 ## How To Flash
 Flasing with or without a debugger is described in detail in [How To Flash](https://firmware.card10.badge.events.ccc.de/how-to-flash.html).
 

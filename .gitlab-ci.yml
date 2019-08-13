@@ -11,6 +11,21 @@ build:
         - merge_requests
         - master
 
+release:
+    stage: build
+    script:
+        - ./bootstrap.sh
+        - ninja -C build/
+        - arm-none-eabi-size build/bootloader/bootloader.elf build/epicardium/epicardium.elf build/pycardium/pycardium.elf
+    only:
+        - tag
+    artifacts:
+        paths:
+            - build/bootloader/bootloader.elf
+            - build/epicardium/epicardium.elf
+            - build/pycardium/pycardium.elf
+            - build/pycardium/pycardium_epicardium.bin
+
 lint:
     stage: test
     image: "derq3k/card10-lint-env:20190806-201106Z-f95b541-dirty"
