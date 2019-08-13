@@ -36,7 +36,8 @@ int main(void)
 	LOG_INFO("startup", "Epicardium startup ...");
 	LOG_INFO("startup", "Version " CARD10_VERSION);
 
-	card10_init();
+	hardware_early_init();
+
 #ifdef CARD10_DEBUG_CORE1
 	LOG_WARN("startup", "Core 1 Debugger Mode");
 	static const gpio_cfg_t swclk = {
@@ -156,6 +157,8 @@ int main(void)
 		LOG_INFO("startup", "Starting pycardium on core 1 ...");
 		core1_load((void *)0x10080000, "main.py");
 	}
+
+	hardware_init();
 
 	LOG_INFO("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
