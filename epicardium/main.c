@@ -126,6 +126,10 @@ int main(void)
 	LOG_INFO("startup", "Initializing dispatcher ...");
 	api_dispatcher_init();
 
+	/* light sensor */
+	LOG_INFO("startup", "starting light sensor ...");
+	epic_light_sensor_run();
+
 	/*
 	 * See if there's a l0dable.elf to run. If not, run pycardium.
 	 * This is temporary until epicardium gets a l0dable API from pycardium.

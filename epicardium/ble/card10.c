@@ -233,9 +233,7 @@ static uint8_t readCard10CB(
 
 	switch (handle) {
 	case CARD10_LIGHT_SENSOR_VAL_HDL:
-		epic_light_sensor_run();
 		epic_light_sensor_get(&ui16);
-		// epic_light_sensor_stop(); stop it everywhere, also in py
 		*pAttr->pValue = ui16;
 		APP_TRACE_INFO1("ble-card10: read lightsensor: %d\n", ui16);
 		return ATT_SUCCESS;

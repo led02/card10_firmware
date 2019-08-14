@@ -8,8 +8,8 @@ be fairly stable.
 
 .. py:function:: light_sensor.start()
 
-   Turn on the ADC and start reading brightness values.  This function must be
-   called before any measurements can be taken.
+   Turn on the ADC and start reading brightness values.  (In past this function must be
+   called before any measurements can be taken.)
 
 .. py:function:: light_sensor.get_reading()
 
