@@ -14,7 +14,7 @@ be fairly stable.
 .. py:function:: light_sensor.get_reading()
 
    Get an ambient brightness reading.  The returned value is in no particular
-   unit, though it seems to be fairly stable.  Common values:
+   unit, though it seems to be fairly stable. The value could be between 0 and 400.  Common values:
 
    - ~8: Very dark are
    - ~17: Typical hackerspace brightness

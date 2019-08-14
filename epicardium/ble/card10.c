@@ -32,7 +32,7 @@
 
 /*
  * This has to match in order and number of members to the functions
- * called in fileTransAddGroupDyn() otherwise the stack breaks.
+ * called in addCard10GroupDyn() otherwise the stack breaks.
  */
 enum {
 	/*!< \brief card10 service declaration */
@@ -50,32 +50,28 @@ enum {
 	CARD10_MAX_HDL
 };
 
+/* clang-format off */
+
 /* BLE UUID for card10 service*/
 static const uint8_t UUID_svc[] = { CARD10_UUID_SUFFIX, 0x0, 0xf0, 0x0, 0x0 };
 
 /* BLE UUID for card10 char vibra */
-static const uint8_t UUID_char_vibra[] = { ATT_PROP_WRITE_NO_RSP,
-					   UINT16_TO_BYTES(
-						   CARD10_VIBRA_VAL_HDL),
-					   CARD10_UUID_SUFFIX,
-					   0xf,
-					   0xf1,
-					   0x0,
-					   0x0 };
+static const uint8_t UUID_char_vibra[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_VIBRA_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0xf, 0xf1, 0x0, 0x0
+};
 
 static const uint8_t UUID_attChar_vibra[] = {
 	CARD10_UUID_SUFFIX, 0xf, 0xf1, 0x0, 0x0
 };
 
 /* BLE UUID for card10 char rockets */
-static const uint8_t UUID_char_rockets[] = { ATT_PROP_WRITE_NO_RSP,
-					     UINT16_TO_BYTES(
-						     CARD10_ROCKETS_VAL_HDL),
-					     CARD10_UUID_SUFFIX,
-					     0x10,
-					     0xf1,
-					     0x0,
-					     0x0 };
+static const uint8_t UUID_char_rockets[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_ROCKETS_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x10, 0xf1, 0x0, 0x0
+};
 
 static const uint8_t UUID_attChar_rockets[] = {
 	CARD10_UUID_SUFFIX, 0x10, 0xf1, 0x0, 0x0
@@ -85,15 +81,12 @@ static const uint8_t UUID_attChar_rockets[] = {
 static const uint8_t UUID_char_light_sensor[] = {
 	ATT_PROP_READ,
 	UINT16_TO_BYTES(CARD10_LIGHT_SENSOR_VAL_HDL),
-	CARD10_UUID_SUFFIX,
-	0xf0,
-	0xf0,
-	0x0,
-	0x0
+	CARD10_UUID_SUFFIX, 0xf0, 0xf0, 0x0, 0x0
 };
 static const uint8_t UUID_attChar_light_sensor[] = {
 	CARD10_UUID_SUFFIX, 0xf0, 0xf0, 0x0, 0x0
 };
+/* clang-format on */
 
 /*
  * Create the BLE service description. 
@@ -132,7 +125,7 @@ static void *addCard10GroupDyn(void)
 			pSHdl,
 			UUID_attChar_vibra,
 			NULL,
-			sizeof(uint16_t),
+			0,
 			sizeof(uint16_t),
 			ATTS_SET_WRITE_CBACK,
 			ATTS_PERMIT_WRITE
@@ -153,7 +146,7 @@ static void *addCard10GroupDyn(void)
 			pSHdl,
 			UUID_attChar_rockets,
 			NULL,
-			3 * sizeof(uint8_t),
+			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
 			ATTS_PERMIT_WRITE
@@ -180,16 +173,13 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_READ
 		);
 
-		APP_TRACE_INFO0("ble-card10: services binded\n");
+		APP_TRACE_INFO0("ble-card10: services bound\n");
 	}
 	return pSHdl;
 }
 
 /*
- * BLE file transfer write callback.
- * 
- * This gets called when data is written by a BLE central to our BLE
- * peripheral. Here we take care of handling the received data.
+ * BLE card10 write callback.
  */
 
 static uint8_t writeCard10CB(
@@ -228,6 +218,10 @@ static uint8_t writeCard10CB(
 	}
 }
 
+/*
+ * BLE card10 read callback.
+ */
+
 static uint8_t readCard10CB(
 	dmConnId_t connId,
 	uint16_t handle,
@@ -252,7 +246,7 @@ static uint8_t readCard10CB(
 }
 
 /*
- * This registers and starts the BLE file transfer service.
+ * This registers and starts the BLE card10 service.
  */
 
 void bleCard10_init(void)

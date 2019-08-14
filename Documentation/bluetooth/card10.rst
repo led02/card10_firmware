@@ -34,6 +34,7 @@ light sensor characteristic
 ---------------------------------
 
 The light sensor characteristic makes it possible to read the current value of the light sensor by receiving a ``uint16``.
+The range of this sensor is between 0 (``0x0``) and 400 (``0x9001``).
 
 - reading of ``0x0e00`` means **14**
 
@@ -55,8 +56,8 @@ Dataformat:
 ======= ======= =======
    0       1       2
 ------- ------- -------
-rocket0 rocket1 rocket2
+Rocket0 Rocket1 Rocket2
 ======= ======= =======
 
-- Enable only Rocket 1:  ``0xff0000``
-- Enable all rockets with 50% lightness: ``0x7f7f7f``
+- Enable only Rocket0:  ``0xff0000``
+- Enable all rockets with 50% brightness: ``0x7f7f7f``
