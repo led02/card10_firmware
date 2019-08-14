@@ -17,10 +17,9 @@ the following commands:
 
 .. code-block:: shell-session
 
-   $ git clone https://git.card10.badge.events.ccc.de/card10/openocd.git
+   $ git clone --recursive https://git.card10.badge.events.ccc.de/card10/openocd.git
    $ cd openocd
 
-   $ git submodule update --init
    $ ./bootstrap
    $ ./configure --disable-werror
 
