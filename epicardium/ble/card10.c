@@ -47,6 +47,9 @@ enum {
 	/*!< \brief rockets led characteristic */
 	CARD10_ROCKETS_CH_HDL,
 	CARD10_ROCKETS_VAL_HDL,
+	/*!< \brief single led characteristic */
+	CARD10_LED_S_CH_HDL,
+	CARD10_LED_S_VAL_HDL,
 	/*!< \brief light sensor characteristic */
 	CARD10_LIGHT_SENSOR_CH_HDL,
 	CARD10_LIGHT_SENSOR_VAL_HDL,
@@ -98,6 +101,16 @@ static const uint8_t UUID_attChar_rockets[] = {
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
 
+/* BLE UUID for card10 char led single (debugging) */
+static const uint8_t UUID_char_led_s[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LED_S_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0xef, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_led_s[] = {
+	CARD10_UUID_SUFFIX, 0xef, CARD10_UUID_PREFIX
+};
 // starting at 0xf0 with read only characteristics
 
 /* BLE UUID for card10 char light sensor */
@@ -196,6 +209,27 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_WRITE
 		);
 
+		// SINGLE LED
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_led_s,
+			sizeof(UUID_char_led_s),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_led_s,
+			NULL,
+			0,
+			sizeof(uint16_t) + 3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
 		// LIGHT_SENSOR
 
 		AttsDynAddAttrConst(
@@ -279,6 +313,17 @@ static uint8_t writeCard10CB(
 			pValue[0],
 			pValue[1],
 			pValue[2]
+		);
+		return ATT_SUCCESS;
+	case CARD10_LED_S_VAL_HDL:
+		BYTES_TO_UINT16(ui16, pValue);
+		epic_leds_set(ui16, pValue[2], pValue[3], pValue[4]);
+		APP_TRACE_INFO4(
+			"ble-card10: set single led %ld to #%x%x%x\n",
+			ui16,
+			pValue[2],
+			pValue[3],
+			pValue[4]
 		);
 		return ATT_SUCCESS;
 	default:
