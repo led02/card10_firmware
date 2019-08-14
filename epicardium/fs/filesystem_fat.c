@@ -65,6 +65,9 @@ static bool globalLockAccquire();
 static void globalLockRelease();
 static void efs_close_all(EpicFileSystem *fs);
 
+/**
+ * if EPICSTAT_NONE is passed to `expected`, the type is not checked.
+ */
 static bool efs_get_opened(
 	EpicFileSystem *fs,
 	int i,
@@ -72,6 +75,19 @@ static bool efs_get_opened(
 	struct FatObject **res,
 	int *rc
 );
+
+static bool
+efs_get_new(EpicFileSystem *fs, uint32_t *idx, struct FatObject **obj, int *rc);
+
+static int efs_obj_init(
+	EpicFileSystem *fs,
+	struct FatObject *obj,
+	uint32_t index,
+	enum epic_stat_type type
+);
+
+static void efs_obj_deinit(EpicFileSystem *fs, struct FatObject *obj);
+static void efs_init_stat(struct epic_stat *stat, FILINFO *finfo);
 
 static EpicFileSystem s_globalFileSystem;
 
@@ -225,14 +241,64 @@ static bool efs_get_opened(
 	    generation >= EPIC_FAT_FD_MAX_GENERATION) {
 		return false;
 	}
-	if (fs->pool[index].type != expected ||
-	    fs->pool[index].generation != generation) {
+	if (fs->pool[index].generation != generation) {
+		return false;
+	}
+	if (expected != EPICSTAT_NONE && fs->pool[index].type != expected) {
 		return false;
 	}
 
 	*obj = &fs->pool[index];
 	*rc  = 0;
 	return true;
+}
+
+static bool
+efs_get_new(EpicFileSystem *fs, uint32_t *idx, struct FatObject **obj, int *rc)
+{
+	uint32_t index;
+
+	*obj = NULL;
+	*rc  = 0;
+	*idx = 0;
+
+	//find free object to use
+	for (index = 0; index < EPIC_FAT_MAX_OPENED; ++index) {
+		if (fs->pool[index].type == EPICSTAT_NONE) {
+			break;
+		}
+	}
+	if (index == EPIC_FAT_MAX_OPENED) {
+		*rc = -s_libffToErrno[FR_TOO_MANY_OPEN_FILES];
+		return false;
+	}
+
+	*obj = &fs->pool[index];
+	return true;
+}
+
+static int efs_obj_init(
+	EpicFileSystem *fs,
+	struct FatObject *obj,
+	uint32_t index,
+	enum epic_stat_type type
+) {
+	uint32_t generation;
+
+	generation = fs->generationCount++;
+	if (generation == EPIC_FAT_FD_MAX_GENERATION) {
+		fs->generationCount = 1;
+	}
+	obj->type       = type;
+	obj->generation = generation;
+
+	return EPIC_FAT_FD(index, generation);
+}
+
+static void efs_obj_deinit(EpicFileSystem *fs, struct FatObject *obj)
+{
+	obj->type       = EPICSTAT_NONE;
+	obj->generation = 0;
 }
 
 /* here we're trying to mirror glibc's behaviour:
@@ -282,28 +348,16 @@ static inline bool parse_mode(const char *mstring, int *mode)
 int efs_open(EpicFileSystem *fs, const char *filename, const char *modeString)
 {
 	struct FatObject *o = NULL;
-	uint32_t index, generation;
+	uint32_t index;
 	int mode = 0;
 	int res;
 
-	//find free object to use
-	for (index = 0; index < EPIC_FAT_MAX_OPENED; ++index) {
-		if (fs->pool[index].type == EPICSTAT_NONE) {
-			break;
-		}
-	}
-	if (index == EPIC_FAT_MAX_OPENED) {
-		return -s_libffToErrno[FR_TOO_MANY_OPEN_FILES];
-	}
-
-	generation = fs->generationCount++;
-	if (generation == EPIC_FAT_FD_MAX_GENERATION) {
-		fs->generationCount = 1;
-	}
-	o = &fs->pool[index];
-
 	if (!parse_mode(modeString, &mode)) {
 		return -EINVAL;
+	}
+
+	if (!efs_get_new(fs, &index, &o, &res)) {
+		return res;
 	}
 
 	res = f_open(&o->file, filename, mode);
@@ -311,29 +365,28 @@ int efs_open(EpicFileSystem *fs, const char *filename, const char *modeString)
 		return -s_libffToErrno[res];
 	}
 
-	o->type       = EPICSTAT_FILE;
-	o->generation = generation;
-
 	// for 'a' mode, we must begin at the end of the file
 	if ((mode & FA_OPEN_APPEND) != 0) {
 		f_lseek(&o->file, f_size(&o->file));
 	}
 
-	return EPIC_FAT_FD(index, generation);
+	return efs_obj_init(fs, o, index, EPICSTAT_FILE);
 }
 
 int efs_close(EpicFileSystem *fs, int fd)
 {
 	int res;
 	struct FatObject *o;
-	if (efs_get_opened(fs, fd, EPICSTAT_FILE, &o, &res)) {
-		res = f_close(&o->file);
+	if (efs_get_opened(fs, fd, EPICSTAT_NONE, &o, &res)) {
+		if (o->type == EPICSTAT_FILE) {
+			res = f_close(&o->file);
+		} else {
+			res = f_closedir(&o->dir);
+		}
 		if (res != FR_OK) {
 			return -s_libffToErrno[res];
 		}
-
-		o->type       = EPICSTAT_NONE;
-		o->generation = 0;
+		efs_obj_deinit(fs, o);
 	}
 	return res;
 }
@@ -346,13 +399,12 @@ void efs_close_all(EpicFileSystem *fs)
 			f_close(&fs->pool[i].file);
 			break;
 		case EPICSTAT_DIR:
-			//NYI
+			f_closedir(&fs->pool[i].dir);
 			break;
 		case EPICSTAT_NONE:
 			break;
 		}
-		fs->pool[i].type       = EPICSTAT_NONE;
-		fs->pool[i].generation = 0;
+		efs_obj_deinit(fs, &fs->pool[i]);
 	}
 }
 
@@ -440,18 +492,65 @@ int efs_tell(EpicFileSystem *fs, int fd)
 	return res;
 }
 
-int efs_stat(EpicFileSystem *fs, const char *filename, struct epic_stat *stat)
+static void efs_init_stat(struct epic_stat *stat, FILINFO *finfo)
 {
-	int res = 0;
-	FILINFO finfo;
-	res = f_stat(filename, &finfo);
-	if (res == 0) {
-		if (finfo.fattrib & AM_DIR) {
+	if (finfo->fname[0] != 0) {
+		if (finfo->fattrib & AM_DIR) {
 			stat->type = EPICSTAT_DIR;
 		} else {
 			stat->type = EPICSTAT_FILE;
 		}
+		strncpy(stat->name, finfo->fname, EPICSTAT_MAX_PATH);
+	} else {
+		stat->name[0] = 0;
+		stat->type    = EPICSTAT_NONE;
 	}
+}
+
+int efs_stat(EpicFileSystem *fs, const char *filename, struct epic_stat *stat)
+{
+	int res = 0;
+	static FILINFO finfo;
+	res = f_stat(filename, &finfo);
+	if (res == 0) {
+		efs_init_stat(stat, &finfo);
+	}
+	return -s_libffToErrno[res];
+}
+
+int efs_opendir(EpicFileSystem *fs, const char *path)
+{
+	int res;
+	struct FatObject *o;
+	uint32_t index;
+
+	if (efs_get_new(fs, &index, &o, &res)) {
+		res = f_opendir(&o->dir, path);
+		if (res != FR_OK) {
+			return -s_libffToErrno[res];
+		}
+		return efs_obj_init(fs, o, index, EPICSTAT_DIR);
+	}
+	return res;
+}
+
+int efs_readdir(EpicFileSystem *fs, int fd, struct epic_stat *stat)
+{
+	int res;
+	struct FatObject *o;
+	if (efs_get_opened(fs, fd, EPICSTAT_DIR, &o, &res)) {
+		FILINFO finfo;
+		res = f_readdir(&o->dir, stat ? &finfo : NULL);
+		if (res == FR_OK && stat) {
+			efs_init_stat(stat, &finfo);
+		}
+	}
+	return res;
+}
+
+int efs_unlink(EpicFileSystem *fs, const char *path)
+{
+	int res = f_unlink(path);
 	return -s_libffToErrno[res];
 }
 

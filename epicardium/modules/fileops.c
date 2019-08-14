@@ -8,6 +8,16 @@
 
 #include "fs/internal.h"
 
+#if defined(__GNUC__) &&                                                       \
+	((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+#define HAVE_STATIC_ASSERT 1
+#elif defined(__clang__)
+#define HAVE_STATIC_ASSERT 1
+#endif
+#if HAVE_STATIC_ASSERT
+_Static_assert(sizeof(struct epic_stat) == 276, "");
+#endif
+
 int epic_file_open(const char *filename, const char *mode)
 {
 	EpicFileSystem *fs;
@@ -91,6 +101,39 @@ int epic_file_stat(const char *filename, struct epic_stat *stat)
 	int res = efs_lock_global(&fs);
 	if (res == 0) {
 		res = efs_stat(fs, filename, stat);
+		efs_unlock_global(fs);
+	}
+	return res;
+}
+
+int epic_file_opendir(const char *path)
+{
+	EpicFileSystem *fs;
+	int res = efs_lock_global(&fs);
+	if (res == 0) {
+		res = efs_opendir(fs, path);
+		efs_unlock_global(fs);
+	}
+	return res;
+}
+
+int epic_file_readdir(int fd, struct epic_stat *stat)
+{
+	EpicFileSystem *fs;
+	int res = efs_lock_global(&fs);
+	if (res == 0) {
+		res = efs_readdir(fs, fd, stat);
+		efs_unlock_global(fs);
+	}
+	return res;
+}
+
+int epic_file_unlink(const char *path)
+{
+	EpicFileSystem *fs;
+	int res = efs_lock_global(&fs);
+	if (res == 0) {
+		res = efs_unlink(fs, path);
 		efs_unlock_global(fs);
 	}
 	return res;

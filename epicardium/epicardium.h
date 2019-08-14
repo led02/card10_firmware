@@ -60,6 +60,9 @@ typedef _Bool bool;
 #define API_FILE_SEEK              0x46
 #define API_FILE_TELL              0x47
 #define API_FILE_STAT              0x48
+#define API_FILE_OPENDIR           0x49
+#define API_FILE_READDIR           0x4a
+#define API_FILE_UNLINK            0x4b
 
 #define API_RTC_GET_SECONDS        0x50
 #define API_RTC_SCHEDULE_ALARM     0x51
@@ -805,13 +808,28 @@ API(
 	int epic_file_open(const char* filename, const char* modeString)
 );
 
-/** */
+/**
+ * epic_file_close
+ *
+ * :param int fd: descriptor returned by epic_file_opendir
+ *
+ * :return: ``0`` on success, negative on error
+ */
 API(API_FILE_CLOSE, int epic_file_close(int fd));
 
 /** */
 API(API_FILE_READ, int epic_file_read(int fd, void* buf, size_t nbytes));
 
-/** */
+/**
+ * epic_file_write
+ *
+ * :param int fd: descriptor returned by epic_file_open
+ * :param const void* buf: data to write
+ * :param size_t nbytes: no of bytes to write
+ *
+ * :return: ``< 0`` on error, ``nbytes`` on success. (Partial writes don't occur on success!)
+ *
+*/
 API(
 	API_FILE_WRITE,
 	int epic_file_write(int fd, const void* buf, size_t nbytes)
@@ -842,6 +860,9 @@ enum epic_stat_type {
 	EPICSTAT_DIR,
 };
 
+#define EPICSTAT_MAX_PATH 	255 //conveniently the same as FF_MAX_LFN
+
+
 /** */
 struct epic_stat {
 	/** Entity Type: file, directory or none */
@@ -860,20 +881,9 @@ struct epic_stat {
 	/** Size in bytes. */
 	uint32_t size;
 
-	/**
-	 * Which FAT volume this entity resides on.
-	 *
-	 * (will be needed later once we distinguish between system and user volume)
-	 */
-	uint8_t volume;
-	uint8_t _reserved[9];
+	char name[EPICSTAT_MAX_PATH + 1];
+	uint8_t _reserved[12];
 };
-
-#ifndef __cplusplus
-#if defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
-_Static_assert(sizeof(struct epic_stat) == 20, "");
-#endif
-#endif
 
 /**
  * stat path
@@ -886,6 +896,36 @@ _Static_assert(sizeof(struct epic_stat) == 20, "");
 API(API_FILE_STAT, int epic_file_stat(
 	const char* path, struct epic_stat* stat
 ));
+
+/**
+ * open directory
+ *
+ * :param char* path: directory to open
+ *
+ * :return: ``> 0`` on success, negative on error
+ */
+API(API_FILE_OPENDIR, int epic_file_opendir(const char* path));
+
+/**
+ * readdir
+ *
+ * :param int fd: descriptor returned by epic_file_opendir
+ * :param epic_stat* stat: pointer to result - pass NULL to reset iteration offset of fd
+ *
+ * :return: ``0`` on success, negative on error
+ */
+API(API_FILE_READDIR, int epic_file_readdir(int fd, struct epic_stat* stat));
+
+/**
+ * epic_file_unlink
+ *
+ * :param char* path: file to delete
+ *
+ * :return: ``0`` on success, negative on error
+ */
+API(API_FILE_UNLINK, int epic_file_unlink(const char* path));
+
+
 
 /**
  * RTC

@@ -26,6 +26,9 @@ int efs_flush(EpicFileSystem *fs, int fd);
 int efs_seek(EpicFileSystem *fs, int fd, long offset, int whence);
 int efs_tell(EpicFileSystem *fs, int fd);
 int efs_stat(EpicFileSystem *fs, const char *filename, struct epic_stat *stat);
+int efs_opendir(EpicFileSystem *fs, const char *path);
+int efs_readdir(EpicFileSystem *fs, int fd, struct epic_stat *stat);
+int efs_unlink(EpicFileSystem *fs, const char *path);
 /**
  * lock global filesystem
  * 
