@@ -123,12 +123,12 @@ void bootloader_stop(void)
 
 void bootloader_dirty(void)
 {
-	bootloader_display_line(3, "Writing.", 0xf000);
+	bootloader_display_line(4, "Writing.", 0xf000);
 }
 
 void bootloader_clean(void)
 {
-	bootloader_display_line(3, "Ready.  ", 0xffff);
+	bootloader_display_line(4, "Ready.  ", 0xffff);
 }
 
 /******************************************************************************/

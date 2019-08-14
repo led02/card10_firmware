@@ -1,4 +1,5 @@
 #include "mphalport.h"
+#include "card10-version.h"
 
 #include "max32665.h"
 
@@ -13,8 +14,17 @@
 extern void *__StackTop, *__StackLimit;
 extern void *__HeapBase, *__HeapLimit;
 
+static const char header[] =
+	"--------------------------------\r\n"
+	"          Pycardium\r\n"
+	" Version: " CARD10_VERSION
+	"\r\n"
+	"--------------------------------\r\n";
+
 int main(void)
 {
+	epic_uart_write_str(header, sizeof(header));
+
 	pycardium_hal_init();
 
 	mp_stack_set_top(&__StackTop);

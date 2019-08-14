@@ -21,6 +21,7 @@
 #include "Heart.h"
 #include "gfx.h"
 #include "display.h"
+#include "card10-version.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -47,6 +48,7 @@ void vApiDispatcher(void *pvParameters)
 int main(void)
 {
 	LOG_INFO("startup", "Epicardium startup ...");
+	LOG_INFO("startup", "Version " CARD10_VERSION);
 
 	card10_init();
 	card10_diag();

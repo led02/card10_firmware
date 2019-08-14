@@ -37,6 +37,15 @@ add_global_link_arguments(
 # python3 = import('python').find_installation('python3')
 python3 = 'python3'
 
+# Version Header
+version_hdr = custom_target(
+  'card10-version.h',
+  output: 'card10-version.h',
+  build_by_default: true,
+  build_always_stale: true,
+  command: [files('tools/version-header.sh'), '@OUTPUT@'],
+)
+
 subdir('lib/')
 subdir('bootloader/')
 

@@ -1,4 +1,5 @@
 #include "bootloader.h"
+#include "card10-version.h"
 
 #include "card10.h"
 #include "led.h"
@@ -197,7 +198,7 @@ static void pmic_button(bool falling)
 /******************************************************************************/
 int main(void)
 {
-	printf("\n\nBootloader\n");
+	printf("\n\nBootloader " CARD10_VERSION "\n");
 	card10_init();
 
 	/*
@@ -210,8 +211,8 @@ int main(void)
 	// If the button is pressed, we go into MSC mode.
 	if (PB_Get(3)) {
 		bootloader_display_header();
-		bootloader_display_line(2, "USB activated.", 0xffff);
-		bootloader_display_line(3, "Ready.", 0xffff);
+		bootloader_display_line(3, "USB activated.", 0xffff);
+		bootloader_display_line(4, "Ready.", 0xffff);
 		run_usbmsc();
 
 		// If we return, don't try to boot. Maybe rather trigger a software reset.
@@ -229,7 +230,7 @@ int main(void)
 			printf("card10.bin CRC is invalid!\n");
 			bootloader_display_header();
 			bootloader_display_line(
-				2, "Integrity check failed", 0xffff
+				3, "Integrity check failed", 0xffff
 			);
 
 			bootloader_display_line(4, "Trying to boot", 0xffff);
@@ -239,7 +240,7 @@ int main(void)
 				printf("Trying to update firmware from external flash\n");
 				bootloader_display_header();
 				bootloader_display_line(
-					3, "Updating ...", 0xffff
+					4, "Updating ...", 0xffff
 				);
 				erase_partition();
 				flash_partition();
@@ -253,7 +254,7 @@ int main(void)
 	} else {
 		bootloader_display_header();
 		bootloader_display_line(
-			2, "Failed to mount filesystem", 0xffff
+			3, "Failed to mount filesystem", 0xffff
 		);
 		printf("Failed to mount the external flash\n");
 

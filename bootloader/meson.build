@@ -21,6 +21,7 @@ executable(
   'bootloader-usb.c',
   'crc16-ccitt.c',
   splash_screen,
+  version_hdr,
   dependencies: [
     libcard10,
     max32665_startup_boot,

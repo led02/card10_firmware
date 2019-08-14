@@ -78,6 +78,7 @@ elf = executable(
   frozen_source,
   modsrc,
   mp_headers,
+  version_hdr,
   include_directories: micropython_includes,
   dependencies: [max32665_startup_core1, periphdriver, api_caller],
   link_with: upy,
