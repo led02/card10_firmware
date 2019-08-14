@@ -56,6 +56,11 @@ int main(void)
 	}
 }
 
+void HardFault_Handler(void)
+{
+	epic_exit(255);
+}
+
 void gc_collect(void)
 {
 	void *sp = (void *)__get_MSP();
