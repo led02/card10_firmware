@@ -87,6 +87,9 @@ void gfx_puts(
 	Color bg
 ) {
 	while (*str) {
+		gfx_putchar(font, r, x, y, *str, fg, bg);
+		str++;
+
 		x += font->Width;
 		if (x >= r->width) {
 			x = 0;
@@ -94,8 +97,6 @@ void gfx_puts(
 		}
 		if (y >= r->height)
 			return;
-		gfx_putchar(font, r, x, y, *str, fg, bg);
-		str++;
 	}
 }
 
