@@ -31,21 +31,6 @@ TaskHandle_t dispatcher_task_id;
 
 void vBleTask(void *pvParameters);
 
-/*
- * API dispatcher task.  This task will sleep until an API call is issued and
- * then wake up to dispatch it.
- */
-void vApiDispatcher(void *pvParameters)
-{
-	LOG_DEBUG("dispatcher", "Ready.");
-	while (1) {
-		if (api_dispatcher_poll()) {
-			api_dispatcher_exec();
-		}
-		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	}
-}
-
 int main(void)
 {
 	LOG_INFO("startup", "Epicardium startup ...");

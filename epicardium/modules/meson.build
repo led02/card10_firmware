@@ -1,4 +1,5 @@
 module_sources = files(
+  'dispatcher.c',
   'display.c',
   'fileops.c',
   'leds.c',

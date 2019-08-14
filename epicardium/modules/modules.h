@@ -1,12 +1,19 @@
 #ifndef MODULES_H
 #define MODULES_H
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 #include <stdint.h>
+
+/* ---------- Dispatcher --------------------------------------------------- */
+void vApiDispatcher(void *pvParameters);
+extern SemaphoreHandle_t api_mutex;
+extern TaskHandle_t dispatcher_task_id;
 
 /* ---------- Serial ------------------------------------------------------- */
 #define SERIAL_READ_BUFFER_SIZE 128
 void vSerialTask(void *pvParameters);
-
 void serial_enqueue_char(char chr);
 
 /* ---------- PMIC --------------------------------------------------------- */
