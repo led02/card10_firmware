@@ -7,5 +7,6 @@ ble_sources = files(
   'app/app_main.c',
   'app/common/app_db.c',
   'app/common/app_ui.c',
-  'uart.c'
+  'uart.c',
+  'card10.c',
 )
