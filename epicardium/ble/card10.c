@@ -24,6 +24,7 @@
 
 #define CARD10_UUID_SUFFIX                                                     \
 	0x42, 0x23, 0x42, 0x23, 0x42, 0x23, 0x42, 0x23, 0x42, 0x23, 0x42, 0x23
+#define CARD10_UUID_PREFIX 0x02, 0x23, 0x42
 
 /*!< \brief Service start handle. */
 #define CARD10_START_HDL 0x920
@@ -53,38 +54,38 @@ enum {
 /* clang-format off */
 
 /* BLE UUID for card10 service*/
-static const uint8_t UUID_svc[] = { CARD10_UUID_SUFFIX, 0x0, 0xf0, 0x0, 0x0 };
+static const uint8_t UUID_svc[] = { CARD10_UUID_SUFFIX, 0x0, CARD10_UUID_PREFIX };
 
 /* BLE UUID for card10 char vibra */
 static const uint8_t UUID_char_vibra[] = {
 	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_VIBRA_VAL_HDL),
-	CARD10_UUID_SUFFIX, 0xf, 0xf1, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0xf, CARD10_UUID_PREFIX
 };
 
 static const uint8_t UUID_attChar_vibra[] = {
-	CARD10_UUID_SUFFIX, 0xf, 0xf1, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0xf, CARD10_UUID_PREFIX
 };
 
 /* BLE UUID for card10 char rockets */
 static const uint8_t UUID_char_rockets[] = {
 	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_ROCKETS_VAL_HDL),
-	CARD10_UUID_SUFFIX, 0x10, 0xf1, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
 
 static const uint8_t UUID_attChar_rockets[] = {
-	CARD10_UUID_SUFFIX, 0x10, 0xf1, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
 
 /* BLE UUID for card10 char light sensor */
 static const uint8_t UUID_char_light_sensor[] = {
 	ATT_PROP_READ,
 	UINT16_TO_BYTES(CARD10_LIGHT_SENSOR_VAL_HDL),
-	CARD10_UUID_SUFFIX, 0xf0, 0xf0, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0xf0, CARD10_UUID_PREFIX
 };
 static const uint8_t UUID_attChar_light_sensor[] = {
-	CARD10_UUID_SUFFIX, 0xf0, 0xf0, 0x0, 0x0
+	CARD10_UUID_SUFFIX, 0xf0, CARD10_UUID_PREFIX
 };
 /* clang-format on */
 

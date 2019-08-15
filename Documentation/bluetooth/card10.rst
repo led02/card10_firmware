@@ -13,21 +13,21 @@ The current draft uses following service specification:
 
 - Service
 
-  UUID: ``0000f000-2342-2342-2342-234223422342``
+  UUID: ``42230200-2342-2342-2342-234223422342``
 
 - light sensor characteristic:
 
-  UUID: ``0000f0f0-2342-2342-2342-234223422342``
+  UUID: ``422302f0-2342-2342-2342-234223422342``
   read
 
 - Vibra characteristic:
 
-  UUID: ``0000f10f-2342-2342-2342-234223422342``
+  UUID: ``4223020f-2342-2342-2342-234223422342``
   write
 
 - Rockets characteristic:
 
-  UUID: ``0000f110-2342-2342-2342-234223422342``
+  UUID: ``42230210-2342-2342-2342-234223422342``
   write
 
 light sensor characteristic
