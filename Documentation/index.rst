@@ -53,6 +53,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    :caption: Bluetooth
 
    bluetooth/file-transfer
+   bluetooth/card10
 
 Indices and tables
 ==================
