@@ -27,19 +27,21 @@ void pmic_interrupt_callback(void *_)
 
 void vPmicTask(void *pvParameters)
 {
-	int count          = 0;
-	portTickType delay = portMAX_DELAY;
-	pmic_task_id       = xTaskGetCurrentTaskHandle();
+	pmic_task_id = xTaskGetCurrentTaskHandle();
+
+	TickType_t button_start_tick = 0;
 
 	while (1) {
-		ulTaskNotifyTake(pdTRUE, delay);
-
-		if (count == PMIC_PRESS_SLEEP) {
-			LOG_ERR("pmic", "Sleep [[ Unimplemented ]]");
+		if (button_start_tick == 0) {
+			ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		} else {
+			ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
 		}
 
-		if (count == PMIC_PRESS_POWEROFF) {
-			LOG_INFO("pmic", "Poweroff");
+		TickType_t duration = xTaskGetTickCount() - button_start_tick;
+
+		if (button_start_tick != 0 && duration > pdMS_TO_TICKS(1000)) {
+			LOG_WARN("pmic", "Poweroff");
 			MAX77650_setSFT_RST(0x2);
 		}
 
@@ -47,17 +49,17 @@ void vPmicTask(void *pvParameters)
 
 		if (int_flag & MAX77650_INT_nEN_F) {
 			/* Button was pressed */
-			count = 0;
-			delay = portTICK_PERIOD_MS * 100;
+			button_start_tick = xTaskGetTickCount();
 		}
 		if (int_flag & MAX77650_INT_nEN_R) {
-			/* Button was pressed */
-			if (count < PMIC_PRESS_SLEEP) {
+			/* Button was released */
+			button_start_tick = 0;
+			if (duration < pdMS_TO_TICKS(400)) {
+				return_to_menu();
+			} else {
+				LOG_WARN("pmic", "Resetting ...");
 				card10_reset();
 			}
-
-			count = 0;
-			delay = portMAX_DELAY;
 		}
 
 		/* TODO: Remove when all interrupts are handled */
@@ -67,10 +69,6 @@ void vPmicTask(void *pvParameters)
 				"Unhandled PMIC Interrupt: %x",
 				int_flag
 			);
-		}
-
-		if (delay != portMAX_DELAY) {
-			count += 1;
 		}
 	}
 }

@@ -231,6 +231,9 @@ void __dispatch_isr(api_int_id_t id)
             f_client.write(tmp.format(**isr))
 
         tmp = """\
+        case (-1):
+                /* Ignore a spurious interrupt */
+                break;
         default:
                 epic_isr_default_handler(id);
                 break;

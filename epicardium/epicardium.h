@@ -29,8 +29,8 @@ typedef _Bool bool;
  */
 
 /* clang-format off */
-#define API_SYSTEM_EXIT             0x1 /* TODO */
-#define API_SYSTEM_EXEC             0x2 /* TODO */
+#define API_SYSTEM_EXIT             0x1
+#define API_SYSTEM_EXEC             0x2
 
 #define API_INTERRUPT_ENABLE        0xA
 #define API_INTERRUPT_DISABLE       0xB
@@ -116,7 +116,7 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
  */
 
 /* clang-format off */
-/** Reset Handler? **TODO** */
+/** Reset Handler */
 #define EPIC_INT_RESET                  0
 /** ``^C`` interrupt. See :c:func:`epic_isr_ctrl_c` for details.  */
 #define EPIC_INT_CTRL_C                 1
@@ -129,8 +129,59 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_NUM                    4
 /* clang-format on */
 
-API_ISR(EPIC_INT_RESET, epic_isr_reset);
+/*
+ * "Reset Handler*.  This isr is implemented by the API caller and is used to
+ * reset the core for loading a new payload.
+ *
+ * Just listed here for completeness.  You don't need to implement this yourself.
+ */
+API_ISR(EPIC_INT_RESET, __epic_isr_reset);
 
+/**
+ * Core API
+ * ========
+ * The following functions control execution of code on core 1.
+ */
+
+/**
+ * Stop execution of the current payload and return to the menu.
+ *
+ * :param int ret:  Return code.
+ * :return: :c:func:`epic_exit` will never return.
+ */
+void epic_exit(int ret) __attribute__((noreturn));
+
+/*
+ * The actual epic_exit() function is not an API call because it needs special
+ * behavior.  The underlying call is __epic_exit() which returns.  After calling
+ * this API function, epic_exit() will enter the reset handler.
+ */
+API(API_SYSTEM_EXIT, void __epic_exit(int ret));
+
+/**
+ * Stop execution of the current payload and immediately start another payload.
+ *
+ * :param char* name: Name (path) of the new payload to start.  This can either
+ *    be:
+ *
+ *    - A path to an ``.elf`` file (l0dable).
+ *    - A path to a ``.py`` file (will be loaded using Pycardium).
+ *    - A path to a directory (assumed to be a Python module, execution starts
+ *      with ``__init__.py`` in this folder).
+ *
+ * :return: :c:func:`epic_exec` will only return in case loading went wrong.
+ *    The following error codes can be returned:
+ *
+ *    - ``-ENOENT``: File not found.
+ *    - ``-ENOEXEC``: File not a loadable format.
+ */
+int epic_exec(char *name);
+
+/*
+ * Underlying API call for epic_exec().  The function is not an API call itself
+ * because it needs special behavior when loading a new payload.
+ */
+API(API_SYSTEM_EXEC, int __epic_exec(char *name));
 
 /**
  * UART/Serial Interface

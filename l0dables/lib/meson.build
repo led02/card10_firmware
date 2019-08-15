@@ -3,7 +3,7 @@ l0dable_startup_lib = static_library(
   'crt.s',
   'hardware.c',
   dependencies: [api_caller],
-  pic: true,
+  c_args: ['-fpie'],
 )
 
 l0dable_startup = declare_dependency(

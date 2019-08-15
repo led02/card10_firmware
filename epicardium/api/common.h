@@ -8,7 +8,8 @@
  * Semaphore used for API synchronization.
  * TODO: Replace this with a LDREX/STREX based implementation
  */
-#define _API_SEMAPHORE    0
+#define _API_SEMAPHORE        0
+#define _CONTROL_SEMAPHORE    1
 
 /* Type of API IDs */
 typedef uint32_t api_id_t;
@@ -19,6 +20,13 @@ typedef uint32_t api_id_t;
 
 /* Layout of the shared memory for API calls */
 struct api_call_mem {
+	/*
+	 * Reset stub.  The reset stub is a small function provided by
+	 * epicardium that should be called by a payload when receiving the
+	 * reset interrupt.
+	 */
+	void (*reset_stub)();
+
 	/*
 	 * Flag for synchronization of API calls.  When this flag
 	 * is set, the caller has issued a call and is waiting for

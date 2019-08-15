@@ -68,6 +68,8 @@ firmware features:
 - ``-Ddebug_prints=true``: Print more verbose debugging log messages
 - ``-Dble_trace=true``: Enable BLE tracing.  This will output lots of status
   info related to BLE.
+- ``-Ddebug_core1=true``: Enable the core 1 SWD lines which are exposed on the
+  SAO connector.  Only use this if you have a debugger which is modified for core 1.
 
 .. warning::
 

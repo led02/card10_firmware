@@ -85,3 +85,7 @@ Q(tell)
 Q(TextIOWrapper)
 Q(write)
 
+/* os */
+Q(os)
+Q(exit)
+Q(exec)
