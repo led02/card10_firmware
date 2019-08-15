@@ -1,7 +1,6 @@
 #include "modules/log.h"
 
 #include "fs_util.h"
-
 #include "wsf_types.h"
 #include "wsf_buf.h"
 #include "wsf_trace.h"
@@ -162,6 +161,13 @@ static void scheduleTimer(void)
 	if (timerRunning) {
 		//printf("time_to_next_expire = %d\n", time_to_next_expire);
 		//printf("change period\n");
+		/* We need to make sure not to schedule a 0 ticks timer.
+		 * Maybe it would also be enough to simply call the dispatcher
+		 * in this case... */
+		if (time_to_next_expire == 0) {
+			time_to_next_expire = 1;
+		}
+
 		if (timerWakeup != NULL) {
 			xTimerChangePeriod(
 				timerWakeup,
