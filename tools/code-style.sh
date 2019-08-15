@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 ###########################
@@ -72,6 +72,6 @@ for source_file in "$@"; do
         echo -e "\tBLACK\t\t$source_file"
         black -q "$source_file"
     else
-        echo " - Ignoring $source_file" >&2
+        echo -e "\tIGN\t\t$source_file"
 	fi
 done
