@@ -85,6 +85,7 @@ elf = executable(
   include_directories: [freertos_includes],
   link_args: [
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
+    '-Wl,--defsym=_write=_write_epicardium',
   ],
 )
 

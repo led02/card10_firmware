@@ -49,7 +49,7 @@ int epic_uart_read_char(void)
  */
 int epic_uart_read_str(char *buf, size_t cnt)
 {
-	int i = 0;
+	size_t i = 0;
 
 	for (i = 0; i < cnt; i++) {
 		if (xQueueReceive(read_queue, &buf[i], 0) != pdTRUE) {
@@ -58,6 +58,24 @@ int epic_uart_read_str(char *buf, size_t cnt)
 	}
 
 	return i;
+}
+
+long _write_epicardium(int fd, const char *buf, size_t cnt)
+{
+	/*
+	 * Only print one line at a time.  Insert `\r` between lines so they are
+	 * properly displayed on the serial console.
+	 */
+	size_t i, last = 0;
+	for (i = 0; i < cnt; i++) {
+		if (buf[i] == '\n') {
+			epic_uart_write_str(&buf[last], i - last);
+			epic_uart_write_str("\r", 1);
+			last = i;
+		}
+	}
+	epic_uart_write_str(&buf[last], cnt - last);
+	return cnt;
 }
 
 /* Interrupt handler needed for SDK UART implementation */
