@@ -69,7 +69,7 @@ typedef union
 /*! configurable parameters for advertising */
 static const appAdvCfg_t bleAdvCfg =
 {
-  {60000,     0,     0},                  /*! Advertising durations in ms */
+  {0,             0,              0},                  /*! Advertising durations in ms */
   {500/0.625,     4000/0.625,     0}                   /*! Advertising intervals in 0.625 ms units */
 };
 
