@@ -66,6 +66,7 @@ typedef _Bool bool;
 
 #define API_RTC_GET_SECONDS        0x50
 #define API_RTC_SCHEDULE_ALARM     0x51
+#define API_RTC_SET_MILLISECONDS   0x52
 
 #define API_LEDS_SET               0x60
 #define API_LEDS_SET_HSV           0x61
@@ -963,6 +964,11 @@ API(API_FILE_UNLINK, int epic_file_unlink(const char* path));
  * :return: Unix time in seconds
  */
 API(API_RTC_GET_SECONDS, uint32_t epic_rtc_get_seconds(void));
+
+/**
+ * Sets the current RTC time in milliseconds
+ */
+API(API_RTC_SET_MILLISECONDS, void epic_rtc_set_milliseconds(uint64_t milliseconds));
 
 /**
  * Schedule the RTC alarm for the given timestamp.

@@ -25,6 +25,21 @@ uint32_t epic_rtc_get_seconds(void)
 	return sec;
 }
 
+void epic_rtc_set_milliseconds(uint64_t milliseconds)
+{
+	uint32_t sec, subsec;
+
+	sec    = milliseconds / 1000;
+	subsec = (milliseconds % 1000);
+	subsec *= 256;
+	subsec /= 1000;
+
+	while (RTC_Init(MXC_RTC, sec, subsec, NULL) == E_BUSY)
+		;
+	while (RTC_EnableRTCE(MXC_RTC) == E_BUSY)
+		;
+}
+
 void RTC_IRQHandler(void)
 {
 	int flags = RTC_GetFlags();
