@@ -162,7 +162,7 @@ int RTC_DisableRTCE(mxc_rtc_regs_t *rtc);
  *@return    #E_SUCCESS If function is successful.
  *@return    #E_BUSY If RTC is busy.
  */
-int RTC_Init(mxc_rtc_regs_t *rtc, uint32_t sec, uint8_t ssec, sys_cfg_rtc_t *sys_cfg);
+int RTC_Init(mxc_rtc_regs_t *rtc, uint32_t sec, uint16_t ssec, sys_cfg_rtc_t *sys_cfg);
 
 /**
  * @brief Allow generation of Square Wave on the SQW pin

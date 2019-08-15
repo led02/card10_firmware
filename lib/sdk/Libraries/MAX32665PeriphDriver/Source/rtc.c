@@ -196,7 +196,7 @@ int RTC_DisableRTCE(mxc_rtc_regs_t *rtc)
 
 
 // *****************************************************************************
-int RTC_Init(mxc_rtc_regs_t *rtc, uint32_t sec, uint8_t ssec, sys_cfg_rtc_t *sys_cfg)
+int RTC_Init(mxc_rtc_regs_t *rtc, uint32_t sec, uint16_t ssec, sys_cfg_rtc_t *sys_cfg)
 {
     SYS_RTCClockEnable(sys_cfg);
 
