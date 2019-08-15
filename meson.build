@@ -46,6 +46,22 @@ version_hdr = custom_target(
   command: [files('tools/version-header.sh'), '@OUTPUT@'],
 )
 
+jq = find_program('jq', required: false)
+if jq.found()
+  compile_commands = custom_target(
+    'compile_commands_tidy.json',
+    build_by_default: true,
+    output: 'compile_commands_tidy.json',
+    command: [
+      files('tools/convert-ccjson.sh'),
+      meson.current_source_dir(),
+      meson.current_build_dir(),
+      '@OUTPUT@',
+    ],
+  )
+endif
+
+
 subdir('lib/')
 subdir('bootloader/')
 
