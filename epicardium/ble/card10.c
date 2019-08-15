@@ -47,6 +47,9 @@ enum {
 	/*!< \brief light sensor characteristic */
 	CARD10_LIGHT_SENSOR_CH_HDL,
 	CARD10_LIGHT_SENSOR_VAL_HDL,
+	/*!< \brief time update characteristic */
+	CARD10_TIME_UPDATE_CH_HDL,
+	CARD10_TIME_UPDATE_VAL_HDL,
 	/*!< \brief Maximum handle. */
 	CARD10_MAX_HDL
 };
@@ -86,6 +89,17 @@ static const uint8_t UUID_char_light_sensor[] = {
 };
 static const uint8_t UUID_attChar_light_sensor[] = {
 	CARD10_UUID_SUFFIX, 0xf0, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 time update */
+static const uint8_t UUID_char_time[] = {
+	ATT_PROP_WRITE,
+	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_time[] = {
+	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
 /* clang-format on */
 
@@ -174,9 +188,49 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_READ
 		);
 
+		// TIME UPDTAE
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_time,
+			sizeof(UUID_char_time),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_time,
+			NULL,
+			0,
+			sizeof(uint64_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
 		APP_TRACE_INFO0("ble-card10: services bound\n");
 	}
 	return pSHdl;
+}
+
+/*
+ * Set the time given in milliseconds since 1.1.1970 as 64 bit integer.
+ */
+static uint8_t setTime(uint8_t *pValue, uint16_t len)
+{
+	uint64_t timeNet;
+	uint64_t time;
+
+	if (len < sizeof(uint64_t)) {
+		return ATT_ERR_LENGTH;
+	}
+	memcpy(&timeNet, pValue, sizeof(timeNet));
+
+	time = __bswap64(timeNet);
+	epic_rtc_set_milliseconds(time);
+
+	return ATT_SUCCESS;
 }
 
 /*
@@ -211,6 +265,14 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
+	case CARD10_TIME_UPDATE_VAL_HDL:
+		if (operation == ATT_PDU_PREP_WRITE_REQ) {
+			if (len < sizeof(uint64_t)) {
+				return ATT_ERR_LENGTH;
+			}
+			return ATT_SUCCESS;
+		}
+		return setTime(pValue, len);
 	default:
 		APP_TRACE_INFO1(
 			"ble-card10: unsupported characteristic: %c\n", handle

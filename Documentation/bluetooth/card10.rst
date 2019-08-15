@@ -30,6 +30,11 @@ The current draft uses following service specification:
   UUID: ``42230210-2342-2342-2342-234223422342``
   write
 
+- Time update characteristic:
+
+  UUID: ``42230201-2342-2342-2342-234223422342``
+  write
+
 light sensor characteristic
 ---------------------------------
 
@@ -61,3 +66,10 @@ Rocket0 Rocket1 Rocket2
 
 - Enable only Rocket0:  ``0xff0000``
 - Enable all rockets with 50% brightness: ``0x7f7f7f``
+
+time update characteristic
+---------------------------------
+
+The time update characteristic makes it possible to set the current time given in milliseconds after 1.1.1970 in the UTC timezone. The value is represented as a big endian ``uint64``
+
+- Thu Aug 15 19:40:45 UTC 2019 : ``0x0 0x0 0x1 0x6c 0x96 0xcb 0xf8 0xcc``
