@@ -3,31 +3,32 @@
  ******************************************************************************/
 
 /***** Includes *****/
-#include "mxc_config.h"
-#include "led.h"
+#include "bhy_uc_driver.h"
 #include "board.h"
-#include "tmr_utils.h"
+#include "display.h"
+#include "gfx.h"
+#include "gpio.h"
 #include "i2c.h"
+#include "led.h"
+#include "mxc_config.h"
+#include "pmic.h"
 #include "rtc.h"
 #include "spi.h"
-#include "gpio.h"
-#include "bhy_uc_driver.h"
-#include "pmic.h"
-#include "gfx.h"
-#include "display.h"
+#include "tmr_utils.h"
 
 #include "card10.h"
 
 #include <math.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #define M_PI 3.1415
 /***** Definitions *****/
 
-/* should be greater or equal to 69 bytes, page size (50) + maximum packet size(18) + 1 */
+/* should be greater or equal to 69 bytes, page size (50) + maximum packet
+ * size(18) + 1 */
 #define FIFO_SIZE 300
 #define ROTATION_VECTOR_SAMPLE_RATE 10
 #define MAX_PACKET_LENGTH 18
@@ -49,7 +50,7 @@ void draw_arrow(int angle, int color)
 	int x2 = x1 - sin * 30;
 	int y2 = y1 - cos * 30;
 
-	gfx_thick_line(&display_screen, x1, y1, x2, y2, 2, color);
+	gfx_line(&display_screen, x1, y1, x2, y2, 2, color);
 
 	sin = sinf((angle - 140) * 2 * M_PI / 360.);
 	cos = cosf((angle - 140) * 2 * M_PI / 360.);
@@ -57,7 +58,7 @@ void draw_arrow(int angle, int color)
 	int x3 = x2 - sin * 10;
 	int y3 = y2 - cos * 10;
 
-	gfx_thick_line(&display_screen, x2, y2, x3, y3, 2, color);
+	gfx_line(&display_screen, x2, y2, x3, y3, 2, color);
 
 	sin = sinf((angle + 140) * 2 * M_PI / 360.);
 	cos = cosf((angle + 140) * 2 * M_PI / 360.);
@@ -65,7 +66,7 @@ void draw_arrow(int angle, int color)
 	int x4 = x2 - sin * 10;
 	int y4 = y2 - cos * 10;
 
-	gfx_thick_line(&display_screen, x2, y2, x4, y4, 2, color);
+	gfx_line(&display_screen, x2, y2, x4, y4, 2, color);
 }
 
 /***** Functions *****/
@@ -92,8 +93,8 @@ static void sensors_callback_orientation(
 		draw_arrow(sensor_data->data_vector.x * 360 / 32768, color);
 
 		char buf[128];
-		//sprintf(buf, "Azimuth: %3d", angle);
-		//Paint_DrawString_EN(0, 0, buf, &Font12, BLACK, color);
+		// sprintf(buf, "Azimuth: %3d", angle);
+		// Paint_DrawString_EN(0, 0, buf, &Font12, BLACK, color);
 
 		sprintf(buf, "%3d", angle);
 		gfx_puts(
@@ -220,10 +221,14 @@ int main(void)
     }
 #endif
 
-	//if(bhy_install_sensor_callback(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, sensors_callback_vector))
-	//if(bhy_install_sensor_callback(VS_TYPE_GRAVITY, VS_WAKEUP, sensors_callback_vector))
-	//if(bhy_install_sensor_callback(VS_TYPE_ACCELEROMETER, VS_WAKEUP, sensors_callback_vector))
-	//if(bhy_install_sensor_callback(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, sensors_callback_vector_uncalib))
+	// if(bhy_install_sensor_callback(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP,
+	// sensors_callback_vector))
+	// if(bhy_install_sensor_callback(VS_TYPE_GRAVITY, VS_WAKEUP,
+	// sensors_callback_vector))
+	// if(bhy_install_sensor_callback(VS_TYPE_ACCELEROMETER, VS_WAKEUP,
+	// sensors_callback_vector))
+	// if(bhy_install_sensor_callback(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+	// VS_WAKEUP, sensors_callback_vector_uncalib))
 	if (bhy_install_sensor_callback(
 		    VS_TYPE_ORIENTATION,
 		    VS_WAKEUP,
@@ -240,10 +245,14 @@ int main(void)
 #endif
 
 	/* enables the virtual sensor */
-	//if(bhy_enable_virtual_sensor(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
-	//if(bhy_enable_virtual_sensor(VS_TYPE_GRAVITY, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
-	//if(bhy_enable_virtual_sensor(VS_TYPE_ACCELEROMETER, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
-	//if(bhy_enable_virtual_sensor(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED, VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+	// if(bhy_enable_virtual_sensor(VS_TYPE_GEOMAGNETIC_FIELD, VS_WAKEUP,
+	// ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+	// if(bhy_enable_virtual_sensor(VS_TYPE_GRAVITY, VS_WAKEUP,
+	// ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+	// if(bhy_enable_virtual_sensor(VS_TYPE_ACCELEROMETER, VS_WAKEUP,
+	// ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
+	// if(bhy_enable_virtual_sensor(VS_TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+	// VS_WAKEUP, ROTATION_VECTOR_SAMPLE_RATE, 0, VS_FLUSH_NONE, 0, 0))
 	if (bhy_enable_virtual_sensor(
 		    VS_TYPE_ORIENTATION,
 		    VS_WAKEUP,
@@ -288,8 +297,10 @@ int main(void)
 				);
 			}
 
-			/* the logic here is that if doing a partial parsing of the fifo, then we should not parse  */
-			/* the last 18 bytes (max length of a packet) so that we don't try to parse an incomplete   */
+			/* the logic here is that if doing a partial parsing of the fifo, then we
+       * should not parse  */
+			/* the last 18 bytes (max length of a packet) so that we don't try to
+       * parse an incomplete   */
 			/* packet */
 		} while ((result == BHY_SUCCESS) &&
 			 (bytes_read >

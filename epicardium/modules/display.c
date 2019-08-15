@@ -1,13 +1,13 @@
-#include "epicardium.h"
-#include "tmr_utils.h"
-#include "gpio.h"
-#include "Fonts/fonts.h"
-#include "tmr.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "gfx.h"
 #include "display.h"
+#include "Fonts/fonts.h"
+#include "FreeRTOS.h"
 #include "LCD_Driver.h"
+#include "epicardium.h"
+#include "gfx.h"
+#include "gpio.h"
+#include "task.h"
+#include "tmr.h"
+#include "tmr_utils.h"
 
 static TaskHandle_t lock = NULL;
 
@@ -73,7 +73,7 @@ int epic_disp_line(
 		return cl;
 	} else {
 		/* TODO add linestyle support to gfx code */
-		gfx_thick_line(
+		gfx_line(
 			&display_screen,
 			xstart,
 			ystart,

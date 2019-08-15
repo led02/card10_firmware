@@ -1,8 +1,8 @@
 #include "gfx.h"
 #include "framebuffer.h"
+#include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <math.h>
 
 const struct gfx_color_rgb gfx_colors_rgb[COLORS] = {
 	{ 255, 255, 255 }, /* WHITE */
@@ -157,17 +157,10 @@ void gfx_circle_fill(struct gfx_region *reg, int x, int y, int r, Color c)
 void gfx_rectangle(
 	struct gfx_region *reg, int x, int y, int w, int h, int t, Color c
 ) {
-	if (t > 1) {
-		gfx_thick_line(reg, x, y, x + w, y, t, c);
-		gfx_thick_line(reg, x, y + h, x + w, y + h, t, c);
-		gfx_thick_line(reg, x, y, x, y + h, t, c);
-		gfx_thick_line(reg, x + w, y, x + w, y + h, t, c);
-	} else {
-		gfx_line(reg, x, y, x + w, y, c);
-		gfx_line(reg, x, y + h, x + w, y + h, c);
-		gfx_line(reg, x, y, x, y + h, c);
-		gfx_line(reg, x + w, y, x + w, y + h, c);
-	}
+	gfx_line(reg, x, y, x + w, y, t, c);
+	gfx_line(reg, x, y + h, x + w, y + h, t, c);
+	gfx_line(reg, x, y, x, y + h, t, c);
+	gfx_line(reg, x + w, y, x + w, y + h, t, c);
 }
 
 void gfx_rectangle_fill(
@@ -179,37 +172,86 @@ void gfx_rectangle_fill(
 	}
 }
 
-void gfx_line(struct gfx_region *reg, int x1, int y1, int x2, int y2, Color c)
-{
-	float dx = x2 - x1;
-	float dy = y2 - y1;
-	float de = fabs(dy / dx);
-	float e  = .0f;
-	int y    = y1;
-	for (int x = x1; x < x2; x++) {
-		gfx_setpixel(reg, x, y, c);
-		e += de;
-		if (e >= .5f) {
-			y += dy >= .0f ? 1 : -1;
-			e -= 1.0f;
+/*
+ * For derivation of the algorithm, see:
+ * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+ */
+static void plot_line_low(
+	struct gfx_region *reg, int x0, int y0, int x1, int y1, int t, Color c
+) {
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+	int yi = 1;
+
+	if (dy < 0) {
+		yi = -1;
+		dy = -dy;
+	}
+
+	int d = 2 * dy - dx;
+	int y = y0;
+	for (int x = x0; x < x1; x++) {
+		if (t > 1) {
+			gfx_circle_fill(reg, x, y, t, c);
+		} else {
+			gfx_setpixel(reg, x, y, c);
 		}
+
+		if (d > 0) {
+			y += yi;
+			d -= 2 * dx;
+		}
+		d += 2 * dy;
 	}
 }
 
-void gfx_thick_line(
-	struct gfx_region *reg, int x1, int y1, int x2, int y2, int t, Color c
+/*
+ * For derivation of the algorithm, see:
+ * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+ */
+static void plot_line_high(
+	struct gfx_region *reg, int x0, int y0, int x1, int y1, int t, Color c
 ) {
-	float dx = x2 - x1;
-	float dy = y2 - y1;
-	float de = fabs(dy / dx);
-	float e  = .0f;
-	int y    = y1;
-	for (int x = x1; x < x2; x++) {
-		gfx_circle_fill(reg, x, y, t, c);
-		e += de;
-		if (e >= .5f) {
-			y += dy >= .0f ? 1 : -1;
-			e -= 1.0f;
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+	int xi = 1;
+
+	if (dx < 0) {
+		xi = -1;
+		dx = -dx;
+	}
+
+	int d = 2 * dx - dy;
+	int x = x0;
+	for (int y = y0; y < y1; y++) {
+		if (t > 1) {
+			gfx_circle_fill(reg, x, y, t, c);
+		} else {
+			gfx_setpixel(reg, x, y, c);
+		}
+
+		if (d > 0) {
+			x += xi;
+			d -= 2 * dy;
+		}
+		d += 2 * dx;
+	}
+}
+
+void gfx_line(
+	struct gfx_region *reg, int x0, int y0, int x1, int y1, int t, Color c
+) {
+	if (abs(y1 - y0) < abs(x1 - x0)) {
+		if (x0 > x1) {
+			plot_line_low(reg, x1, y1, x0, y0, t, c);
+		} else {
+			plot_line_low(reg, x0, y0, x1, y1, t, c);
+		}
+	} else {
+		if (y0 > y1) {
+			plot_line_high(reg, x1, y1, x0, y0, t, c);
+		} else {
+			plot_line_high(reg, x0, y0, x1, y1, t, c);
 		}
 	}
 }

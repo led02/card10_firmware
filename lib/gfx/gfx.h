@@ -28,9 +28,8 @@ void gfx_rectangle(struct gfx_region *reg, int x, int y, int w, int h,
 						      int t, Color c);
 void gfx_rectangle_fill(struct gfx_region *reg, int x, int y, int w, int h,
 								  Color c);
-void gfx_line(struct gfx_region *reg, int x1, int y1, int x2, int y2, Color c);
-void gfx_thick_line(struct gfx_region *reg, int x1, int y1, int x2, int y2,
-							   int t, Color c);
+void gfx_line(struct gfx_region *reg, int x1, int y1, int x2, int y2,
+						     int t, Color c);
 void gfx_update(struct gfx_region *reg);
 
 enum gfx_color {

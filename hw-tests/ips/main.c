@@ -3,19 +3,19 @@
  ******************************************************************************/
 
 /***** Includes *****/
-#include "tmr_utils.h"
-#include "gpio.h"
-#include "gfx.h"
-#include "display.h"
+#include "DEV_Config.h"
 #include "Fonts/fonts.h"
+#include "display.h"
+#include "gfx.h"
+#include "gpio.h"
 #include "image/image.h"
 #include "tmr.h"
-#include "DEV_Config.h"
+#include "tmr_utils.h"
 
 #include "card10.h"
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 // *****************************************************************************
@@ -33,8 +33,8 @@ int main(void)
 	gfx_puts(&Font24, &display_screen, 0, 0, "123", 0x000f, 0xfff8);
 	gfx_puts(&Font24, &display_screen, 23, 0, "ABC", 0x000f, 0xfff8);
 	gfx_rectangle(&display_screen, 70, 10, 100, 40, 2, red);
-	gfx_thick_line(&display_screen, 70, 10, 100, 40, 2, green);
-	gfx_thick_line(&display_screen, 100, 10, 70, 40, 2, yellow);
+	gfx_line(&display_screen, 70, 10, 100, 40, 2, green);
+	gfx_line(&display_screen, 100, 10, 70, 40, 2, yellow);
 	gfx_circle(&display_screen, 85, 25, 22, 2, green);
 
 	gfx_copy_region_raw(
