@@ -120,6 +120,15 @@ static const smpCfg_t bleSmpCfg =
   DM_AUTH_MITM_FLAG,                      /*! Device authentication requirements */
 };
 
+/* Configuration structure */
+static const attCfg_t bleAttCfg =
+{
+  15,                                  /* ATT server service discovery connection idle timeout in seconds */
+  241,                                 /* desired ATT MTU */
+  ATT_MAX_TRANS_TIMEOUT,               /* transaction timeout in seconds */
+  1                                    /* number of queued prepare writes supported by server */
+};
+
 /**************************************************************************************************
   Advertising Data
 **************************************************************************************************/
@@ -454,6 +463,7 @@ static void BleHandlerInit(void)
 
   /* Set stack configuration pointers */
   pSmpCfg = (smpCfg_t *) &bleSmpCfg;
+  pAttCfg = (attCfg_t *) &bleAttCfg;
 
   /* initialize battery service server */
   BasInit(bleHandlerId, (basCfg_t *) &bleBasCfg);
