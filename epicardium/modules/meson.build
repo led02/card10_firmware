@@ -4,6 +4,7 @@ module_sources = files(
   'fileops.c',
   'hardware.c',
   'leds.c',
+  'lifecycle.c',
   'light_sensor.c',
   'log.c',
   'pmic.c',

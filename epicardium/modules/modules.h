@@ -16,6 +16,10 @@ int hardware_early_init(void);
 int hardware_init(void);
 int hardware_reset(void);
 
+/* ---------- Lifecycle ---------------------------------------------------- */
+void vLifecycleTask(void *pvParameters);
+void return_to_menu(void);
+
 /* ---------- Serial ------------------------------------------------------- */
 #define SERIAL_READ_BUFFER_SIZE 128
 void vSerialTask(void *pvParameters);
