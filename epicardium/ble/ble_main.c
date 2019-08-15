@@ -113,11 +113,11 @@ static const basCfg_t bleBasCfg =
 static const smpCfg_t bleSmpCfg =
 {
   3000,                                   /*! 'Repeated attempts' timeout in msec */
-  SMP_IO_NO_IN_NO_OUT,                    /*! I/O Capability */
+  SMP_IO_DISP_YES_NO,                     /*! I/O Capability */
   7,                                      /*! Minimum encryption key length */
   16,                                     /*! Maximum encryption key length */
   3,                                      /*! Attempts to trigger 'repeated attempts' timeout */
-  0,                                      /*! Device authentication requirements */
+  DM_AUTH_MITM_FLAG,                      /*! Device authentication requirements */
 };
 
 /**************************************************************************************************
