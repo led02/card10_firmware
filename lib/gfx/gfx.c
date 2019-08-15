@@ -127,8 +127,8 @@ void gfx_clear(struct gfx_region *reg)
 
 void gfx_circle(struct gfx_region *reg, int x, int y, int r, int t, Color c)
 {
-	for (int y_ = y - r; y_ <= y + r; y_++) {
-		for (int x_ = x - r; x_ <= x + r; x_++) {
+	for (int y_ = y - r - t; y_ <= y + r + t; y_++) {
+		for (int x_ = x - r - t; x_ <= x + r + t; x_++) {
 			int dx    = (x_ - x) * (x_ - x);
 			int dy    = (y_ - y) * (y_ - y);
 			int outer = (r + t) * (r + t);
