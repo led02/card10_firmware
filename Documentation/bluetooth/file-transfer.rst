@@ -13,20 +13,20 @@ The service consists of two GATT characteristics that act as a bidrectional
 link, similar to many BLE UART implementations. The two channels are seen from
 the Central perspective and hence named Central TX and Central RX.
 
-The current draft uses following service specification:
+The current version uses following service specification:
 
 - Service
 
-  UUID: 00422342-2342-2342-2342-234223422342
+  UUID: 42230100-2342-2342-2342-234223422342
 
 - Central TX characteristic:
 
-  UUID: 01422342-2342-2342-2342-234223422342
+  UUID: 42230101-2342-2342-2342-234223422342
   write
 
 - Central RX characteristic:
 
-  UUID 02422342-2342-2342-2342-234223422342
+  UUID 42230102-2342-2342-2342-234223422342
   read, notify
 
 Low Effort File Transfer Protocol
