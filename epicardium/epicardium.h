@@ -803,29 +803,22 @@ API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
  */
 
 /** */
-API(
-	API_FILE_OPEN,
-	int epic_file_open(const char* filename, const char* modeString)
-);
+API(API_FILE_OPEN, int epic_file_open(
+	const char* filename, const char* modeString
+));
 
-/**
- * epic_file_close
- *
- * :param int fd: descriptor returned by epic_file_opendir
- *
- * :return: ``0`` on success, negative on error
- */
+/** */
 API(API_FILE_CLOSE, int epic_file_close(int fd));
 
 /** */
 API(API_FILE_READ, int epic_file_read(int fd, void* buf, size_t nbytes));
 
 /**
- * epic_file_write
+ * Write bytes to a file.
  *
- * :param int fd: descriptor returned by epic_file_open
- * :param const void* buf: data to write
- * :param size_t nbytes: no of bytes to write
+ * :param int fd: Descriptor returned by :c:func:`epic_file_open`.
+ * :param void* buf: Data to write.
+ * :param size_t nbytes: Number of bytes to write.
  *
  * :return: ``< 0`` on error, ``nbytes`` on success. (Partial writes don't occur on success!)
  *
@@ -860,8 +853,11 @@ enum epic_stat_type {
 	EPICSTAT_DIR,
 };
 
-#define EPICSTAT_MAX_PATH 	255 //conveniently the same as FF_MAX_LFN
-
+/**
+ * Maximum length of a path string (=255).
+ */
+#define EPICSTAT_MAX_PATH        255
+/* conveniently the same as FF_MAX_LFN */
 
 /** */
 struct epic_stat {
@@ -881,6 +877,7 @@ struct epic_stat {
 	/** Size in bytes. */
 	uint32_t size;
 
+	/** File Name. */
 	char name[EPICSTAT_MAX_PATH + 1];
 	uint8_t _reserved[12];
 };
@@ -898,33 +895,61 @@ API(API_FILE_STAT, int epic_file_stat(
 ));
 
 /**
- * open directory
+ * Open a directory, for enumerating its contents.
  *
- * :param char* path: directory to open
+ * Use :c:func:`epic_file_readdir` to iterate over the directories entries.
+ *
+ * **Example**:
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    int fd = epic_file_opendir("/path/to/dir");
+ *
+ *    struct epic_stat entry;
+ *    for (;;) {
+ *            epic_file_readdir(fd, &entry);
+ *
+ *            if (entry.type == EPICSTAT_NONE) {
+ *                    // End
+ *                    break;
+ *            }
+ *
+ *            printf("%s\n", entry.name);
+ *    }
+ *
+ *    epic_file_close(fd);
+ *
+ * :param char* path: Directory to open.
  *
  * :return: ``> 0`` on success, negative on error
  */
 API(API_FILE_OPENDIR, int epic_file_opendir(const char* path));
 
 /**
- * readdir
+ * Read one entry from a directory.
  *
- * :param int fd: descriptor returned by epic_file_opendir
- * :param epic_stat* stat: pointer to result - pass NULL to reset iteration offset of fd
+ * Call :c:func:`epic_file_readdir` multiple times to iterate over all entries
+ * of a directory.  The end of the entry list is marked by returning
+ * :c:data:`EPICSTAT_NONE` as the :c:member:`epic_stat.type`.
+ *
+ * :param int fd: Descriptor returned by :c:func:`epic_file_opendir`.
+ * :param epic_stat* stat: Pointer where to store the result.  Pass NULL to
+ *    reset iteration offset of ``fd`` back to the beginning.
  *
  * :return: ``0`` on success, negative on error
  */
 API(API_FILE_READDIR, int epic_file_readdir(int fd, struct epic_stat* stat));
 
 /**
- * epic_file_unlink
+ * Unlink (remove) a file.
  *
  * :param char* path: file to delete
  *
  * :return: ``0`` on success, negative on error
  */
 API(API_FILE_UNLINK, int epic_file_unlink(const char* path));
-
 
 
 /**
