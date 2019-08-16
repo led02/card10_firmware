@@ -132,6 +132,12 @@ void __core1_init(void)
 		/* Signal that we are ready for an IVT address */
 		core1_info.ready = true;
 
+		/*
+		 * Reset the API interrupt so we never block Epicardium when it
+		 * attempts to trigger an interrupt.
+		 */
+		API_CALL_MEM->int_id = (-1);
+
 		SEMA_FreeSema(_CONTROL_SEMAPHORE);
 
 		__WFE();
