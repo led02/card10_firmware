@@ -31,7 +31,7 @@ void epic_rtc_set_milliseconds(uint64_t milliseconds)
 
 	sec    = milliseconds / 1000;
 	subsec = (milliseconds % 1000);
-	subsec *= 256;
+	subsec *= 4096;
 	subsec /= 1000;
 
 	while (RTC_Init(MXC_RTC, sec, subsec, NULL) == E_BUSY)
