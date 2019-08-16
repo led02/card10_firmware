@@ -1,5 +1,5 @@
 Bluetooth Card10 Service
-==========
+========================
 
 .. warning::
     The specification is still work in progress
