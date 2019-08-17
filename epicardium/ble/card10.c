@@ -47,6 +47,21 @@ enum {
 	/*!< \brief rockets led characteristic */
 	CARD10_ROCKETS_CH_HDL,
 	CARD10_ROCKETS_VAL_HDL,
+	/*!< \brief led for background on bottom left characteristic */
+	CARD10_LED_BG_BOTTOM_LEFT_CH_HDL,
+	CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL,
+	/*!< \brief led for background on bottom right characteristic */
+	CARD10_LED_BG_BOTTOM_RIGHT_CH_HDL,
+	CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL,
+	/*!< \brief led for background on top right characteristic */
+	CARD10_LED_BG_TOP_RIGHT_CH_HDL,
+	CARD10_LED_BG_TOP_RIGHT_VAL_HDL,
+	/*!< \brief led for background on top left characteristic */
+	CARD10_LED_BG_TOP_LEFT_CH_HDL,
+	CARD10_LED_BG_TOP_LEFT_VAL_HDL,
+	/*!< \brief leds above characteristic */
+	CARD10_LEDS_ABOVE_CH_HDL,
+	CARD10_LEDS_ABOVE_VAL_HDL,
 	/*!< \brief single led characteristic */
 	CARD10_LED_S_CH_HDL,
 	CARD10_LED_S_VAL_HDL,
@@ -99,6 +114,61 @@ static const uint8_t UUID_char_rockets[] = {
 
 static const uint8_t UUID_attChar_rockets[] = {
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 led background bottom left */
+static const uint8_t UUID_char_led_bg_bottom_left[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_led_bg_bottom_left[] = {
+	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 led background bottom right */
+static const uint8_t UUID_char_led_bg_bottom_right[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_led_bg_bottom_right[] = {
+	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 led background top right */
+static const uint8_t UUID_char_led_bg_top_right[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LED_BG_TOP_RIGHT_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_led_bg_top_right[] = {
+	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 led background top left */
+static const uint8_t UUID_char_led_bg_top_left[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LED_BG_TOP_LEFT_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_led_bg_top_left[] = {
+	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 above leds */
+static const uint8_t UUID_char_leds_above[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LEDS_ABOVE_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_leds_above[] = {
+	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
 };
 
 /* BLE UUID for card10 char led single (debugging) */
@@ -209,6 +279,111 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_WRITE
 		);
 
+		// BG LED Bottom left
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_led_bg_bottom_left,
+			sizeof(UUID_char_led_bg_bottom_left),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_led_bg_bottom_left,
+			NULL,
+			0,
+			3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
+		// BG LED Bottom right
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_led_bg_bottom_right,
+			sizeof(UUID_char_led_bg_bottom_right),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_led_bg_bottom_right,
+			NULL,
+			0,
+			3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
+		// BG LED top right
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_led_bg_top_right,
+			sizeof(UUID_char_led_bg_top_right),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_led_bg_top_right,
+			NULL,
+			0,
+			3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
+		// BG LED top left
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_led_bg_top_left,
+			sizeof(UUID_char_led_bg_top_left),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_led_bg_top_left,
+			NULL,
+			0,
+			3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
+		// ABOVE LEDS
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_leds_above,
+			sizeof(UUID_char_leds_above),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_leds_above,
+			NULL,
+			0,
+			11 * 3 * sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
 		// SINGLE LED
 
 		AttsDynAddAttrConst(
@@ -315,11 +490,63 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
+	case CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL:
+		epic_leds_set(11, pValue[0], pValue[1], pValue[2]);
+		APP_TRACE_INFO3(
+			"ble-card10: set bg bottom left: #%02x%02x%02x\n",
+			pValue[0],
+			pValue[1],
+			pValue[2]
+		);
+		return ATT_SUCCESS;
+	case CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL:
+		epic_leds_set(12, pValue[0], pValue[1], pValue[2]);
+		APP_TRACE_INFO3(
+			"ble-card10: set bg bottom right: #%02x%02x%02x\n",
+			pValue[0],
+			pValue[1],
+			pValue[2]
+		);
+		return ATT_SUCCESS;
+	case CARD10_LED_BG_TOP_RIGHT_VAL_HDL:
+		epic_leds_set(13, pValue[0], pValue[1], pValue[2]);
+		APP_TRACE_INFO3(
+			"ble-card10: set bg top right: #%02x%02x%02x\n",
+			pValue[0],
+			pValue[1],
+			pValue[2]
+		);
+		return ATT_SUCCESS;
+	case CARD10_LED_BG_TOP_LEFT_VAL_HDL:
+		epic_leds_set(14, pValue[0], pValue[1], pValue[2]);
+		APP_TRACE_INFO3(
+			"ble-card10: set bg top left: #%02x%02x%02x\n",
+			pValue[0],
+			pValue[1],
+			pValue[2]
+		);
+		return ATT_SUCCESS;
+	case CARD10_LEDS_ABOVE_VAL_HDL:
+		for( ui16 = 0; ui16 < 11; ui16++) {
+			epic_leds_set(
+				ui16,
+				pValue[ui16 * 3],
+				pValue[ui16 * 3 + 1],
+				pValue[ui16 * 3 + 2]
+			);
+			APP_TRACE_INFO4(
+				"ble-card10: set led %ld above to #%02x%02x%02x\n",
+				ui16,
+				pValue[ui16 * 3],
+				pValue[ui16 * 3 + 1],
+				pValue[ui16 * 3 + 2]
+			);
+		}
 	case CARD10_LED_S_VAL_HDL:
 		BYTES_TO_UINT16(ui16, pValue);
 		epic_leds_set(ui16, pValue[2], pValue[3], pValue[4]);
 		APP_TRACE_INFO4(
-			"ble-card10: set single led %ld to #%x%x%x\n",
+			"ble-card10: set single led %ld to #%02x%02x%02x\n",
 			ui16,
 			pValue[2],
 			pValue[3],
