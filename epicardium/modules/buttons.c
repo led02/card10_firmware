@@ -15,6 +15,10 @@ uint8_t epic_buttons_read(uint8_t mask)
 {
 	uint8_t ret = 0;
 	if (portexpander_detected() && (mask & 0x3)) {
+		/*
+		 * Not using PB_Get() here as that performs one I2C transcation
+		 * per button.
+		 */
 		uint8_t pin_status = ~portexpander_get();
 
 		for (uint8_t m = 1; m < 0x8; m <<= 1) {
