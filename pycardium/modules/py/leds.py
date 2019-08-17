@@ -1,10 +1,10 @@
 import sys_leds
 import math
 
-BOTTOM_RIGHT = 11
-""" ID of the LED in the bottom right corner. """
-BOTTOM_LEFT = 12
+BOTTOM_LEFT = 11
 """ ID of the LED in the bottom left corner. """
+BOTTOM_RIGHT = 12
+""" ID of the LED in the bottom right corner. """
 TOP_RIGHT = 13
 """ ID of the LED in the top right corner. """
 TOP_LEFT = 14
