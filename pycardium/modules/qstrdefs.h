@@ -24,6 +24,15 @@ Q(BOTTOM_RIGHT)
 Q(TOP_LEFT)
 Q(TOP_RIGHT)
 
+/* buttons */
+Q(buttons)
+Q(read)
+Q(BOTTOM_LEFT)
+Q(TOP_LEFT)
+Q(BOTTOM_RIGHT)
+Q(TOP_RIGHT)
+Q(RESET)
+
 /* utime */
 Q(utime)
 Q(alarm)

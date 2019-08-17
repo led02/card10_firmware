@@ -39,6 +39,7 @@
 #define MICROPY_PY_UERRNO                   (1)
 
 /* Modules */
+#define MODULE_BUTTONS_ENABLED              (1)
 #define MODULE_DISPLAY_ENABLED              (1)
 #define MODULE_INTERRUPT_ENABLED            (1)
 #define MODULE_LEDS_ENABLED                 (1)
