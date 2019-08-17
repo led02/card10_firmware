@@ -58,6 +58,15 @@ int epic_rtc_schedule_alarm(uint32_t timestamp)
 {
 	int res;
 
+	/*
+	 * Check if the timestamp lies in the past and if so, trigger
+	 * immediately.
+	 */
+	if (epic_rtc_get_seconds() >= timestamp) {
+		api_interrupt_trigger(EPIC_INT_RTC_ALARM);
+		return 0;
+	}
+
 	NVIC_EnableIRQ(RTC_IRQn);
 
 	while ((res = RTC_SetTimeofdayAlarm(MXC_RTC, timestamp)) == E_BUSY)
