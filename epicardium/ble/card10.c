@@ -38,6 +38,9 @@
 enum {
 	/*!< \brief card10 service declaration */
 	CARD10_SVC_HDL = CARD10_START_HDL,
+	/*!< \brief time update characteristic */
+	CARD10_TIME_UPDATE_CH_HDL,
+	CARD10_TIME_UPDATE_VAL_HDL,
 	/*!< \brief vibra characteristic */
 	CARD10_VIRBA_CH_HDL,
 	CARD10_VIBRA_VAL_HDL,
@@ -47,9 +50,6 @@ enum {
 	/*!< \brief light sensor characteristic */
 	CARD10_LIGHT_SENSOR_CH_HDL,
 	CARD10_LIGHT_SENSOR_VAL_HDL,
-	/*!< \brief time update characteristic */
-	CARD10_TIME_UPDATE_CH_HDL,
-	CARD10_TIME_UPDATE_VAL_HDL,
 	/*!< \brief Maximum handle. */
 	CARD10_MAX_HDL
 };
@@ -59,16 +59,33 @@ enum {
 /* BLE UUID for card10 service*/
 static const uint8_t UUID_svc[] = { CARD10_UUID_SUFFIX, 0x0, CARD10_UUID_PREFIX };
 
+
+// starting at 0x01 with write (non visual) charateristics
+
+/* BLE UUID for card10 time update */
+static const uint8_t UUID_char_time[] = {
+	ATT_PROP_WRITE,
+	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_time[] = {
+	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
+};
+
 /* BLE UUID for card10 char vibra */
 static const uint8_t UUID_char_vibra[] = {
 	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_VIBRA_VAL_HDL),
-	CARD10_UUID_SUFFIX, 0xf, CARD10_UUID_PREFIX
+	CARD10_UUID_SUFFIX, 0x0f, CARD10_UUID_PREFIX
 };
 
 static const uint8_t UUID_attChar_vibra[] = {
-	CARD10_UUID_SUFFIX, 0xf, CARD10_UUID_PREFIX
+	CARD10_UUID_SUFFIX, 0x0f, CARD10_UUID_PREFIX
 };
+
+
+// starting at 0x10 with write of leds (visual output)
 
 /* BLE UUID for card10 char rockets */
 static const uint8_t UUID_char_rockets[] = {
@@ -81,6 +98,8 @@ static const uint8_t UUID_attChar_rockets[] = {
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
 
+// starting at 0xf0 with read only characteristics
+
 /* BLE UUID for card10 char light sensor */
 static const uint8_t UUID_char_light_sensor[] = {
 	ATT_PROP_READ,
@@ -89,17 +108,6 @@ static const uint8_t UUID_char_light_sensor[] = {
 };
 static const uint8_t UUID_attChar_light_sensor[] = {
 	CARD10_UUID_SUFFIX, 0xf0, CARD10_UUID_PREFIX
-};
-
-/* BLE UUID for card10 time update */
-static const uint8_t UUID_char_time[] = {
-	ATT_PROP_WRITE,
-	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
-	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
-};
-
-static const uint8_t UUID_attChar_time[] = {
-	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
 /* clang-format on */
 
@@ -123,6 +131,27 @@ static void *addCard10GroupDyn(void)
 			sizeof(UUID_svc),
 			0,
 			ATTS_PERMIT_READ
+		);
+
+		// TIME UPDTAE
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_time,
+			sizeof(UUID_char_time),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_time,
+			NULL,
+			0,
+			sizeof(uint64_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
 		);
 
 		// VIBRA
@@ -188,27 +217,6 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_READ
 		);
 
-		// TIME UPDTAE
-
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_time,
-			sizeof(UUID_char_time),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_time,
-			NULL,
-			0,
-			sizeof(uint64_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
-
 		APP_TRACE_INFO0("ble-card10: services bound\n");
 	}
 	return pSHdl;
@@ -249,6 +257,14 @@ static uint8_t writeCard10CB(
 	uint16_t ui16;
 
 	switch (handle) {
+	case CARD10_TIME_UPDATE_VAL_HDL:
+		if (operation == ATT_PDU_PREP_WRITE_REQ) {
+			if (len < sizeof(uint64_t)) {
+				return ATT_ERR_LENGTH;
+			}
+			return ATT_SUCCESS;
+		}
+		return setTime(pValue, len);
 	case CARD10_VIBRA_VAL_HDL:
 		BYTES_TO_UINT16(ui16, pValue);
 		epic_vibra_vibrate(ui16);
@@ -265,14 +281,6 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
-	case CARD10_TIME_UPDATE_VAL_HDL:
-		if (operation == ATT_PDU_PREP_WRITE_REQ) {
-			if (len < sizeof(uint64_t)) {
-				return ATT_ERR_LENGTH;
-			}
-			return ATT_SUCCESS;
-		}
-		return setTime(pValue, len);
 	default:
 		APP_TRACE_INFO1(
 			"ble-card10: unsupported characteristic: %c\n", handle
