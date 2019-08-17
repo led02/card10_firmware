@@ -110,7 +110,7 @@ void PB_IntClear(unsigned int pb)
 int PB_Get(unsigned int pb)
 {
 	static const uint8_t expander_pins[] = { 5, 0x0, 3, 6 };
-	MXC_ASSERT(pb < 4);
+	MXC_ASSERT(pb <= 4);
 	switch (pb) {
 	case 1:
 	case 3:
