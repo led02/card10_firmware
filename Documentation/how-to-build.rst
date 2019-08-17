@@ -23,7 +23,7 @@ Dependencies
     
   - Fedora
   
-    ..code-block:: shell-session
+    .. code-block:: shell-session
         
         dnf install arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
 
