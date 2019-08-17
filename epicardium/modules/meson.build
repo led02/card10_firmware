@@ -1,4 +1,5 @@
 module_sources = files(
+  'buttons.c',
   'dispatcher.c',
   'display.c',
   'fileops.c',

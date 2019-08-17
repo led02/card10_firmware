@@ -88,6 +88,8 @@ typedef _Bool bool;
 #define API_LIGHT_SENSOR_RUN       0x80
 #define API_LIGHT_SENSOR_GET       0x81
 #define API_LIGHT_SENSOR_STOP      0x82
+
+#define API_BUTTONS_READ           0x90
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -273,6 +275,68 @@ API_ISR(EPIC_INT_UART_RX, epic_isr_uart_rx);
  *    epic_interrupt_enable(EPIC_INT_CTRL_C);
  */
 API_ISR(EPIC_INT_CTRL_C, epic_isr_ctrl_c);
+
+/**
+ * Buttons
+ * =======
+ *
+ */
+
+/** Button IDs */
+enum epic_button {
+	/** ``1``, Bottom left button (bit 0). */
+	BUTTON_LEFT_BOTTOM   = 1,
+	/** ``2``, Bottom right button (bit 1). */
+	BUTTON_RIGHT_BOTTOM  = 2,
+	/** ``4``, Top right button (bit 2). */
+	BUTTON_RIGHT_TOP     = 4,
+	/** ``8``, Top left (power) button (bit 3). */
+	BUTTON_LEFT_TOP      = 8,
+	/** ``8``, Top left (power) button (bit 3). */
+	BUTTON_RESET         = 8,
+};
+
+/**
+ * Read buttons.
+ *
+ * :c:func:`epic_buttons_read` will read all buttons specified in ``mask`` and
+ * return set bits for each button which was reported as pressed.
+ *
+ * .. note::
+ *
+ *    The reset button cannot be unmapped from reset functionality.  So, while
+ *    you can read it, it cannot be used for app control.
+ *
+ * **Example**:
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    uint8_t pressed = epic_buttons_read(BUTTON_LEFT_BOTTOM | BUTTON_RIGHT_BOTTOM);
+ *
+ *    if (pressed & BUTTON_LEFT_BOTTOM) {
+ *            // Bottom left button is pressed
+ *    }
+ *
+ *    if (pressed & BUTTON_RIGHT_BOTTOM) {
+ *            // Bottom right button is pressed
+ *    }
+ *
+ * :param uint8_t mask: Mask of buttons to read.  The 4 LSBs correspond to the 4
+ *     buttons:
+ *
+ *     ===== ========= ============ ===========
+ *     ``3`` ``2``     ``1``        ``0``
+ *     ----- --------- ------------ -----------
+ *     Reset Right Top Right Bottom Left Bottom
+ *     ===== ========= ============ ===========
+ *
+ *     Use the values defined in :c:type:`epic_button` for masking, as shown in
+ *     the example above.
+ * :return: Returns nonzero value if unmasked buttons are pushed.
+ */
+API(API_BUTTONS_READ, uint8_t epic_buttons_read(uint8_t mask));
 
 /**
  * LEDs
