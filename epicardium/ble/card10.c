@@ -59,6 +59,12 @@ enum {
 	/*!< \brief led for background on top left characteristic */
 	CARD10_LED_BG_TOP_LEFT_CH_HDL,
 	CARD10_LED_BG_TOP_LEFT_VAL_HDL,
+	/*!< \brief dim leds on bottom characteristic */
+	CARD10_LEDS_BOTTOM_DIM_CH_HDL,
+	CARD10_LEDS_BOTTOM_DIM_VAL_HDL,
+	/*!< \brief dim leds on top characteristic */
+	CARD10_LEDS_TOP_DIM_CH_HDL,
+	CARD10_LEDS_TOP_DIM_VAL_HDL,
 	/*!< \brief leds above characteristic */
 	CARD10_LEDS_ABOVE_CH_HDL,
 	CARD10_LEDS_ABOVE_VAL_HDL,
@@ -158,6 +164,28 @@ static const uint8_t UUID_char_led_bg_top_left[] = {
 
 static const uint8_t UUID_attChar_led_bg_top_left[] = {
 	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 dim leds on bottom */
+static const uint8_t UUID_char_leds_bottom_dim[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LEDS_BOTTOM_DIM_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x15, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_leds_bottom_dim[] = {
+	CARD10_UUID_SUFFIX, 0x15, CARD10_UUID_PREFIX
+};
+
+/* BLE UUID for card10 dim leds on top */
+static const uint8_t UUID_char_leds_top_dim[] = {
+	ATT_PROP_WRITE_NO_RSP,
+	UINT16_TO_BYTES(CARD10_LEDS_TOP_DIM_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x16, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_leds_top_dim[] = {
+	CARD10_UUID_SUFFIX, 0x16, CARD10_UUID_PREFIX
 };
 
 /* BLE UUID for card10 above leds */
@@ -363,6 +391,48 @@ static void *addCard10GroupDyn(void)
 			ATTS_PERMIT_WRITE
 		);
 
+		// Dim bottom module
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_leds_bottom_dim,
+			sizeof(UUID_char_leds_bottom_dim),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_leds_bottom_dim,
+			NULL,
+			0,
+			sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
+		// Dim top module
+
+		AttsDynAddAttrConst(
+			pSHdl,
+			attChUuid,
+			UUID_char_leds_top_dim,
+			sizeof(UUID_char_leds_top_dim),
+			0,
+			ATTS_PERMIT_READ
+		);
+
+		AttsDynAddAttr(
+			pSHdl,
+			UUID_attChar_leds_top_dim,
+			NULL,
+			0,
+			sizeof(uint8_t),
+			ATTS_SET_WRITE_CBACK,
+			ATTS_PERMIT_WRITE
+		);
+
 		// ABOVE LEDS
 
 		AttsDynAddAttrConst(
@@ -526,8 +596,16 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
+	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
+		epic_leds_dim_bottom(pValue[0]);
+		APP_TRACE_INFO1("dim bottom to: %d\n", pValue[0]);
+		return ATT_SUCCESS;
+	case CARD10_LEDS_TOP_DIM_VAL_HDL:
+		epic_leds_dim_top(pValue[0]);
+		APP_TRACE_INFO1("dim top to: %d\n", pValue[0]);
+		return ATT_SUCCESS;
 	case CARD10_LEDS_ABOVE_VAL_HDL:
-		for( ui16 = 0; ui16 < 11; ui16++) {
+		for (ui16 = 0; ui16 < 11; ui16++) {
 			epic_leds_set(
 				ui16,
 				pValue[ui16 * 3],
