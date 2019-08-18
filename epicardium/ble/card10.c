@@ -168,7 +168,7 @@ static const uint8_t UUID_attChar_led_bg_top_left[] = {
 
 /* BLE UUID for card10 dim leds on bottom */
 static const uint8_t UUID_char_leds_bottom_dim[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LEDS_BOTTOM_DIM_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x15, CARD10_UUID_PREFIX
 };
@@ -179,7 +179,7 @@ static const uint8_t UUID_attChar_leds_bottom_dim[] = {
 
 /* BLE UUID for card10 dim leds on top */
 static const uint8_t UUID_char_leds_top_dim[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LEDS_TOP_DIM_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x16, CARD10_UUID_PREFIX
 };
@@ -533,7 +533,8 @@ static uint8_t writeCard10CB(
 	uint8_t *pValue,
 	attsAttr_t *pAttr
 ) {
-	uint16_t ui16;
+	uint16_t ui16 = 0;
+	uint8_t ui8 = 0;
 
 	switch (handle) {
 	case CARD10_TIME_UPDATE_VAL_HDL:
@@ -597,13 +598,23 @@ static uint8_t writeCard10CB(
 		);
 		return ATT_SUCCESS;
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
-		epic_leds_dim_bottom(pValue[0]);
-		APP_TRACE_INFO1("dim bottom to: %d\n", pValue[0]);
-		return ATT_SUCCESS;
+		ui8 = pValue[0];
+		if(ui8 >= 1 && ui8 <= 8) {
+			epic_leds_dim_bottom(pValue[0]);
+			APP_TRACE_INFO1("dim bottom to: %d\n", pValue[0]);
+			return ATT_SUCCESS;
+		}
+		APP_TRACE_INFO1("dim bottom invalid value (1-8): %d\n", ui8);
+		return ATT_ERR_RANGE;
 	case CARD10_LEDS_TOP_DIM_VAL_HDL:
-		epic_leds_dim_top(pValue[0]);
-		APP_TRACE_INFO1("dim top to: %d\n", pValue[0]);
-		return ATT_SUCCESS;
+		ui8 = pValue[0];
+		if(ui8 >= 1 && ui8 <= 8) {
+			epic_leds_dim_top(ui8);
+			APP_TRACE_INFO1("dim top to: %d\n", ui8);
+			return ATT_SUCCESS;
+		}
+		APP_TRACE_INFO1("dim top invalid value (1-8): %d\n", ui8);
+		return ATT_ERR_RANGE;
 	case CARD10_LEDS_ABOVE_VAL_HDL:
 		for (ui16 = 0; ui16 < 11; ui16++) {
 			epic_leds_set(
