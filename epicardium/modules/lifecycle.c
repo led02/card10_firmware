@@ -46,6 +46,9 @@ static volatile struct load_info async_load = {
 	.type     = PL_INVALID,
 };
 
+/* Whether to write the menu script before attempting to load. */
+static volatile bool write_menu = false;
+
 /* Helpers {{{ */
 
 /*
@@ -182,6 +185,52 @@ static int load_async(char *name, bool reset)
 }
 
 /*
+ * Epicardium contains an embedded default menu script which it writes to
+ * external flash if none is found there.  This way, you won't make your card10
+ * unusable by accidentally removing the menu script.
+ *
+ * You can find the sources for the menu-script in `preload/menu.py`.
+ */
+
+/*
+ * Embed the menu.py script in the Epicardium binary.
+ */
+__asm(".section \".rodata\"\n"
+      "_menu_script_start:\n"
+      ".incbin \"../preload/menu.py\"\n"
+      "_menu_script_end:\n"
+      ".previous\n");
+
+extern const uint8_t _menu_script_start;
+extern const uint8_t _menu_script_end;
+
+static int write_default_menu(void)
+{
+	const size_t length =
+		(uintptr_t)&_menu_script_end - (uintptr_t)&_menu_script_start;
+	int ret;
+
+	LOG_INFO("lifecycle", "Writing default menu ...");
+
+	int fd = epic_file_open("menu.py", "w");
+	if (fd < 0) {
+		return fd;
+	}
+
+	ret = epic_file_write(fd, &_menu_script_start, length);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = epic_file_close(fd);
+	if (ret < 0) {
+		return ret;
+	}
+
+	return 0;
+}
+
+/*
  * Go back to the menu.
  */
 static void load_menu(bool reset)
@@ -196,9 +245,20 @@ static void load_menu(bool reset)
 
 	int ret = load_async("menu.py", reset);
 	if (ret < 0) {
-		/* TODO: Write default menu */
 		LOG_WARN("lifecycle", "No menu script found.");
-		load_async(PYINTERPRETER, reset);
+
+		/* The lifecycle task will perform the write */
+		write_menu = true;
+
+		async_load.type     = PL_PYTHON_SCRIPT;
+		async_load.do_reset = reset;
+		strncpy((char *)async_load.name,
+			"menu.py",
+			sizeof(async_load.name));
+
+		if (lifecycle_task != NULL) {
+			xTaskNotifyGive(lifecycle_task);
+		}
 	}
 
 	xSemaphoreGive(core1_mutex);
@@ -306,6 +366,18 @@ void vLifecycleTask(void *pvParameters)
 			LOG_ERR("lifecycle",
 				"Can't load because mutex is blocked (task).");
 			continue;
+		}
+
+		if (write_menu) {
+			write_menu = false;
+			int ret    = write_default_menu();
+			if (ret < 0) {
+				LOG_ERR("lifecycle",
+					"Failed to write default menu: %d",
+					ret);
+				load_async(PYINTERPRETER, "");
+				ulTaskNotifyTake(pdTRUE, 0);
+			}
 		}
 
 		do_load((struct load_info *)&async_load);
