@@ -262,8 +262,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			sizeof(uint64_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// VIBRA
 
@@ -283,8 +283,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			sizeof(uint16_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// ROCKETS
 
@@ -304,8 +304,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// BG LED Bottom left
 
@@ -325,8 +325,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// BG LED Bottom right
 
@@ -346,8 +346,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// BG LED top right
 
@@ -367,8 +367,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// BG LED top left
 
@@ -388,8 +388,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// Dim bottom module
 
@@ -409,8 +409,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// Dim top module
 
@@ -430,8 +430,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// ABOVE LEDS
 
@@ -451,8 +451,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			11 * 3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// SINGLE LED
 
@@ -472,8 +472,8 @@ static void *addCard10GroupDyn(void)
 			0,
 			sizeof(uint16_t) + 3 * sizeof(uint8_t),
 			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE
-		);
+			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH);
 
 		// LIGHT_SENSOR
 
@@ -493,8 +493,8 @@ static void *addCard10GroupDyn(void)
 			sizeof(uint8_t),
 			sizeof(uint8_t),
 			ATTS_SET_READ_CBACK,
-			ATTS_PERMIT_READ
-		);
+			ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+				ATTS_PERMIT_READ_AUTH);
 
 		APP_TRACE_INFO0("ble-card10: services bound\n");
 	}
@@ -534,9 +534,10 @@ static uint8_t writeCard10CB(
 	attsAttr_t *pAttr
 ) {
 	uint16_t ui16 = 0;
-	uint8_t ui8 = 0;
+	uint8_t ui8   = 0;
 
 	switch (handle) {
+	// time
 	case CARD10_TIME_UPDATE_VAL_HDL:
 		if (operation == ATT_PDU_PREP_WRITE_REQ) {
 			if (len < sizeof(uint64_t)) {
@@ -545,11 +546,13 @@ static uint8_t writeCard10CB(
 			return ATT_SUCCESS;
 		}
 		return setTime(pValue, len);
+	// vibra
 	case CARD10_VIBRA_VAL_HDL:
 		BYTES_TO_UINT16(ui16, pValue);
 		epic_vibra_vibrate(ui16);
 		APP_TRACE_INFO1("ble-card10: set vibra for %dms\n", ui16);
 		return ATT_SUCCESS;
+	// rockets
 	case CARD10_ROCKETS_VAL_HDL:
 		epic_leds_set_rocket(0, pValue[0]);
 		epic_leds_set_rocket(1, pValue[1]);
@@ -561,6 +564,7 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
+	// bg leds
 	case CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL:
 		epic_leds_set(11, pValue[0], pValue[1], pValue[2]);
 		APP_TRACE_INFO3(
@@ -597,9 +601,10 @@ static uint8_t writeCard10CB(
 			pValue[2]
 		);
 		return ATT_SUCCESS;
+	// dim
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if(ui8 >= 1 && ui8 <= 8) {
+		if (ui8 >= 1 && ui8 <= 8) {
 			epic_leds_dim_bottom(pValue[0]);
 			APP_TRACE_INFO1("dim bottom to: %d\n", pValue[0]);
 			return ATT_SUCCESS;
@@ -608,13 +613,14 @@ static uint8_t writeCard10CB(
 		return ATT_ERR_RANGE;
 	case CARD10_LEDS_TOP_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if(ui8 >= 1 && ui8 <= 8) {
+		if (ui8 >= 1 && ui8 <= 8) {
 			epic_leds_dim_top(ui8);
 			APP_TRACE_INFO1("dim top to: %d\n", ui8);
 			return ATT_SUCCESS;
 		}
 		APP_TRACE_INFO1("dim top invalid value (1-8): %d\n", ui8);
 		return ATT_ERR_RANGE;
+	// leds above
 	case CARD10_LEDS_ABOVE_VAL_HDL:
 		for (ui16 = 0; ui16 < 11; ui16++) {
 			epic_leds_set(
@@ -631,6 +637,7 @@ static uint8_t writeCard10CB(
 				pValue[ui16 * 3 + 2]
 			);
 		}
+	// single led
 	case CARD10_LED_S_VAL_HDL:
 		BYTES_TO_UINT16(ui16, pValue);
 		epic_leds_set(ui16, pValue[2], pValue[3], pValue[4]);
