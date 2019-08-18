@@ -45,9 +45,22 @@ static uintptr_t core1_initial_ivt[] = {
  */
 __attribute__((naked)) void __core1_reset(void)
 {
-	__asm volatile("mov	sp, %0\n\t"
-		       : /* No Outputs */
-		       : "r"(core1_initial_ivt[0]));
+	/* Reset stack to MSP and set it to 0x20080000 */
+	__asm volatile(
+		"mov	r0, #0\n\t"
+		"msr	control, r0\n\t"
+		"mov	sp, %0\n\t"
+		: /* No Outputs */
+		: "r"(core1_initial_ivt[0])
+		: "r0");
+
+	/* Reset FPU */
+	SCB->CPACR  = 0x00000000;
+	FPU->FPDSCR = 0x00000000;
+	FPU->FPCCR  = 0x00000000;
+	__DSB();
+	__ISB();
+
 	__core1_init();
 }
 
