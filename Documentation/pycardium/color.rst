@@ -9,9 +9,19 @@ Color Class
 
 Constants
 ---------
-
 The color module also contains a few constanst for commonly used colors:
 
+Camp Colors
+~~~~~~~~~~~
+.. py:data:: color.CHAOSBLUE
+.. py:data:: color.CHAOSBLUE_DARK
+.. py:data:: color.COMMYELLOW
+.. py:data:: color.COMMYELLOW_DARK
+.. py:data:: color.CAMPGREEN
+.. py:data:: color.CAMPGREEN_DARK
+
+General
+~~~~~~~
 .. py:data:: color.BLACK
 .. py:data:: color.WHITE
 .. py:data:: color.RED

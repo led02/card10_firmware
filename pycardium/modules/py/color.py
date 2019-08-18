@@ -501,6 +501,13 @@ Color.YELLOW  = Color.from_hex(0xffff00)
 Color.BLUE    = Color.from_hex(0x0000ff)
 Color.MAGENTA = Color.from_hex(0xff00ff)
 Color.CYAN    = Color.from_hex(0x00ffff)
+
+Color.CHAOSBLUE       = Color.from_hex(0x0076ba)
+Color.CHAOSBLUE_DARK  = Color.from_hex(0x005383)
+Color.COMMYELLOW      = Color.from_hex(0xffc600)
+Color.COMMYELLOW_DARK = Color.from_hex(0xd39a00)
+Color.CAMPGREEN       = Color.from_hex(0x99ba00)
+Color.CAMPGREEN_DARK  = Color.from_hex(0x6f8700)
 # fmt: on
 
 
