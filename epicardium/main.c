@@ -95,7 +95,7 @@ int main(void)
 		    (const char *)"PMIC",
 		    configMINIMAL_STACK_SIZE,
 		    NULL,
-		    tskIDLE_PRIORITY + 1,
+		    tskIDLE_PRIORITY + 4,
 		    NULL) != pdPASS) {
 		LOG_CRIT("startup", "Failed to create %s task!", "PMIC");
 		abort();
