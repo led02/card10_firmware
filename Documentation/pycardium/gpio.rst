@@ -13,7 +13,7 @@ output in your scripts.
 
    gpio.set_mode(gpio.WRISTBAND_1, gpio.mode.OUTPUT)
    gpio.write(gpio.WRISTBAND_1, True)
-   
+
    gpio.set_mode(gpio.WRISTBAND_2, gpio.mode.INPUT | gpio.mode.PULL_UP)
    state = gpio.read(gpio.WRISTBAND_2)
    print("State of Wristband pin 2:", state)
@@ -30,21 +30,21 @@ output in your scripts.
 .. py:function:: gpio.get_mode(pin)
 
    Get GPIO pin state.
-   
+
    :param int pin: ID of the pin of to get the mode of.
    :returns: An integer with the configure mode bits set.
 
 .. py:function:: gpio.write(pin, value)
 
    Write a value to a GPIO pin.
-   
+
    :param int pin: ID of the pin of to get the mode of.
    :param bool value: New pin value.
-   
+
 .. py:function:: gpio.read(pin)
 
    Read GPIO pin value.
-   
+
    :param int pin: ID of the pin of to get the mode of.
    :returns: Current value of the GPIO pin.
 
@@ -63,19 +63,19 @@ output in your scripts.
 .. py:data:: gpio.WRISTBAND_4
 
    Pin ID for Wristband GPIO 4.
-   
+
 .. py:data:: gpio.mode.OUTPUT
 
    Configures a pin as output.
-   
+
 .. py:data:: gpio.mode.INPUT
 
    Configures a pin as input.
-   
-.. py:data:: gpio.mode:PULL_UP
+
+.. py:data:: gpio.mode.PULL_UP
 
    Enables the internal pull-up resistor of a pin.
-   
-.. py:data:: gpio.mode:PULL_DOwn
+
+.. py:data:: gpio.mode.PULL_DOWN
 
    Enables the internal pull-down resistor of a pin.

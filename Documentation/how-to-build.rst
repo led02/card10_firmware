@@ -20,11 +20,11 @@ Dependencies
     .. code-block:: shell-session
 
        pacman -S arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
-    
+
   - Fedora
-  
+
     .. code-block:: shell-session
-        
+
         dnf install arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
 
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
