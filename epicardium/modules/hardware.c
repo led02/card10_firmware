@@ -9,6 +9,15 @@
 #include "modules/stream.h"
 
 #include "card10.h"
+#include "display.h"
+#include "leds.h"
+#include "pb.h"
+#include "pmic.h"
+#include "portexpander.h"
+
+#include "gpio.h"
+#include "i2c.h"
+#include "spi.h"
 
 /*
  * Early init is called at the very beginning and is meant for modules which
@@ -17,7 +26,66 @@
  */
 int hardware_early_init(void)
 {
-	card10_init();
+	/*
+	 * I2C bus for onboard peripherals (ie. PMIC, BMA400, BHI160, BME680,
+	 * ...)
+	 */
+	I2C_Shutdown(MXC_I2C1_BUS0);
+	I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+#ifndef CARD10_DEBUG_CORE1
+	/*
+	 * SAO I2C bus
+	 */
+	I2C_Shutdown(MXC_I2C0_BUS0);
+	I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
+#endif
+
+	/*
+	 * GPIO peripheral.
+	 */
+	GPIO_Init();
+
+	/*
+	 * PMIC (MAX77650)
+	 */
+	pmic_init();
+	pmic_set_led(0, 0);
+	pmic_set_led(1, 0);
+	pmic_set_led(2, 0);
+
+	/*
+	 * Harmonic Board Portexpander
+	 */
+	portexpander_init();
+
+	/*
+	 * Buttons
+	 */
+	PB_Init();
+
+	/*
+	 * SPI for ECG
+	 */
+	const sys_cfg_spi_t spi17y_master_cfg = {
+		.map = MAP_A,
+		.ss0 = Enable,
+		.ss1 = Disable,
+		.ss2 = Disable,
+	};
+
+	if (SPI_Init(SPI0, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
+		LOG_ERR("init", "Error configuring SPI");
+		while (1)
+			;
+	}
+
+	display_init();
+
+	/*
+	 * RGB LEDs
+	 */
+	leds_init();
 
 #ifdef CARD10_DEBUG_CORE1
 	/*
