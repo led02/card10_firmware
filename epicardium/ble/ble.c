@@ -48,6 +48,7 @@ extern void AppInit(void);
 extern void bleuart_init(void);
 extern void bleFileTransfer_init(void);
 extern void bleCard10_init(void);
+extern void BbBleDrvSetTxPower(int8_t power);
 
 /*************************************************************************************************/
 void PalSysAssertTrap(void)
@@ -195,6 +196,7 @@ void vBleTask(void *pvParameters)
 
 	WsfInit();
 	StackInit();
+	BbBleDrvSetTxPower(0);
 	setAddress();
 
 	NVIC_SetPriority(BTLE_SFD_TO_IRQn, 2);
