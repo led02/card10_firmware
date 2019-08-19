@@ -288,6 +288,13 @@ int main(void)
 		}
 	}
 
+	/* Get the intital SP of the firmware. If it is 0xFFFFFFFF, no image has been
+	 * flashed yet. Drop into MSC for initial flashing. */
+	if (*((uint32_t *)PARTITION_START) == 0xFFFFFFFF) {
+		printf("No valid image in flash\n");
+		msc();
+	}
+
 	printf("Trying to boot\n");
 
 	boot((uintptr_t *)PARTITION_START);
