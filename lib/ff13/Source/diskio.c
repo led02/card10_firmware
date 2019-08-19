@@ -238,7 +238,7 @@ DRESULT disk_ioctl (
                 break;
             case GET_SECTOR_COUNT:
                 /* Mandatory */
-                *((DWORD *)buff) = mx25_size() / SECTOR_SIZE;
+                *((DWORD *)buff) = mx25_size();
                 status = RES_OK;
                 break;
             case GET_BLOCK_SIZE:
