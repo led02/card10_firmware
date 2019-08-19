@@ -99,7 +99,7 @@ static const uint8_t UUID_attChar_time[] = {
 
 /* BLE UUID for card10 char vibra */
 static const uint8_t UUID_char_vibra[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_VIBRA_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x0f, CARD10_UUID_PREFIX
 };
@@ -113,7 +113,7 @@ static const uint8_t UUID_attChar_vibra[] = {
 
 /* BLE UUID for card10 char rockets */
 static const uint8_t UUID_char_rockets[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_ROCKETS_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
@@ -124,7 +124,7 @@ static const uint8_t UUID_attChar_rockets[] = {
 
 /* BLE UUID for card10 led background bottom left */
 static const uint8_t UUID_char_led_bg_bottom_left[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
 };
@@ -135,7 +135,7 @@ static const uint8_t UUID_attChar_led_bg_bottom_left[] = {
 
 /* BLE UUID for card10 led background bottom right */
 static const uint8_t UUID_char_led_bg_bottom_right[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
 };
@@ -146,7 +146,7 @@ static const uint8_t UUID_attChar_led_bg_bottom_right[] = {
 
 /* BLE UUID for card10 led background top right */
 static const uint8_t UUID_char_led_bg_top_right[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
 };
@@ -157,7 +157,7 @@ static const uint8_t UUID_attChar_led_bg_top_right[] = {
 
 /* BLE UUID for card10 led background top left */
 static const uint8_t UUID_char_led_bg_top_left[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
 };
@@ -190,7 +190,7 @@ static const uint8_t UUID_attChar_leds_top_dim[] = {
 
 /* BLE UUID for card10 above leds */
 static const uint8_t UUID_char_leds_above[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LEDS_ABOVE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
 };
@@ -201,7 +201,7 @@ static const uint8_t UUID_attChar_leds_above[] = {
 
 /* BLE UUID for card10 char led single (debugging) */
 static const uint8_t UUID_char_led_s[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_WRITE,
 	UINT16_TO_BYTES(CARD10_LED_S_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0xef, CARD10_UUID_PREFIX
 };
