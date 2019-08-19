@@ -187,6 +187,12 @@ static void scheduleTimer(void)
 void vBleTask(void *pvParameters)
 {
 	ble_task_id = xTaskGetCurrentTaskHandle();
+
+	/*
+	 * Delay BLE startup by a bit because it locks up Epicardium otherwise.
+	 */
+	vTaskDelay(pdMS_TO_TICKS(500));
+
 	WsfInit();
 	StackInit();
 	setAddress();
