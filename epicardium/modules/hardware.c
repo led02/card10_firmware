@@ -1,4 +1,12 @@
+#include "epicardium.h"
+
+#include "api/dispatcher.h"
+#include "api/interrupt-sender.h"
+#include "cdcacm.h"
+#include "modules/filesystem.h"
+#include "modules/log.h"
 #include "modules/modules.h"
+#include "modules/stream.h"
 
 #include "card10.h"
 
@@ -10,6 +18,60 @@
 int hardware_early_init(void)
 {
 	card10_init();
+
+#ifdef CARD10_DEBUG_CORE1
+	/*
+	 * The SAO pins can be reconfigured for SWCLK2 and SWDIO2 which allows
+	 * debugging core 1.  This feature can optionally be enabled at
+	 * compile-time.
+	 */
+	LOG_WARN("init", "Core 1 Debugger Mode");
+	static const gpio_cfg_t swclk = {
+		PORT_0,
+		PIN_7,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+	static const gpio_cfg_t swdio = {
+		PORT_0,
+		PIN_6,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+
+	GPIO_Config(&swclk);
+	GPIO_Config(&swdio);
+#endif /* CARD10_DEBUG_CORE1 */
+
+	/*
+	 * Enable SEV-ON-PEND which is needed for proper working of the FreeRTOS
+	 * tickless idle sleep in Epicardium.
+	 */
+	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+	/*
+	 * USB-Serial
+	 */
+	if (cdcacm_init() < 0) {
+		LOG_ERR("init", "USB-Serial unavailable");
+	}
+
+	/*
+	 * Flash & FatFS
+	 */
+	fatfs_init();
+
+	/*
+	 * API Dispatcher & API Interrupts
+	 */
+	api_interrupt_init();
+	api_dispatcher_init();
+
+	/*
+	 * Sensor streams
+	 */
+	stream_init();
+
 	return 0;
 }
 
@@ -23,6 +85,10 @@ int hardware_early_init(void)
  */
 int hardware_init(void)
 {
+	/* Light Sensor */
+	LOG_INFO("init", "Starting light sensor ...");
+	epic_light_sensor_run();
+
 	return 0;
 }
 
