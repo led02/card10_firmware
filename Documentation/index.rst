@@ -24,6 +24,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/buttons
    pycardium/color
    pycardium/display
+   pycardium/gpio
    pycardium/leds
    pycardium/light-sensor
    pycardium/os

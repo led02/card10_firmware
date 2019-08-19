@@ -4,6 +4,7 @@ modsrc = files(
   'modules/buttons.c',
   'modules/fat_file.c',
   'modules/fat_reader_import.c',
+  'modules/gpio.c',
   'modules/interrupt.c',
   'modules/sys_leds.c',
   'modules/light_sensor.c',
