@@ -18,7 +18,6 @@
 #include "modules/filesystem.h"
 #include "api/interrupt-sender.h"
 
-#include "Heart.h"
 #include "gfx.h"
 #include "display.h"
 #include "card10-version.h"
@@ -55,11 +54,6 @@ int main(void)
 	GPIO_Config(&swclk);
 	GPIO_Config(&swdio);
 #endif /* CARD10_DEBUG_CORE1 */
-
-	gfx_copy_region_raw(
-		&display_screen, 0, 0, 160, 80, 2, (const void *)(Heart)
-	);
-	gfx_update(&display_screen);
 
 	/* TODO: Move this to its own function */
 	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
