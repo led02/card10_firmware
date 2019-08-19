@@ -41,6 +41,12 @@ int format(void)
 		printf("Failed to make new FS %d\n", res);
 		return -1;
 	}
+
+	f_setlabel("card10");
+	if (res != FR_OK) {
+		printf("Failed to set volume name %d\n", res);
+		return -1;
+	}
 	return 0;
 }
 
