@@ -32,6 +32,18 @@
 DIR dir;
 FATFS FatFs;
 
+int format(void)
+{
+	BYTE work[FF_MAX_SS * 16];
+	/* Create FAT volume */
+	int res = f_mkfs("", FM_ANY | FM_SFD, 0, work, sizeof work);
+	if (res != FR_OK) {
+		printf("Failed to make new FS %d\n", res);
+		return -1;
+	}
+	return 0;
+}
+
 int mount(void)
 {
 	FRESULT res;
@@ -195,6 +207,19 @@ static void pmic_button(bool falling)
 	}
 }
 
+static void msc(void)
+{
+	bootloader_display_header();
+	bootloader_display_line(3, "USB activated.", 0xffff);
+	bootloader_display_line(4, "Ready.", 0xffff);
+	run_usbmsc();
+
+	// If we return, don't try to boot. Maybe rather trigger a software reset.
+	// Reason: Not sure in which state the USB peripheral is and what kind
+	// of interrupts are active.
+	while (1)
+		;
+}
 /******************************************************************************/
 int main(void)
 {
@@ -210,16 +235,7 @@ int main(void)
 
 	// If the button is pressed, we go into MSC mode.
 	if (PB_Get(3)) {
-		bootloader_display_header();
-		bootloader_display_line(3, "USB activated.", 0xffff);
-		bootloader_display_line(4, "Ready.", 0xffff);
-		run_usbmsc();
-
-		// If we return, don't try to boot. Maybe rather trigger a software reset.
-		// Reason: Not sure in which state the USB peripheral is and what kind
-		// of interrupts are active.
-		while (1)
-			;
+		msc();
 	}
 
 	if (mount() == 0) {
@@ -252,14 +268,24 @@ int main(void)
 				printf("No update needed\n");
 			}
 		}
+
 	} else {
 		bootloader_display_header();
-		bootloader_display_line(
-			3, "Failed to mount filesystem", 0xffff
-		);
-		printf("Failed to mount the external flash\n");
+		bootloader_display_line(3, "Creating new filesystem", 0xffff);
+		printf("Creating new filesystem\n");
 
-		bootloader_display_line(4, "Trying to boot", 0xffff);
+		if (format() == 0) {
+			/* Drop into MSC after a reboot */
+			card10_reset();
+		} else {
+			bootloader_display_line(
+				3, "Failed to create new filesystem", 0xffff
+			);
+			printf("Feiled to create new filesystem\n");
+			/* Prevent bootloops */
+			while (1) {
+			}
+		}
 	}
 
 	printf("Trying to boot\n");
