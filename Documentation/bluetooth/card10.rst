@@ -60,14 +60,19 @@ The current draft uses following service specification:
   UUID: ``42230216-2342-2342-2342-234223422342``
   write
 
+- LEDs powersafe characteristic:
+
+  UUID: ``42230217-2342-2342-2342-234223422342``
+  write
+
+- flashlight characteristic:
+
+  UUID: ``42230218-2342-2342-2342-234223422342``
+  write
+
 - LEDs above characteristic:
 
   UUID: ``42230220-2342-2342-2342-234223422342``
-  write
-
-- Single rgb led characteristic:
-
-  UUID: ``422302ef-2342-2342-2342-234223422342``
   write
 
 - Light sensor characteristic:
@@ -129,26 +134,28 @@ LEDs dim <Position> characteristic
 The LEDs dim <Position> characteristic makes it possible to dim LEDs by position.
 Just write a ``uint8`` between ``1`` and ``8``.
 
+LEDs powersafe characteristic
+---------------------------------
+
+This characteristic makes it possible to set the LEDs in powersafe mode.
+Even when set to zero, the RGB LEDs still individually consume ~1mA.
+Powersave intelligently switches the supply power in groups.
+This introduces delays in the magnitude of ~10µs, so it can be disabled for high speed applications such as POV
+
+- enabled:   ``0x01``
+- disabled:  ``0x00``
+
+Flashlight characteristic
+---------------------------------
+
+This characteristic makes it possible to activate the flashlight.
+
+- enabled:   ``0x01``
+- disabled:  ``0x00``
+
 LEDs above characteristic
 ---------------------------------
 This characteristic set every 11 leds on the top module at once.
-
-Single rgb led characteristic
----------------------------------
-
-This characteristic makes it possible to address every single rgb led.
-Just write a byte array ``uint18`` address of led and three ``uint8`` for the rgb color.
-
-Dataformat:
-
-====== ===== ===== =====
- 0-1     2     3     4
------- ----- ----- -----
-led nr  red  green blue
-
-- set led 14 red:  ``0x0e00ff0000``
-- set led 14 blue: ``0x0e000000ff``
-- disable led 14:  ``0x0e00000000``
 
 Light sensor characteristic
 ---------------------------------

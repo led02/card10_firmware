@@ -46,8 +46,8 @@ static int lasttick              = 0;
 extern void StackInit(void);
 extern void AppInit(void);
 extern void bleuart_init(void);
-extern void bleCard10_init(void);
 extern void bleFileTransfer_init(void);
+extern void bleCard10_init(void);
 
 /*************************************************************************************************/
 void PalSysAssertTrap(void)
@@ -205,8 +205,8 @@ void vBleTask(void *pvParameters)
 	AttsDynInit();
 
 	bleuart_init();
-	bleCard10_init();
 	bleFileTransfer_init();
+	bleCard10_init();
 
 	lasttick = xTaskGetTickCount();
 
