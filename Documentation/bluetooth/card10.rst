@@ -65,7 +65,7 @@ The current draft uses following service specification:
   UUID: ``42230217-2342-2342-2342-234223422342``
   write
 
-- flashlight characteristic:
+- Flashlight characteristic:
 
   UUID: ``42230218-2342-2342-2342-234223422342``
   write
@@ -156,6 +156,9 @@ This characteristic makes it possible to activate the flashlight.
 LEDs above characteristic
 ---------------------------------
 This characteristic set every 11 leds on the top module at once.
+By defining 11x rgb from left to right. You need also to set exchange a bigger MTU to use this feature.
+
+- set a rainbow beginnig with red on the right edge: ``0xff0000ff8b00e8ff005dff0000ff2e00ffb900b9ff002eff5d00ffe800ffff008b``
 
 Light sensor characteristic
 ---------------------------------
