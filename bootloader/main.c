@@ -244,6 +244,7 @@ int main(void)
 				);
 				erase_partition();
 				flash_partition();
+				f_unlink("card10.bin");
 				bootloader_display_line(
 					4, "Trying to boot", 0xffff
 				);
