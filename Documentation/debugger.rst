@@ -7,6 +7,36 @@ it.  The debugger looks like either one in the following pictures:
 
 .. image:: static/debuggers.png
 
+First of all, you need to connect your debugger and card10.  There are three
+connections that you need (take a look at the above diagram for more info):
+
+* ``HDK``: This connection provides debugging (SWD) and UART.
+* ``DEV``: This connection provides power (battery charger) and the native USB
+  connection (bootloader).
+* ``USB-C``: Connect the proved USB-C cable with the side which has the blue
+  dot, so the blue dots have the same side.
+
+Console
+-------
+When using the debugger, you will usually have two /dev/ttyACM* devices (one
+each for ``HDK`` and ``DEV``).  To avoid confusion, allow access without
+``sudo`` and tell ModemManager to ignore them, you can use the following udev
+rule file (saved under ``/etc/udev/rules.d/99-card10.rules``):
+
+.. code-block:: text
+
+  SUBSYSTEM=="tty", ATTRS{idVendor}=="0d28", ATTRS{idProduct}=="0204", MODE="0664", GROUP="plugdev", SYMLINK+="ttyACM-card10-hdk", ENV{ID_MM_DEVICE_IGNORE}="1"
+  SUBSYSTEM=="tty", ATTRS{idVendor}=="0b6a", ATTRS{idProduct}=="003c", MODE="0664", GROUP="plugdev", SYMLINK+="ttyACM-card10-dev", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+After changing udev rules, you need to tell the udev daemon:
+
+.. code-block:: shell-session
+
+  $ sudo udevadm control --reload
+
+Now, additional symlinks (``/dev/ttyACM-card10-hdk`` and
+``/dev/ttyACM-card10-dev``) will be created when connecting the card10.
+
 OpenOCD
 -------
 For debugging card10, you need our `own fork`_ of OpenOCD.  It contains a patch
@@ -55,15 +85,6 @@ that package from your distros repositories:
 
 Debugging
 ---------
-First of all, you need to connect your debugger and card10.  There are three
-connections that you need (take a look at the above diagram for more info):
-
-* ``HDK``: This connection provides debugging (SWD) and UART.
-* ``DEV``: This connection provides power (battery charger) and the native USB
-  connection (bootloader).
-* ``USB-C``: Connect the proved USB-C cable with the side which has the blue
-  dot, so the blue dots have the same side.
-
 Run OpenOCD from the ``openocd/scripts`` directory in the firmware repository.
 Call it as ``openocd -f interface/cmsis-dap.cfg -f target/max32665.cfg``.  If
 the debugger and card10 are connected correctly, you should see the following
