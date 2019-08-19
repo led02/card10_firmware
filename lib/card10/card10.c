@@ -41,14 +41,14 @@ void card10_init(void)
 	I2C_Shutdown(MXC_I2C1_BUS0);
 	I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
 
+	GPIO_Init();
+
 	pmic_init();
 	pmic_set_led(0, 0);
 	pmic_set_led(1, 0);
 	pmic_set_led(2, 0);
 
 	portexpander_init();
-
-	GPIO_Init();
 
 	PB_Init();
 
