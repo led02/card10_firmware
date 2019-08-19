@@ -3,6 +3,7 @@ module_sources = files(
   'dispatcher.c',
   'display.c',
   'fileops.c',
+  'gpio.c',
   'hardware.c',
   'leds.c',
   'lifecycle.c',

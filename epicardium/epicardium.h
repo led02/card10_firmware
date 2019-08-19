@@ -90,6 +90,11 @@ typedef _Bool bool;
 #define API_LIGHT_SENSOR_STOP      0x82
 
 #define API_BUTTONS_READ           0x90
+
+#define API_GPIO_SET_PIN_MODE      0xA0
+#define API_GPIO_GET_PIN_MODE      0xA1
+#define API_GPIO_WRITE_PIN         0xA2
+#define API_GPIO_READ_PIN          0xA3
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -337,6 +342,132 @@ enum epic_button {
  * :return: Returns nonzero value if unmasked buttons are pushed.
  */
 API(API_BUTTONS_READ, uint8_t epic_buttons_read(uint8_t mask));
+
+/**
+ * Wristband GPIO
+ * ==============
+ */
+
+/** GPIO pins IDs */
+enum gpio_pin {
+    /** ``1``, Wristband connector 1 */
+    GPIO_WRISTBAND_1 = 1,
+    /** ``2``, Wristband connector 2 */
+    GPIO_WRISTBAND_2 = 2,
+    /** ``3``, Wristband connector 3 */
+    GPIO_WRISTBAND_3 = 3,
+    /** ``4``, Wristband connector 4 */
+    GPIO_WRISTBAND_4 = 4,
+};
+
+/** GPIO pin modes */
+enum gpio_mode {
+    /** Configure the pin as input */
+    GPIO_MODE_IN = (1<<0),
+    /** Configure the pin as output */
+    GPIO_MODE_OUT = (1<<1),
+
+    /** Enable the internal pull-up resistor */
+    GPIO_PULL_UP = (1<<6),
+    /** Enable the internal pull-down resistor */
+    GPIO_PULL_DOWN = (1<<7),
+};
+
+/**
+ * Set the mode of a card10 GPIO pin.
+ *
+ * :c:func:`epic_gpio_set_pin_mode` will set the pin specified by ``pin`` to the mode ``mode``.
+ * If the specified pin ID is not valid this function will do nothing.
+ *
+ * **Example:**
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    // Configure wristband pin 1 as output.
+ *    if (epic_gpio_set_pin_mode(GPIO_WRISTBAND_1, GPIO_MODE_OUT)) {
+ *        // Do your error handling here...
+ *    }
+ *
+ * :param uint8_t pin: ID of the pin to configure. Use on of the IDs defined in :c:type:`gpio_pin`.
+ * :param uint8_t mode: Mode to be configured. Use a combination of the :c:type:`gpio_mode` flags.
+ * :returns: ``0`` if the mode was set, ``-EINVAL`` if ``pin`` is not valid or the mode could not be set.
+ */
+API(API_GPIO_SET_PIN_MODE, int epic_gpio_set_pin_mode(uint8_t pin, uint8_t mode));
+
+/**
+ * Get the mode of a card10 GPIO pin.
+ *
+ * :c:func:`epic_gpio_get_pin_mode` will get the current mode of the GPIO pin specified by ``pin``.
+ *
+ * **Example:**
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    // Get the mode of wristband pin 1.
+ *    int mode = epic_gpio_get_pin_mode(GPIO_WRISTBAND_1);
+ *    if (mode < 0) {
+ *        // Do your error handling here...
+ *    } else {
+ *        // Do something with the queried mode information
+ *    }
+ *
+ * :param uint8_t pin: ID of the pin to get the configuration of. Use on of the IDs defined in :c:type:`gpio_pin`.
+ * :returns: Configuration byte for the specified pin or ``-EINVAL`` if the pin is not valid.
+ */
+API(API_GPIO_GET_PIN_MODE, int epic_gpio_get_pin_mode(uint8_t pin));
+
+/**
+ * Write value to a card10 GPIO pin,
+ *
+ * :c:func:`epic_gpio_write_pin` will set the value of the GPIO pin described by ``pin`` to either on or off depending on ``on``.
+ *
+ * **Example:**
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    // Get the mode of wristband pin 1.
+ *    int mode = epic_gpio_get_pin_mode(GPIO_WRISTBAND_1);
+ *    if (mode < 0) {
+ *        // Do your error handling here...
+ *    } else {
+ *        // Do something with the queried mode information
+ *    }
+ *
+ * :param uint8_t pin: ID of the pin to get the configuration of. Use on of the IDs defined in :c:type:`gpio_pin`.
+ * :param bool on: Sets the pin to either true (on/high) or false (off/low).
+ * :returns: ``0`` on succcess, ``-EINVAL`` if ``pin`` is not valid or is not configured as an output.
+ */
+API(API_GPIO_WRITE_PIN, int epic_gpio_write_pin(uint8_t pin, bool on));
+
+/**
+ * Read value of a card10 GPIO pin.
+ *
+ * :c:func:`epic_gpio_read_pin` will get the value of the GPIO pin described by ``pin``.
+ *
+ * **Example:**
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    // Get the current value of wristband pin 1.
+ *    uint32_t value = epic_gpio_read_pin(GPIO_WRISTBAND_1);
+ *    if (mode == -EINVAL) {
+ *        // Do your error handling here...
+ *    } else {
+ *        // Do something with the current value
+ *    }
+ *
+ * :param uint8_t pin: ID of the pin to get the configuration of. Use on of the IDs defined in :c:type:`gpio_pin`.
+ * :returns: ``-EINVAL`` if ``pin`` is not valid, an integer value otherwise.
+ */
+API(API_GPIO_READ_PIN, uint32_t epic_gpio_read_pin(uint8_t pin));
 
 /**
  * LEDs
