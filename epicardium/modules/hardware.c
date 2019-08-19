@@ -80,7 +80,11 @@ int hardware_early_init(void)
 			;
 	}
 
-	display_init();
+	/*
+	 * The bootloader has already initialized the display, so we only need
+	 * to do the bare minimum here (mostly the gfx datastructures).
+	 */
+	display_init_slim();
 
 	/*
 	 * RGB LEDs
