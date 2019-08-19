@@ -23,7 +23,7 @@ the following commands:
    $ ./bootstrap
    $ ./configure --disable-werror
 
-.. warning:
+.. warning::
     Make sure ``CMSIS-DAP Compliant Debugger`` is set to **yes (auto)** after
     running ``./configure`` (if it is not, you might need to install ``libhidapi-dev``
     (Ubuntu)). If you get errors making the documentation you can 
