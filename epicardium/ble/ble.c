@@ -7,6 +7,7 @@
 #include "ble_api.h"
 #include "hci_vs.h"
 #include "att_api.h"
+#include "trng.h"
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -92,8 +93,20 @@ static void setAddress(void)
 	uint8_t bdAddr[6] = { 0x02, 0x02, 0x44, 0x8B, 0x05, 0x00 };
 	char buf[32];
 
-	fs_read_text_file("mac.txt", buf, sizeof(buf));
-	APP_TRACE_INFO1("mac file contents: %s", buf);
+	int result = fs_read_text_file("mac.txt", buf, sizeof(buf));
+
+	if (result == -1) {
+		APP_TRACE_INFO0("mac.txt not found, generating random MAC");
+		TRNG_Init(NULL);
+		TRNG_Read(MXC_TRNG, bdAddr, sizeof(bdAddr));
+		sprintf(buf, "%02x:%02x:%02x:%02x:%02x:%02x\n",
+			bdAddr[0], bdAddr[1], bdAddr[2],
+			bdAddr[3], bdAddr[4], bdAddr[5]);
+		fs_write_file("mac.txt", buf, strlen(buf));
+	} else {
+		APP_TRACE_INFO1("mac file contents: %s", buf);
+	}
+
 	int a, b, c, d, e, f;
 	if (sscanf(buf, "%x:%x:%x:%x:%x:%x", &a, &b, &c, &d, &e, &f) == 6) {
 		bdAddr[0] = f;
