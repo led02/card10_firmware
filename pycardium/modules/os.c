@@ -188,6 +188,32 @@ static mp_obj_t mp_os_urandom(mp_obj_t size_in)
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(urandom_obj, mp_os_urandom);
 
+enum usb_config_device {
+	USB_DEVICE_NONE,
+	USB_DEVICE_FLASH,
+	USB_DEVICE_SERIAL,
+};
+
+static mp_obj_t mp_os_usbconfig(mp_obj_t dev)
+{
+	int device = mp_obj_get_int(dev);
+	switch (device) {
+	case USB_DEVICE_NONE:
+		epic_usb_shutdown();
+		break;
+	case USB_DEVICE_FLASH:
+		epic_usb_storage();
+		break;
+	case USB_DEVICE_SERIAL:
+		epic_usb_cdcacm();
+		break;
+	default:
+		mp_raise_ValueError("Invalid parameter");
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(usbconfig_obj, mp_os_usbconfig);
+
 static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_os) },
 	{ MP_ROM_QSTR(MP_QSTR_exit), MP_ROM_PTR(&exit_obj) },
@@ -199,6 +225,11 @@ static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_rename), MP_ROM_PTR(&rename_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_read_battery), MP_ROM_PTR(&read_battery_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_urandom), MP_ROM_PTR(&urandom_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_usbconfig), MP_ROM_PTR(&usbconfig_obj) },
+
+	{ MP_ROM_QSTR(MP_QSTR_USB_SERIAL), MP_ROM_INT(USB_DEVICE_SERIAL) },
+	{ MP_ROM_QSTR(MP_QSTR_USB_FLASH), MP_ROM_INT(USB_DEVICE_FLASH) },
+	{ MP_ROM_QSTR(MP_QSTR_USB_NONE), MP_ROM_INT(USB_DEVICE_NONE) },
 };
 
 static MP_DEFINE_CONST_DICT(os_module_globals, os_module_globals_table);
