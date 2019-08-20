@@ -30,11 +30,10 @@ int main(void)
 
 	pycardium_hal_init();
 
-	epic_uart_write_str(header, sizeof(header));
-
 	if (cnt < 0) {
 		printf("pycardium: Error fetching args: %d\n", cnt);
 	} else if (cnt > 0) {
+		epic_uart_write_str(header, sizeof(header));
 		printf("  Loading %s ...\n", script_name);
 	}
 
@@ -50,6 +49,7 @@ int main(void)
 			pyexec_file_if_exists(script_name);
 		}
 
+		epic_uart_write_str(header, sizeof(header));
 		pyexec_friendly_repl();
 
 		mp_deinit();
