@@ -48,6 +48,7 @@ void hwlock_init(void);
 enum hwlock_periph {
 	HWLOCK_I2C = 0,
 	HWLOCK_ADC,
+    HWLOCK_LED,
 	_HWLOCK_MAX,
 };
 

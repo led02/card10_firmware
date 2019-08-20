@@ -11,12 +11,16 @@
 
 #define NUM_LEDS 15 /* Take from lib/card10/leds.c */
 
-static void update_if_needed()
+static void do_update()
 {
-	if (personal_state_enabled() == 0) {
-		leds_update_power();
-		leds_update();
+	while (hwlock_acquire(HWLOCK_LED, pdMS_TO_TICKS(1)) < 0) {
+		vTaskDelay(pdMS_TO_TICKS(1));
 	}
+
+	leds_update_power();
+	leds_update();
+
+	hwlock_release(HWLOCK_LED);
 }
 
 void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
@@ -25,8 +29,7 @@ void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
 		return;
 
 	leds_prep(led, r, g, b);
-	leds_update_power();
-	leds_update();
+	do_update();
 }
 
 void epic_leds_set_hsv(int led, float h, float s, float v)
@@ -35,7 +38,7 @@ void epic_leds_set_hsv(int led, float h, float s, float v)
 		return;
 
 	leds_prep_hsv(led, h, s, v);
-	update_if_needed();
+	do_update();
 }
 
 void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b)
@@ -63,7 +66,7 @@ void epic_leds_set_all(uint8_t *pattern_ptr, uint8_t len)
 
 		leds_prep(i, pattern[i][0], pattern[i][1], pattern[i][2]);
 	}
-	update_if_needed();
+	do_update();
 }
 
 void epic_leds_set_all_hsv(float *pattern_ptr, uint8_t len)
@@ -75,7 +78,7 @@ void epic_leds_set_all_hsv(float *pattern_ptr, uint8_t len)
 
 		leds_prep_hsv(i, pattern[i][0], pattern[i][1], pattern[i][2]);
 	}
-	update_if_needed();
+	do_update();
 }
 
 void epic_leds_dim_top(uint8_t value)
@@ -105,7 +108,7 @@ void epic_set_flashlight(bool power)
 
 void epic_leds_update(void)
 {
-	update_if_needed();
+	do_update();
 }
 
 void epic_leds_set_powersave(bool eco)
@@ -127,6 +130,5 @@ void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b)
 		leds_prep(i, r, g, b);
 	}
 
-	leds_update_power();
-	leds_update();
+	do_update();
 }

@@ -31,9 +31,15 @@ int epic_personal_state_set(uint8_t state, bool persistent)
 	personal_state_persistent = persistent;
 
 	if (was_enabled && !_personal_state_enabled) {
+		while (hwlock_acquire(HWLOCK_LED, pdMS_TO_TICKS(1)) < 0) {
+			vTaskDelay(pdMS_TO_TICKS(1));
+		}
+
 		leds_prep(PERSONAL_STATE_LED, 0, 0, 0);
 		leds_update_power();
 		leds_update();
+
+		hwlock_release(HWLOCK_LED);
 	}
 
 	return 0;
@@ -54,6 +60,11 @@ void vLedTask(void *pvParameters)
 	const int led_animation_rate = 1000 / 25; /* 25Hz -> 40ms*/
 	while (1) {
 		if (_personal_state_enabled) {
+			while (hwlock_acquire(HWLOCK_LED, pdMS_TO_TICKS(1)) <
+			       0) {
+				vTaskDelay(pdMS_TO_TICKS(1));
+			}
+
 			led_animation_ticks++;
 			if (personal_state == STATE_NO_CONTACT) {
 				leds_prep(PERSONAL_STATE_LED, 255, 0, 0);
@@ -121,6 +132,8 @@ void vLedTask(void *pvParameters)
 			}
 			leds_update_power();
 			leds_update();
+
+			hwlock_release(HWLOCK_LED);
 		}
 
 		vTaskDelay(led_animation_rate / portTICK_PERIOD_MS);
