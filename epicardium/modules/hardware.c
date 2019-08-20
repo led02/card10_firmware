@@ -163,7 +163,7 @@ int hardware_early_init(void)
 int hardware_init(void)
 {
 	/* Light Sensor */
-	LOG_INFO("init", "Starting light sensor ...");
+	LOG_DEBUG("init", "Starting light sensor ...");
 	epic_light_sensor_run();
 
 	return 0;

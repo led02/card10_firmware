@@ -23,6 +23,7 @@
 #include "card10.h"
 #include "modules/log.h"
 
+#define SSLOG_DEBUG(...) LOG_DEBUG("fatfs", __VA_ARGS__)
 #define SSLOG_INFO(...) LOG_INFO("fatfs", __VA_ARGS__)
 #define SSLOG_ERR(...) LOG_ERR("fatfs", __VA_ARGS__)
 
@@ -136,7 +137,7 @@ int fatfs_attach()
 			ff_res = f_mount(&fs->FatFs, "/", 0);
 			if (ff_res == FR_OK) {
 				fs->initialized = true;
-				SSLOG_INFO("FatFs mounted\n");
+				SSLOG_DEBUG("FatFs mounted\n");
 			} else {
 				SSLOG_ERR(
 					"f_mount error %s\n",

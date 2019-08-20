@@ -244,7 +244,7 @@ static int write_default_menu(void)
  */
 static void load_menu(bool reset)
 {
-	LOG_INFO("lifecycle", "Into the menu");
+	LOG_DEBUG("lifecycle", "Into the menu");
 
 	if (xSemaphoreTake(core1_mutex, BLOCK_WAIT) != pdTRUE) {
 		LOG_ERR("lifecycle",
@@ -362,7 +362,7 @@ void vLifecycleTask(void *pvParameters)
 		vTaskDelay(portMAX_DELAY);
 	}
 
-	LOG_INFO("lifecycle", "Booting core 1 ...");
+	LOG_DEBUG("lifecycle", "Booting core 1 ...");
 	core1_boot();
 	vTaskDelay(pdMS_TO_TICKS(10));
 

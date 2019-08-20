@@ -14,10 +14,10 @@ int main(void)
 	LOG_INFO("startup", "Epicardium startup ...");
 	LOG_INFO("startup", "Version " CARD10_VERSION);
 
-	LOG_INFO("startup", "Initializing hardware ...");
+	LOG_DEBUG("startup", "Initializing hardware ...");
 	hardware_early_init();
 
-	LOG_INFO("startup", "Initializing tasks ...");
+	LOG_DEBUG("startup", "Initializing tasks ...");
 
 	/* Serial */
 	if (xTaskCreate(
@@ -85,7 +85,7 @@ int main(void)
 		abort();
 	}
 
-	LOG_INFO("startup", "Starting FreeRTOS ...");
+	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
 
 	LOG_CRIT("startup", "FreeRTOS did not start due to unknown error!");
