@@ -98,6 +98,9 @@ typedef _Bool bool;
 #define API_GPIO_GET_PIN_MODE      0xA1
 #define API_GPIO_WRITE_PIN         0xA2
 #define API_GPIO_READ_PIN          0xA3
+
+#define API_TRNG_READ              0xB0
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -1208,5 +1211,22 @@ API(API_RTC_SCHEDULE_ALARM, int epic_rtc_schedule_alarm(uint32_t timestamp));
  * can be scheduled using :c:func:`epic_rtc_schedule_alarm`.
  */
 API_ISR(EPIC_INT_RTC_ALARM, epic_isr_rtc_alarm);
+
+/**
+ * TRNG
+ * ====
+ */
+
+/**
+ * Read random bytes from the TRNG.
+ *
+ * :param uint8_t * dest: Destination buffer
+ * :param size: Number of bytes to read.
+ * :return: `0` on success or a negative value if an error occured. Possible
+ *    errors:
+ *
+ *    - ``-EFAULT``: Invalid destination address.
+ */
+API(API_TRNG_READ, int epic_trng_read(uint8_t *dest, size_t size));
 
 #endif /* _EPICARDIUM_H */

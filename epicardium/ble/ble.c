@@ -8,7 +8,6 @@
 #include "ble_api.h"
 #include "hci_vs.h"
 #include "att_api.h"
-#include "trng.h"
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -101,7 +100,7 @@ static void setAddress(void)
 		bdAddr[0] = 0xCA;
 		bdAddr[1] = 0x4D;
 		bdAddr[2] = 0x10;
-		TRNG_Read(MXC_TRNG, bdAddr + 3, 3);
+		epic_trng_read(bdAddr + 3, 3);
 		sprintf(buf,
 			"%02x:%02x:%02x:%02x:%02x:%02x\n",
 			bdAddr[0],

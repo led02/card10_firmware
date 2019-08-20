@@ -18,6 +18,7 @@
 #include "gpio.h"
 #include "i2c.h"
 #include "spi.h"
+#include "trng.h"
 
 /*
  * Early init is called at the very beginning and is meant for modules which

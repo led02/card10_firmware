@@ -13,5 +13,6 @@ module_sources = files(
   'rtc.c',
   'serial.c',
   'stream.c',
+  'trng.c',
   'vibra.c',
 )
