@@ -276,6 +276,14 @@ static void load_menu(bool reset)
 
 /* API {{{ */
 /*
+ * Restart the firmware
+ */
+void epic_system_reset(void)
+{
+	card10_reset();
+}
+
+/*
  * This is NOT the epic_exec() called from Pycardium, but an implementation of
  * the same call for use in Epicardium.  This function is synchroneous and will
  * wait until the call returns.

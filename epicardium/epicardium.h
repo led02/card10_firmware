@@ -31,6 +31,7 @@ typedef _Bool bool;
 /* clang-format off */
 #define API_SYSTEM_EXIT             0x1
 #define API_SYSTEM_EXEC             0x2
+#define API_SYSTEM_RESET            0x3
 
 #define API_INTERRUPT_ENABLE        0xA
 #define API_INTERRUPT_DISABLE       0xB
@@ -195,6 +196,11 @@ int epic_exec(char *name);
  * because it needs special behavior when loading a new payload.
  */
 API(API_SYSTEM_EXEC, int __epic_exec(char *name));
+
+/**
+ * Reset/Restart card10
+ */
+API(API_SYSTEM_RESET, void epic_system_reset(void));
 
 /**
  * UART/Serial Interface
