@@ -37,7 +37,10 @@ void api_prepare_args(char *args);
 void core1_boot(void);
 
 /* Reset core 1 into a state where it can accept a new payload */
-void core1_reset(void);
+void core1_trigger_reset(void);
+
+/* Wait for core 1 to respond that it is ready for a new payload */
+void core1_wait_ready(void);
 
 /* Load a payload into core 1 */
 void core1_load(void *ivt, char *args);
