@@ -103,3 +103,18 @@ void display_init(void)
 	txt_init(&display_textb, &display_screen, &Font12);
 	gfx_clear(&display_screen);
 }
+
+void display_init_slim(void)
+{
+	if (!portexpander_detected()) {
+		// Open-drain
+		MAX77650_setDRV(false);
+		// Output
+		MAX77650_setDIR(false);
+	}
+
+	GPIO_Config(&DEV_DC_PIN);
+
+	display_screen = gfx_screen(LCD_framebuffer());
+	txt_init(&display_textb, &display_screen, &Font12);
+}

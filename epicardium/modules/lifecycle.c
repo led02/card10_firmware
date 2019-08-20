@@ -2,6 +2,7 @@
 #include "modules/log.h"
 #include "modules/modules.h"
 #include "api/dispatcher.h"
+#include "api/interrupt-sender.h"
 #include "l0der/l0der.h"
 
 #include "card10.h"
@@ -87,6 +88,9 @@ static int load_stat(char *name)
  */
 static int do_load(struct load_info *info)
 {
+	struct l0dable_info l0dable;
+	int res;
+
 	if (*info->name == '\0') {
 		LOG_INFO("lifecycle", "Loading Python interpreter ...");
 	} else {
@@ -100,9 +104,21 @@ static int do_load(struct load_info *info)
 
 	if (info->do_reset) {
 		LOG_DEBUG("lifecycle", "Triggering core 1 reset.");
-		core1_reset();
 
-		api_dispatcher_init();
+		core1_trigger_reset();
+	}
+
+	/*
+	 * Wait for the core to become ready to accept a new payload.
+	 */
+	core1_wait_ready();
+
+	/*
+	 * Reinitialize Hardware & Drivers
+	 */
+	res = hardware_reset();
+	if (res < 0) {
+		return res;
 	}
 
 	switch (info->type) {
@@ -112,14 +128,7 @@ static int do_load(struct load_info *info)
 		core1_load(PYCARDIUM_IVT, info->name);
 		break;
 	case PL_L0DABLE:
-		/*
-		 * Always reset when loading a l0dable to make sure the memory
-		 * space is absolutely free.
-		 */
-		core1_reset();
-
-		struct l0dable_info l0dable;
-		int res = l0der_load_path(info->name, &l0dable);
+		res = l0der_load_path(info->name, &l0dable);
 		if (res != 0) {
 			LOG_ERR("lifecycle", "l0der failed: %d\n", res);
 			xSemaphoreGive(api_mutex);

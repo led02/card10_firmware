@@ -1,6 +1,23 @@
+#include "epicardium.h"
+
+#include "api/dispatcher.h"
+#include "api/interrupt-sender.h"
+#include "cdcacm.h"
+#include "modules/filesystem.h"
+#include "modules/log.h"
 #include "modules/modules.h"
+#include "modules/stream.h"
 
 #include "card10.h"
+#include "display.h"
+#include "leds.h"
+#include "pb.h"
+#include "pmic.h"
+#include "portexpander.h"
+
+#include "gpio.h"
+#include "i2c.h"
+#include "spi.h"
 
 /*
  * Early init is called at the very beginning and is meant for modules which
@@ -9,7 +26,124 @@
  */
 int hardware_early_init(void)
 {
-	card10_init();
+	/*
+	 * I2C bus for onboard peripherals (ie. PMIC, BMA400, BHI160, BME680,
+	 * ...)
+	 */
+	I2C_Shutdown(MXC_I2C1_BUS0);
+	I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
+
+#ifndef CARD10_DEBUG_CORE1
+	/*
+	 * SAO I2C bus
+	 */
+	I2C_Shutdown(MXC_I2C0_BUS0);
+	I2C_Init(MXC_I2C0_BUS0, I2C_FAST_MODE, NULL);
+#endif
+
+	/*
+	 * GPIO peripheral.
+	 */
+	GPIO_Init();
+
+	/*
+	 * PMIC (MAX77650)
+	 */
+	pmic_init();
+	pmic_set_led(0, 0);
+	pmic_set_led(1, 0);
+	pmic_set_led(2, 0);
+
+	/*
+	 * Harmonic Board Portexpander
+	 */
+	portexpander_init();
+
+	/*
+	 * Buttons
+	 */
+	PB_Init();
+
+	/*
+	 * SPI for ECG
+	 */
+	const sys_cfg_spi_t spi17y_master_cfg = {
+		.map = MAP_A,
+		.ss0 = Enable,
+		.ss1 = Disable,
+		.ss2 = Disable,
+	};
+
+	if (SPI_Init(SPI0, 0, SPI_SPEED, spi17y_master_cfg) != 0) {
+		LOG_ERR("init", "Error configuring SPI");
+		while (1)
+			;
+	}
+
+	/*
+	 * The bootloader has already initialized the display, so we only need
+	 * to do the bare minimum here (mostly the gfx datastructures).
+	 */
+	display_init_slim();
+
+	/*
+	 * RGB LEDs
+	 */
+	leds_init();
+
+#ifdef CARD10_DEBUG_CORE1
+	/*
+	 * The SAO pins can be reconfigured for SWCLK2 and SWDIO2 which allows
+	 * debugging core 1.  This feature can optionally be enabled at
+	 * compile-time.
+	 */
+	LOG_WARN("init", "Core 1 Debugger Mode");
+	static const gpio_cfg_t swclk = {
+		PORT_0,
+		PIN_7,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+	static const gpio_cfg_t swdio = {
+		PORT_0,
+		PIN_6,
+		GPIO_FUNC_ALT3,
+		GPIO_PAD_NONE,
+	};
+
+	GPIO_Config(&swclk);
+	GPIO_Config(&swdio);
+#endif /* CARD10_DEBUG_CORE1 */
+
+	/*
+	 * Enable SEV-ON-PEND which is needed for proper working of the FreeRTOS
+	 * tickless idle sleep in Epicardium.
+	 */
+	SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+	/*
+	 * USB-Serial
+	 */
+	if (cdcacm_init() < 0) {
+		LOG_ERR("init", "USB-Serial unavailable");
+	}
+
+	/*
+	 * Flash & FatFS
+	 */
+	fatfs_init();
+
+	/*
+	 * API Dispatcher & API Interrupts
+	 */
+	api_interrupt_init();
+	api_dispatcher_init();
+
+	/*
+	 * Sensor streams
+	 */
+	stream_init();
+
 	return 0;
 }
 
@@ -23,6 +157,10 @@ int hardware_early_init(void)
  */
 int hardware_init(void)
 {
+	/* Light Sensor */
+	LOG_INFO("init", "Starting light sensor ...");
+	epic_light_sensor_run();
+
 	return 0;
 }
 
@@ -35,6 +173,24 @@ int hardware_init(void)
  */
 int hardware_reset(void)
 {
-	card10_init();
+	/*
+	 * API Dispatcher & API Interrupts
+	 */
+	api_interrupt_init();
+	api_dispatcher_init();
+
+	/*
+	 * LEDs
+	 */
+	leds_init();
+	epic_leds_set_rocket(0, 0);
+	epic_leds_set_rocket(1, 0);
+	epic_leds_set_rocket(2, 0);
+
+	/*
+	 * Display
+	 */
+	display_init_slim();
+
 	return 0;
 }

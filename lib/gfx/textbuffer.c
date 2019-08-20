@@ -12,8 +12,6 @@ void txt_init(struct txt_buffer *txtb, struct gfx_region *reg, sFONT *f)
 	txtb->bg_color      = gfx_color_rgb_f(reg, .0f, .0f, .0f);
 	txtb->draw_cursor   = 1;
 	txtb->auto_update   = 1;
-
-	txt_clear(txtb);
 }
 
 static inline size_t width_(struct txt_buffer *tm)

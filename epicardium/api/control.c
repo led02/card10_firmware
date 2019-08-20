@@ -199,11 +199,14 @@ void core1_boot(void)
 	core1_start(&core1_initial_ivt);
 }
 
-void core1_reset(void)
+void core1_trigger_reset(void)
 {
 	/* Signal core 1 that we intend to load a new payload. */
 	api_interrupt_trigger(EPIC_INT_RESET);
+}
 
+void core1_wait_ready(void)
+{
 	/* Wait for the core to accept */
 	while (1) {
 		while (SEMA_GetSema(_CONTROL_SEMAPHORE) == E_BUSY) {

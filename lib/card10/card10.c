@@ -1,3 +1,4 @@
+#include "card10.h"
 #include "pmic.h"
 #include "bosch.h"
 #include "display.h"
@@ -23,8 +24,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
-#define SPI_SPEED (15 * 1000 * 1000) // Bit Rate
 
 const gpio_cfg_t bhi_interrupt_pin = {
 	PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
