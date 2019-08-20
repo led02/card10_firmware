@@ -152,3 +152,14 @@ void NORETURN nlr_jump_fail(void *val)
 
 	Reset_Handler();
 }
+
+/******************************************************************************
+ * TRNG
+ */
+
+int mp_hal_trng_read_int(void)
+{
+	int result;
+	epic_trng_read((uint8_t *)&result, sizeof(result));
+	return result;
+}

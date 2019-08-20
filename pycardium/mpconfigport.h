@@ -23,6 +23,9 @@
 
 #define MICROPY_ENABLE_SOURCE_LINE          (1)
 
+/* urandom init */
+int mp_hal_trng_read_int(void);
+
 /* Builtin function and modules */
 #define MICROPY_PY_ALL_SPECIAL_METHODS      (1)
 #define MICROPY_PY_BUILTINS_HELP            (1)
@@ -32,6 +35,7 @@
 #define MICROPY_PY_UJSON                    (1)
 #define MICROPY_PY_URANDOM                  (1)
 #define MICROPY_PY_URANDOM_EXTRA_FUNCS      (1)
+#define MICROPY_PY_URANDOM_SEED_INIT_FUNC   (mp_hal_trng_read_int())
 #define MICROPY_PY_URE                      (1)
 #define MICROPY_PY_URE_MATCH_GROUPS         (1)
 #define MICROPY_PY_URE_MATCH_SPAN_START_END (1)
