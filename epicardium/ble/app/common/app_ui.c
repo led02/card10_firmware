@@ -37,6 +37,19 @@
 /*! \brief Callback struct */
 appUiCback_t appUiCbackTbl;
 
+
+/*************************************************************************************************/
+/*!
+ *  \brief  card10 - Should disable encryption. MAXIM bug reported to us in current static library. Requires 
+ *                   this to be called before the BTLE app starts making advertisements. Avoids encryption
+ *                   rendering the frame unreadable.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void llc_api_crypto_disable_tx();
+
+
 /*************************************************************************************************/
 /*!
  *  \brief  Perform a user interface action based on the event value passed to the function.
@@ -59,6 +72,7 @@ void AppUiAction(uint8_t event)
       break;
 
     case APP_UI_ADV_START:
+      llc_api_crypto_disable_tx();
       APP_TRACE_INFO0(">>> Advertising started <<<");
       break;
 
