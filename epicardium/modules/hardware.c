@@ -60,6 +60,11 @@ int hardware_early_init(void)
 	portexpander_init();
 
 	/*
+	 * RNG
+	 */
+	TRNG_Init(NULL);
+
+	/*
 	 * Buttons
 	 */
 	PB_Init();
