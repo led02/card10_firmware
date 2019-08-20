@@ -118,3 +118,12 @@ Q(INPUT)
 Q(OUTPUT)
 Q(PULL_UP)
 Q(PULL_DOWN)
+
+/* personal_state */
+Q(personal_state)
+Q(get)
+Q(NO_STATE)
+Q(NO_CONTACT)
+Q(CHAOS)
+Q(COMMUNICATION)
+Q(CAMP)
