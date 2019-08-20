@@ -3,7 +3,7 @@ import leds, utime, math
 
 def col_cor(colors, brightness=1, gamma=1):
     """
-    Gamma correction for the RGB channels
+    Gamma and  brightness correction for the RGB channels
     """
     return [
         [int(255 * brightness * math.pow((y / 255.0), gamma)) for y in x]
@@ -13,7 +13,7 @@ def col_cor(colors, brightness=1, gamma=1):
 
 def halo(colors):
     """ 
-    sets the four bottom/side LEDs to colors corresponding to the color spectrum on the top 11 LEDs
+    sets the four bottom/side LEDs to colors corresponding to the color spectrum on the outermost of the top 11 LEDs
     """
     used_leds = len(colors)
     #add additional RGB-Color-lists to the colors-list to fill up the top LEDs with emptiness
@@ -26,7 +26,7 @@ def halo(colors):
 def kitt(
     #amount of cycles for the animation
     cycles=100,
-    #time in microseconds until the animation moves on.
+    #time in microseconds until the animation moves on. (we could also call it framerate)
     delay=80,
     #the shape of your brightness curve. bigger values make a steeper curve, smaller values make the curve wider.
     power=10,
@@ -54,12 +54,12 @@ def kitt(
         #and go backwards after 10 steps
         if j > 10:
             j = 20 - j
-        #if a color spectrum was given
+        #if a color spectrum wasn't given
         if spectrum == []:
             #set the amount of LEDs used to 11, because we're using the full width
             used_leds = 11
             #set the color values to the LEDs by multiplying the given color value with the corresponding brightness value in the kitt table
-            output = [[int(x * y) for y in rgb] for x in kitt_table[j : (j + 11)]]
+            output = [[int(x * y) for y in rgb] for x in kitt_table[j : (j + used_leds)]]
         else:
             #use the amount of leds specified in the spectrum
             used_leds = len(spectrum)
@@ -68,7 +68,7 @@ def kitt(
                 [int(y * kitt_table[j + x]) for y in spectrum[x]]
                 for x in range(used_leds)
             ]
-        #if a halo has been defined, also use the four bottom LEDs
+        #if a halo is True, also use the four bottom LEDs
         if halo:
             halo(output)
         #set the LEDs to the output defined above
