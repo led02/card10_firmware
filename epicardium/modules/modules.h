@@ -34,6 +34,9 @@ int personal_state_enabled();
 /* ---------- PMIC --------------------------------------------------------- */
 void vPmicTask(void *pvParameters);
 
+/* Critical battery voltage */
+#define BATTERY_CRITICAL   3.40f
+
 enum pmic_amux_signal {
 	PMIC_AMUX_CHGIN_U     = 0x1,
 	PMIC_AMUX_CHGIN_I     = 0x2,

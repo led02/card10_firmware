@@ -154,6 +154,36 @@ pmic_poll_interrupts(TickType_t *button_start_tick, TickType_t duration)
 	}
 }
 
+__attribute__((noreturn)) static void pmic_die(float u_batt)
+{
+	/* Stop core 1 */
+	core1_stop();
+
+	/* Grab the screen */
+	disp_forcelock();
+
+	/* Draw an error screen */
+	epic_disp_clear(0x0000);
+
+	epic_disp_print(0, 0, " Battery", 0xffff, 0x0000);
+	epic_disp_print(0, 20, " critical", 0xffff, 0x0000);
+	epic_disp_print(0, 40, "  !!!!", 0xffff, 0x0000);
+	epic_disp_update();
+
+	/* Vibrate violently */
+	epic_vibra_set(true);
+
+	/* Wait a bit */
+	for (int i = 0; i < 50000000; i++)
+		__NOP();
+
+	LOG_WARN("pmic", "Poweroff");
+	MAX77650_setSFT_RST(0x2);
+
+	while (1)
+		__WFI();
+}
+
 /*
  * Check the battery voltage.  If it drops too low, turn card10 off.
  */
@@ -175,9 +205,9 @@ static void pmic_check_battery()
 		(int)(u_batt * 1000.0) % 1000
 	);
 
-	/*
-	 * TODO: Handle voltage value
-	 */
+	if (u_batt < BATTERY_CRITICAL) {
+		pmic_die(u_batt);
+	}
 }
 
 /*
