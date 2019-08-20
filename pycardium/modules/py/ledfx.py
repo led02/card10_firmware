@@ -24,24 +24,25 @@ def halo(colors):
 
 
 def kitt(
-    #amount of cycles for the animation
     cycles=100,
-    #time in microseconds until the animation moves on. (we could also call it framerate)
     delay=80,
-    #the shape of your brightness curve. bigger values make a steeper curve, smaller values make the curve wider.
     power=10,
-    #the minimal brightness
     minimum=0.3,
-    #if you don't enter a spectrum this is the color we'll use
     rgb=[255, 0, 0],
-    #a color spectrum consisting of up to 11 RGB-Value-Lists (e.g. [[255,255,255], [0,0,0], [255,255,255] and so on] - ). if you use less, the animation will be less wide.
     spectrum=[],
     
     halo=False,
 ):
     """
     LED Animation. Knight rider-Style. 
+    :param cycles: amount of cycles for the animation
+    :param delay: time in microseconds until the animation moves on. (we could also call it framerate)
+    :param power: the shape of your brightness curve. bigger values make a steeper curve, smaller values make the curve wider.
+    :param minimum: the minimal brightness
+    :param rgb: if you don't enter a spectrum this is the color we'll use
+    :param specttrum: a color spectrum consisting of up to 11 RGB-Value-Lists (e.g. [[255,255,255], [0,0,0], [255,255,255] and so on] - ). if you use less, the animation will be less wide.
     """
+    
     # create a basic table of values for a smooth increment of the LED brightness (if you don't understand this, don't worry, i don't either. just paste it into the python shell and see the output). Basically creates a negative cosinus curve. 
     kitt_table = [((-math.cos(math.pi * (x / 10.0))) + 1) / 2.0 for x in range(21)]
     #adjust the values to start with a minimum brightness and the width of the curve to the given power.
