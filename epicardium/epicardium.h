@@ -84,6 +84,7 @@ typedef _Bool bool;
 #define API_LEDS_SET_ALL           0x6a
 #define API_LEDS_SET_ALL_HSV       0x6b
 #define API_LEDS_SET_GAMMA_TABLE   0x6c
+#define API_LEDS_CLEAR_ALL         0x6d
 
 #define API_VIBRA_SET              0x70
 #define API_VIBRA_VIBRATE          0x71
@@ -647,6 +648,15 @@ API(API_LEDS_SET_GAMMA_TABLE, void epic_leds_set_gamma_table(
 	uint8_t rgb_channel,
 	uint8_t *gamma_table
 ));
+
+/**
+ * Set all LEDs to a certain RGB color.
+ *
+ * :param uint8_t r: Value for the red color channel.
+ * :param uint8_t g: Value for the green color channel.
+ * :param uint8_t b: Value for the blue color channel.
+ */
+API(API_LEDS_CLEAR_ALL, void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b));
 
 /**
  * Sensor Data Streams

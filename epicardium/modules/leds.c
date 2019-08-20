@@ -87,3 +87,16 @@ void epic_leds_set_gamma_table(uint8_t rgb_channel, uint8_t gamma_table[256])
 {
 	leds_set_gamma_table(rgb_channel, gamma_table);
 }
+
+void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b)
+{
+	for (int i = 0; i < NUM_LEDS; i++) {
+		if (i == PERSONAL_STATE_LED && personal_state_enabled)
+			continue;
+
+		leds_prep(i, r, g, b);
+	}
+
+	leds_update_power();
+	leds_update();
+}
