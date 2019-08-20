@@ -610,8 +610,7 @@ API(API_LEDS_UPDATE, void epic_leds_update(void));
  *    +-------+--------+----------+
  *    | ``2`` | Green  | Right    |
  *    +-------+--------+----------+
- * :param uint8_t value:  Brightness of LED (only two brightness levels are
- *    supported right now).
+ * :param uint8_t value:  Brightness of LED (value between 0 and 31).
  */
 API(API_LEDS_SET_ROCKET, void epic_leds_set_rocket(int led, uint8_t value));
 

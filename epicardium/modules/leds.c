@@ -63,6 +63,7 @@ void epic_leds_dim_bottom(uint8_t value)
 
 void epic_leds_set_rocket(int led, uint8_t value)
 {
+	value = value > 31 ? 31 : value;
 	pmic_set_led(led, value);
 }
 

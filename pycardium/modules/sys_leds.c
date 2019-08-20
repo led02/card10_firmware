@@ -1,9 +1,11 @@
+#include "epicardium.h"
+
 #include "py/obj.h"
 #include "py/objlist.h"
 #include "py/runtime.h"
+
 #include <stdio.h>
 
-#include "epicardium.h"
 
 static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
@@ -162,6 +164,11 @@ static mp_obj_t mp_leds_set_rocket(mp_obj_t led_in, mp_obj_t value_in)
 {
 	int led   = mp_obj_get_int(led_in);
 	int value = mp_obj_get_int(value_in);
+
+	if (value > 31) {
+		mp_raise_ValueError("brightness must by < 32");
+	}
+
 	epic_leds_set_rocket(led, value);
 	return mp_const_none;
 }
@@ -170,6 +177,11 @@ static MP_DEFINE_CONST_FUN_OBJ_2(leds_set_rocket_obj, mp_leds_set_rocket);
 static mp_obj_t mp_leds_dim_top(mp_obj_t dim_in)
 {
 	int dim = mp_obj_get_int(dim_in);
+
+	if (dim > 8) {
+		mp_raise_ValueError("maximum allowed dim is 8");
+	}
+
 	epic_leds_dim_top(dim);
 	return mp_const_none;
 }
@@ -178,6 +190,11 @@ static MP_DEFINE_CONST_FUN_OBJ_1(leds_dim_top_obj, mp_leds_dim_top);
 static mp_obj_t mp_leds_dim_bottom(mp_obj_t dim_in)
 {
 	int dim = mp_obj_get_int(dim_in);
+
+	if (dim > 8) {
+		mp_raise_ValueError("maximum allowed dim is 8");
+	}
+
 	epic_leds_dim_bottom(dim);
 	return mp_const_none;
 }

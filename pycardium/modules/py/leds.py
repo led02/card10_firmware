@@ -61,8 +61,7 @@ def set_rocket(led, value):
        +-------+--------+----------+
        | ``2`` | Green  | Right    |
        +-------+--------+----------+
-    :param int value:  Brightness of LED (only two brightness levels are
-       supported right now).
+    :param int value:  Brightness of LED (value between 0 and 31).
     """
     sys_leds.set_rocket(led, value)
 
@@ -71,7 +70,7 @@ def dim_top(value):
     """
     Set global brightness for top RGB LEDs.
 
-    :param int value: Brightness. Default = 1, range = 1...8
+    :param int value: Brightness. Default = 1, Range = 1..8
     """
     sys_leds.dim_top(value)
 
@@ -80,7 +79,7 @@ def dim_bottom(value):
     """
     Set global brightness for bottom RGB LEDs.
 
-    :param int value: Brightness. Default = 8, range = 1...8
+    :param int value: Brightness. Default = 8, Range = 1..8
     """
     sys_leds.dim_bottom(value)
 
