@@ -1,12 +1,29 @@
 #include "leds.h"
 #include "pmic.h"
-//#include "FreeRTOS.h"
-//#include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "epicardium.h"
+#include "modules.h"
+
+#include <stdbool.h>
 
 //TODO: create smth like vTaskDelay(pdMS_TO_TICKS(//put ms here)) for us, remove blocking delay from /lib/leds.c to avoid process blocking
 
+#define NUM_LEDS 15 /* Take from lib/card10/leds.c */
+
+static void update_if_needed()
+{
+	if (personal_state_enabled() == 0) {
+		leds_update_power();
+		leds_update();
+	}
+}
+
 void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
 {
+	if (led == PERSONAL_STATE_LED && personal_state_enabled())
+		return;
+
 	leds_prep(led, r, g, b);
 	leds_update_power();
 	leds_update();
@@ -14,18 +31,26 @@ void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b)
 
 void epic_leds_set_hsv(int led, float h, float s, float v)
 {
+	if (led == PERSONAL_STATE_LED && personal_state_enabled())
+		return;
+
 	leds_prep_hsv(led, h, s, v);
-	leds_update_power();
-	leds_update();
+	update_if_needed();
 }
 
 void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b)
 {
+	if (led == PERSONAL_STATE_LED && personal_state_enabled())
+		return;
+
 	leds_prep(led, r, g, b);
 }
 
 void epic_leds_prep_hsv(int led, float h, float s, float v)
 {
+	if (led == PERSONAL_STATE_LED && personal_state_enabled())
+		return;
+
 	leds_prep_hsv(led, h, s, v);
 }
 
@@ -33,32 +58,38 @@ void epic_leds_set_all(uint8_t *pattern_ptr, uint8_t len)
 {
 	uint8_t(*pattern)[3] = (uint8_t(*)[3])pattern_ptr;
 	for (int i = 0; i < len; i++) {
+		if (i == PERSONAL_STATE_LED && personal_state_enabled())
+			continue;
+
 		leds_prep(i, pattern[i][0], pattern[i][1], pattern[i][2]);
 	}
-	leds_update_power();
-	leds_update();
+	update_if_needed();
 }
 
 void epic_leds_set_all_hsv(float *pattern_ptr, uint8_t len)
 {
 	float(*pattern)[3] = (float(*)[3])pattern_ptr;
 	for (int i = 0; i < len; i++) {
+		if (i == PERSONAL_STATE_LED && personal_state_enabled())
+			continue;
+
 		leds_prep_hsv(i, pattern[i][0], pattern[i][1], pattern[i][2]);
 	}
-	leds_update_power();
-	leds_update();
+	update_if_needed();
 }
 
 void epic_leds_dim_top(uint8_t value)
 {
 	leds_set_dim_top(value);
-	leds_update();
+	if (personal_state_enabled() == 0)
+		leds_update();
 }
 
 void epic_leds_dim_bottom(uint8_t value)
 {
 	leds_set_dim_bottom(value);
-	leds_update();
+	if (personal_state_enabled() == 0)
+		leds_update();
 }
 
 void epic_leds_set_rocket(int led, uint8_t value)
@@ -74,8 +105,7 @@ void epic_set_flashlight(bool power)
 
 void epic_leds_update(void)
 {
-	leds_update_power();
-	leds_update();
+	update_if_needed();
 }
 
 void epic_leds_set_powersave(bool eco)
@@ -91,7 +121,7 @@ void epic_leds_set_gamma_table(uint8_t rgb_channel, uint8_t gamma_table[256])
 void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b)
 {
 	for (int i = 0; i < NUM_LEDS; i++) {
-		if (i == PERSONAL_STATE_LED && personal_state_enabled)
+		if (i == PERSONAL_STATE_LED && personal_state_enabled())
 			continue;
 
 		leds_prep(i, r, g, b);

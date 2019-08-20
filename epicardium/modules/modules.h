@@ -26,6 +26,11 @@ void return_to_menu(void);
 void vSerialTask(void *pvParameters);
 void serial_enqueue_char(char chr);
 
+/* ---------- LED Animation / Personal States ------------------------------ */
+#define PERSONAL_STATE_LED 14
+void vLedTask(void *pvParameters);
+int personal_state_enabled();
+
 /* ---------- PMIC --------------------------------------------------------- */
 /* In 1/10s */
 #define PMIC_PRESS_SLEEP           20
