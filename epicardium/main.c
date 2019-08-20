@@ -73,6 +73,18 @@ int main(void)
 		}
 	}
 
+	/* LEDs */
+	if (xTaskCreate(
+		    vLedTask,
+		    (const char *)"LED",
+		    configMINIMAL_STACK_SIZE,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
+		LOG_CRIT("startup", "Failed to create %s task!", "LED");
+		abort();
+	}
+
 	/* Lifecycle */
 	if (xTaskCreate(
 		    vLifecycleTask,

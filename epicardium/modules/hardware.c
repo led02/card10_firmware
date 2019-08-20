@@ -190,10 +190,22 @@ int hardware_reset(void)
 	api_interrupt_init();
 	api_dispatcher_init();
 
+	/* Personal State */
+	const int personal_state_is_persistent =
+		epic_personal_state_is_persistent();
+
+	if (personal_state_is_persistent == 0) {
+		epic_personal_state_set(STATE_NONE, 0);
+	}
+
 	/*
 	 * LEDs
 	 */
-	leds_init();
+	if (personal_state_is_persistent) {
+		epic_leds_clear_all(0, 0, 0);
+	} else {
+		leds_init();
+	}
 	epic_leds_set_rocket(0, 0);
 	epic_leds_set_rocket(1, 0);
 	epic_leds_set_rocket(2, 0);

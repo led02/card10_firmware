@@ -46,6 +46,7 @@
 #define MODULE_LEDS_ENABLED                 (1)
 #define MODULE_LIGHT_SENSOR_ENABLED         (1)
 #define MODULE_OS_ENABLED                   (1)
+#define MODULE_PERSONAL_STATE_ENABLED       (1)
 #define MODULE_UTIME_ENABLED                (1)
 #define MODULE_VIBRA_ENABLED                (1)
 

@@ -10,6 +10,7 @@ module_sources = files(
   'lifecycle.c',
   'light_sensor.c',
   'log.c',
+  'personal_state.c',
   'pmic.c',
   'rtc.c',
   'serial.c',
