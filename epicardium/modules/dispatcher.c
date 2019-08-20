@@ -8,6 +8,8 @@
 
 #define TIMEOUT pdMS_TO_TICKS(2000)
 
+TaskHandle_t dispatcher_task_id;
+
 static StaticSemaphore_t api_mutex_data;
 SemaphoreHandle_t api_mutex = NULL;
 

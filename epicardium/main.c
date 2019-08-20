@@ -9,10 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-TaskHandle_t dispatcher_task_id;
-
-void vBleTask(void *pvParameters);
-
 #define BLEMAXCFGBYTES 100
 int bleShallStart(void)
 {

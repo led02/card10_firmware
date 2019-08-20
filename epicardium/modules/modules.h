@@ -32,6 +32,7 @@ void serial_enqueue_char(char chr);
 void vPmicTask(void *pvParameters);
 
 /* ---------- BLE ---------------------------------------------------------- */
+void vBleTask(void *pvParameters);
 void ble_uart_write(uint8_t *pValue, uint8_t len);
 
 /* ---------- Display ------------------------------------------------------ */
