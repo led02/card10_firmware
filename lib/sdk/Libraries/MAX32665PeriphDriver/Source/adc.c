@@ -118,6 +118,7 @@ int ADC_Init(unsigned divisor, const sys_cfg_adc_t* sys_cfg)
     // Power up the ADC
     MXC_ADC->ctrl |= MXC_F_ADC_CTRL_PWR;
     MXC_ADC->ctrl |= MXC_F_ADC_CTRL_REFBUF_PWR;
+    MXC_ADC->ctrl |= MXC_F_ADC_CTRL_CHGPUMP_PWR;
     
     while ((MXC_ADC->intr & MXC_F_ADC_INTR_REF_READY_IF)>>MXC_F_ADC_INTR_REF_READY_IF_POS);
     ADC_ClearFlags(MXC_F_ADC_INTR_REF_READY_IF);
