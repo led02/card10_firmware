@@ -91,7 +91,7 @@ int main(void)
 		    (const char *)"Lifecycle",
 		    configMINIMAL_STACK_SIZE * 4,
 		    NULL,
-		    tskIDLE_PRIORITY + 1,
+		    tskIDLE_PRIORITY + 3,
 		    NULL) != pdPASS) {
 		LOG_CRIT("startup", "Failed to create %s task!", "Lifecycle");
 		abort();
