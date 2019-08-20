@@ -180,6 +180,14 @@ static void pmic_check_battery()
 	 */
 }
 
+/*
+ * API-call for battery voltage
+ */
+int epic_read_battery_voltage(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_BATT_U, result);
+}
+
 static StaticTimer_t pmic_timer_data;
 static void vPmicTimerCb(TimerHandle_t xTimer)
 {
