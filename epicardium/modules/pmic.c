@@ -45,7 +45,13 @@ void vPmicTask(void *pvParameters)
 			MAX77650_setSFT_RST(0x2);
 		}
 
+		while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(500)) < 0) {
+			LOG_WARN("pmic", "Failed to acquire I2C. Retrying ...");
+			vTaskDelay(pdMS_TO_TICKS(500));
+		}
+
 		uint8_t int_flag = MAX77650_getINT_GLBL();
+		hwlock_release(HWLOCK_I2C);
 
 		if (int_flag & MAX77650_INT_nEN_F) {
 			/* Button was pressed */

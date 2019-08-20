@@ -150,6 +150,11 @@ int hardware_early_init(void)
 	 */
 	stream_init();
 
+	/*
+	 * Hardware/Peripheral Locks
+	 */
+	hwlock_init();
+
 	return 0;
 }
 

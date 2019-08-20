@@ -37,6 +37,17 @@ void vBleTask(void *pvParameters);
 bool ble_shall_start(void);
 void ble_uart_write(uint8_t *pValue, uint8_t len);
 
+/* ---------- Hardware (Peripheral) Locks ---------------------------------- */
+void hwlock_init(void);
+
+enum hwlock_periph {
+	HWLOCK_I2C = 0,
+	_HWLOCK_MAX,
+};
+
+int hwlock_acquire(enum hwlock_periph p, TickType_t wait);
+int hwlock_release(enum hwlock_periph p);
+
 /* ---------- Display ------------------------------------------------------ */
 /* Forces an unlock of the display. Only to be used in Epicardium */
 void disp_forcelock();
