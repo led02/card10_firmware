@@ -21,6 +21,7 @@ in stdenv.mkDerivation rec {
     meson
     ninja
     py
+    py.pkgs.pillow
   ];
   src = ./.;
   buildCommand = ''
@@ -33,7 +34,7 @@ in stdenv.mkDerivation rec {
     chmod -R +w .
 
     # The nix sandbox does not have /usr/bin/env bash, patch things up.
-    for f in lib/micropython/*.sh; do
+    for f in lib/micropython/*.sh tools/*.sh; do
       patchShebangs "$f"
     done
 
