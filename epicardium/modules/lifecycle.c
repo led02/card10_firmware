@@ -114,10 +114,12 @@ static int do_load(struct load_info *info)
 	core1_wait_ready();
 
 	/*
-	 * Reinitialize API
+	 * Reinitialize Hardware & Drivers
 	 */
-	api_dispatcher_init();
-	api_interrupt_init();
+	res = hardware_reset();
+	if (res < 0) {
+		return res;
+	}
 
 	switch (info->type) {
 	case PL_PYTHON_SCRIPT:

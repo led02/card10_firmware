@@ -173,6 +173,24 @@ int hardware_init(void)
  */
 int hardware_reset(void)
 {
-	card10_init();
+	/*
+	 * API Dispatcher & API Interrupts
+	 */
+	api_interrupt_init();
+	api_dispatcher_init();
+
+	/*
+	 * LEDs
+	 */
+	leds_init();
+	epic_leds_set_rocket(0, 0);
+	epic_leds_set_rocket(1, 0);
+	epic_leds_set_rocket(2, 0);
+
+	/*
+	 * Display
+	 */
+	display_init_slim();
+
 	return 0;
 }
