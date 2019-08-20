@@ -97,10 +97,18 @@ static void setAddress(void)
 
 	if (result == -1) {
 		APP_TRACE_INFO0("mac.txt not found, generating random MAC");
-		TRNG_Read(MXC_TRNG, bdAddr, sizeof(bdAddr));
-		sprintf(buf, "%02x:%02x:%02x:%02x:%02x:%02x\n",
-			bdAddr[0], bdAddr[1], bdAddr[2],
-			bdAddr[3], bdAddr[4], bdAddr[5]);
+		bdAddr[0] = 0xCA;
+		bdAddr[1] = 0x4D;
+		bdAddr[2] = 0x10;
+		TRNG_Read(MXC_TRNG, bdAddr + 3, 3);
+		sprintf(buf,
+			"%02x:%02x:%02x:%02x:%02x:%02x\n",
+			bdAddr[0],
+			bdAddr[1],
+			bdAddr[2],
+			bdAddr[3],
+			bdAddr[4],
+			bdAddr[5]);
 		fs_write_file("mac.txt", buf, strlen(buf));
 	} else {
 		APP_TRACE_INFO1("mac file contents: %s", buf);
