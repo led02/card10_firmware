@@ -39,6 +39,11 @@
 #include <stdio.h>
 #include "mx25.h"
 
+#ifdef MX25_PRINT_FUNCTION_NAMES
+#define PRINT_FUNCTION_NAME printf("%s\n", __func__);
+#else
+#define PRINT_FUNCTION_NAME
+#endif
 /***** Definitions *****/
 
 #define LBA_SIZE                    512         /* Size of "logical blocks" in bytes */
@@ -118,7 +123,7 @@ static uint32_t getSector(uint32_t num)
 /******************************************************************************/
 int mx25_init()
 {
-    printf("%s\n", __func__);
+    PRINT_FUNCTION_NAME
 
     if(!initialized) {
         MX25_Init();
@@ -132,7 +137,7 @@ int mx25_init()
 /******************************************************************************/
 uint32_t mx25_size(void)
 {
-    //printf("%s\n", __func__);
+    //PRINT_FUNCTION_NAME
     /* Get number of 512 byte chunks the MX25 contains. */
     return (MX25_SECTOR_SIZE >> LBA_SIZE_SHIFT) * MX25_NUM_SECTORS;
 }
@@ -140,7 +145,7 @@ uint32_t mx25_size(void)
 /******************************************************************************/
 int mx25_read(uint32_t lba, uint8_t* buffer)
 {
-    //printf("%s\n", __func__);
+    //PRINT_FUNCTION_NAME
     uint32_t addr;
 
     /* Convert to MX25 sector number. */
@@ -162,7 +167,7 @@ int mx25_read(uint32_t lba, uint8_t* buffer)
 /******************************************************************************/
 int mx25_write(uint32_t lba, uint8_t* buffer)
 {
-    //printf("%s\n", __func__);
+    //PRINT_FUNCTION_NAME
     uint32_t addr;
 
     /* Convert to MX25 sector number. */
@@ -185,7 +190,7 @@ int mx25_write(uint32_t lba, uint8_t* buffer)
 /******************************************************************************/
 int mx25_start()
 {
-    printf("%s\n", __func__);
+    PRINT_FUNCTION_NAME
     /* Turn on the MX25 if it is not already. */
     if(!initialized) {
         mx25_init();
@@ -203,7 +208,7 @@ int mx25_start()
 /******************************************************************************/
 int mx25_stop()
 {
-    printf("%s\n", __func__);
+    PRINT_FUNCTION_NAME
     /* TODO - could shut down XIPF interface here. */
 
     /* Flush the currently cached sector if necessary. */
@@ -217,7 +222,7 @@ int mx25_stop()
 /******************************************************************************/
 int mx25_sync()
 {
-    printf("%s\n", __func__);
+    PRINT_FUNCTION_NAME
     /* Flush the currently cached sector if necessary. */
     if(getSector(INVALID_SECTOR)) {
         return 1;
