@@ -1,10 +1,14 @@
-#include "FreeRTOS.h"
-#include "timers.h"
-#include "led.h"
+#include "epicardium.h"
+#include "modules/log.h"
+#include "modules/modules.h"
+
 #include "mxc_config.h"
+#include "led.h"
 #include "adc.h"
 #include "gpio.h"
-#include <errno.h>
+
+#include "FreeRTOS.h"
+#include "timers.h"
 
 #define READ_FREQ pdMS_TO_TICKS(100)
 
@@ -25,12 +29,25 @@ static int light_sensor_init()
 
 static void readAdcCallback()
 {
+	if (hwlock_acquire(HWLOCK_ADC, 0) != 0) {
+		/* Can't do much about this here ... Retry next time */
+		return;
+	}
+
 	ADC_StartConvert(ADC_CH_7, 0, 0);
 	ADC_GetData(&last_value);
+
+	hwlock_release(HWLOCK_ADC);
 }
 
 int epic_light_sensor_run()
 {
+	int ret = 0;
+
+	if (hwlock_acquire(HWLOCK_ADC, pdMS_TO_TICKS(500)) != 0) {
+		return -EBUSY;
+	}
+
 	light_sensor_init();
 
 	if (!poll_timer) {
@@ -47,10 +64,12 @@ int epic_light_sensor_run()
 	}
 	if (xTimerIsTimerActive(poll_timer) == pdFALSE) {
 		if (xTimerStart(poll_timer, 0) != pdPASS) {
-			return -EBUSY;
+			ret = -EBUSY;
 		}
 	}
-	return 0;
+
+	hwlock_release(HWLOCK_ADC);
+	return ret;
 }
 
 int epic_light_sensor_stop()
@@ -63,6 +82,7 @@ int epic_light_sensor_stop()
 	if (xTimerStop(poll_timer, 0) != pdPASS) {
 		return -EBUSY;
 	}
+
 	return 0;
 }
 
