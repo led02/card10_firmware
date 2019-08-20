@@ -12,7 +12,7 @@ static uint16_t last_value;
 static TimerHandle_t poll_timer;
 static StaticTimer_t poll_timer_buffer;
 
-int epic_light_sensor_init()
+static int light_sensor_init()
 {
 	const sys_cfg_adc_t sys_adc_cfg =
 		NULL; /* No system specific configuration needed. */
@@ -23,7 +23,7 @@ int epic_light_sensor_init()
 	return 0;
 }
 
-void readAdcCallback()
+static void readAdcCallback()
 {
 	ADC_StartConvert(ADC_CH_7, 0, 0);
 	ADC_GetData(&last_value);
@@ -31,7 +31,7 @@ void readAdcCallback()
 
 int epic_light_sensor_run()
 {
-	epic_light_sensor_init();
+	light_sensor_init();
 
 	if (!poll_timer) {
 		poll_timer = xTimerCreateStatic(
