@@ -14,7 +14,7 @@ static const uint8_t pin_mask[] = {
 uint8_t epic_buttons_read(uint8_t mask)
 {
 	uint8_t ret = 0;
-	if (portexpander_detected() && (mask & 0x3)) {
+	if (portexpander_detected() && (mask & 0x7)) {
 		/*
 		 * Not using PB_Get() here as that performs one I2C transcation
 		 * per button.

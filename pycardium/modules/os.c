@@ -19,6 +19,15 @@ static mp_obj_t mp_os_exit(size_t n_args, const mp_obj_t *args)
 }
 static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(exit_obj, 0, 1, mp_os_exit);
 
+static mp_obj_t mp_os_reset(void)
+{
+	epic_system_reset();
+
+	/* unreachable */
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(reset_obj, mp_os_reset);
+
 static mp_obj_t mp_os_exec(mp_obj_t name_in)
 {
 	const char *name_ptr;
@@ -117,6 +126,7 @@ static MP_DEFINE_CONST_FUN_OBJ_2(rename_obj, mp_os_rename);
 static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_os) },
 	{ MP_ROM_QSTR(MP_QSTR_exit), MP_ROM_PTR(&exit_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&reset_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_exec), MP_ROM_PTR(&exec_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_listdir), MP_ROM_PTR(&listdir_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_unlink), MP_ROM_PTR(&unlink_obj) },

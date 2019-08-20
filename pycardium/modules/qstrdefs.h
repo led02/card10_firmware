@@ -97,6 +97,7 @@ Q(write)
 /* os */
 Q(os)
 Q(exit)
+Q(reset)
 Q(exec)
 Q(listdir)
 Q(unlink)
