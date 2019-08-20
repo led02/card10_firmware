@@ -71,6 +71,13 @@ def main():
     numapps = len(applist)
     current = 0
     for ev in button_events():
+        if numapps == 0:
+            disp.clear()
+            disp.print("No apps", posy=0)
+            disp.print("available", posy=20)
+            disp.update()
+            continue
+
         if ev == buttons.BOTTOM_RIGHT:
             # Scroll down
             draw_menu(disp, applist, current, -8)
