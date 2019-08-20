@@ -72,9 +72,21 @@ def main():
     current = 0
     for ev in button_events():
         if numapps == 0:
-            disp.clear()
-            disp.print("No apps", posy=0)
-            disp.print("available", posy=20)
+            disp.clear(color.COMMYELLOW)
+            disp.print(
+                " No apps ",
+                posx=17,
+                posy=20,
+                fg=color.COMMYELLOW_DARK,
+                bg=color.COMMYELLOW,
+            )
+            disp.print(
+                "available",
+                posx=17,
+                posy=40,
+                fg=color.COMMYELLOW_DARK,
+                bg=color.COMMYELLOW,
+            )
             disp.update()
             continue
 
