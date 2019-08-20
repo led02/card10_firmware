@@ -29,6 +29,8 @@ int efs_stat(EpicFileSystem *fs, const char *filename, struct epic_stat *stat);
 int efs_opendir(EpicFileSystem *fs, const char *path);
 int efs_readdir(EpicFileSystem *fs, int fd, struct epic_stat *stat);
 int efs_unlink(EpicFileSystem *fs, const char *path);
+int efs_rename(EpicFileSystem *fs, const char *oldp, const char *newp);
+int efs_mkdir(EpicFileSystem *fs, const char *dirname);
 /**
  * lock global filesystem
  * 

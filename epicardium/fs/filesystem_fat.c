@@ -554,6 +554,18 @@ int efs_unlink(EpicFileSystem *fs, const char *path)
 	return -s_libffToErrno[res];
 }
 
+int efs_rename(EpicFileSystem *fs, const char *oldp, const char *newp)
+{
+	int res = f_rename(oldp, newp);
+	return -s_libffToErrno[res];
+}
+
+int efs_mkdir(EpicFileSystem *fs, const char *dirname)
+{
+	int res = f_mkdir(dirname);
+	return -s_libffToErrno[res];
+}
+
 static const int s_libffToErrno[20] = {
 	[FR_OK]                  = 0,
 	[FR_DISK_ERR]            = EIO,

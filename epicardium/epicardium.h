@@ -63,6 +63,8 @@ typedef _Bool bool;
 #define API_FILE_OPENDIR           0x49
 #define API_FILE_READDIR           0x4a
 #define API_FILE_UNLINK            0x4b
+#define API_FILE_RENAME            0x4c
+#define API_FILE_MKDIR             0x4d
 
 #define API_RTC_GET_SECONDS        0x50
 #define API_RTC_SCHEDULE_ALARM     0x51
@@ -1146,6 +1148,24 @@ API(API_FILE_READDIR, int epic_file_readdir(int fd, struct epic_stat* stat));
  */
 API(API_FILE_UNLINK, int epic_file_unlink(const char* path));
 
+/**
+ * Rename a file or directory.
+ *
+ * :param char* oldp: old name
+ * :param char* newp: new name
+ *
+ * :return: ``0`` on success, negative on error
+ */
+API(API_FILE_RENAME, int epic_file_rename(const char *oldp, const char* newp));
+
+/**
+ * Create directory in CWD
+ *
+ * :param char* dirname: directory name
+ *
+ * :return: ``0`` on success, negative on error
+ */
+API(API_FILE_MKDIR, int epic_file_mkdir(const char *dirname));
 
 /**
  * RTC

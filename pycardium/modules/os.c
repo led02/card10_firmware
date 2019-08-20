@@ -89,12 +89,39 @@ static mp_obj_t mp_os_unlink(mp_obj_t py_path)
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(unlink_obj, mp_os_unlink);
 
+static mp_obj_t mp_os_mkdir(mp_obj_t py_path)
+{
+	const char *path = mp_obj_str_get_str(py_path);
+	int rc           = epic_file_mkdir(path);
+
+	if (rc < 0) {
+		mp_raise_OSError(-rc);
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(mkdir_obj, mp_os_mkdir);
+
+static mp_obj_t mp_os_rename(mp_obj_t py_oldp, mp_obj_t py_newp)
+{
+	const char *oldp = mp_obj_str_get_str(py_oldp);
+	const char *newp = mp_obj_str_get_str(py_newp);
+	int rc           = epic_file_rename(oldp, newp);
+
+	if (rc < 0) {
+		mp_raise_OSError(-rc);
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_2(rename_obj, mp_os_rename);
+
 static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_os) },
 	{ MP_ROM_QSTR(MP_QSTR_exit), MP_ROM_PTR(&exit_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_exec), MP_ROM_PTR(&exec_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_listdir), MP_ROM_PTR(&listdir_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_unlink), MP_ROM_PTR(&unlink_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_mkdir), MP_ROM_PTR(&mkdir_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_rename), MP_ROM_PTR(&rename_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(os_module_globals, os_module_globals_table);

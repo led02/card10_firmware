@@ -100,6 +100,8 @@ Q(exit)
 Q(exec)
 Q(listdir)
 Q(unlink)
+Q(mkdir)
+Q(rename)
 
 /* gpio */
 Q(gpio)

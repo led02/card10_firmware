@@ -138,3 +138,25 @@ int epic_file_unlink(const char *path)
 	}
 	return res;
 }
+
+int epic_file_rename(const char *oldp, const char *newp)
+{
+	EpicFileSystem *fs;
+	int res = efs_lock_global(&fs);
+	if (res == 0) {
+		res = efs_rename(fs, oldp, newp);
+		efs_unlock_global(fs);
+	}
+	return res;
+}
+
+int epic_file_mkdir(const char *dirname)
+{
+	EpicFileSystem *fs;
+	int res = efs_lock_global(&fs);
+	if (res == 0) {
+		res = efs_mkdir(fs, dirname);
+		efs_unlock_global(fs);
+	}
+	return res;
+}
