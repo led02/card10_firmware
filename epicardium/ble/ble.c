@@ -1,3 +1,4 @@
+#include "epicardium.h"
 #include "modules/log.h"
 
 #include "fs_util.h"
@@ -170,6 +171,37 @@ void wsf_ble_signal_event(void)
 {
 	//printf("wsf_ble_signal_event\n");
 	notify();
+}
+/*************************************************************************************************/
+#define BLEMAXCFGBYTES 100
+bool ble_shall_start(void)
+{
+	int bleConfigFile = epic_file_open("ble.txt", "r");
+	if (bleConfigFile < 0) {
+		LOG_INFO("ble", "can not open ble.txt -> BLE is not started");
+		epic_file_close(bleConfigFile);
+		return false;
+	}
+
+	char cfgBuf[BLEMAXCFGBYTES + 1];
+	int readNum = epic_file_read(bleConfigFile, cfgBuf, BLEMAXCFGBYTES);
+	epic_file_close(bleConfigFile);
+	if (readNum < 0) {
+		LOG_WARN("ble", "can not read ble.txt -> BLE is not started");
+		return false;
+	}
+	cfgBuf[readNum] = '\0';
+
+	char bleActiveStr[]              = "active=true";
+	cfgBuf[sizeof(bleActiveStr) - 1] = '\0';
+
+	if (strcmp(cfgBuf, "active=true") != 0) {
+		LOG_INFO("ble", "BLE is disabled.");
+		return false;
+	} else {
+		LOG_INFO("ble", "BLE is enabled.");
+		return true;
+	}
 }
 /*************************************************************************************************/
 static void scheduleTimer(void)

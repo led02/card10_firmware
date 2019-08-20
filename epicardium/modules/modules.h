@@ -5,6 +5,7 @@
 #include "semphr.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* ---------- Dispatcher --------------------------------------------------- */
 void vApiDispatcher(void *pvParameters);
@@ -33,6 +34,7 @@ void vPmicTask(void *pvParameters);
 
 /* ---------- BLE ---------------------------------------------------------- */
 void vBleTask(void *pvParameters);
+bool ble_shall_start(void);
 void ble_uart_write(uint8_t *pValue, uint8_t len);
 
 /* ---------- Display ------------------------------------------------------ */

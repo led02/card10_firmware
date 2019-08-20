@@ -9,46 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BLEMAXCFGBYTES 100
-int bleShallStart(void)
-{
-	int bleConfigFile = epic_file_open("ble.txt", "r");
-	if (bleConfigFile < 0) {
-		LOG_INFO(
-			"startup",
-			"can not open ble.txt -> BLE is not started"
-		);
-		epic_file_close(bleConfigFile);
-		return 0;
-	}
-
-	char cfgBuf[BLEMAXCFGBYTES + 1];
-	int readNum = epic_file_read(bleConfigFile, cfgBuf, BLEMAXCFGBYTES);
-	epic_file_close(bleConfigFile);
-	if (readNum < 0) {
-		LOG_INFO(
-			"startup",
-			"can not read ble.txt -> BLE is not started"
-		);
-		return 0;
-	}
-	cfgBuf[readNum] = '\0';
-
-	char bleActiveStr[]              = "active=true";
-	cfgBuf[sizeof(bleActiveStr) - 1] = '\0';
-
-	if (strcmp(cfgBuf, "active=true") != 0) {
-		LOG_INFO(
-			"startup",
-			"ble.txt is not \"active=true\" -> BLE is not started"
-		);
-		return 0;
-	}
-
-	LOG_INFO("startup", "ble.txt is \"active=true\" -> BLE is starting");
-	return 1;
-}
-
 int main(void)
 {
 	LOG_INFO("startup", "Epicardium startup ...");
@@ -100,7 +60,7 @@ int main(void)
 	}
 
 	/* BLE */
-	if (bleShallStart()) {
+	if (ble_shall_start()) {
 		if (xTaskCreate(
 			    vBleTask,
 			    (const char *)"BLE",
