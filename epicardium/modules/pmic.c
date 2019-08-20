@@ -13,17 +13,30 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 
 #include <stdio.h>
 
 /* Task ID for the pmic handler */
 static TaskHandle_t pmic_task_id = NULL;
 
+enum {
+	/* An irq was received, probably the power button */
+	PMIC_NOTIFY_IRQ = 1,
+	/* The timer has ticked and we should check the battery voltage again */
+	PMIC_NOTIFY_MONITOR = 2,
+};
+
 void pmic_interrupt_callback(void *_)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	if (pmic_task_id != NULL) {
-		vTaskNotifyGiveFromISR(pmic_task_id, &xHigherPriorityTaskWoken);
+		xTaskNotifyFromISR(
+			pmic_task_id,
+			PMIC_NOTIFY_IRQ,
+			eSetBits,
+			&xHigherPriorityTaskWoken
+		);
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	}
 }
@@ -104,6 +117,78 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 	return ret;
 }
 
+/*
+ * Read the interrupt flag register and handle all interrupts which the PMIC has
+ * sent.  In most cases this will be the buttons.
+ */
+static void
+pmic_poll_interrupts(TickType_t *button_start_tick, TickType_t duration)
+{
+	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(500)) < 0) {
+		LOG_WARN("pmic", "Failed to acquire I2C. Retrying ...");
+		xTaskNotify(pmic_task_id, PMIC_NOTIFY_IRQ, eSetBits);
+		return;
+	}
+
+	uint8_t int_flag = MAX77650_getINT_GLBL();
+	hwlock_release(HWLOCK_I2C);
+
+	if (int_flag & MAX77650_INT_nEN_F) {
+		/* Button was pressed */
+		*button_start_tick = xTaskGetTickCount();
+	}
+	if (int_flag & MAX77650_INT_nEN_R) {
+		/* Button was released */
+		*button_start_tick = 0;
+		if (duration < pdMS_TO_TICKS(400)) {
+			return_to_menu();
+		} else {
+			LOG_WARN("pmic", "Resetting ...");
+			card10_reset();
+		}
+	}
+
+	/* TODO: Remove when all interrupts are handled */
+	if (int_flag & ~(MAX77650_INT_nEN_F | MAX77650_INT_nEN_R)) {
+		LOG_WARN("pmic", "Unhandled PMIC Interrupt: %x", int_flag);
+	}
+}
+
+/*
+ * Check the battery voltage.  If it drops too low, turn card10 off.
+ */
+static void pmic_check_battery()
+{
+	float u_batt;
+	int res;
+
+	res = pmic_read_amux(PMIC_AMUX_BATT_U, &u_batt);
+	if (res < 0) {
+		LOG_ERR("pmic", "Failed reading battery voltage: %d", res);
+		return;
+	}
+
+	LOG_DEBUG(
+		"pmic",
+		"Battery is at %d.%03d V",
+		(int)u_batt,
+		(int)(u_batt * 1000.0) % 1000
+	);
+
+	/*
+	 * TODO: Handle voltage value
+	 */
+}
+
+static StaticTimer_t pmic_timer_data;
+static void vPmicTimerCb(TimerHandle_t xTimer)
+{
+	/*
+	 * Tell the PMIC task to check the battery again.
+	 */
+	xTaskNotify(pmic_task_id, PMIC_NOTIFY_MONITOR, eSetBits);
+}
+
 void vPmicTask(void *pvParameters)
 {
 	pmic_task_id = xTaskGetCurrentTaskHandle();
@@ -113,11 +198,28 @@ void vPmicTask(void *pvParameters)
 
 	TickType_t button_start_tick = 0;
 
+	pmic_check_battery();
+
+	TimerHandle_t pmic_timer = xTimerCreateStatic(
+		"PMIC Timer",
+		pdMS_TO_TICKS(60 * 1000),
+		pdTRUE,
+		NULL,
+		vPmicTimerCb,
+		&pmic_timer_data
+	);
+	if (pmic_timer == NULL) {
+		LOG_CRIT("pmic", "Could not create timer.");
+		vTaskDelay(portMAX_DELAY);
+	}
+	xTimerStart(pmic_timer, 0);
+
 	while (1) {
+		uint32_t reason;
 		if (button_start_tick == 0) {
-			ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+			reason = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		} else {
-			ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+			reason = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
 		}
 
 		TickType_t duration = xTaskGetTickCount() - button_start_tick;
@@ -127,36 +229,12 @@ void vPmicTask(void *pvParameters)
 			MAX77650_setSFT_RST(0x2);
 		}
 
-		while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(500)) < 0) {
-			LOG_WARN("pmic", "Failed to acquire I2C. Retrying ...");
-			vTaskDelay(pdMS_TO_TICKS(500));
+		if (reason & PMIC_NOTIFY_IRQ) {
+			pmic_poll_interrupts(&button_start_tick, duration);
 		}
 
-		uint8_t int_flag = MAX77650_getINT_GLBL();
-		hwlock_release(HWLOCK_I2C);
-
-		if (int_flag & MAX77650_INT_nEN_F) {
-			/* Button was pressed */
-			button_start_tick = xTaskGetTickCount();
-		}
-		if (int_flag & MAX77650_INT_nEN_R) {
-			/* Button was released */
-			button_start_tick = 0;
-			if (duration < pdMS_TO_TICKS(400)) {
-				return_to_menu();
-			} else {
-				LOG_WARN("pmic", "Resetting ...");
-				card10_reset();
-			}
-		}
-
-		/* TODO: Remove when all interrupts are handled */
-		if (int_flag & ~(MAX77650_INT_nEN_F | MAX77650_INT_nEN_R)) {
-			LOG_WARN(
-				"pmic",
-				"Unhandled PMIC Interrupt: %x",
-				int_flag
-			);
+		if (reason & PMIC_NOTIFY_MONITOR) {
+			pmic_check_battery();
 		}
 	}
 }
