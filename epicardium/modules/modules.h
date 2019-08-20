@@ -34,7 +34,8 @@ void vPmicTask(void *pvParameters);
 /* ---------- BLE ---------------------------------------------------------- */
 void ble_uart_write(uint8_t *pValue, uint8_t len);
 
-// Forces an unlock of the display. Only to be used in epicardium
+/* ---------- Display ------------------------------------------------------ */
+/* Forces an unlock of the display. Only to be used in Epicardium */
 void disp_forcelock();
 
 #endif /* MODULES_H */
