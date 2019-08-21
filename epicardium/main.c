@@ -58,7 +58,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		printf("Failed to create bhi160 dispatcher task!\n");
+		LOG_CRIT("startup", "Failed to create %s task!", "BHI160");
 		abort();
 	}
 

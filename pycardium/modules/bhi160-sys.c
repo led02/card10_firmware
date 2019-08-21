@@ -23,10 +23,6 @@ STATIC mp_obj_t mp_bhi160_enable_sensor(size_t n_args, const mp_obj_t *args)
 	cfg.sample_rate                 = mp_obj_get_int(args[2]);
 	cfg.dynamic_range               = mp_obj_get_int(args[3]);
 
-	//cfg.sample_buffer_len = 200;
-	//cfg.sample_rate       = 4;
-	//cfg.dynamic_range     = 2;
-
 	int sd = epic_bhi160_enable_sensor(sensor_type, &cfg);
 
 	return MP_OBJ_NEW_SMALL_INT(sd);

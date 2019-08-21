@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 #include <errno.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 #ifndef __SPHINX_DOC
 /* Some headers are not recognized by hawkmoth for some odd reason */
