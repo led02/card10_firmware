@@ -53,6 +53,15 @@ Card10-Specific
    :param str name: Path to new app/script/l0dable.
    :return: This function never returns.  It can, however raise an exception.
 
+.. py:function:: read_battery()
+
+   Read the current battery voltage in V.  Please keep in mind that battery
+   voltage behaves exponentially when interpreting this value.
+
+   .. warning::
+
+      Card10 will hard-shutdown once the voltage drops below 3.4 V
+
 .. py:function:: reset()
 
    Reboot card10.
