@@ -54,7 +54,7 @@ def list_apps():
                     "/main.py",
                     {
                         "author": "card10badge Team",
-                        "name": "Main Clock",
+                        "name": "Home",
                         "description": "",
                         "category": "",
                         "revision": 0,
