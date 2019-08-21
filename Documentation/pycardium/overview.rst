@@ -33,8 +33,8 @@ systems this device will be called ``/dev/ttyACM0`` or ``/dev/ttyACM1``.
 Choose a terminal-emulator of your liking and open the above mentioned device.
 Baud-rate is 115200.  Some options are:
 
-* **screen**: ``screen /dev/ttyACM0 115200``
-* **picocom**: ``picocom -b 115200 /dev/ttyACM0``
+* **screen**: ``sudo screen /dev/ttyACM0 115200``
+* **picocom**: ``sudo picocom -b 115200 /dev/ttyACM0``
 
 After connecting, reboot card10 and you should see the MicroPython REPL pop up.
 
