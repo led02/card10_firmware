@@ -18,13 +18,11 @@ int main(void)
 	LOG_DEBUG("startup", "Initializing hardware ...");
 	hardware_early_init();
 
-	char *commit_buf  = "Commit: " CARD10_GITHASH;
-	char *version_buf = "Version: " CARD10_VERSION;
-	commit_buf[16] = '\0';
-	epic_disp_print (5,  5, "card10 firmware", 0x0000, 0xffff);
-	epic_disp_print (25, 5, version_buf,       0x0000, 0xffff);
-	epic_disp_print (45, 5, commit_buf,        0x0000, 0xffff);
-	mxc_delay(5000000);
+	char *commit_buf  = CARD10_GITHASH;
+	epic_disp_print (0,  5, "version",   0xffff, 0x0000);
+	epic_disp_print (0, 24, version_buf, 0xffff, 0x0000);
+	epic_disp_update();
+	mxc_delay(2000000);
 
 	LOG_DEBUG("startup", "Initializing tasks ...");
 
