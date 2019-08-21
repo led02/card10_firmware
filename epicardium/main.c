@@ -19,8 +19,8 @@ int main(void)
 	hardware_early_init();
 
 	char *version_buf = CARD10_VERSION;
-	epic_disp_print (0,  5, "version/tag", 0xffff, 0x0000);
-	epic_disp_print (0, 24, version_buf,   0xffff, 0x0000);
+	epic_disp_print (0,  5, "epicardium:",   0xffff, 0x0000);
+	epic_disp_print (0, 24, version_buf,     0xffff, 0x0000);
 	epic_disp_update();
 	mxc_delay(2000000);
 
