@@ -17,6 +17,7 @@
 
 #include "gpio.h"
 #include "i2c.h"
+#include "rtc.h"
 #include "spi.h"
 #include "trng.h"
 
@@ -69,6 +70,21 @@ int hardware_early_init(void)
 	 * Buttons
 	 */
 	PB_Init();
+
+	/* Enable 32 kHz output */
+	while (RTC_SquareWave(
+		       MXC_RTC,
+		       SQUARE_WAVE_ENABLED,
+		       F_32KHZ,
+		       NOISE_IMMUNE_MODE,
+		       NULL) == E_BUSY
+	)
+		;
+
+	/* If we don't have a valid time yet, set it to 2019-01-01 */
+	if (RTC_GetSecond() < 1546300800UL) {
+		epic_rtc_set_milliseconds(1546300800UL * 1000);
+	}
 
 	/*
 	 * SPI for ECG

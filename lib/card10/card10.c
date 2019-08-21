@@ -53,9 +53,6 @@ void card10_init(void)
 
 	TMR_Delay(MXC_TMR0, MSEC(1000), 0);
 
-	while (RTC_EnableRTCE(MXC_RTC) == E_BUSY)
-		;
-
 	// Enable 32 kHz output
 	while (RTC_SquareWave(
 		       MXC_RTC,
@@ -70,6 +67,9 @@ void card10_init(void)
 		while (RTC_Init(MXC_RTC, 1546300800UL, 0, NULL) == E_BUSY)
 			;
 	}
+
+	while (RTC_EnableRTCE(MXC_RTC) == E_BUSY)
+		;
 
 	// Enable SPI
 	sys_cfg_spi_t spi17y_master_cfg;
