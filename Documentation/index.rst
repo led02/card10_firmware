@@ -31,6 +31,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/light-sensor
    pycardium/os
    pycardium/personal_state
+   pycardium/simple_menu
    pycardium/utime
    pycardium/vibra
    pycardium/pride

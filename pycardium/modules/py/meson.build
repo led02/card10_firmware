@@ -5,6 +5,7 @@ python_modules = files(
   'leds.py',
   'pride.py',
   'ledfx.py',
+  'simple_menu.py',
 
   # MicroPython Standard-Library
   'col_defaultdict.py',
