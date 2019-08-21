@@ -21,6 +21,14 @@ CPython-Like
    :returns: A list of entities (files or subdirectories) in the directory
       ``dir``.
 
+.. py:function:: urandom(n)
+
+   Return ``n`` random bytes.
+
+   :param int n: Number of random bytes to retrieve.
+   :returns: ``bytes()`` object with ``n`` random bytes.
+
+
 Epicardium-Specific
 -------------------
 

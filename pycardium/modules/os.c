@@ -135,6 +135,18 @@ static mp_obj_t mp_os_read_battery()
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(read_battery_obj, mp_os_read_battery);
 
+static mp_obj_t mp_os_urandom(mp_obj_t size_in)
+{
+	size_t size = mp_obj_get_int(size_in);
+	vstr_t vstr;
+
+	vstr_init_len(&vstr, size);
+	epic_trng_read((uint8_t*)vstr.buf, size);
+
+	return mp_obj_new_str_from_vstr(&mp_type_bytes, &vstr);
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(urandom_obj, mp_os_urandom);
+
 static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_os) },
 	{ MP_ROM_QSTR(MP_QSTR_exit), MP_ROM_PTR(&exit_obj) },
@@ -145,6 +157,7 @@ static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_mkdir), MP_ROM_PTR(&mkdir_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_rename), MP_ROM_PTR(&rename_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_read_battery), MP_ROM_PTR(&read_battery_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_urandom), MP_ROM_PTR(&urandom_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(os_module_globals, os_module_globals_table);

@@ -106,6 +106,7 @@ Q(unlink)
 Q(mkdir)
 Q(rename)
 Q(read_battery)
+Q(urandom)
 
 /* gpio */
 Q(gpio)
