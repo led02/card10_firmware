@@ -33,6 +33,7 @@
 #include "hci_vs.h"
 
 #include <epicardium.h>
+#include "modules/log.h"
 
 #include "util/bstream.h"
 #include "att_api.h"
@@ -218,9 +219,11 @@ static void sendCrcResponse(
 				msg,
 				sizeof(answer) - len);
 			len += strlen(msg);
-			printf("BLE file transfer: %s\n", msg);
+			LOG_ERR("filetrans", "%s\n", msg);
 		} else {
-			printf("error message \"%s\" too long\n", msg);
+			LOG_ERR("filetrans",
+				"error message \"%s\" too long\n",
+				msg);
 		}
 	}
 
@@ -251,9 +254,10 @@ static int bleFileCreateOrOpen(char *filepath)
 			if (ret == -ENOENT) {
 				ret = epic_file_mkdir(filepath);
 				if (ret) {
-					printf("mkdir failed: %s, ret: %i\n",
-					       filepath,
-					       ret);
+					LOG_ERR("filetrans",
+						"mkdir failed: %s, ret: %i\n",
+						filepath,
+						ret);
 					return ret;
 				}
 			}
@@ -341,8 +345,9 @@ static uint8_t handleCentralTX(
 	} else if (
 		operation != ATT_PDU_EXEC_WRITE_REQ &&
 		operation != ATT_PDU_WRITE_CMD) {
-		printf("operation 0x%x not supported, try normal write\n",
-		       operation);
+		LOG_ERR("filetrans",
+			"operation 0x%x not supported, try normal write\n",
+			operation);
 		return ATT_ERR_INVALID_PDU;
 	}
 
@@ -370,7 +375,7 @@ static uint8_t handleCentralTX(
 		return ATT_SUCCESS;
 
 	case 'E':
-		printf("Error was acked");
+		LOG_ERR("filetrans", "Error was acked");
 		return ATT_SUCCESS;
 
 	default:
@@ -401,7 +406,9 @@ static uint8_t writeCallback(
 			connId, handle, operation, offset, len, pValue, pAttr
 		);
 	default:
-		printf("unsupported characteristic: %c\n", handle);
+		LOG_ERR("filetrans",
+			"unsupported characteristic: %c\n",
+			handle);
 		return ATT_ERR_HANDLE;
 	}
 }
@@ -413,7 +420,7 @@ static uint8_t readCallback(
 	uint16_t offset,
 	attsAttr_t *pAttr
 ) {
-	printf("read callback\n");
+	LOG_ERR("filetrans", "read callback\n");
 	return ATT_SUCCESS;
 }
 
