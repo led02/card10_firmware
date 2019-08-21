@@ -17,6 +17,10 @@ int main(void)
 	LOG_DEBUG("startup", "Initializing hardware ...");
 	hardware_early_init();
 
+	epic_disp_print (5, 5, "card10 firmware", 0x0000, 0xffff);
+	epic_disp_print (5, 5, "Tag: v1.1", 0x0000, 0xffff);
+	epic_disp_print (5, 5, "Commit: f54e3c0", 0x0000, 0xffff);
+
 	LOG_DEBUG("startup", "Initializing tasks ...");
 
 	/* Serial */
