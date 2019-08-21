@@ -11,34 +11,34 @@ alarm.
 .. |time| replace:: ``time``
 .. _time: https://docs.python.org/3/library/time.html
 
-.. py:function:: utime.sleep(secs)
+.. py:function:: sleep(secs)
 
    Sleep for ``secs`` seconds.  Can take a floating-point value.
 
-.. py:function:: utime.sleep_ms(msecs)
+.. py:function:: sleep_ms(msecs)
 
    Sleep for ``msecs`` milliseconds.  Only takes integer values.
 
-.. py:function:: utime.sleep_us(usecs)
+.. py:function:: sleep_us(usecs)
 
    Sleep for ``usecs`` microseconds.  Only takes integer values.
 
-.. py:function:: utime.time()
+.. py:function:: time()
 
    Return the current timestamp in seconds since 2000-01-01 00:00.
 
-.. py:function:: utime.set_time(secs)
+.. py:function:: set_time(secs)
 
    Sets the time to ``secs`` seconds since 2000-01-01 00:00.
    
-.. py:function:: utime.set_unix_time(secs)
+.. py:function:: set_unix_time(secs)
 
    Sets the time to ``secs`` seconds since 1970-01-01 00:00 UTC.
    This corresponds a regular Unix timestamp which can be obtained
    by running ``date +%s`` in a command line or ``int(time.time())``
    in Python.
 
-.. py:function:: utime.localtime([secs])
+.. py:function:: localtime([secs])
 
    Return the current time as a timestruct tuple.  If ``secs`` is given, return
    its timestruct tuple instead.  Timestruct tuple looks like:
@@ -48,14 +48,14 @@ alarm.
       (year, month, mday, hour, min, sec, wday, yday)
       #   0      1     2     3    4    5     6     7
 
-.. py:function:: utime.mktime(t)
+.. py:function:: mktime(t)
 
    Convert timestruct tuple into a seconds time stamp.  See
    :py:func:`utime.localtime` for details about timestruct tuples.
 
    :returns: Seconds since 2000-01-01
 
-.. py:function:: utime.alarm(secs, [callback])
+.. py:function:: alarm(secs, [callback])
 
    Register the next RTC alarm for the timestamp ``secs``.  ``secs`` is seconds
    since 2000-01-01.
