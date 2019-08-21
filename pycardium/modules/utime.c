@@ -15,6 +15,7 @@
 
 /* MicroPython has its epoch at 2000-01-01. Our RTC is in UTC */
 #define EPOCH_OFFSET 946684800UL
+#define TZONE_OFFSET 7600UL
 
 static mp_obj_t time_set_time(mp_obj_t secs)
 {
@@ -36,7 +37,7 @@ static MP_DEFINE_CONST_FUN_OBJ_1(time_set_unix_time_obj, time_set_unix_time);
 static mp_obj_t time_time(void)
 {
 	mp_int_t seconds;
-	seconds = epic_rtc_get_seconds() - EPOCH_OFFSET;
+	seconds = epic_rtc_get_seconds() - EPOCH_OFFSET + TZONE_OFFSET;
 	return mp_obj_new_int(seconds);
 }
 MP_DEFINE_CONST_FUN_OBJ_0(time_time_obj, time_time);
@@ -46,7 +47,7 @@ static mp_obj_t time_localtime(size_t n_args, const mp_obj_t *args)
 	mp_int_t seconds;
 
 	if (n_args == 0 || args[0] == mp_const_none) {
-		seconds = epic_rtc_get_seconds() - EPOCH_OFFSET;
+		seconds = epic_rtc_get_seconds() - EPOCH_OFFSET + TZONE_OFFSET;
 	} else {
 		seconds = mp_obj_get_int(args[0]);
 	}
@@ -98,7 +99,8 @@ static MP_DEFINE_CONST_FUN_OBJ_1(time_mktime_obj, time_mktime);
 /* Schedule an alarm */
 static mp_obj_t time_alarm(size_t n_args, const mp_obj_t *args)
 {
-	mp_int_t timestamp = mp_obj_get_int(args[0]) + EPOCH_OFFSET;
+	mp_int_t timestamp =
+		mp_obj_get_int(args[0]) + EPOCH_OFFSET - TZONE_OFFSET;
 	if (n_args == 2) {
 		/* If a callback was given, register it for the RTC Alarm */
 		mp_obj_t callback = args[1];
