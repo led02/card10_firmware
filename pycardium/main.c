@@ -45,6 +45,16 @@ int main(void)
 
 		mp_init();
 
+		/* request by badge.team */
+		mp_obj_list_init(mp_sys_path, 0);
+		mp_obj_list_append(mp_sys_path, MP_ROM_QSTR(MP_QSTR_));
+		mp_obj_list_append(
+			mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_lib)
+		);
+		mp_obj_list_append(
+			mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_apps)
+		);
+
 		if (cnt > 0) {
 			pyexec_file_if_exists(script_name);
 		}

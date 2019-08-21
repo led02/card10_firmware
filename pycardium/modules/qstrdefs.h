@@ -119,6 +119,10 @@ Q(OUTPUT)
 Q(PULL_UP)
 Q(PULL_DOWN)
 
+/* path */
+Q(/apps)
+Q(/lib)
+
 /* personal_state */
 Q(personal_state)
 Q(get)
