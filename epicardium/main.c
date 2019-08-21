@@ -23,7 +23,7 @@ int main(void)
 	if (xTaskCreate(
 		    vSerialTask,
 		    (const char *)"Serial",
-		    configMINIMAL_STACK_SIZE,
+		    configMINIMAL_STACK_SIZE * 2,
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
