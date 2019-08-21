@@ -33,6 +33,7 @@
 #include "hci_vs.h"
 
 #include <epicardium.h>
+#include "modules/log.h"
 
 #include "util/bstream.h"
 #include "att_api.h"
@@ -40,6 +41,7 @@
 #include "FreeRTOS.h"
 #include "crc32.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -217,14 +219,51 @@ static void sendCrcResponse(
 				msg,
 				sizeof(answer) - len);
 			len += strlen(msg);
-			printf("BLE file transfer: %s\n", msg);
+			LOG_ERR("filetrans", "%s\n", msg);
 		} else {
-			printf("error message \"%s\" too long\n", msg);
+			LOG_ERR("filetrans",
+				"error message \"%s\" too long\n",
+				msg);
 		}
 	}
 
 	AttsSetAttr(FILE_TRANS_CENTRAL_RX_VAL_HDL, len, answer);
 	AttsHandleValueNtf(connId, FILE_TRANS_CENTRAL_RX_VAL_HDL, len, answer);
+}
+
+/*
+ * This function splits the path into the folders and the file name and 
+ * creates all the missing folders.
+ */
+static int bleFileCreateOrOpen(char *filepath)
+{
+	char *pathEnd;
+	int pos = 0;
+	int ret;
+
+	while (true) {
+		pathEnd = strchr(filepath + pos, '/');
+		if (!pathEnd)
+			return epic_file_open(filepath, "w");
+
+		pathEnd[0] = '\00';
+		pos        = pathEnd - filepath + 1;
+
+		if (strlen(filepath)) {
+			ret = epic_file_stat(filepath, NULL);
+			if (ret == -ENOENT) {
+				ret = epic_file_mkdir(filepath);
+				if (ret) {
+					LOG_ERR("filetrans",
+						"mkdir failed: %s, ret: %i\n",
+						filepath,
+						ret);
+					return ret;
+				}
+			}
+		}
+		pathEnd[0] = '/';
+	}
 }
 
 static uint8_t bleFileOpen(dmConnId_t connId, uint8_t *pValue, uint16_t len)
@@ -238,11 +277,12 @@ static uint8_t bleFileOpen(dmConnId_t connId, uint8_t *pValue, uint16_t len)
 
 	/* Copy only file path and not type, make sure this is NULL terminated */
 	strncpy(filepath, (char *)pValue + 1, len - 1);
+	filepath[len - 1] = 0;
 
 	if (file_fd != -1)
 		epic_file_close(file_fd);
 
-	file_fd = epic_file_open(filepath, "w");
+	file_fd = bleFileCreateOrOpen(filepath);
 	if (file_fd < 0) {
 		sendCrcResponse(connId, 'e', 0, NULL, "open failed");
 		return ATT_ERR_RESOURCES;
@@ -305,8 +345,9 @@ static uint8_t handleCentralTX(
 	} else if (
 		operation != ATT_PDU_EXEC_WRITE_REQ &&
 		operation != ATT_PDU_WRITE_CMD) {
-		printf("operation 0x%x not supported, try normal write\n",
-		       operation);
+		LOG_ERR("filetrans",
+			"operation 0x%x not supported, try normal write\n",
+			operation);
 		return ATT_ERR_INVALID_PDU;
 	}
 
@@ -334,7 +375,7 @@ static uint8_t handleCentralTX(
 		return ATT_SUCCESS;
 
 	case 'E':
-		printf("Error was acked");
+		LOG_ERR("filetrans", "Error was acked");
 		return ATT_SUCCESS;
 
 	default:
@@ -365,7 +406,9 @@ static uint8_t writeCallback(
 			connId, handle, operation, offset, len, pValue, pAttr
 		);
 	default:
-		printf("unsupported characteristic: %c\n", handle);
+		LOG_ERR("filetrans",
+			"unsupported characteristic: %c\n",
+			handle);
 		return ATT_ERR_HANDLE;
 	}
 }
@@ -377,7 +420,7 @@ static uint8_t readCallback(
 	uint16_t offset,
 	attsAttr_t *pAttr
 ) {
-	printf("read callback\n");
+	LOG_ERR("filetrans", "read callback\n");
 	return ATT_SUCCESS;
 }
 
