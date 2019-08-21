@@ -25,7 +25,18 @@ alarm.
 
 .. py:function:: utime.time()
 
-   Return the current timestamp in seconds since 2000-01-01
+   Return the current timestamp in seconds since 2000-01-01 00:00.
+
+.. py:function:: utime.set_time(secs)
+
+   Sets the time to ``secs`` seconds since 2000-01-01 00:00.
+   
+.. py:function:: utime.set_unix_time(secs)
+
+   Sets the time to ``secs`` seconds since 1970-01-01 00:00 UTC.
+   This corresponds a regular Unix timestamp which can be obtained
+   by running ``date +%s`` in a command line or ``int(time.time())``
+   in Python.
 
 .. py:function:: utime.localtime([secs])
 

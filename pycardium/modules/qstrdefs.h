@@ -47,6 +47,8 @@ Q(ticks_diff)
 Q(localtime)
 Q(mktime)
 Q(time)
+Q(set_time)
+Q(set_unix_time)
 
 /* vibra */
 Q(vibra)

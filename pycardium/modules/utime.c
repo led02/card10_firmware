@@ -16,6 +16,23 @@
 /* MicroPython has its epoch at 2000-01-01. Our RTC is in UTC */
 #define EPOCH_OFFSET 946684800UL
 
+static mp_obj_t time_set_time(mp_obj_t secs)
+{
+	uint64_t timestamp =
+		mp_obj_get_int(secs) * 1000ULL + EPOCH_OFFSET * 1000ULL;
+	epic_rtc_set_milliseconds(timestamp);
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(time_set_time_obj, time_set_time);
+
+static mp_obj_t time_set_unix_time(mp_obj_t secs)
+{
+	uint64_t timestamp = mp_obj_get_int(secs) * 1000ULL;
+	epic_rtc_set_milliseconds(timestamp);
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(time_set_unix_time_obj, time_set_unix_time);
+
 static mp_obj_t time_time(void)
 {
 	mp_int_t seconds;
@@ -101,6 +118,9 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(time_alarm_obj, 1, 2, time_alarm);
 static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_utime) },
 	{ MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&time_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_set_time), MP_ROM_PTR(&time_set_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_set_unix_time),
+	  MP_ROM_PTR(&time_set_unix_time_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_localtime), MP_ROM_PTR(&time_localtime_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_mktime), MP_ROM_PTR(&time_mktime_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_sleep), MP_ROM_PTR(&mp_utime_sleep_obj) },
