@@ -326,11 +326,11 @@ static void bleClose(bleMsg_t *pMsg)
 static void bleSetup(bleMsg_t *pMsg)
 {
   char buf[32];
-  char a, b, c, d, e, f;
+  char a, b, c, d, e, f, K;
 
   if (fs_read_text_file("mac.txt", buf, sizeof(buf)))
   {
-    if (sscanf(buf, "**:**:**:%c%c:%c%c:%c%c", &a, &b, &c, &d, &e, &f) == 6)
+    if (sscanf(buf, "%c%c:%c%c:%c%c:%c%c:%c%c:%c%c", &K,&K,&K,&K,&K,&K, &a, &b, &c, &d, &e, &f) == 12)
     {
       bleScanDataDisc[9]  = a;
       bleScanDataDisc[10] = b;

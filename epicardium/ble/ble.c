@@ -120,7 +120,7 @@ static void setAddress(void)
 		bdAddr[4] = b;
 		bdAddr[5] = a;
 	}
-		
+
 	LOG_INFO(
 		"ble",
 		"Setting MAC address to %02X:%02X:%02X:%02X:%02X:%02X",
