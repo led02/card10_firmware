@@ -45,6 +45,8 @@
 
 #define USBHS_M31_CLOCK_RECOVERY
 
+/* #define MAXUSB_DEBUG    1 */
+
 typedef enum {
 	      SETUP_IDLE,
 	      SETUP_NODATA,
@@ -879,7 +881,9 @@ int usb_get_setup(usb_setup_pkt *sud)
     MXC_USBHS->index = 0;
 
     if ((sud == NULL) || !(MXC_USBHS->csr0 & MXC_F_USBHS_CSR0_OUTPKTRDY)) {
+#if MAXUSB_DEBUG
         printf("MAXUSB ISSUE 3\n");
+#endif
         MAXUSB_EXIT_CRITICAL();
         return -1;
     }
@@ -1029,7 +1033,9 @@ int usb_read_endpoint(usb_req_t *req)
 
     /* EP must be enabled (configured) and not stalled */
     if (!usb_is_configured(ep)) {
+#if MAXUSB_DEBUG
         printf("MAXUSB ISSUE 1\n");
+#endif
         MAXUSB_EXIT_CRITICAL();
         return -1;
     }
@@ -1104,7 +1110,9 @@ int usb_read_endpoint(usb_req_t *req)
             }
         }
     } else {
+#if MAXUSB_DEBUG
         printf("MAXUSB ISSUE 2\n");
+#endif
         MAXUSB_EXIT_CRITICAL();
     }
 
