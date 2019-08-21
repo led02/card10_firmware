@@ -2,7 +2,8 @@
 
 ``os`` - OS Functions
 =====================
-The ``os`` module allows access to a few core functionalities of Epicardium and functions found in CPythons ``os`` module.
+The ``os`` module allows access to a few core functionalities of Epicardium and
+functions found in CPythons ``os`` module.
 
 CPython-Like
 ------------
@@ -29,8 +30,8 @@ CPython-Like
    :returns: ``bytes()`` object with ``n`` random bytes.
 
 
-Epicardium-Specific
--------------------
+Card10-Specific
+---------------
 
 .. py:function:: exit(ret = None)
 
