@@ -87,17 +87,16 @@ void gfx_puts(
 	Color bg
 ) {
 	// iterate over the string
-	while(*str) {
-
+	while (*str) {
 		// if the current position plus the width of the next character
 		// would bring us outside of the display ...
-		if( (x + font->Width) > r->width) {
+		if ((x + font->Width) > r->width) {
 			// ... we move down a line before printing the character
 			x = 0;
 			y += font->Height;
 		}
 		// if the line is outside the display we return
-		if(y >= r->height)
+		if (y >= r->height)
 			return;
 
 		// now print the character
