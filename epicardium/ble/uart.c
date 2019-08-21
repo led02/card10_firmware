@@ -119,18 +119,20 @@ static uint8_t UARTWriteCback(
 	return ATT_SUCCESS;
 }
 
-uint8_t ble_uart_tx_buf[129];
-uint8_t ble_uart_buf_tx_fill;
-int ble_uart_lasttick = 0;
+static uint8_t ble_uart_tx_buf[128];
+static uint8_t ble_uart_buf_tx_fill;
+static int ble_uart_lasttick = 0;
 
 void ble_uart_write(uint8_t *pValue, uint8_t len)
 {
-	int i;
-	for (i = 0; i < len; i++) {
+	for (int i = 0; i < len; i++) {
 		if (pValue[i] >= 0x20 && pValue[i] < 0x7f) {
 			ble_uart_tx_buf[ble_uart_buf_tx_fill] = pValue[i];
 			ble_uart_buf_tx_fill++;
-		} else if (pValue[i] == '\r' || pValue[i] == '\n') {
+		}
+
+		if (ble_uart_buf_tx_fill == 128 || pValue[i] == '\r' ||
+		    pValue[i] == '\n') {
 			if (ble_uart_buf_tx_fill > 0) {
 				AttsSetAttr(
 					UART_TX_HDL,
@@ -141,16 +143,14 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 					int x = xTaskGetTickCount() -
 						ble_uart_lasttick;
 					if (x < 100) {
-						// Ugly hack if we already send something recently.
-						// TODO: figure out how fast we can send or use indications
+						/*
+						 * TODO: Ugly hack if we already
+						 *     send something recently.
+						 *     Figure out how fast we
+						 *     can send or use indications.
+						 */
 						vTaskDelay(100 - x);
 					}
-					//printf("notify: ");
-					//int j;
-					//for(j=0;j<ble_uart_buf_tx_fill;j++) {
-					//    printf("%02x ", ble_uart_tx_buf[j]);
-					//}
-					//printf("\n");
 					AttsHandleValueNtf(
 						active_connection,
 						UART_TX_HDL,
