@@ -116,6 +116,11 @@ int epic_bhi160_enable_sensor(
 		return -ENODEV;
 	}
 
+	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (lockret < 0) {
+		return lockret;
+	}
+
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
 		struct stream_info *stream = &bhi160_streams[sensor_type];
 		stream->item_size = bhi160_lookup_data_size(sensor_type);
@@ -125,6 +130,7 @@ int epic_bhi160_enable_sensor(
 		);
 		if (stream->queue == NULL) {
 			xSemaphoreGive(bhi160_mutex);
+			hwlock_release(HWLOCK_I2C);
 			return -ENOMEM;
 		}
 
@@ -141,9 +147,11 @@ int epic_bhi160_enable_sensor(
 		);
 		xSemaphoreGive(bhi160_mutex);
 	} else {
+		hwlock_release(HWLOCK_I2C);
 		return -EBUSY;
 	}
 
+	hwlock_release(HWLOCK_I2C);
 	return 0;
 }
 
@@ -152,6 +160,11 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 	bhy_virtual_sensor_t vs_id = bhi160_lookup_vs_id(sensor_type);
 	if (vs_id < 0) {
 		return -ENODEV;
+	}
+
+	int ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (ret < 0) {
+		return ret;
 	}
 
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
@@ -163,9 +176,11 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 		bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
 		xSemaphoreGive(bhi160_mutex);
 	} else {
+		hwlock_release(HWLOCK_I2C);
 		return -EBUSY;
 	}
 
+	hwlock_release(HWLOCK_I2C);
 	return 0;
 }
 /* }}} */
@@ -237,7 +252,13 @@ static int bhi160_fetch_fifo(void)
 	/* Number of bytes left in BHI160's FIFO buffer */
 	uint16_t bytes_left_in_fifo = 1;
 
+	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (lockret < 0) {
+		return lockret;
+	}
+
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) != pdTRUE) {
+		hwlock_release(HWLOCK_I2C);
 		return -EBUSY;
 	}
 
@@ -283,6 +304,7 @@ static int bhi160_fetch_fifo(void)
 	}
 
 	xSemaphoreGive(bhi160_mutex);
+	hwlock_release(HWLOCK_I2C);
 	return 0;
 }
 
@@ -309,6 +331,11 @@ void vBhi160Task(void *pvParameters)
 
 	bhi160_task_id = xTaskGetCurrentTaskHandle();
 	bhi160_mutex   = xSemaphoreCreateMutexStatic(&bhi160_mutex_data);
+
+	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (lockret < 0) {
+		return;
+	}
 
 	/* Take Mutex during initialization, just in case */
 	if (xSemaphoreTake(bhi160_mutex, 0) != pdTRUE) {
@@ -356,6 +383,7 @@ void vBhi160Task(void *pvParameters)
 	bhy_set_sic_matrix(bhi160_sic_array);
 
 	xSemaphoreGive(bhi160_mutex);
+	hwlock_release(HWLOCK_I2C);
 
 	/* ----------------------------------------- */
 
