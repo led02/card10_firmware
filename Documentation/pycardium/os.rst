@@ -43,3 +43,12 @@ Epicardium-Specific
 
    :param str name: Path to new app/script/l0dable.
    :return: This function never returns.  It can, however raise an exception.
+
+.. py:function:: os.reset()
+
+   Reboot card10.
+
+   .. warning::
+
+      Please only call this function if absolutely necessary.  In most cases
+      you'll want to just :py:func:`os.exit` instead.

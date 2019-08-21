@@ -19,15 +19,6 @@ static mp_obj_t mp_os_exit(size_t n_args, const mp_obj_t *args)
 }
 static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(exit_obj, 0, 1, mp_os_exit);
 
-static mp_obj_t mp_os_reset(void)
-{
-	epic_system_reset();
-
-	/* unreachable */
-	return mp_const_none;
-}
-static MP_DEFINE_CONST_FUN_OBJ_0(reset_obj, mp_os_reset);
-
 static mp_obj_t mp_os_exec(mp_obj_t name_in)
 {
 	const char *name_ptr;
@@ -56,6 +47,15 @@ static mp_obj_t mp_os_exec(mp_obj_t name_in)
 	return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(exec_obj, mp_os_exec);
+
+static mp_obj_t mp_os_reset(void)
+{
+	epic_system_reset();
+
+	/* unreachable */
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(reset_obj, mp_os_reset);
 
 static mp_obj_t mp_os_listdir(mp_obj_t py_path)
 {
