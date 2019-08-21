@@ -123,6 +123,18 @@ static mp_obj_t mp_os_rename(mp_obj_t py_oldp, mp_obj_t py_newp)
 }
 static MP_DEFINE_CONST_FUN_OBJ_2(rename_obj, mp_os_rename);
 
+static mp_obj_t mp_os_read_battery()
+{
+	float result;
+	int res = epic_read_battery_voltage(&result);
+	if (res < 0) {
+		mp_raise_OSError(-res);
+	}
+
+	return mp_obj_new_float(result);
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(read_battery_obj, mp_os_read_battery);
+
 static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_os) },
 	{ MP_ROM_QSTR(MP_QSTR_exit), MP_ROM_PTR(&exit_obj) },
@@ -132,6 +144,7 @@ static const mp_rom_map_elem_t os_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_unlink), MP_ROM_PTR(&unlink_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_mkdir), MP_ROM_PTR(&mkdir_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_rename), MP_ROM_PTR(&rename_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_read_battery), MP_ROM_PTR(&read_battery_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(os_module_globals, os_module_globals_table);

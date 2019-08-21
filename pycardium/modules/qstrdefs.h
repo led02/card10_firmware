@@ -105,6 +105,7 @@ Q(listdir)
 Q(unlink)
 Q(mkdir)
 Q(rename)
+Q(read_battery)
 
 /* gpio */
 Q(gpio)

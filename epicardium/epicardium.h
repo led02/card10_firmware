@@ -32,6 +32,7 @@ typedef _Bool bool;
 #define API_SYSTEM_EXIT             0x1
 #define API_SYSTEM_EXEC             0x2
 #define API_SYSTEM_RESET            0x3
+#define API_BATTERY_VOLTAGE         0x4
 
 #define API_INTERRUPT_ENABLE        0xA
 #define API_INTERRUPT_DISABLE       0xB
@@ -209,6 +210,16 @@ API(API_SYSTEM_EXEC, int __epic_exec(char *name));
  * Reset/Restart card10
  */
 API(API_SYSTEM_RESET, void epic_system_reset(void));
+
+/**
+ * Battery Voltage
+ * ===============
+ */
+
+/**
+ * Read the current battery voltage.
+ */
+API(API_BATTERY_VOLTAGE, int epic_read_battery_voltage(float *result));
 
 /**
  * UART/Serial Interface

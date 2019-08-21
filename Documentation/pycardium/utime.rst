@@ -25,16 +25,18 @@ alarm.
 
 .. py:function:: time()
 
-   Return the current timestamp in seconds since 2000-01-01 00:00.
+   Return the current timestamp in seconds since 2000-01-01 00:00 in
+   the local timezone.
 
 .. py:function:: set_time(secs)
 
-   Sets the time to ``secs`` seconds since 2000-01-01 00:00.
+   Sets the time to ``secs`` seconds since 2000-01-01 00:00 in the local
+   timezone.
    
 .. py:function:: set_unix_time(secs)
 
    Sets the time to ``secs`` seconds since 1970-01-01 00:00 UTC.
-   This corresponds a regular Unix timestamp which can be obtained
+   This corresponds to a regular Unix timestamp which can be obtained
    by running ``date +%s`` in a command line or ``int(time.time())``
    in Python.
 

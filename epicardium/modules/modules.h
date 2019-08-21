@@ -32,10 +32,31 @@ void vLedTask(void *pvParameters);
 int personal_state_enabled();
 
 /* ---------- PMIC --------------------------------------------------------- */
-/* In 1/10s */
-#define PMIC_PRESS_SLEEP           20
-#define PMIC_PRESS_POWEROFF        40
 void vPmicTask(void *pvParameters);
+
+/* Critical battery voltage */
+#define BATTERY_CRITICAL   3.40f
+
+enum pmic_amux_signal {
+	PMIC_AMUX_CHGIN_U     = 0x1,
+	PMIC_AMUX_CHGIN_I     = 0x2,
+	PMIC_AMUX_BATT_U      = 0x3,
+	PMIC_AMUX_BATT_CHG_I  = 0x4,
+	PMIC_AMUX_BATT_DIS_I  = 0x5,
+	PMIC_AMUX_BATT_NULL_I = 0x6,
+	PMIC_AMUX_THM_U       = 0x7,
+	PMIC_AMUX_TBIAS_U     = 0x8,
+	PMIC_AMUX_AGND_U      = 0x9,
+	PMIC_AMUX_SYS_U       = 0xA,
+	_PMIC_AMUX_MAX,
+};
+
+/*
+ * Read a value from the PMIC's AMUX.  The result is already converted into its
+ * proper unit.  See the MAX77650 datasheet for details.
+ */
+int pmic_read_amux(enum pmic_amux_signal sig, float *result);
+
 
 /* ---------- BLE ---------------------------------------------------------- */
 void vBleTask(void *pvParameters);
