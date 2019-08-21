@@ -2,7 +2,12 @@
 
 ``personal_state`` - Personal State
 ===================================
-The :py:mod:`personal_state` module allows you to set and get the card10 users personal state from your script. The personal state is displayed on the top-left LED on the bottom of the harmonics board. While the personal state is set the LED can't be controlled by the :py:mod:`leds` module.
+The :py:mod:`personal_state` module allows you to set and get the card10 users
+`personal state`_ from your script. The personal state is displayed on the
+top-left LED on the bottom of the harmonics board. While the personal state is
+set the LED can't be controlled by the :py:mod:`leds` module.
+
+.. _personal state: https://card10.badge.events.ccc.de/ps/
 
 **Example**:
 
@@ -26,8 +31,13 @@ The :py:mod:`personal_state` module allows you to set and get the card10 users p
 
    Set the users personal state.
 
-   :param int state: ID of the personal state to set. Must be one of :py:data:`personal_state.NO_CONTACT`, :py:data:`personal_state.CHAOS`, :py:data:`personal_state.COMMUNICATION`, :py:data:`personal_state.CAMP`.
-   :param int persistent: Controls whether the personal state is persistent. A persistent state is not reset when the pycardium application is changed or restarted. In persistent mode the personal state LED is not controllable by the pycardium application.
+   :param int state: ID of the personal state to set. Must be one of
+      :py:data:`personal_state.NO_CONTACT`, :py:data:`personal_state.CHAOS`,
+      :py:data:`personal_state.COMMUNICATION`, :py:data:`personal_state.CAMP`.
+   :param int persistent: Controls whether the personal state is persistent. A
+      persistent state is not reset when the pycardium application is changed
+      or restarted. In persistent mode the personal state LED is not
+      controllable by the pycardium application.
 
 .. py:function:: clear()
 
@@ -40,7 +50,8 @@ The :py:mod:`personal_state` module allows you to set and get the card10 users p
 
    Get the users personal state.
 
-   :returns: A tuple containing the currently set state and a boolean indicating if it's persistent or not.
+   :returns: A tuple containing the currently set state and a boolean
+      indicating if it's persistent or not.
 
 .. py:data:: NO_STATE
 
