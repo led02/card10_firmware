@@ -17,11 +17,13 @@ BUTTON_TIMER_POPPED = -1
 COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
 MAXCHARS = 11
 
+
 def create_folders():
     try:
         os.mkdir("/apps")
     except:
         pass
+
 
 def read_metadata(app_folder):
     try:
@@ -31,7 +33,14 @@ def read_metadata(app_folder):
         return ujson.loads(information)
     except BaseException as e:
         sys.print_exception(e)
-        return {'author':'', 'name':app_folder, 'description':'', 'category':'', 'revision': 0}
+        return {
+            "author": "",
+            "name": app_folder,
+            "descriptionr": "",
+            "category": "",
+            "revision": 0,
+        }
+
 
 def list_apps():
     """Create a list of available apps."""
@@ -40,25 +49,59 @@ def list_apps():
     # add main application
     for mainFile in os.listdir("/"):
         if mainFile == "main.py":
-            apps.append(["/main.py", {'author':'', 'name':'Main Clock', 'description':'', 'category':'', 'revision': 0}])
+            apps.append(
+                [
+                    "/main.py",
+                    {
+                        "author": "card10badge Team",
+                        "name": "Main Clock",
+                        "description": "",
+                        "category": "",
+                        "revision": 0,
+                    },
+                ]
+            )
 
     # list all hatchary style apps (not .elf and not .py)
     # with or without metadata.json
     for appFolder in sorted(os.listdir("/apps")):
-        if not(appFolder.endswith(".py") or appFolder.endswith(".elf")):
+        if not (appFolder.endswith(".py") or appFolder.endswith(".elf")):
             apps.append(["/apps/%s/__init__.py" % appFolder, read_metadata(appFolder)])
 
     # list simple python scripts
     for pyFile in sorted(os.listdir("/apps")):
         if pyFile.endswith(".py"):
-            apps.append(["/apps/%s" % pyFile, {'author':'', 'name':pyFile, 'description':'', 'category':'', 'revision': 0}])
+            apps.append(
+                [
+                    "/apps/%s" % pyFile,
+                    {
+                        "author": "",
+                        "name": pyFile,
+                        "description": "",
+                        "category": "",
+                        "revision": 0,
+                    },
+                ]
+            )
 
     # list simple elf binaries
     for elfFile in sorted(os.listdir("/apps")):
         if elfFile.endswith(".elf"):
-            apps.append(["/apps/%s" % elfFile, {'author':'', 'name':elfFile, 'description':'', 'category':'', 'revision': 0}])
+            apps.append(
+                [
+                    "/apps/%s" % elfFile,
+                    {
+                        "author": "",
+                        "name": elfFile,
+                        "description": "",
+                        "category": "",
+                        "revision": 0,
+                    },
+                ]
+            )
 
     return apps
+
 
 def button_events(timeout=0):
     """Iterate over button presses (event-loop)."""
@@ -90,19 +133,21 @@ def button_events(timeout=0):
 
         utime.sleep_ms(10)
 
-def triangle(disp, x, y, left, scale=6, color=[255,0,0]):
+
+def triangle(disp, x, y, left, scale=6, color=[255, 0, 0]):
     """Draw a triangle to show there's more text in this line"""
     yf = 1 if left else -1
     disp.line(x - scale * yf, int(y + scale / 2), x, y, col=color)
     disp.line(x, y, x, y + scale, col=color)
     disp.line(x, y + scale, x - scale * yf, y + int(scale / 2), col=color)
 
+
 def draw_menu(disp, applist, pos, appcount, lineoffset):
     disp.clear()
 
     start = 0
     if pos > 0:
-        start = pos-1
+        start = pos - 1
     if start + 4 > appcount:
         start = appcount - 4
     if start < 0:
@@ -113,24 +158,31 @@ def draw_menu(disp, applist, pos, appcount, lineoffset):
             break
         if i >= start:
             disp.rect(
-                0, (i - start) * 20, 159, (i - start) * 20 + 20,
-                col=COLOR1 if i == pos else COLOR2
+                0,
+                (i - start) * 20,
+                159,
+                (i - start) * 20 + 20,
+                col=COLOR1 if i == pos else COLOR2,
             )
 
-            line = app[1]['name']
+            line = app[1]["name"]
             linelength = len(line)
             off = 0
 
             # calc line offset for scrolling
             if i == pos and linelength > (MAXCHARS - 1) and lineoffset > 0:
-                off = lineoffset if lineoffset + (MAXCHARS - 1) < linelength else linelength - (MAXCHARS - 1)
+                off = (
+                    lineoffset
+                    if lineoffset + (MAXCHARS - 1) < linelength
+                    else linelength - (MAXCHARS - 1)
+                )
             if lineoffset > linelength:
                 off = 0
 
             disp.print(
-                " " + line[off:(off+(MAXCHARS - 1))],
+                " " + line[off : (off + (MAXCHARS - 1))],
                 posy=(i - start) * 20,
-                bg=COLOR1 if i == pos else COLOR2
+                bg=COLOR1 if i == pos else COLOR2,
             )
             if i == pos:
                 disp.print(">", posy=(i - start) * 20, fg=color.COMMYELLOW, bg=COLOR1)
@@ -191,7 +243,10 @@ def main():
 
         elif ev == BUTTON_TIMER_POPPED:
             timercountpopped += 1
-            if timercountpopped >= timerstartscroll and (timercountpopped - timerstartscroll) % timerscrollspeed == 0:
+            if (
+                timercountpopped >= timerstartscroll
+                and (timercountpopped - timerstartscroll) % timerscrollspeed == 0
+            ):
                 lineoffset += 1
 
         elif ev == buttons.TOP_RIGHT:
