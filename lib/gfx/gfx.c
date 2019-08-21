@@ -86,17 +86,26 @@ void gfx_puts(
 	Color fg,
 	Color bg
 ) {
-	while (*str) {
-		gfx_putchar(font, r, x, y, *str, fg, bg);
-		str++;
+	// iterate over the string
+	while(*str) {
 
-		x += font->Width;
-		if (x >= r->width) {
+		// if the current position plus the width of the next character
+		// would bring us outside of the display ...
+		if( (x + font->Width) > r->width) {
+			// ... we move down a line before printing the character
 			x = 0;
 			y += font->Height;
 		}
-		if (y >= r->height)
+		// if the line is outside the display we return
+		if(y >= r->height)
 			return;
+
+		// now print the character
+		gfx_putchar(font, r, x, y, *str, fg, bg);
+		str++;
+
+		// move along on the x axis to get the position of the next character
+		x += font->Width;
 	}
 }
 
