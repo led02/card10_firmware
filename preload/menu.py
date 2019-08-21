@@ -9,20 +9,51 @@ import buttons
 import color
 import display
 import os
+import ujson
+import sys
 
+def create_folders():
+    try:
+        os.mkdir("/apps")
+    except:
+        pass
+
+def read_metadata(app_folder):
+    try:
+        info_file = "/apps/%s/metadata.json" % (app_folder)
+        with open(info_file) as f:
+            information = f.read()
+        return ujson.loads(information)
+    except BaseException as e:
+        sys.print_exception(e)
+        return {'author':'', 'name':app_folder, 'description':'', 'category':'', 'revision': 0}
 
 def list_apps():
     """Create a list of available apps."""
-    apps = sorted(os.listdir("."))
+    apps = []
 
-    # Filter for apps
-    apps = [app for app in apps if app.endswith(".elf") or app.endswith(".py")]
+    # add main application
+    for mainFile in os.listdir("/"):
+        if mainFile == "main.py":
+            apps.append(["/main.py", {'author':'', 'name':'Main Clock', 'description':'', 'category':'', 'revision': 0}])
 
-    if "menu.py" in apps:
-        apps.remove("menu.py")
+    # list all hatchary style apps (not .elf and not .py)
+    # with or without metadata.json
+    for appFolder in sorted(os.listdir("/apps")):
+        if not(appFolder.endswith(".py") or appFolder.endswith(".elf")):
+            apps.append(["/apps/%s/__init__.py" % appFolder, read_metadata(appFolder)])
+
+    # list simple python scripts
+    for pyFile in sorted(os.listdir("/apps")):
+        if pyFile.endswith(".py"):
+            apps.append(["/apps/%s" % pyFile, {'author':'', 'name':pyFile, 'description':'', 'category':'', 'revision': 0}])
+
+    # list simple elf binaries
+    for elfFile in sorted(os.listdir("/apps")):
+        if elfFile.endswith(".elf"):
+            apps.append(["/apps/%s" % elfFile, {'author':'', 'name':elfFile, 'description':'', 'category':'', 'revision': 0}])
 
     return apps
-
 
 def button_events():
     """Iterate over button presses (event-loop)."""
@@ -56,7 +87,7 @@ def draw_menu(disp, applist, idx, offset):
     # Wrap around the app-list and draw entries from idx - 3 to idx + 4
     for y, i in enumerate(range(len(applist) + idx - 3, len(applist) + idx + 4)):
         disp.print(
-            " " + applist[i % len(applist)] + "      ",
+            " " + applist[i % len(applist)][1]['name'] + "      ",
             posy=offset + y * 20 - 40,
             bg=COLOR1 if i % 2 == 0 else COLOR2,
         )
@@ -71,6 +102,7 @@ def draw_menu(disp, applist, idx, offset):
 
 
 def main():
+    create_folders()
     disp = display.open()
     applist = list_apps()
     numapps = len(applist)
@@ -108,7 +140,7 @@ def main():
             disp.clear().update()
             disp.close()
             try:
-                os.exec(applist[current])
+                os.exec(applist[current][0])
             except OSError as e:
                 print("Loading failed: ", e)
                 os.exit(1)
