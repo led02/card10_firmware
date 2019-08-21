@@ -273,6 +273,7 @@ static uint8_t bleFileOpen(dmConnId_t connId, uint8_t *pValue, uint16_t len)
 
 	/* Copy only file path and not type, make sure this is NULL terminated */
 	strncpy(filepath, (char *)pValue + 1, len - 1);
+	filepath[len - 1] = 0;
 
 	if (file_fd != -1)
 		epic_file_close(file_fd);
