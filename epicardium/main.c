@@ -5,6 +5,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "mxc_delay.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,9 +18,13 @@ int main(void)
 	LOG_DEBUG("startup", "Initializing hardware ...");
 	hardware_early_init();
 
-	epic_disp_print (5, 5, "card10 firmware", 0x0000, 0xffff);
-	epic_disp_print (5, 5, "Tag: v1.1", 0x0000, 0xffff);
-	epic_disp_print (5, 5, "Commit: f54e3c0", 0x0000, 0xffff);
+	char *commit_buf  = "Commit: " CARD10_GITHASH;
+	char *version_buf = "Version: " CARD10_VERSION;
+	commit_buf[16] = '\0';
+	epic_disp_print (5,  5, "card10 firmware", 0x0000, 0xffff);
+	epic_disp_print (25, 5, version_buf,       0x0000, 0xffff);
+	epic_disp_print (45, 5, commit_buf,        0x0000, 0xffff);
+	mxc_delay(5000000);
 
 	LOG_DEBUG("startup", "Initializing tasks ...");
 
