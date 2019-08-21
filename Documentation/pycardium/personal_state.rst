@@ -22,42 +22,42 @@ The :py:mod:`personal_state` module allows you to set and get the card10 users p
    # Clear the currently configured state
    personal_state.clear()
 
-.. py:function:: personal_state.set(state, persistent)
+.. py:function:: set(state, persistent)
 
    Set the users personal state.
 
    :param int state: ID of the personal state to set. Must be one of :py:data:`personal_state.NO_CONTACT`, :py:data:`personal_state.CHAOS`, :py:data:`personal_state.COMMUNICATION`, :py:data:`personal_state.CAMP`.
    :param int persistent: Controls whether the personal state is persistent. A persistent state is not reset when the pycardium application is changed or restarted. In persistent mode the personal state LED is not controllable by the pycardium application.
 
-.. py:function:: personal_state.clear()
+.. py:function:: clear()
 
    Clears a previously set personal state.
-   
+
    If no personal state was set this function does nothing. It does not matter
    if a set state is marked as persistent or not.
 
-.. py:function:: personal_state.get()
+.. py:function:: get()
 
    Get the users personal state.
-   
+
    :returns: A tuple containing the currently set state and a boolean indicating if it's persistent or not.
 
-.. py:data:: personal_state.NO_STATE
+.. py:data:: NO_STATE
 
    State ID reported when no personal state is set.
 
-.. py:data:: personal_state.NO_CONTACT
+.. py:data:: NO_CONTACT
 
    State ID for the "No Contact" personal state.
 
-.. py:data:: personal_state.CHAOS
+.. py:data:: CHAOS
 
    State ID for the "Chaos" personal state.
 
-.. py:data:: personal_state.COMMUNICATION
+.. py:data:: COMMUNICATION
 
    State ID for the "Communicatoin" personal state.
-   
-.. py:data:: personal_state.CAMP
+
+.. py:data:: CAMP
 
    State ID for the "Camp" personal state.

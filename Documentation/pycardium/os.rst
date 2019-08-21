@@ -7,13 +7,13 @@ The ``os`` module allows access to a few core functionalities of Epicardium and 
 CPython-Like
 ------------
 
-.. py:function:: os.unlink(path)
+.. py:function:: unlink(path)
 
    Unlink (remove) a file.
 
    :param str path: The file to remove.
 
-.. py:function:: os.listdir(dir)
+.. py:function:: listdir(dir)
 
    List contents of a directory.
 
@@ -24,7 +24,7 @@ CPython-Like
 Epicardium-Specific
 -------------------
 
-.. py:function:: os.exit(ret = None)
+.. py:function:: exit(ret = None)
 
    Exit from the current app and return to the menu.
 
@@ -33,7 +33,7 @@ Epicardium-Specific
       success).
    :return: This function will never return.
 
-.. py:function:: os.exec(name)
+.. py:function:: exec(name)
 
    Try executing a new app, stopping the currently running one.
 
@@ -44,7 +44,7 @@ Epicardium-Specific
    :param str name: Path to new app/script/l0dable.
    :return: This function never returns.  It can, however raise an exception.
 
-.. py:function:: os.reset()
+.. py:function:: reset()
 
    Reboot card10.
 

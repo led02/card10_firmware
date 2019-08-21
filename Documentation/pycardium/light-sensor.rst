@@ -6,12 +6,12 @@ On the harmonic board, there is an IR-LED which can be used in reverse as a
 crude brightness sensor.  Values returned are in no particular unit but seem to
 be fairly stable.
 
-.. py:function:: light_sensor.start()
+.. py:function:: start()
 
    Turn on the ADC and start reading brightness values.  (In past this function must be
    called before any measurements can be taken.)
 
-.. py:function:: light_sensor.get_reading()
+.. py:function:: get_reading()
 
    Get an ambient brightness reading.  The returned value is in no particular
    unit, though it seems to be fairly stable. The value could be between 0 and 400.  Common values:
@@ -22,6 +22,6 @@ be fairly stable.
 
    :returns: A brightness reading in no particular unit
 
-.. py:function:: light_sensor.stop()
+.. py:function:: stop()
 
    Stop the ADC.

@@ -182,7 +182,7 @@ Struct module.
 ``uuid``
 --------
 
-.. py:class:: uuid.UUID(hex=None, bytes=None, int=None, version=None)
+.. py:class:: UUID(hex=None, bytes=None, int=None, version=None)
 
    Create a new UUID object.
 
@@ -217,7 +217,7 @@ Struct module.
 
       UUID version accordiung to RFC 4122
 
-.. py:function:: uuid.uuid4():
+.. py:function:: uuid4():
 
    Generate a new UUID version 4 (random UUID).
 
