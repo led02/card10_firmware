@@ -40,6 +40,7 @@
 #include "FreeRTOS.h"
 #include "crc32.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -227,6 +228,40 @@ static void sendCrcResponse(
 	AttsHandleValueNtf(connId, FILE_TRANS_CENTRAL_RX_VAL_HDL, len, answer);
 }
 
+/*
+ * This function splits the path into the folders and the file name and 
+ * creates all the missing folders.
+ */
+static int bleFileCreateOrOpen(char *filepath)
+{
+	char *pathEnd;
+	int pos = 0;
+	int ret;
+
+	while (true) {
+		pathEnd = strchr(filepath + pos, '/');
+		if (!pathEnd)
+			return epic_file_open(filepath, "w");
+
+		pathEnd[0] = '\00';
+		pos        = pathEnd - filepath + 1;
+
+		if (strlen(filepath)) {
+			ret = epic_file_stat(filepath, NULL);
+			if (ret == -ENOENT) {
+				ret = epic_file_mkdir(filepath);
+				if (ret) {
+					printf("mkdir failed: %s, ret: %i\n",
+					       filepath,
+					       ret);
+					return ret;
+				}
+			}
+		}
+		pathEnd[0] = '/';
+	}
+}
+
 static uint8_t bleFileOpen(dmConnId_t connId, uint8_t *pValue, uint16_t len)
 {
 	char filepath[100];
@@ -242,7 +277,7 @@ static uint8_t bleFileOpen(dmConnId_t connId, uint8_t *pValue, uint16_t len)
 	if (file_fd != -1)
 		epic_file_close(file_fd);
 
-	file_fd = epic_file_open(filepath, "w");
+	file_fd = bleFileCreateOrOpen(filepath);
 	if (file_fd < 0) {
 		sendCrcResponse(connId, 'e', 0, NULL, "open failed");
 		return ATT_ERR_RESOURCES;
