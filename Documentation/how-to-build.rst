@@ -49,6 +49,12 @@ Dependencies
 * **python3-crc16**: Install with ``pip3 install --user crc16``.
 * **python3-pillow**: Python Image Library ``pip3 install --user pillow``.
 
+  - Arch
+
+    .. code-block:: shell-session
+
+       pacman -S python-crc16 python-pillow
+
 .. _ARM's GNU toolchain: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
 Cloning
