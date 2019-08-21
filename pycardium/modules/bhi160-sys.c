@@ -23,17 +23,17 @@ STATIC mp_obj_t mp_bhi160_enable_sensor(size_t n_args, const mp_obj_t *args)
 	cfg.sample_rate                 = mp_obj_get_int(args[2]);
 	cfg.dynamic_range               = mp_obj_get_int(args[3]);
 
-	int sd = epic_bhi160_enable_sensor(sensor_type, &cfg);
+	int stream_id = epic_bhi160_enable_sensor(sensor_type, &cfg);
 
-	return MP_OBJ_NEW_SMALL_INT(sd);
+	return MP_OBJ_NEW_SMALL_INT(stream_id);
 }
 
 STATIC mp_obj_t mp_bhi160_read_sensor(mp_obj_t stream_id_in)
 {
 	struct bhi160_data_vector buf[100];
-	int sd = mp_obj_get_int(stream_id_in);
+	int stream_id = mp_obj_get_int(stream_id_in);
 
-	int n = epic_stream_read(sd, buf, sizeof(buf));
+	int n = epic_stream_read(stream_id, buf, sizeof(buf));
 
 	mp_obj_list_t *list = mp_obj_new_list(0, NULL);
 	for (int i = 0; i < n; i++) {

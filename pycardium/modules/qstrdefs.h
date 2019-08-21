@@ -58,6 +58,7 @@ Q(set_callback)
 Q(enable_callback)
 Q(disable_callback)
 Q(BHI160_ACCELEROMETER)
+Q(BHI160_GYROSCOPE)
 Q(RTC_ALARM)
 
 /* bhi160 */
