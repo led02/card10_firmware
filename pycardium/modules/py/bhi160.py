@@ -30,6 +30,24 @@ class BHI160Accelerometer:
             interrupt.disable_callback(interrupt.BHI160_ACCELEROMETER)
             interrupt.set_callback(interrupt.BHI160_ACCELEROMETER, None)
 
+    def convert(self, value):
+        return 2 * value / 32768.0
+
+    def read(self):
+        result = []
+        if self.acc_sd is not None:
+            for sample in sys_bhi160.read_sensor(self.acc_sd):
+                result.append(
+                    dict(
+                        {
+                            "x": self.convert(sample.x()),
+                            "y": self.convert(sample.y()),
+                            "z": self.convert(sample.z()),
+                        }
+                    )
+                )
+        return result
+
     def _accelerometer_interrupt(self, _):
         if self.acc_sd is not None:
             data = sys_bhi160.read_sensor(self.acc_sd)
