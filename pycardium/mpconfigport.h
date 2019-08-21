@@ -21,6 +21,8 @@
 
 #define MICROPY_ENABLE_SCHEDULER            (1)
 
+#define MICROPY_ENABLE_SOURCE_LINE          (1)
+
 /* Builtin function and modules */
 #define MICROPY_PY_ALL_SPECIAL_METHODS      (1)
 #define MICROPY_PY_BUILTINS_HELP            (1)
