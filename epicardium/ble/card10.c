@@ -1,19 +1,7 @@
 #include "wsf_types.h"
-#include "wsf_os.h"
-#include "wsf_buf.h"
-#include "wsf_timer.h"
-#include "wsf_trace.h"
-#include "app_ui.h"
-#include "fit/fit_api.h"
-#include "hci_vs.h"
-
-#include "ff.h"
-
 #include "util/bstream.h"
+#include "wsf_assert.h"
 #include "att_api.h"
-
-#include "FreeRTOS.h"
-#include "crc32.h"
 
 #include "epicardium.h"
 
@@ -85,7 +73,8 @@ enum {
 
 /* BLE UUID for card10 service*/
 static const uint8_t UUID_svc[] = { CARD10_UUID_SUFFIX, 0x0, CARD10_UUID_PREFIX };
-
+// works vor everyone?
+static const uint16_t UUID_len = sizeof(UUID_svc);
 
 // starting at 0x01 with write (non visual) charateristics
 
@@ -95,6 +84,8 @@ static const uint8_t UUID_char_time[] = {
 	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
+// works vor everyone?
+static const uint16_t UUID_char_len = sizeof(UUID_char_time);
 
 static const uint8_t UUID_attChar_time[] = {
 	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
@@ -234,308 +225,300 @@ static const uint8_t UUID_char_light_sensor[] = {
 static const uint8_t UUID_attChar_light_sensor[] = {
 	CARD10_UUID_SUFFIX, 0xf0, CARD10_UUID_PREFIX
 };
-/* clang-format on */
+
+static uint8_t initLightSensorValue[] = { UINT16_TO_BYTES(0) };
+static uint16_t initLightSensorLen = sizeof(initLightSensorValue);
 
 /*
  * Create the BLE service description. 
  */
-static void *addCard10GroupDyn(void)
+
+static const attsAttr_t card10SvcAttrList[] =
 {
-	void *pSHdl;
+	{
+		attPrimSvcUuid,
+		(uint8_t *) UUID_svc,
+		(uint16_t *) &UUID_len,
+		sizeof(UUID_svc),
+		0,
+		ATTS_PERMIT_READ
+	},
 
-	uint8_t initLightSensorValue[] = { UINT16_TO_BYTES(0) };
+	// TIME UPDTAE
 
-	/* Create the service */
-	pSHdl = AttsDynCreateGroup(CARD10_START_HDL, CARD10_END_HDL);
-	if (pSHdl != NULL) {
-		/* Primary service */
-		AttsDynAddAttrConst(
-			pSHdl,
-			attPrimSvcUuid,
-			UUID_svc,
-			sizeof(UUID_svc),
-			0,
-			ATTS_PERMIT_READ
-		);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_time,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_time),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_time,
+		NULL,
+		0,
+		sizeof(uint64_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		// TIME UPDTAE
+	// VIBRA
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_time,
-			sizeof(UUID_char_time),
-			0,
-			ATTS_PERMIT_READ
-		);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_vibra,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_vibra),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_vibra,
+		NULL,
+		0,
+		sizeof(uint16_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_time,
-			NULL,
-			0,
-			sizeof(uint64_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	// ROCKETS
 
-		// VIBRA
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_rockets,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_rockets),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_rockets,
+		NULL,
+		0,
+		3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_vibra,
-			sizeof(UUID_char_vibra),
-			0,
-			ATTS_PERMIT_READ
-		);
+	// BG LED Bottom left
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_vibra,
-			NULL,
-			0,
-			sizeof(uint16_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_led_bg_bottom_left,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_led_bg_bottom_left),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_led_bg_bottom_left,
+		NULL,
+		0,
+		3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		// ROCKETS
+	// BG LED Bottom right
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_rockets,
-			sizeof(UUID_char_rockets),
-			0,
-			ATTS_PERMIT_READ
-		);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_led_bg_bottom_right,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_led_bg_bottom_right),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_led_bg_bottom_right,
+		NULL,
+		0,
+		3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_rockets,
-			NULL,
-			0,
-			3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	// BG LED top right
 
-		// BG LED Bottom left
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_led_bg_top_right,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_led_bg_top_right),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_led_bg_top_right,
+		NULL,
+		0,
+		3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_led_bg_bottom_left,
-			sizeof(UUID_char_led_bg_bottom_left),
-			0,
-			ATTS_PERMIT_READ
-		);
+	// BG LED top left
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_led_bg_bottom_left,
-			NULL,
-			0,
-			3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_led_bg_top_left,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_led_bg_top_left),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_led_bg_top_left,
+		NULL,
+		0,
+		3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		// BG LED Bottom right
+	// Dim bottom module
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_led_bg_bottom_right,
-			sizeof(UUID_char_led_bg_bottom_right),
-			0,
-			ATTS_PERMIT_READ
-		);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_leds_bottom_dim,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_leds_bottom_dim),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_leds_bottom_dim,
+		NULL,
+		0,
+		sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_led_bg_bottom_right,
-			NULL,
-			0,
-			3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	// Dim top module
 
-		// BG LED top right
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_leds_top_dim,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_leds_top_dim),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_leds_top_dim,
+		NULL,
+		0,
+		sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_led_bg_top_right,
-			sizeof(UUID_char_led_bg_top_right),
-			0,
-			ATTS_PERMIT_READ
-		);
+	// led powersafe
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_led_bg_top_right,
-			NULL,
-			0,
-			3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_led_powersafe,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_led_powersafe),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_led_powersafe,
+		NULL,
+		0,
+		sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		// BG LED top left
+	// flashlight
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_led_bg_top_left,
-			sizeof(UUID_char_led_bg_top_left),
-			0,
-			ATTS_PERMIT_READ
-		);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_flashlight,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_flashlight),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_flashlight,
+		NULL,
+		0,
+		sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_led_bg_top_left,
-			NULL,
-			0,
-			3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	// ABOVE LEDS
 
-		// Dim bottom module
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_leds_above,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_leds_above),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_leds_above,
+		NULL,
+		0,
+		11 * 3 * sizeof(uint8_t),
+		ATTS_SET_WRITE_CBACK,
+		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH)
+	},
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_leds_bottom_dim,
-			sizeof(UUID_char_leds_bottom_dim),
-			0,
-			ATTS_PERMIT_READ
-		);
+	// ABOVE LEDS
 
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_leds_bottom_dim,
-			NULL,
-			0,
-			sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
+	{
+		attChUuid,
+		(uint8_t *) UUID_char_light_sensor,
+		(uint16_t *) &UUID_char_len,
+		sizeof(UUID_char_light_sensor),
+		0,
+		ATTS_PERMIT_READ
+	},
+	{
+		UUID_attChar_light_sensor,
+		initLightSensorValue,
+		&initLightSensorLen,
+		sizeof(uint8_t),
+		ATTS_SET_READ_CBACK,
+		(ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+				ATTS_PERMIT_READ_AUTH)
+	},
+};
+/* clang-format on */
 
-		// Dim top module
+static attsGroup_t svcCard10Group = {
+	NULL,
+	(attsAttr_t *)card10SvcAttrList,
+	NULL,
+	NULL,
+	CARD10_START_HDL,
+	CARD10_END_HDL,
+};
 
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_leds_top_dim,
-			sizeof(UUID_char_leds_top_dim),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_leds_top_dim,
-			NULL,
-			0,
-			sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
-
-		// led powersafe
-
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_led_powersafe,
-			sizeof(UUID_char_led_powersafe),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_led_powersafe,
-			NULL,
-			0,
-			sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
-
-		// flashlight
-
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_flashlight,
-			sizeof(UUID_char_flashlight),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_flashlight,
-			NULL,
-			0,
-			sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
-
-		// ABOVE LEDS
-
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_leds_above,
-			sizeof(UUID_char_leds_above),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_leds_above,
-			NULL,
-			0,
-			11 * 3 * sizeof(uint8_t),
-			ATTS_SET_WRITE_CBACK,
-			ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH);
-
-		// LIGHT_SENSOR
-
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			UUID_char_light_sensor,
-			sizeof(UUID_char_light_sensor),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		AttsDynAddAttr(
-			pSHdl,
-			UUID_attChar_light_sensor,
-			initLightSensorValue,
-			sizeof(uint8_t),
-			sizeof(uint8_t),
-			ATTS_SET_READ_CBACK,
-			ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
-				ATTS_PERMIT_READ_AUTH);
-
-		APP_TRACE_INFO0("ble-card10: services bound\n");
-	}
-	return pSHdl;
-}
-
+// validating, that the service really get all charateristics
+WSF_CT_ASSERT(
+	((sizeof(card10SvcAttrList) / sizeof(card10SvcAttrList[0])) ==
+	 CARD10_END_HDL - CARD10_START_HDL + 1));
 /*
  * Set the time given in milliseconds since 1.1.1970 as 64 bit integer.
  */
@@ -548,7 +531,7 @@ static uint8_t setTime(uint8_t *pValue)
 	time = __bswap64(timeNet);
 	epic_rtc_set_milliseconds(time);
 
-	APP_TRACE_INFO1("set time to: %d\n", time);
+	APP_TRACE_INFO1("ble-card10: set time to: %d\n", time);
 	return ATT_SUCCESS;
 }
 
@@ -712,6 +695,7 @@ static uint8_t readCard10CB(
 
 void bleCard10_init(void)
 {
-	void *pSHdl = addCard10GroupDyn();
-	AttsDynRegister(pSHdl, readCard10CB, writeCard10CB);
+	svcCard10Group.readCback  = readCard10CB;
+	svcCard10Group.writeCback = writeCard10CB;
+	AttsAddGroup(&svcCard10Group);
 }
