@@ -112,7 +112,7 @@ Rocket0 Rocket1 Rocket2
 - Enable all rockets with 50% brightness: ``0x7f7f7f``
 
 Background LED <Position> characteristic
----------------------------------
+----------------------------------------
 
 The Background LEDs <Position> characteristic makes it possible to address the bottom LEDs by position.
 Just write there three ``uint8`` for the rgb color.
@@ -129,7 +129,7 @@ Dataformat:
 - disabled:  ``0x000000``
 
 LEDs dim <Position> characteristic
----------------------------------
+----------------------------------
 
 The LEDs dim <Position> characteristic makes it possible to dim LEDs by position.
 Just write a ``uint8`` between ``1`` and ``8``.
