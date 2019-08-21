@@ -32,6 +32,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/personal_state
    pycardium/utime
    pycardium/vibra
+   pycardium/pride
 
 .. toctree::
    :maxdepth: 1

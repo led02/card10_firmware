@@ -83,6 +83,12 @@ import leds, display, math, utime, ledfx
 
 
 def expand(colors, cutoff=12):
+    """
+    Expands the raw color list to a longer list, for example for the 11 LEDs.
+
+    :param int colors: Color list to be expanded.
+    :param int cutoff: How long the expanded list is to be. Default = 12
+    """
     output = []
     if len(colors) != 7 or cutoff > 14:
         leds_per_color = int(cutoff / len(colors))
@@ -95,6 +101,18 @@ def expand(colors, cutoff=12):
 
 
 def show_leds(flag="rainbow", brightness=0.5, gamma=1, cutoff=12, halo=True):
+    """
+    Shows pride flag on the top leds.
+    
+    :param str flag: Chooses flag. A list of all available flags is accessible
+        via print_all(). Default = 'rainbow'
+    :param float brightness: Set brightness of LEDs. Default = 0.5
+    :param float gamma: Apply simple gamma correction to adjust colors. 
+        Default = 1
+    :param int cutoff: See expand(). Default = 12
+    :param bool halo: Bottom LEDs copy outermost top LEDs if true. 
+        Default = True
+    """
     colors = ledfx.col_cor(flags[flag], brightness, gamma)
     output = expand(colors, cutoff)[::-1][0:11]
     if halo:
@@ -104,6 +122,15 @@ def show_leds(flag="rainbow", brightness=0.5, gamma=1, cutoff=12, halo=True):
 
 
 def show_display(flag="rainbow", brightness=1, gamma=1):
+    """
+    Shows pride flag on the display.
+    
+    :param str flag: Chooses flag. A list of all available flags is accessible
+        via print_all(). Default = 'rainbow'
+    :param float brightness: Set brightness of LEDs. Default = 0.5
+    :param float gamma: Apply simple gamma correction to adjust colors.
+        Default = 1
+    """
     colors = ledfx.col_cor(flags[flag], brightness, gamma)
     colors = expand(colors, 160)
     with display.open() as disp:
@@ -115,10 +142,29 @@ def show_display(flag="rainbow", brightness=1, gamma=1):
 
 
 def get(flag="rainbow"):
+    """
+    Returns color list of flag.
+
+    :param str flag: Chooses flag. A list of all available flags is accessible
+        via print_all(). Default = 'rainbow'
+    """
     return flags[flag]
 
 
+def print_all():
+    """
+    Prints the names of all available flags on the serial port.
+    """
+    for i in flags:
+        print(i)
+
+
 def demo(s_delay=2):
+    """
+    Demos all available flags on LEDs and display.
+    
+    :param int s_delay: How long each flag is shown in seconds. Default = 2
+    """
     for i in flags:
         print(i)
         show_leds(flag=i)
