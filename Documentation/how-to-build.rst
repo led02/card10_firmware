@@ -1,8 +1,8 @@
 How To Build
 ============
 If you just want to write MicroPython code for card10, you probably **won't**
-need to build the firmware yourself.  This page is for people who want to work
-on the underlying firmware itself.
+need to build the firmware yourself.  This page is for people **who want to work
+on the underlying firmware itself**.
 
 Dependencies
 ------------
@@ -26,25 +26,45 @@ Dependencies
     .. code-block:: shell-session
 
         dnf install arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
+        
+  - macOS (Note: The card10 firmware team used Linux so far. macOS recommendations here are experimental.) 
+    
+    You can use `Homebrew`_ to install the required tools.
+    The version of the Arm crosscompiler tool chain is quite important; with the wrong version, e.g. strip and/or ld might throw strange errors.
+    
+    .. code-block:: shell-session
+            
+        brew tap px4/px4
+        brew install px4/px4/gcc-arm-none-eabi-63
+        brew install coreutils
 
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
+.. _Homebrew: https://brew.sh/
+
 * **python3**:  For meson and various scripts needed for building.
 * **meson** (>0.43.0) & **ninja**:  Unfortunately most distros only have very old versions
   of meson in their repositories.  Instead, you'll probably save yourself a lot
   of headaches by installing meson from *pip*.
 
-   - Ubuntu / Debian:
+  - Ubuntu / Debian:
 
     .. code-block:: shell-session
 
        apt install ninja-build
        pip3 install --user meson
 
-   - Arch (has latest *meson* in the repos):
+  - Arch (has latest *meson* in the repos):
 
     .. code-block:: shell-session
 
        pacman -S meson
+       
+  - macOS 
+  
+    .. code-block:: shell-session
+            
+        brew install ninja
+        pip3 install --user meson  # see https://mesonbuild.com/Getting-meson.html - you will have to add ~/.local/bin to your PATH.
 
 * **python3-crc16**: Install with ``pip3 install --user crc16``.
 * **python3-pillow**: Python Image Library ``pip3 install --user pillow``.
