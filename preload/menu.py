@@ -61,7 +61,12 @@ def draw_menu(disp, applist, idx, offset):
             bg=COLOR1 if i % 2 == 0 else COLOR2,
         )
 
-    disp.print(">", posy=20, fg=color.COMMYELLOW, bg=COLOR2 if idx % 2 == 0 else COLOR1)
+    disp.print(
+        ">",
+        posy=20,
+        fg=color.COMMYELLOW,
+        bg=COLOR1 if (idx + len(applist)) % 2 == 0 else COLOR2,
+    )
     disp.update()
 
 
