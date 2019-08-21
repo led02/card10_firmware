@@ -13,9 +13,11 @@
  */
 /* clang-format off */
 /* clang-formet turned off for easier diffing against orginal file */
+#include <stdio.h>
 #include <string.h>
 #include "wsf_types.h"
 #include "util/bstream.h"
+#include "fs_util.h"
 #include "wsf_msg.h"
 #include "wsf_trace.h"
 #include "hci_api.h"
@@ -155,12 +157,12 @@ static const uint8_t bleAdvDataDisc[] =
 };
 
 /*! scan data, discoverable mode */
-static const uint8_t bleScanDataDisc[] =
+uint8_t bleScanDataDisc[] =
 {
   /*! device name */
-  7,                                      /*! length */
+  14,                                      /*! length */
   DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
-  'c','a','r','d','1','0'
+  'c','a','r','d','1','0','-','0','0','0','0','0','0'
 };
 
 /**************************************************************************************************
@@ -323,6 +325,22 @@ static void bleClose(bleMsg_t *pMsg)
 /*************************************************************************************************/
 static void bleSetup(bleMsg_t *pMsg)
 {
+  char buf[32];
+  char a, b, c, d, e, f;
+
+  if (fs_read_text_file("mac.txt", buf, sizeof(buf)))
+  {
+    if (sscanf(buf, "**:**:**:%c%c:%c%c:%c%c", &a, &b, &c, &d, &e, &f) == 6)
+    {
+      bleScanDataDisc[9]  = a;
+      bleScanDataDisc[10] = b;
+      bleScanDataDisc[11] = c;
+      bleScanDataDisc[12] = d;
+      bleScanDataDisc[13] = e;
+      bleScanDataDisc[14] = f;
+    }
+  }
+  
   /* set advertising and scan response data for discoverable mode */
   AppAdvSetData(APP_ADV_DATA_DISCOVERABLE, sizeof(bleAdvDataDisc), (uint8_t *) bleAdvDataDisc);
   AppAdvSetData(APP_SCAN_DATA_DISCOVERABLE, sizeof(bleScanDataDisc), (uint8_t *) bleScanDataDisc);

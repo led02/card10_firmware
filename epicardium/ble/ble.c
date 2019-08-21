@@ -90,16 +90,13 @@ static void WsfInit(void)
 /* TODO: We need a source of MACs */
 static void setAddress(void)
 {
-	uint8_t bdAddr[6] = { 0x02, 0x02, 0x44, 0x8B, 0x05, 0x00 };
+	uint8_t bdAddr[6] = { 0xCA, 0x4D, 0x10, 0x00, 0x00, 0x00 };
 	char buf[32];
 
 	int result = fs_read_text_file("mac.txt", buf, sizeof(buf));
 
 	if (result == -1) {
 		APP_TRACE_INFO0("mac.txt not found, generating random MAC");
-		bdAddr[0] = 0xCA;
-		bdAddr[1] = 0x4D;
-		bdAddr[2] = 0x10;
 		epic_trng_read(bdAddr + 3, 3);
 		sprintf(buf,
 			"%02x:%02x:%02x:%02x:%02x:%02x\n",
@@ -123,7 +120,7 @@ static void setAddress(void)
 		bdAddr[4] = b;
 		bdAddr[5] = a;
 	}
-
+		
 	LOG_INFO(
 		"ble",
 		"Setting MAC address to %02X:%02X:%02X:%02X:%02X:%02X",
