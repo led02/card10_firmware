@@ -9,8 +9,13 @@ import buttons
 import color
 import display
 import os
+import utime
 import ujson
 import sys
+
+BUTTON_TIMER_POPPED = -1
+COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
+MAXCHARS = 11
 
 def create_folders():
     try:
@@ -55,12 +60,18 @@ def list_apps():
 
     return apps
 
-def button_events():
+def button_events(timeout=0):
     """Iterate over button presses (event-loop)."""
     yield 0
     button_pressed = False
+    count = 0
     while True:
         v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT)
+        if timeout > 0 and count > 0 and count % timeout == 0:
+            yield BUTTON_TIMER_POPPED
+
+        if timeout > 0:
+            count += 1
 
         if v == 0:
             button_pressed = False
@@ -77,27 +88,62 @@ def button_events():
             button_pressed = True
             yield buttons.TOP_RIGHT
 
+        utime.sleep_ms(10)
 
-COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
+def triangle(disp, x, y, left, scale=6, color=[255,0,0]):
+    """Draw a triangle to show there's more text in this line"""
+    yf = 1 if left else -1
+    disp.line(x - scale * yf, int(y + scale / 2), x, y, col=color)
+    disp.line(x, y, x, y + scale, col=color)
+    disp.line(x, y + scale, x - scale * yf, y + int(scale / 2), col=color)
 
-
-def draw_menu(disp, applist, idx, offset):
+def draw_menu(disp, applist, pos, appcount, lineoffset):
     disp.clear()
 
-    # Wrap around the app-list and draw entries from idx - 3 to idx + 4
-    for y, i in enumerate(range(len(applist) + idx - 3, len(applist) + idx + 4)):
-        disp.print(
-            " " + applist[i % len(applist)][1]['name'] + "      ",
-            posy=offset + y * 20 - 40,
-            bg=COLOR1 if i % 2 == 0 else COLOR2,
-        )
+    start = 0
+    if pos > 0:
+        start = pos-1
+    if start + 4 > appcount:
+        start = appcount - 4
+    if start < 0:
+        start = 0
 
-    disp.print(
-        ">",
-        posy=20,
-        fg=color.COMMYELLOW,
-        bg=COLOR1 if (idx + len(applist)) % 2 == 0 else COLOR2,
-    )
+    for i, app in enumerate(applist):
+        if i >= start + 4 or i >= appcount:
+            break
+        if i >= start:
+            disp.rect(
+                0, (i - start) * 20, 159, (i - start) * 20 + 20,
+                col=COLOR1 if i == pos else COLOR2
+            )
+
+            line = app[1]['name']
+            linelength = len(line)
+            off = 0
+
+            # calc line offset for scrolling
+            if i == pos and linelength > (MAXCHARS - 1) and lineoffset > 0:
+                off = lineoffset if lineoffset + (MAXCHARS - 1) < linelength else linelength - (MAXCHARS - 1)
+            if lineoffset > linelength:
+                off = 0
+
+            disp.print(
+                " " + line[off:(off+(MAXCHARS - 1))],
+                posy=(i - start) * 20,
+                bg=COLOR1 if i == pos else COLOR2
+            )
+            if i == pos:
+                disp.print(">", posy=(i - start) * 20, fg=color.COMMYELLOW, bg=COLOR1)
+
+            if linelength > (MAXCHARS - 1) and off < linelength - (MAXCHARS - 1):
+                triangle(disp, 153, (i - start) * 20 + 6, False, 6)
+                triangle(disp, 154, (i - start) * 20 + 7, False, 4)
+                triangle(disp, 155, (i - start) * 20 + 8, False, 2)
+            if off > 0:
+                triangle(disp, 24, (i - start) * 20 + 6, True, 6)
+                triangle(disp, 23, (i - start) * 20 + 7, True, 4)
+                triangle(disp, 22, (i - start) * 20 + 8, True, 2)
+
     disp.update()
 
 
@@ -107,7 +153,11 @@ def main():
     applist = list_apps()
     numapps = len(applist)
     current = 0
-    for ev in button_events():
+    lineoffset = 0
+    timerscrollspeed = 1
+    timerstartscroll = 5
+    timercountpopped = 0
+    for ev in button_events(10):
         if numapps == 0:
             disp.clear(color.COMMYELLOW)
             disp.print(
@@ -129,12 +179,21 @@ def main():
 
         if ev == buttons.BOTTOM_RIGHT:
             # Scroll down
-            draw_menu(disp, applist, current, -8)
             current = (current + 1) % numapps
+            lineoffset = 0
+            timercountpopped = 0
+
         elif ev == buttons.BOTTOM_LEFT:
             # Scroll up
-            draw_menu(disp, applist, current, 8)
             current = (current + numapps - 1) % numapps
+            lineoffset = 0
+            timercountpopped = 0
+
+        elif ev == BUTTON_TIMER_POPPED:
+            timercountpopped += 1
+            if timercountpopped >= timerstartscroll and (timercountpopped - timerstartscroll) % timerscrollspeed == 0:
+                lineoffset += 1
+
         elif ev == buttons.TOP_RIGHT:
             # Select & start
             disp.clear().update()
@@ -145,7 +204,7 @@ def main():
                 print("Loading failed: ", e)
                 os.exit(1)
 
-        draw_menu(disp, applist, current, 0)
+        draw_menu(disp, applist, current, numapps, lineoffset)
 
 
 if __name__ == "__main__":
