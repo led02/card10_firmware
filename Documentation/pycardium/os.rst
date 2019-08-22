@@ -26,6 +26,8 @@ CPython-Like
 
    Return ``n`` random bytes.
 
+   .. versionadded:: 1.3
+
    :param int n: Number of random bytes to retrieve.
    :returns: ``bytes()`` object with ``n`` random bytes.
 
