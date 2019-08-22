@@ -89,12 +89,14 @@ int epic_bme680_init()
 
 int epic_bme680_deinit()
 {
-	int8_t result = BME680_OK;
-
-	result = bme680_soft_reset(&bme);
-	if (result != BME680_OK) {
-		LOG_ERR("bme680", "bme680_soft_reset error: %d\n", result);
-		return -convert_error(result);
+	if (initialized) {
+		int8_t result = bme680_soft_reset(&bme);
+		if (result != BME680_OK) {
+			LOG_ERR("bme680",
+				"bme680_soft_reset error: %d\n",
+				result);
+			return -convert_error(result);
+		}
 	}
 
 	initialized = false;
