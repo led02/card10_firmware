@@ -54,17 +54,17 @@ def is_active():
 def headline():
     disp.print("BLE", posy=0, fg=[0, 255, 255])
     if is_active():
-        disp.print("active", posy=20, fg=[0, 255, 255])
+        disp.print("active", posy=20, fg=[0, 255, 0])
         mac = load_mac()
         if mac is not None:
             disp.print(mac[9:], posy=60, fg=[0, 0, 255])
     else:
-        disp.print("inactive", posy=20, fg=[0, 255, 255])
+        disp.print("inactive", posy=20, fg=[255, 0, 0])
 
 
 def selector():
     triangle(disp, 148, 46, False)
-    disp.print("toggle", posx=25, posy=40, fg=[0, 255, 0])
+    disp.print("toggle", posx=25, posy=40, fg=[255, 255, 255])
 
 
 disp = display.open()
