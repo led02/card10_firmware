@@ -20,7 +20,7 @@
 static mp_obj_t time_set_time(mp_obj_t secs)
 {
 	uint64_t timestamp = mp_obj_get_int(secs) * 1000ULL +
-			     EPOCH_OFFSET * 1000ULL + TZONE_OFFSET;
+			     EPOCH_OFFSET * 1000ULL - TZONE_OFFSET * 1000ULL;
 	epic_rtc_set_milliseconds(timestamp);
 	return mp_const_none;
 }
