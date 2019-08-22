@@ -236,284 +236,252 @@ static uint16_t initLightSensorLen = sizeof(initLightSensorValue);
 static const attsAttr_t card10SvcAttrList[] =
 {
 	{
-		attPrimSvcUuid,
-		(uint8_t *) UUID_svc,
-		(uint16_t *) &UUID_len,
-		sizeof(UUID_svc),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attPrimSvcUuid,
+		.pValue = (uint8_t *) UUID_svc,
+		.pLen = (uint16_t *) &UUID_len,
+		.maxLen = sizeof(UUID_svc),
+		.permissions = ATTS_PERMIT_READ
 	},
 
-	// TIME UPDTAE
+	// TIME
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_time,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_time),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_time,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_time),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_time,
-		NULL,
-		0,
-		sizeof(uint64_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_time,
+		.pValue = NULL,
+		.maxLen = sizeof(uint64_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// VIBRA
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_vibra,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_vibra),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_vibra,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_vibra),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_vibra,
-		NULL,
-		0,
-		sizeof(uint16_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_vibra,
+		.pValue = NULL,
+		.maxLen = sizeof(uint16_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// ROCKETS
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_rockets,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_rockets),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_rockets,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_rockets),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_rockets,
-		NULL,
-		0,
-		3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_rockets,
+		.pValue = NULL,
+		.maxLen = 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// BG LED Bottom left
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_led_bg_bottom_left,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_led_bg_bottom_left),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_led_bg_bottom_left,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_led_bg_bottom_left),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_led_bg_bottom_left,
-		NULL,
-		0,
-		3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_led_bg_bottom_left,
+		.pValue = NULL,
+		.maxLen = 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// BG LED Bottom right
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_led_bg_bottom_right,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_led_bg_bottom_right),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_led_bg_bottom_right,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_led_bg_bottom_right),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_led_bg_bottom_right,
-		NULL,
-		0,
-		3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_led_bg_bottom_right,
+		.pValue = NULL,
+		.maxLen = 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// BG LED top right
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_led_bg_top_right,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_led_bg_top_right),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_led_bg_top_right,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_led_bg_top_right),
+		.settings = 0,
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_led_bg_top_right,
-		NULL,
-		0,
-		3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_led_bg_top_right,
+		.pValue = NULL,
+		.maxLen = 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// BG LED top left
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_led_bg_top_left,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_led_bg_top_left),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_led_bg_top_left,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_led_bg_top_left),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_led_bg_top_left,
-		NULL,
-		0,
-		3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_led_bg_top_left,
+		.pValue = NULL,
+		.maxLen = 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// Dim bottom module
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_leds_bottom_dim,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_leds_bottom_dim),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_leds_bottom_dim,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_leds_bottom_dim),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_leds_bottom_dim,
-		NULL,
-		0,
-		sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_leds_bottom_dim,
+		.pValue = NULL,
+		.pLen = 0,
+		.maxLen = sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// Dim top module
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_leds_top_dim,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_leds_top_dim),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_leds_top_dim,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_leds_top_dim),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_leds_top_dim,
-		NULL,
-		0,
-		sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_leds_top_dim,
+		.pValue = NULL,
+		.maxLen = sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// led powersafe
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_led_powersafe,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_led_powersafe),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_led_powersafe,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_led_powersafe),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_led_powersafe,
-		NULL,
-		0,
-		sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_led_powersafe,
+		.pValue = NULL,
+		.maxLen = sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// flashlight
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_flashlight,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_flashlight),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_flashlight,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_flashlight),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_flashlight,
-		NULL,
-		0,
-		sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_flashlight,
+		.pValue = NULL,
+		.maxLen = sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// ABOVE LEDS
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_leds_above,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_leds_above),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_leds_above,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_leds_above),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_leds_above,
-		NULL,
-		0,
-		11 * 3 * sizeof(uint8_t),
-		ATTS_SET_WRITE_CBACK,
-		(ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		.pUuid = UUID_attChar_leds_above,
+		.pValue = NULL,
+		.maxLen = 11 * 3 * sizeof(uint8_t),
+		.settings = ATTS_SET_WRITE_CBACK,
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
 	// ABOVE LEDS
 
 	{
-		attChUuid,
-		(uint8_t *) UUID_char_light_sensor,
-		(uint16_t *) &UUID_char_len,
-		sizeof(UUID_char_light_sensor),
-		0,
-		ATTS_PERMIT_READ
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_light_sensor,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_light_sensor),
+		.permissions = ATTS_PERMIT_READ
 	},
 	{
-		UUID_attChar_light_sensor,
-		initLightSensorValue,
-		&initLightSensorLen,
-		sizeof(uint8_t),
-		ATTS_SET_READ_CBACK,
-		(ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+		.pUuid = UUID_attChar_light_sensor,
+		.pValue = initLightSensorValue,
+		.pLen = &initLightSensorLen,
+		.maxLen = sizeof(uint8_t),
+		.settings = ATTS_SET_READ_CBACK,
+		.permissions = (ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
 				ATTS_PERMIT_READ_AUTH)
 	},
 };
 /* clang-format on */
 
-static attsGroup_t svcCard10Group = {
-	NULL,
-	(attsAttr_t *)card10SvcAttrList,
-	NULL,
-	NULL,
-	CARD10_START_HDL,
-	CARD10_END_HDL,
-};
 
 // validating, that the service really get all charateristics
 WSF_CT_ASSERT(
@@ -689,13 +657,20 @@ static uint8_t readCard10CB(
 	}
 }
 
+static attsGroup_t svcCard10Group = {
+	.pNext       = NULL,
+	.pAttr       = (attsAttr_t *)card10SvcAttrList,
+	.readCback   = readCard10CB,
+	.writeCback  = writeCard10CB,
+	.startHandle = CARD10_START_HDL,
+	.endHandle   = CARD10_END_HDL,
+};
+
 /*
  * This registers and starts the BLE card10 service.
  */
 
 void bleCard10_init(void)
 {
-	svcCard10Group.readCback  = readCard10CB;
-	svcCard10Group.writeCback = writeCard10CB;
 	AttsAddGroup(&svcCard10Group);
 }
