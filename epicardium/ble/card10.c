@@ -80,7 +80,7 @@ static const uint16_t UUID_len = sizeof(UUID_svc);
 
 /* BLE UUID for card10 time update */
 static const uint8_t UUID_char_time[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
@@ -93,7 +93,7 @@ static const uint8_t UUID_attChar_time[] = {
 
 /* BLE UUID for card10 char vibra */
 static const uint8_t UUID_char_vibra[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_VIBRA_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x0f, CARD10_UUID_PREFIX
 };
@@ -107,7 +107,7 @@ static const uint8_t UUID_attChar_vibra[] = {
 
 /* BLE UUID for card10 char rockets */
 static const uint8_t UUID_char_rockets[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_ROCKETS_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
@@ -118,7 +118,7 @@ static const uint8_t UUID_attChar_rockets[] = {
 
 /* BLE UUID for card10 led background bottom left */
 static const uint8_t UUID_char_led_bg_bottom_left[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
 };
@@ -129,7 +129,7 @@ static const uint8_t UUID_attChar_led_bg_bottom_left[] = {
 
 /* BLE UUID for card10 led background bottom right */
 static const uint8_t UUID_char_led_bg_bottom_right[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
 };
@@ -140,7 +140,7 @@ static const uint8_t UUID_attChar_led_bg_bottom_right[] = {
 
 /* BLE UUID for card10 led background top right */
 static const uint8_t UUID_char_led_bg_top_right[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
 };
@@ -151,7 +151,7 @@ static const uint8_t UUID_attChar_led_bg_top_right[] = {
 
 /* BLE UUID for card10 led background top left */
 static const uint8_t UUID_char_led_bg_top_left[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
 };
@@ -184,7 +184,7 @@ static const uint8_t UUID_attChar_leds_top_dim[] = {
 
 /* BLE UUID for card10 powersafe */
 static const uint8_t UUID_char_led_powersafe[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_POWERSAFE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x17, CARD10_UUID_PREFIX
 };
@@ -195,7 +195,7 @@ static const uint8_t UUID_attChar_led_powersafe[] = {
 
 /* BLE UUID for card10 flashlight */
 static const uint8_t UUID_char_flashlight[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_FLASHLIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x18, CARD10_UUID_PREFIX
 };
@@ -206,7 +206,7 @@ static const uint8_t UUID_attChar_flashlight[] = {
 
 /* BLE UUID for card10 above leds */
 static const uint8_t UUID_char_leds_above[] = {
-	ATT_PROP_WRITE,
+	ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LEDS_ABOVE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
 };
@@ -581,22 +581,58 @@ static uint8_t writeCard10CB(
 	// dim
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if (ui8 >= 1 && ui8 <= 8) {
+		if (operation == ATT_PDU_PREP_WRITE_REQ) {
+			if (ui8 >= 1 && ui8 <= 8) {
+				APP_TRACE_INFO1(
+					"ble_card10: prep to dim bottom to: %d\n",
+					pValue[0]
+				);
+				return ATT_SUCCESS;
+			}
+			APP_TRACE_INFO1(
+				"ble-card: prep dim bottom invalid value (1-8): %d\n",
+				ui8
+			);
+			return ATT_ERR_RANGE;
+		} else if (operation == ATT_PDU_EXEC_WRITE_REQ) {
 			epic_leds_dim_bottom(pValue[0]);
-			APP_TRACE_INFO1("dim bottom to: %d\n", pValue[0]);
+			APP_TRACE_INFO1(
+				"ble-card10: dim bottom to: %d\n", pValue[0]
+			);
 			return ATT_SUCCESS;
 		}
-		APP_TRACE_INFO1("dim bottom invalid value (1-8): %d\n", ui8);
-		return ATT_ERR_RANGE;
+		APP_TRACE_INFO1(
+			"ble-card10: dim bottom with unknown operation: %d\n",
+			operation
+		);
+		return ATT_ERR_INVALID_PDU;
 	case CARD10_LEDS_TOP_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if (ui8 >= 1 && ui8 <= 8) {
-			epic_leds_dim_top(ui8);
-			APP_TRACE_INFO1("dim top to: %d\n", ui8);
+		if (operation == ATT_PDU_PREP_WRITE_REQ) {
+			if (ui8 >= 1 && ui8 <= 8) {
+				APP_TRACE_INFO1(
+					"ble_card10: prep to dim top to: %d\n",
+					pValue[0]
+				);
+				return ATT_SUCCESS;
+			}
+			APP_TRACE_INFO1(
+				"ble-card: prep dim top invalid value (1-8): %d\n",
+				ui8
+			);
+			return ATT_ERR_RANGE;
+		} else if (operation == ATT_PDU_EXEC_WRITE_REQ) {
+			epic_leds_dim_top(pValue[0]);
+			APP_TRACE_INFO1(
+				"ble-card10: dim top to: %d\n", pValue[0]
+			);
 			return ATT_SUCCESS;
 		}
-		APP_TRACE_INFO1("dim top invalid value (1-8): %d\n", ui8);
-		return ATT_ERR_RANGE;
+		APP_TRACE_INFO1(
+			"ble-card10: dim top with unknown operation: %d\n",
+			operation
+		);
+		return ATT_ERR_INVALID_PDU;
 	// led powersafe
 	case CARD10_LED_POWERSAFE_VAL_HDL:
 		epic_leds_set_powersave(pValue[0]);

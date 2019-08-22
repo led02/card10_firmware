@@ -18,37 +18,37 @@ The current draft uses following service specification:
 - Time update characteristic:
 
   UUID: ``42230201-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Vibra characteristic:
 
   UUID: ``4223020f-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Rockets characteristic:
 
   UUID: ``42230210-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Background LED Bottom Left characteristic:
 
   UUID: ``42230211-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Background LED Bottom Right characteristic:
 
   UUID: ``42230212-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Background LED Top Right characteristic:
 
   UUID: ``42230213-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Background LED Top Left characteristic:
 
   UUID: ``42230214-2342-2342-2342-234223422342``
-  write
+  write no reponse
 
 - LEDS dim bottom characteristic:
 
@@ -63,22 +63,22 @@ The current draft uses following service specification:
 - LEDs powersafe characteristic:
 
   UUID: ``42230217-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - Flashlight characteristic:
 
   UUID: ``42230218-2342-2342-2342-234223422342``
-  write
+  write no response
 
 - LEDs above characteristic:
 
   UUID: ``42230220-2342-2342-2342-234223422342``
-  write
+  write no reponse
 
 - Light sensor characteristic:
 
   UUID: ``422302f0-2342-2342-2342-234223422342``
-  read
+  read no response
 
 Time update characteristic
 ---------------------------------
