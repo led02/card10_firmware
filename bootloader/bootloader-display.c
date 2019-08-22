@@ -55,6 +55,21 @@ void bootloader_display_header(void)
 	bootloader_display_line(2, CARD10_VERSION, white);
 }
 
+void bootloader_display_error(char *errtype, char *line1, char *line2)
+{
+	gfx_clear(&display_screen);
+
+	Color red    = gfx_color(&display_screen, RED);
+	Color yellow = gfx_color(&display_screen, YELLOW);
+	Color white  = gfx_color(&display_screen, WHITE);
+
+	bootloader_display_line(0, "[FATAL ERROR]", red);
+	bootloader_display_line(1, errtype, yellow);
+	bootloader_display_line(2, CARD10_VERSION, white);
+	bootloader_display_line(3, line1, white);
+	bootloader_display_line(4, line2, white);
+}
+
 /*
  * Display a line of text on the display.
  */

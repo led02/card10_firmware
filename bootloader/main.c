@@ -179,6 +179,9 @@ void flash_partition(void)
 				data); /* wild cast. not sure if this works */
 		if (ret != E_NO_ERROR) {
 			printf("FLC_Write failed with %d\n", ret);
+			bootloader_display_error(
+				"Firmware Write", "Firmware not", "updated."
+			);
 			while (1)
 				;
 		}
