@@ -25,6 +25,7 @@ void return_to_menu(void);
 #define SERIAL_READ_BUFFER_SIZE 128
 void vSerialTask(void *pvParameters);
 void serial_enqueue_char(char chr);
+extern TaskHandle_t serial_task_id;
 
 /* ---------- LED Animation / Personal States ------------------------------ */
 #define PERSONAL_STATE_LED 14

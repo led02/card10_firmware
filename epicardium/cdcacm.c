@@ -57,6 +57,7 @@
 #include "cdc_acm.h"
 #include "descriptors.h"
 
+#include "modules/modules.h"
 #include "modules/log.h"
 #include <errno.h>
 
@@ -358,7 +359,6 @@ static int usb_read_callback(void)
 #include "FreeRTOS.h"
 #include "task.h"
 
-extern TaskHandle_t serial_task_id;
 void USB_IRQHandler(void)
 {
 	usb_event_handler();

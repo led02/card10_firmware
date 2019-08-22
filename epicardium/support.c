@@ -6,11 +6,10 @@
 #include "task.h"
 
 #include "api/dispatcher.h"
+#include "modules/modules.h"
 #include "modules/log.h"
 
 #include "card10.h"
-
-extern TaskHandle_t dispatcher_task_id;
 
 /*
  * This hook is called before FreeRTOS enters tickless idle.
