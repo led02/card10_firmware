@@ -54,6 +54,13 @@ typedef _Bool bool;
 #define API_DISP_PIXEL             0x28
 #define API_DISP_FRAMEBUFFER       0x29
 
+/* API_BATTERY_VOLTAGE              0x30 */
+#define API_BATTERY_CURRENT        0x31
+#define API_CHARGEIN_VOLTAGE       0x32
+#define API_CHARGEIN_CURRENT       0x33
+#define API_SYSTEM_VOLTAGE         0x34
+#define API_THERMISTOR_VOLTAGE     0x35
+
 #define API_FILE_OPEN              0x40
 #define API_FILE_CLOSE             0x41
 #define API_FILE_READ              0x42
@@ -227,14 +234,41 @@ API(API_SYSTEM_EXEC, int __epic_exec(char *name));
 API(API_SYSTEM_RESET, void epic_system_reset(void));
 
 /**
- * Battery Voltage
+ * PMIC API
  * ===============
  */
+
 
 /**
  * Read the current battery voltage.
  */
 API(API_BATTERY_VOLTAGE, int epic_read_battery_voltage(float *result));
+
+/**
+ * Read the current battery current.
+ */
+API(API_BATTERY_CURRENT, int epic_read_battery_current(float *result));
+
+/**
+ * Read the current charge voltage.
+ */
+API(API_CHARGEIN_VOLTAGE, int epic_read_chargein_voltage(float *result));
+
+/**
+ * Read the current charge current.
+ */
+API(API_CHARGEIN_CURRENT, int epic_read_chargein_current(float *result));
+
+/**
+ * Read the current system voltage.
+ */
+API(API_SYSTEM_VOLTAGE, int epic_read_system_voltage(float *result));
+
+/**
+ * Read the current thermistor voltage.
+ */
+API(API_THERMISTOR_VOLTAGE, int epic_read_thermistor_voltage(float *result));
+
 
 /**
  * UART/Serial Interface
