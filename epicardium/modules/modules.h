@@ -35,6 +35,9 @@ int personal_state_enabled();
 /* ---------- PMIC --------------------------------------------------------- */
 void vPmicTask(void *pvParameters);
 
+/* ---------- Watchdog ----------------------------------------------------- */
+void watchdog_clearer_init();
+
 /* Critical battery voltage */
 #define BATTERY_CRITICAL   3.40f
 
