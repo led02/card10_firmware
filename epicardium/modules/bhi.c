@@ -417,7 +417,8 @@ void vBhi160Task(void *pvParameters)
 
 	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
 	if (lockret < 0) {
-		return;
+		LOG_CRIT("bhi160", "Failed to acquire I2C lock!");
+		vTaskDelay(portMAX_DELAY);
 	}
 
 	/* Take Mutex during initialization, just in case */
@@ -447,9 +448,14 @@ void vBhi160Task(void *pvParameters)
 		vTaskDelay(portMAX_DELAY);
 	}
 
-	/* Wait for first two interrupts */
+	/* Wait for first interrupt */
+	hwlock_release(HWLOCK_I2C);
 	ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
-	ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+	lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (lockret < 0) {
+		LOG_CRIT("bhi160", "Failed to acquire I2C lock!");
+		vTaskDelay(portMAX_DELAY);
+	}
 
 	/* Remap axes to match card10 layout */
 	bhy_mapping_matrix_set(
