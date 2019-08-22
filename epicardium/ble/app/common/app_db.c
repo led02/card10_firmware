@@ -99,7 +99,7 @@ static appDbRec_t *pAppDbNewRec = appDb.rec;
 static TimerHandle_t store_timer;
 static StaticTimer_t store_timer_buffer;
 static void store_callback();
-#define STORE_DELAY pdMS_TO_TICKS(1000)
+#define STORE_DELAY pdMS_TO_TICKS(5000)
 
 /*************************************************************************************************/
 /*!
@@ -129,9 +129,11 @@ void AppDbInit(void)
                                      );
 }
 
+/* TODO this should actually put tasks into a queue. On the other end of the queue */
+/* a worker task can read tasks off the queue and execute them */
 static void store(void)
 {
-  LOG_DEBUG("appDb", "store() called, resetting timer");
+  LOG_INFO("appDb", "store() called, resetting timer");
   if (xTimerReset(store_timer, 10) != pdPASS) {     /* (Re)start the timer */
     /* Store timer could not be reset, write to persistent storage anyway */
     store_callback();
@@ -140,10 +142,11 @@ static void store(void)
 
 static void store_callback()
 {
+  LOG_INFO("appDb", "STORE_DELAY passed, writing to persistent storage");
+
   int fd = epic_file_open("pairings.bin", "w");
   if(fd >= 0) {
     if(epic_file_write(fd, &appDb, sizeof(appDb)) != sizeof(appDb)) {
-      LOG_DEBUG("appDb", "STORE_DELAY passed, writing to persistent storage");
     }
     epic_file_close(fd);
   }
