@@ -113,6 +113,7 @@ typedef _Bool bool;
 
 #define API_BHI160_ENABLE          0xe0
 #define API_BHI160_DISABLE         0xe1
+#define API_BHI160_DISABLE_ALL     0xe2
 
 /* clang-format on */
 
@@ -1028,6 +1029,11 @@ API(API_BHI160_ENABLE, int epic_bhi160_enable_sensor(
 API(API_BHI160_DISABLE, int epic_bhi160_disable_sensor(
 	enum bhi160_sensor_type sensor_type
 ));
+
+/**
+ * Disable all BHI160 sensors.
+ */
+API(API_BHI160_DISABLE_ALL, void epic_bhi160_disable_all_sensors());
 
 /**
  * Vibration Motor

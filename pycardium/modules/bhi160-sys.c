@@ -65,7 +65,6 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(
 	mp_bhi160_disable_sensor_obj, mp_bhi160_disable_sensor
 );
 
-
 STATIC const mp_rom_map_elem_t bhi160_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_sys_bhi160) },
 	{ MP_ROM_QSTR(MP_QSTR_enable_sensor),

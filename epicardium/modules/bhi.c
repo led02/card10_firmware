@@ -62,6 +62,9 @@ static SemaphoreHandle_t bhi160_mutex = NULL;
 /* Streams */
 static struct stream_info bhi160_streams[10];
 
+/* Active */
+static bool bhi160_sensor_active[10] = { 0 };
+
 /* -- Utilities -------------------------------------------------------- {{{ */
 /*
  * Retrieve the data size for a sensor.  This value is needed for the creation
@@ -165,6 +168,9 @@ int epic_bhi160_enable_sensor(
 			hwlock_release(HWLOCK_I2C);
 			return bhyret;
 		}
+
+		bhi160_sensor_active[sensor_type] = true;
+
 		xSemaphoreGive(bhi160_mutex);
 	} else {
 		hwlock_release(HWLOCK_I2C);
@@ -189,7 +195,9 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
 		struct stream_info *stream = &bhi160_streams[sensor_type];
-		int streamret = stream_deregister(bhi160_lookup_sd(sensor_type), stream);
+		int streamret              = stream_deregister(
+                        bhi160_lookup_sd(sensor_type), stream
+		);
 		if (streamret < 0) {
 			xSemaphoreGive(bhi160_mutex);
 			hwlock_release(HWLOCK_I2C);
@@ -197,12 +205,15 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 		}
 		vQueueDelete(stream->queue);
 		stream->queue = NULL;
-		int bhyret = bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
+		int bhyret    = bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
 		if (bhyret < 0) {
 			xSemaphoreGive(bhi160_mutex);
 			hwlock_release(HWLOCK_I2C);
 			return bhyret;
 		}
+
+		bhi160_sensor_active[sensor_type] = false;
+
 		xSemaphoreGive(bhi160_mutex);
 	} else {
 		hwlock_release(HWLOCK_I2C);
@@ -212,6 +223,16 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 	hwlock_release(HWLOCK_I2C);
 	return 0;
 }
+
+void epic_bhi160_disable_all_sensors()
+{
+	for (int i = 0; i < sizeof(bhi160_sensor_active); i++) {
+		if (bhi160_sensor_active[i]) {
+			epic_bhi160_disable_sensor(i);
+		}
+	}
+}
+
 /* }}} */
 
 /* -- Driver ----------------------------------------------------------- {{{ */
