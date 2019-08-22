@@ -35,8 +35,8 @@ number of tasks that will have been keeping card10 running.  These are:
 Epicardium API
 --------------
 Epicardium exposes lots of functionality via the *Epicardium API*.  The
-technical details if this API can be found in this :ref:`overview
-<epicardium_api_overview>`.  If you are interesting in adding new API calls,
+technical details of this API can be found in this :ref:`overview
+<epicardium_api_overview>`.  If you are interested in adding new API calls,
 you should probably read the :ref:`epicardium_api_guide` guide.
 
 Pycardium
