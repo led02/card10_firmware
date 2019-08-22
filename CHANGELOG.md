@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [v1.5] - 2019-08-23 00:30
+## [Unreleased]
+- Maxim BLE SDK update
+
+## [v1.5] - 2019-08-23 00:18 - [Eggppppplant]
+[Eggppppplant]: https://card10.badge.events.ccc.de/release/card10-v1.5-Eggppppplant.zip
+
 ### Added
 - **bootloader**: Add an error message when flashing fails.
 - **display**: Option to set backlight from Python
@@ -18,7 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **gpio**: Fix field-setting in `gpio_cfg_t`.
 
 
-## [v1.4] - 2019-08-22 19:43
+## [v1.4] - 2019-08-22 19:43 - [DaikonRadish]
+[DaikonRadish]: https://card10.badge.events.ccc.de/release/card10-v1.4-DaikonRadish.zip
+
 ### Added
 - Support for the `bme680` environmental sensor.
 - Support for the `bhi160` sensor fusion.
@@ -39,7 +46,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed the PMIC driver not releasing some locks properly.
 
 
-## [v1.3] - 2019-08-22 00:12
+## [v1.3] - 2019-08-22 00:12 - [CCCauliflower]
+[CCCauliflower]: https://card10.badge.events.ccc.de/release/card10-v1.3-cccauliflower.zip
+
 ### Added
 - A splashscreen in Epicardium showing the version number.
 - `os.urandom()` function.
@@ -54,7 +63,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed confusing MAXUSB messages.
 
 
-## [v1.2] - 2019-08-21 18:18
+## [v1.2] - 2019-08-21 18:18 - [Broccoli]
+[Broccoli]: https://card10.badge.events.ccc.de/release/card10-v1.2-broccoli.zip
 
 ```text
 8e8d8614 feat(apps): Add scope to preload
@@ -84,7 +94,7 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 5e5c7a4f fix(menu.py): Fix color-mismatch of selector background
 ```
 
-## [v1.1] - 2019-08-21 03:14
+## [v1.1] - 2019-08-21 03:14 - Asparagus
 ### Added
 - Seed ``urandom`` PRNG with ``TRNG`` peripheral.
 - Show linenumbers in MicroPython tracebacks.
@@ -97,7 +107,8 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 ## [v1.0] - 2019-08-21 00:50
 Initial release.
 
-[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.4...master
+[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.5...master
+[v1.5]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.4...v1.5
 [v1.4]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.3...v1.4
 [v1.3]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.2...v1.3
 [v1.2]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.1...v1.2
