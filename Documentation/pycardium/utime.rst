@@ -32,7 +32,11 @@ alarm.
 
    Sets the time to ``secs`` seconds since 2000-01-01 00:00 in the local
    timezone.
-   
+
+   .. versionchanged:: 1.4
+      :py:func:`utime.set_time` previously applied a wrong timezone offset,
+      thus leading to wrong results.
+
 .. py:function:: set_unix_time(secs)
 
    Sets the time to ``secs`` seconds since 1970-01-01 00:00 UTC.

@@ -691,6 +691,8 @@ API(API_LEDS_CLEAR_ALL, void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b
 /**
  * BME680
  * ======
+ *
+ * .. versionadded:: 1.4
  */
 
 /**
@@ -710,6 +712,8 @@ struct bme680_sensor_data {
 /**
  * Initialize the BM680 sensor.
  *
+ * .. versionadded:: 1.4
+ *
  * :return: 0 on success or ``-Exxx`` on error.  The following
  *     errors might occur:
  *
@@ -723,6 +727,8 @@ API(API_BME680_INIT, int epic_bme680_init());
 /**
  * De-Initialize the BM680 sensor.
  *
+ * .. versionadded:: 1.4
+ *
  * :return: 0 on success or ``-Exxx`` on error.  The following
  *     errors might occur:
  *
@@ -735,6 +741,8 @@ API(API_BME680_DEINIT, int epic_bme680_deinit());
 
 /**
  * Get the current BME680 data.
+ *
+ * .. versionadded:: 1.4
  *
  * :param data: Where to store the environmental data.
  * :return: 0 on success or ``-Exxx`` on error.  The following
@@ -875,6 +883,8 @@ API(API_STREAM_READ, int epic_stream_read(int sd, void *buf, size_t count));
  * ====================
  * card10 has a BHI160 onboard which is used as an IMU.  BHI160 exposes a few
  * different sensors which can be accessed using Epicardium API.
+ *
+ * .. versionadded:: 1.4
  *
  * **Example**:
  *
@@ -1017,6 +1027,8 @@ struct bhi160_sensor_config {
  *
  *    - ``-EBUSY``:  The BHI160 driver is currently busy with other tasks and
  *      could not be acquired for enabling a sensor.
+ *
+ * .. versionadded:: 1.4
  */
 API(API_BHI160_ENABLE, int epic_bhi160_enable_sensor(
 	enum bhi160_sensor_type sensor_type,
@@ -1027,6 +1039,8 @@ API(API_BHI160_ENABLE, int epic_bhi160_enable_sensor(
  * Disable a BHI160 sensor.
  *
  * :param bhi160_sensor_type sensor_type: Which sensor to disable.
+ *
+ * .. versionadded:: 1.4
  */
 API(API_BHI160_DISABLE, int epic_bhi160_disable_sensor(
 	enum bhi160_sensor_type sensor_type
@@ -1034,6 +1048,8 @@ API(API_BHI160_DISABLE, int epic_bhi160_disable_sensor(
 
 /**
  * Disable all BHI160 sensors.
+ *
+ * .. versionadded:: 1.4
  */
 API(API_BHI160_DISABLE_ALL, void epic_bhi160_disable_all_sensors());
 

@@ -1,5 +1,7 @@
 ``simple_menu`` - Draw a Menu
 =============================
+.. versionadded:: 1.4
+
 To allow quickly hacking some scripts, Pycardium has a small library for
 displaying menus.  You can use it like this:
 

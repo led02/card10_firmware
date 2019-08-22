@@ -24,6 +24,8 @@ def button_events():
             elif ev == buttons.TOP_RIGHT:
                 # Select
                 pass
+
+    .. versionadded:: 1.4
     """
     yield 0
     v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT)
@@ -62,6 +64,8 @@ class Menu:
         m.run()
 
     Then, call :py:meth:`~simple_menu.Menu.run` to start the event loop.
+
+    .. versionadded:: 1.4
     """
 
     color_1 = color.CHAOSBLUE

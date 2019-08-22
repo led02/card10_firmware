@@ -28,6 +28,8 @@
    Before being able to read data from the sensor, you have to call
    :py:func:`bme680.init`.
 
+   .. versionadded:: 1.4
+
 .. py:function:: get_data()
 
    Perform a single measurement of environmental data.
@@ -35,6 +37,10 @@
    :return: Tuple containing ``temperature`` (°C), ``humidity`` (% r.h.),
       ``pressure`` (hPa) and ``gas resistance`` (Ohm).
 
+   .. versionadded:: 1.4
+
 .. py:function:: deinit()
 
    Deinitialize the sensor.
+
+   .. versionadded:: 1.4
