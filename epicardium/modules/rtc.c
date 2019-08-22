@@ -25,6 +25,16 @@ uint32_t epic_rtc_get_seconds(void)
 	return sec;
 }
 
+uint64_t epic_rtc_get_milliseconds(void)
+{
+	uint32_t sec, subsec;
+
+	while (RTC_GetTime(&sec, &subsec) == E_BUSY) {
+		vTaskDelay(pdMS_TO_TICKS(4));
+	}
+	return subsec * 1000ULL / 4096 + sec * 1000ULL;
+}
+
 void epic_rtc_set_milliseconds(uint64_t milliseconds)
 {
 	uint32_t sec, subsec;

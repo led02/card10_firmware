@@ -79,6 +79,7 @@ typedef _Bool bool;
 #define API_RTC_GET_SECONDS        0x50
 #define API_RTC_SCHEDULE_ALARM     0x51
 #define API_RTC_SET_MILLISECONDS   0x52
+#define API_RTC_GET_MILLISECONDS   0x53
 
 #define API_LEDS_SET               0x60
 #define API_LEDS_SET_HSV           0x61
@@ -1576,6 +1577,13 @@ API(API_FILE_MKDIR, int epic_file_mkdir(const char *dirname));
  * :return: Unix time in seconds
  */
 API(API_RTC_GET_SECONDS, uint32_t epic_rtc_get_seconds(void));
+
+/**
+ * Read the current RTC value in ms.
+ *
+ * :return: Unix time in milliseconds
+ */
+API(API_RTC_GET_MILLISECONDS, uint64_t epic_rtc_get_milliseconds(void));
 
 /**
  * Sets the current RTC time in milliseconds

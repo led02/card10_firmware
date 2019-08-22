@@ -42,6 +42,15 @@ static mp_obj_t time_time(void)
 }
 MP_DEFINE_CONST_FUN_OBJ_0(time_time_obj, time_time);
 
+static mp_obj_t time_time_ms(void)
+{
+	uint64_t milliseconds;
+	milliseconds = epic_rtc_get_milliseconds() -
+		       (EPOCH_OFFSET + TZONE_OFFSET) * 1000ULL;
+	return mp_obj_new_int_from_ull(milliseconds);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(time_time_ms_obj, time_time_ms);
+
 static mp_obj_t time_localtime(size_t n_args, const mp_obj_t *args)
 {
 	mp_int_t seconds;
@@ -120,6 +129,7 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(time_alarm_obj, 1, 2, time_alarm);
 static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_utime) },
 	{ MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&time_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_time_ms), MP_ROM_PTR(&time_time_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_time), MP_ROM_PTR(&time_set_time_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_unix_time),
 	  MP_ROM_PTR(&time_set_unix_time_obj) },
