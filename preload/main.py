@@ -4,6 +4,7 @@ from utime import sleep
 import utime
 import math
 import leds
+import buttons
 
 class Time:
     def __init__(self, start = 0):
@@ -42,22 +43,96 @@ class Clock:
         self.run_once = run_once
         self.offsetx = offsetx
         self.time = Time()
-        white = (255, 255, 255)
-        self.center_col = white
-        self.m1_col = white
-        self.m5_col = white
-        self.hour_hand_col = white
-        self.minute_hand_col = white
-        self.second_hand_col = white
+        self.theme = 0
+        self.default_themes = [
+            {
+                "background": [0, 0, 0],
+                "center": [255, 255, 255],
+                "m1": [255, 255, 255],
+                "m5": [255, 255, 255],
+                "hour_hand": [255, 255, 255],
+                "minute_hand": [255, 255, 255],
+                "second_hand": [255, 255, 255],
+            },
+            {
+                "background": [255, 255, 255],
+                "center": [0, 0, 0],
+                "m1": [0, 0, 0],
+                "m5": [0, 0, 0],
+                "hour_hand": [0, 0, 0],
+                "minute_hand": [0, 0, 0],
+                "second_hand": [0, 0, 0],
+            },
+        ]
+        self.themes = self.default_themes
+        # TODO load themes from clock.json
+        # TODO load current theme from clock.json
+
+        # load colors
+        print("theme: ", self.theme)
+        print("themes: ", self.themes)
+        self.setTheme(self.theme)
+
+    def setTheme(self, theme):
+        self.theme = theme % len(self.themes)
+        self.background_col = (
+            self.themes[self.theme]['background']
+            if 'background' in self.themes[self.theme]
+            else self.default_themes[0]['background']
+        )
+        self.center_col = (
+            self.themes[self.theme]['center']
+            if 'center' in self.themes[self.theme]
+            else self.default_themes[0]['center']
+        )
+        self.m1_col = (
+            self.themes[self.theme]['m1']
+            if 'm1' in self.themes[self.theme]
+            else self.default_themes[0]['m1']
+        )
+        self.m5_col = (
+            self.themes[self.theme]['m5']
+            if 'm5' in self.themes[self.theme]
+            else self.default_themes[0]['m5']
+        )
+        self.hour_hand_col = (
+            self.themes[self.theme]['hour_hand']
+            if 'hour_hand' in self.themes[self.theme]
+            else self.default_themes[0]['hour_hand']
+        )
+        self.minute_hand_col = (
+            self.themes[self.theme]['minute_hand']
+            if 'minute_hand' in self.themes[self.theme]
+            else self.default_themes[0]['minute_hand']
+        )
+        self.second_hand_col = (
+            self.themes[self.theme]['second_hand']
+            if 'second_hand' in self.themes[self.theme]
+            else self.default_themes[0]['second_hand']
+        )
 
     def loop(self):
         colored = False
         try:
             with display.open() as disp:
+                button_pressed = False
                 while True:
                     self.updateClock(disp)
                     if self.run_once:
                         break
+
+                    # check for button presses
+                    v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT)
+                    if v == 0:
+                        button_pressed = False
+
+                    if not button_pressed and v & buttons.BOTTOM_LEFT != 0:
+                        button_pressed = True
+                        self.setTheme(self.theme - 1)
+                    elif not button_pressed and v & buttons.BOTTOM_RIGHT != 0:
+                        button_pressed = True
+                        self.setTheme(self.theme + 1)
+
         except KeyboardInterrupt:
             for i in range(11):
                 leds.set(i, (0, 0, 0))
@@ -72,7 +147,7 @@ class Clock:
             d.update()
 
     def updateClock(self, disp):
-        disp.clear()
+        disp.clear(self.background_col)
         localtime = utime.localtime()
 
         disp.pixel(self.center[0] + self.offsetx, self.center[1], col = self.center_col)
