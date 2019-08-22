@@ -71,6 +71,15 @@ Q(x)
 Q(y)
 Q(z)
 
+/* power */
+Q(power)
+Q(read_battery_voltage)
+Q(read_battery_current)
+Q(read_chargein_voltage)
+Q(read_chargein_current)
+Q(read_system_voltage)
+Q(read_thermistor_voltage)
+
 /* display */
 Q(sys_display)
 Q(display)

@@ -11,6 +11,7 @@ modsrc = files(
   'modules/light_sensor.c',
   'modules/os.c',
   'modules/personal_state.c',
+  'modules/power.c',
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
