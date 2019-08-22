@@ -88,7 +88,9 @@ static int load_stat(char *name)
  */
 static int do_load(struct load_info *info)
 {
+#if defined(JAILBREAK_CARD10) && (JAILBREAK_CARD10 == 1)
 	struct l0dable_info l0dable;
+#endif
 	int res;
 
 	if (*info->name == '\0') {
