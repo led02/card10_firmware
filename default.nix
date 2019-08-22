@@ -42,10 +42,13 @@ in stdenv.mkDerivation rec {
     meson --cross-file card10-cross.ini "$build"
     ninja -C "$build" -j $NIX_BUILD_CORES
 
-    # Copy artifacts to derivation outputs.
-    install -D -m 444 "$build/bootloader/bootloader.elf" -t "$out/bootloader"
-    install -D -m 444 "$build/pycardium/pycardium_epicardium.bin" -t "$out/pycardium"
-    install -D -m 444 "$build/epicardium/epicardium.elf" -t "$out/epicardium"
-    install -D -m 444 "$build/pycardium/pycardium.elf" -t "$out/pycardium"
+    # Copy ELFs for debugging
+    install -D -m 444 "$build/bootloader/bootloader.elf" -t "$out/lib/bootloader.elf"
+    install -D -m 444 "$build/epicardium/epicardium.elf" -t "$out/lib/epicardium.elf"
+    install -D -m 444 "$build/pycardium/pycardium.elf" -t "$out/lib/pycardium.elf"
+    # Create new flash contents
+    install -D -m 444 "$build/pycardium/pycardium_epicardium.bin" "$out/card10/card10.bin"
+    install -m 444 preload/*.py -t $out/card10/
+    cp -ar preload/apps $out/card10/
   '';
 }
