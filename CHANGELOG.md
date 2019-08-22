@@ -3,12 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [v1.5] - 2019-08-23 00:30
 ### Added
 - **bootloader**: Add an error message when flashing fails.
+- **display**: Option to set backlight from Python
+- **utime**: Function to read time in ms from Python
 
 ### Changed
 - **gpio**: Rename constants for consistency.
+- **ble**: Storing pairings outside BLE stack context
+- **security**: Disable ELFs by default, prevent access to some more files
 
 ### Fixed
 - **gpio**: Fix field-setting in `gpio_cfg_t`.
