@@ -85,9 +85,7 @@ void DEV_Set_BL(uint16_t _Value)
 	gpio_pwm.mask = PIN_PWM;
 	gpio_pwm.pad  = GPIO_PAD_PULL_DOWN;
 
-	if (GPIO_Config(&gpio_pwm) != E_NO_ERROR) {
-		printf("Failed GPIO_Config for pwm.\n");
-	}
+	GPIO_Config(&gpio_pwm);
 
 	/* 
     Steps for configuring a timer for PWM mode:
@@ -111,11 +109,6 @@ void DEV_Set_BL(uint16_t _Value)
 	tmr_pwm.per_cnt  = period_ticks;
 	tmr_pwm.duty_cnt = duty_ticks;
 
-	if (TMR_PWMConfig(PWM_TIMER, &tmr_pwm) != E_NO_ERROR) {
-		printf("Failed TMR_PWMConfig.\n");
-	}
-
+	TMR_PWMConfig(PWM_TIMER, &tmr_pwm);
 	TMR_Enable(PWM_TIMER);
-
-	printf("PWM started.\n");
 }
