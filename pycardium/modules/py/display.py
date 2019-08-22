@@ -91,6 +91,16 @@ class Display:
         sys_display.pixel(x, y, col)
         return self
 
+    def backlight(self, brightness):
+        """
+        Set display backlight brightness
+
+        :param brightness: backlight brightness 0 <= brightness <= 1000
+        """
+
+        sys_display.backlight(brightness)
+        return self
+
     def line(self, xs, ys, xe, ye, *, col=None, dotted=False, size=1):
         """
         Draws a line on the display.
