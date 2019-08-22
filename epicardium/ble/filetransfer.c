@@ -96,8 +96,6 @@ static const uint16_t txChConfig_len = sizeof(txChConfig);
 static const uint8_t attTxChConfigUuid[] = { FILE_TRANS_UUID_SUFFIX,
 					     0x01,
 					     FILE_TRANS_UUID_PREFIX };
-static uint8_t attTxChConfigValue[128];
-static uint16_t attTxChConfigValue_len = sizeof(attTxChConfigUuid);
 
 /* BLE File transfer Central RX configuration */
 static const uint8_t rxChConfig[]    = { ATT_PROP_READ | ATT_PROP_NOTIFY,
@@ -113,7 +111,7 @@ static const uint8_t attRxChConfigUuid[] = { FILE_TRANS_UUID_SUFFIX,
 					     0x02,
 					     FILE_TRANS_UUID_PREFIX };
 static uint8_t attRxChConfigValue[64];
-static uint16_t attRxChConfigValue_len = sizeof(attRxChConfigUuid);
+static uint16_t attRxChConfigValue_len = 0;
 
 /* File descriptor of the currently transferred file */
 static int file_fd = -1;
@@ -140,11 +138,10 @@ static const attsAttr_t fileTransCfgList[] = {
 	},
 	/* File transfer Central TX, this contains information about the real data */
 	{
-		.pUuid  = attTxChConfigUuid,
-		.pValue = attTxChConfigValue,
-		.pLen   = &attTxChConfigValue_len,
-		/* use last biyte for null termination */
-		.maxLen      = sizeof(attTxChConfigValue) - 1,
+		.pUuid       = attTxChConfigUuid,
+		.pValue      = NULL,
+		.pLen        = NULL,
+		.maxLen      = 128,
 		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
 		.permissions = ATTS_PERMIT_WRITE,
 	},
@@ -163,7 +160,7 @@ static const attsAttr_t fileTransCfgList[] = {
 		.pValue      = attRxChConfigValue,
 		.pLen        = &attRxChConfigValue_len,
 		.maxLen      = sizeof(attRxChConfigValue),
-		.settings    = ATTS_SET_READ_CBACK,
+		.settings    = ATTS_SET_VARIABLE_LEN,
 		.permissions = ATTS_PERMIT_READ,
 	},
 	/* File transfer Central RX notification channel */
