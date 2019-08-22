@@ -1,14 +1,15 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
+#include "epicardium.h"
+#include "modules/modules.h"
+#include "modules/log.h"
+
+#include "card10.h"
 
 #include "bme680.h"
 #include "bosch.h"
-#include "card10.h"
 
-#include "epicardium.h"
-#include "modules.h"
-#include "modules/log.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
 
 #define HEATR_TEMP 320
 #define HEATR_DUR 150
@@ -42,9 +43,12 @@ int epic_bme680_init()
 		bme.read     = card10_bosch_i2c_read;
 		bme.write    = card10_bosch_i2c_write;
 		bme.delay_ms = card10_bosch_delay;
-		/* amb_temp can be set to 25 prior to configuring the gas sensor
-     * or by performing a few temperature readings without operating the gas sensor.
-     */
+
+		/*
+		 * amb_temp can be set to 25 prior to configuring the gas sensor
+		 * or by performing a few temperature readings without operating
+		 * the gas sensor.
+		 */
 		bme.amb_temp = 25;
 
 		result = bme680_init(&bme);
@@ -53,8 +57,10 @@ int epic_bme680_init()
 			return -convert_error(result);
 		}
 
-		/* Select the power mode */
-		/* Must be set before writing the sensor configuration */
+		/*
+		 * Select the power mode.  Must be set before writing the sensor
+		 * configuration
+		 */
 		bme.power_mode = BME680_FORCED_MODE;
 
 		/* Set the temperature, pressure and humidity settings */
@@ -131,9 +137,9 @@ int epic_bme680_read_sensors(struct bme680_sensor_data *data)
 		return -convert_error(result);
 	}
 
-	data->temperature    = raw_data.temperature / 100.0l;
-	data->humidity       = raw_data.humidity / 1000.0l;
-	data->pressure       = raw_data.pressure / 100.0l;
+	data->temperature    = (float)raw_data.temperature / 100.0f;
+	data->humidity       = raw_data.humidity / 1000.0f;
+	data->pressure       = raw_data.pressure / 100.0f;
 	data->gas_resistance = raw_data.gas_resistance;
 
 	return 0;
