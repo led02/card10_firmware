@@ -1567,7 +1567,7 @@ API(API_FILE_MKDIR, int epic_file_mkdir(const char *dirname));
 API(API_RTC_GET_SECONDS, uint32_t epic_rtc_get_seconds(void));
 
 /**
- * Read the current RTC value.
+ * Read the current RTC value in ms.
  *
  * :return: Unix time in milliseconds
  */

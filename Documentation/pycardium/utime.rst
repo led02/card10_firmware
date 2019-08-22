@@ -28,6 +28,11 @@ alarm.
    Return the current timestamp in seconds since 2000-01-01 00:00 in
    the local timezone.
 
+.. py:function:: time_ms()
+
+   Return the current timestamp in milliseconds since 2000-01-01 00:00 in
+   the local timezone.
+
 .. py:function:: set_time(secs)
 
    Sets the time to ``secs`` seconds since 2000-01-01 00:00 in the local
