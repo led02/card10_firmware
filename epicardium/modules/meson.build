@@ -18,4 +18,5 @@ module_sources = files(
   'stream.c',
   'trng.c',
   'vibra.c',
+  'watchdog.c',
 )

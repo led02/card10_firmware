@@ -20,6 +20,7 @@
 #include "rtc.h"
 #include "spi.h"
 #include "trng.h"
+#include "wdt.h"
 
 /*
  * Early init is called at the very beginning and is meant for modules which
@@ -28,6 +29,23 @@
  */
 int hardware_early_init(void)
 {
+	/*
+	 * Watchdog timer
+	 */
+	sys_cfg_wdt_t wdt_cfg = NULL;
+	WDT_Init(MXC_WDT0, wdt_cfg);
+
+	if (WDT_GetResetFlag(MXC_WDT0)) {
+		WDT_ClearResetFlag(MXC_WDT0);
+		LOG_INFO("watchdog", "Reset due to watchdog timeout");
+	}
+
+	WDT_Enable(MXC_WDT0, 1);
+	WDT_SetResetPeriod(
+		MXC_WDT0,
+		WDT_PERIOD_2_27); /* Clocked by PCLK at 50MHz, reset at 2^27 ticks = 2.7 seconds */
+	WDT_EnableReset(MXC_WDT0, 1);
+
 	/*
 	 * I2C bus for onboard peripherals (ie. PMIC, BMA400, BHI160, BME680,
 	 * ...)

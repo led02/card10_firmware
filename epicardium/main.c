@@ -104,6 +104,9 @@ int main(void)
 		abort();
 	}
 
+	/* Watchdog petting */
+	watchdog_clearer_init();
+
 	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
 
