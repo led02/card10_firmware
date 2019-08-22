@@ -22,6 +22,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
 
    pycardium/overview
    pycardium/stdlib
+   pycardium/bme680
    pycardium/buttons
    pycardium/color
    pycardium/display

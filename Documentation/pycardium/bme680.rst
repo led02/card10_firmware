@@ -1,17 +1,40 @@
-``bme680`` - 4-in-1 Sensor
-==========================
+.. py:module:: bme680
 
-.. py:function:: bme680.init()
+``bme680`` - Environmental Sensor
+=================================
 
-   Before being able to read data from the sensor, you have to call init().
+**Example**:
 
-.. py:function:: bme680.get_data()
+.. code-block:: python
 
-   Does a single measurement to get environmental data.
+   import bme680, utime
 
-   :return: Tuple containing ``temperature`` (°C), ``humidity`` (% r.h.), 
-   ``pressure`` (hPa) and ``gas resistance`` (Ohm).
+   bme680.init()
 
-.. py:function:: bme680.deinit()
+   while True:
+       temperature, humidity, pressure, resistance = bme680.get_data()
 
-   De-Initializes the sensor.
+       print("Temperature:    {:10.2f} °C".format(temperature))
+       print("Humidity:       {:10.2f} % r.h.".format(humidity))
+       print("Pressure:       {:10.2f} hPa".format(pressure))
+       print("Gas Resistance: {:10.2f} Ω".format(resistance))
+
+       utime.sleep(1)
+
+.. py:function:: init()
+
+   Initialize the sensor.
+
+   Before being able to read data from the sensor, you have to call
+   :py:func:`bme680.init`.
+
+.. py:function:: get_data()
+
+   Perform a single measurement of environmental data.
+
+   :return: Tuple containing ``temperature`` (°C), ``humidity`` (% r.h.),
+      ``pressure`` (hPa) and ``gas resistance`` (Ohm).
+
+.. py:function:: deinit()
+
+   Deinitialize the sensor.
