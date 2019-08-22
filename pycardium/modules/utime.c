@@ -45,8 +45,8 @@ MP_DEFINE_CONST_FUN_OBJ_0(time_time_obj, time_time);
 static mp_obj_t time_time_ms(void)
 {
 	uint64_t milliseconds;
-	milliseconds = epic_rtc_get_milliseconds()
-				   - (EPOCH_OFFSET + TZONE_OFFSET) * 1000ULL;
+	milliseconds = epic_rtc_get_milliseconds() -
+		       (EPOCH_OFFSET + TZONE_OFFSET) * 1000ULL;
 	return mp_obj_new_int_from_ull(milliseconds);
 }
 MP_DEFINE_CONST_FUN_OBJ_0(time_time_ms_obj, time_time_ms);
