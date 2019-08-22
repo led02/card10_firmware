@@ -402,20 +402,8 @@ static uint8_t writeCallback(
 	}
 }
 
-static uint8_t readCallback(
-	dmConnId_t connId,
-	uint16_t handle,
-	uint8_t operation,
-	uint16_t offset,
-	attsAttr_t *pAttr
-) {
-	LOG_ERR("filetrans", "read callback\n");
-	return ATT_SUCCESS;
-}
-
 static attsGroup_t fileTransCfgGroup = {
 	.pAttr       = (attsAttr_t *)fileTransCfgList,
-	.readCback   = readCallback,
 	.writeCback  = writeCallback,
 	.startHandle = FILE_TRANS_START_HDL,
 	.endHandle   = FILE_TRANS_END_HDL,
