@@ -70,6 +70,14 @@ subdir('ble/')
 
 subdir('l0der/')
 
+epicardium_cargs = []
+if get_option('jailbreak_card10')
+  epicardium_cargs += [
+    '-DJAILBREAK_CARD10=1',
+  ]
+endif
+
+
 elf = executable(
   name + '.elf',
   'cdcacm.c',
@@ -88,6 +96,7 @@ elf = executable(
     '-Wl,-Map=' + meson.current_build_dir() + '/' + name + '.map',
     '-Wl,--defsym=_write=_write_epicardium',
   ],
+  c_args: epicardium_cargs,
 )
 
 epicardium_bin = custom_target(

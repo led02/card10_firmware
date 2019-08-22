@@ -51,6 +51,9 @@ Next to Pycardium, other bare-metal code can also run on core 1.  For example,
 a Rustcardium or C-cardium.  These l0dables must be compiled using our special
 linker script and should link against the api-caller library so they can
 interface with the :ref:`epicardium_api`.
+Note: this feature is disabled by default and has to be enabled at build time.
+To do this, run ``bootstrap.sh`` with the option ``-Djailbreak_card10=true``
+and rebuild the firmware as described in :ref:`how_to_build`.
 
 .. todo::
 

@@ -21,3 +21,11 @@ option(
 
   description: 'Whether to enable WSF TRACE prints',
 )
+
+option(
+  'jailbreak_card10',
+  type: 'boolean',
+  value: false,
+
+  description: 'Enable execution of .elf l0dables',
+)
