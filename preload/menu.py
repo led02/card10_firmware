@@ -62,14 +62,18 @@ def list_apps():
                 ]
             )
 
+    dirlist = [
+        entry for entry in sorted(os.listdir("/apps")) if not entry.startswith(".")
+    ]
+
     # list all hatchary style apps (not .elf and not .py)
     # with or without metadata.json
-    for appFolder in sorted(os.listdir("/apps")):
+    for appFolder in dirlist:
         if not (appFolder.endswith(".py") or appFolder.endswith(".elf")):
             apps.append(["/apps/%s/__init__.py" % appFolder, read_metadata(appFolder)])
 
     # list simple python scripts
-    for pyFile in sorted(os.listdir("/apps")):
+    for pyFile in dirlist:
         if pyFile.endswith(".py"):
             apps.append(
                 [
@@ -85,7 +89,7 @@ def list_apps():
             )
 
     # list simple elf binaries
-    for elfFile in sorted(os.listdir("/apps")):
+    for elfFile in dirlist:
         if elfFile.endswith(".elf"):
             apps.append(
                 [
