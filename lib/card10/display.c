@@ -37,7 +37,7 @@ void display_init(void)
 
 	GPIO_Config(&DEV_DC_PIN);
 
-	LCD_SetBacklight(200);
+	LCD_SetBacklight(20);
 	LCD_Init();
 
 	display_screen = gfx_screen(LCD_framebuffer());

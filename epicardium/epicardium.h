@@ -1337,7 +1337,7 @@ API(API_DISP_FRAMEBUFFER, int epic_disp_framebuffer(union disp_framebuffer *fb))
 /**
  * Set the backlight brightness value
  *
- * :param brightness: brightness from 0 - 1000
+ * :param brightness: brightness from 0 - 100
  * :return: ``0`` on success or negative value in case of an error:
  *
  *    - ``-EBUSY``: Display was already locked from another task.

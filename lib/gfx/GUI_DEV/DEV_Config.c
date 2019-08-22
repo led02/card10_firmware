@@ -76,39 +76,43 @@ void DEV_Set_BL(uint16_t _Value)
 	gpio_cfg_t gpio_pwm;   // to configure GPIO
 	tmr_cfg_t tmr;         // to congigure timer
 	tmr_pwm_cfg_t tmr_pwm; // for configure PWM
+
+	if (_Value > 100) {
+		_Value = 100;
+	}
+
 	unsigned int period_ticks = PeripheralClock / FREQ;
-	unsigned int duty_ticks   = period_ticks * _Value / 1000;
-
-	// Congfigure GPIO port and pin for PWM
-	gpio_pwm.func = GPIO_FUNC_ALT4;
-	gpio_pwm.port = PORT_PWM;
-	gpio_pwm.mask = PIN_PWM;
-	gpio_pwm.pad  = GPIO_PAD_PULL_DOWN;
-
-	GPIO_Config(&gpio_pwm);
-
-	/* 
-    Steps for configuring a timer for PWM mode:
-    1. Disable the timer
-    2. Set the prescale value
-    3. Configure the timer for PWM mode
-    4. Set polarity, pwm parameters
-    5. Enable Timer
-    */
+	unsigned int duty_ticks   = period_ticks * _Value / 100;
 
 	TMR_Disable(PWM_TIMER);
 
-	TMR_Init(PWM_TIMER, TMR_PRES_1, 0);
+	if (duty_ticks > 0) {
+		// Congfigure GPIO port and pin for PWM
+		gpio_pwm.func = GPIO_FUNC_ALT4;
+		gpio_pwm.port = PORT_PWM;
+		gpio_pwm.mask = PIN_PWM;
+		gpio_pwm.pad  = GPIO_PAD_PULL_DOWN;
+		GPIO_Config(&gpio_pwm);
 
-	tmr.mode    = TMR_MODE_PWM;
-	tmr.cmp_cnt = period_ticks;
-	tmr.pol     = 0;
-	TMR_Config(PWM_TIMER, &tmr);
+		TMR_Init(PWM_TIMER, TMR_PRES_1, 0);
 
-	tmr_pwm.pol      = 1;
-	tmr_pwm.per_cnt  = period_ticks;
-	tmr_pwm.duty_cnt = duty_ticks;
+		tmr.mode    = TMR_MODE_PWM;
+		tmr.cmp_cnt = period_ticks;
+		tmr.pol     = 0;
+		TMR_Config(PWM_TIMER, &tmr);
 
-	TMR_PWMConfig(PWM_TIMER, &tmr_pwm);
-	TMR_Enable(PWM_TIMER);
+		tmr_pwm.pol      = 1;
+		tmr_pwm.per_cnt  = period_ticks;
+		tmr_pwm.duty_cnt = duty_ticks;
+
+		TMR_PWMConfig(PWM_TIMER, &tmr_pwm);
+		TMR_Enable(PWM_TIMER);
+	} else {
+		gpio_pwm.func = GPIO_FUNC_OUT;
+		gpio_pwm.port = PORT_PWM;
+		gpio_pwm.mask = PIN_PWM;
+		gpio_pwm.pad  = GPIO_PAD_PULL_DOWN;
+		GPIO_Config(&gpio_pwm);
+		GPIO_OutClr(&gpio_pwm);
+	}
 }

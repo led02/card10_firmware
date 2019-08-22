@@ -95,7 +95,7 @@ class Display:
         """
         Set display backlight brightness
 
-        :param brightness: backlight brightness 0 <= brightness <= 1000
+        :param brightness: backlight brightness 0 <= brightness <= 100
         """
 
         sys_display.backlight(brightness)
