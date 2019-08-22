@@ -171,6 +171,17 @@ int epic_disp_framebuffer(union disp_framebuffer *fb)
 	return 0;
 }
 
+int epic_disp_backlight(uint16_t brightness)
+{
+	int cl = check_lock();
+	if (cl < 0) {
+		return cl;
+	}
+
+	LCD_SetBacklight(brightness);
+	return 0;
+}
+
 int epic_disp_open()
 {
 	TaskHandle_t task = xTaskGetCurrentTaskHandle();
