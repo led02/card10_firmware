@@ -33,6 +33,11 @@
 #include "app_cfg.h"
 
 #include "epicardium.h"
+#include "modules/log.h"
+#include "FreeRTOS.h"
+#include "timers.h"
+#include "mxc_sys.h"
+#include "wdt.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -90,6 +95,12 @@ static appDb_t appDb;
 /*! When all records are allocated use this index to determine which to overwrite */
 static appDbRec_t *pAppDbNewRec = appDb.rec;
 
+/* Timer to delay writing to persistent storage until a burst of store() calls has finished */
+static TimerHandle_t store_timer;
+static StaticTimer_t store_timer_buffer;
+static void store_callback();
+#define STORE_DELAY pdMS_TO_TICKS(1000)
+
 /*************************************************************************************************/
 /*!
  *  \brief  Initialize the device database.
@@ -107,13 +118,32 @@ void AppDbInit(void)
     }
     epic_file_close(fd);
   }
+
+	store_timer = xTimerCreateStatic(
+                                     "appdb_store_timer",
+                                     STORE_DELAY,
+                                     pdFALSE,
+                                     NULL,
+                                     store_callback,
+                                     &store_timer_buffer
+                                     );
 }
 
 static void store(void)
 {
+  LOG_DEBUG("appDb", "store() called, resetting timer");
+  if (xTimerReset(store_timer, 10) != pdPASS) {     /* (Re)start the timer */
+    /* Store timer could not be reset, write to persistent storage anyway */
+    store_callback();
+  }
+}
+
+static void store_callback()
+{
   int fd = epic_file_open("pairings.bin", "w");
   if(fd >= 0) {
     if(epic_file_write(fd, &appDb, sizeof(appDb)) != sizeof(appDb)) {
+      LOG_DEBUG("appDb", "STORE_DELAY passed, writing to persistent storage");
     }
     epic_file_close(fd);
   }
