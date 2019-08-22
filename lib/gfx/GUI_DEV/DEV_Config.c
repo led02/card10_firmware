@@ -68,7 +68,7 @@ void lcd_write(uint8_t *data, int size)
 // Parameters for PWM output
 #define PORT_PWM PORT_0    // port
 #define PIN_PWM PIN_28     // pin
-#define FREQ 200           // (Hz)
+#define FREQ 1000          // (Hz)
 #define PWM_TIMER MXC_TMR4 // must change PORT_PWM and PIN_PWM if changed
 void DEV_Set_BL(uint16_t _Value)
 {
