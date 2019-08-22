@@ -32,13 +32,13 @@ in your scripts.
 
    .. versionadded:: 1.4
 
-.. py:function:: read_chargin_voltage()
+.. py:function:: read_chargein_voltage()
 
    Read the charge voltage in V.
 
    .. versionadded:: 1.4
 
-.. py:function:: read_chargin_current()
+.. py:function:: read_chargein_current()
 
    Read the charge current in A.
 
