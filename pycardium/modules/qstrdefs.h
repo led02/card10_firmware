@@ -47,6 +47,7 @@ Q(ticks_diff)
 Q(localtime)
 Q(mktime)
 Q(time)
+Q(time_ms)
 Q(set_time)
 Q(set_unix_time)
 
