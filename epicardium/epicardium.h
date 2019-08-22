@@ -543,7 +543,7 @@ API(API_GPIO_WRITE_PIN, int epic_gpio_write_pin(uint8_t pin, bool on));
  * :param uint8_t pin: ID of the pin to get the configuration of. Use on of the IDs defined in :c:type:`gpio_pin`.
  * :returns: ``-EINVAL`` if ``pin`` is not valid, an integer value otherwise.
  */
-API(API_GPIO_READ_PIN, uint32_t epic_gpio_read_pin(uint8_t pin));
+API(API_GPIO_READ_PIN, int epic_gpio_read_pin(uint8_t pin));
 
 /**
  * LEDs

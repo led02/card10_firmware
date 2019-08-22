@@ -28,10 +28,10 @@ static MP_DEFINE_CONST_FUN_OBJ_1(gpio_get_mode, mp_gpio_get_mode);
 
 static mp_obj_t mp_gpio_read(mp_obj_t pin_obj)
 {
-	int pin        = mp_obj_get_int(pin_obj);
-	uint32_t value = epic_gpio_read_pin(pin);
-	if (value == -EINVAL)
-		mp_raise_OSError(EINVAL);
+	int pin   = mp_obj_get_int(pin_obj);
+	int value = epic_gpio_read_pin(pin);
+	if (value < 0)
+		mp_raise_OSError(-value);
 
 	return MP_OBJ_NEW_SMALL_INT(value);
 };

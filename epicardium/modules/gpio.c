@@ -21,27 +21,27 @@ int epic_gpio_set_pin_mode(uint8_t pin, uint8_t mode)
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
 
-	bool is_input  = (mode & GPIO_MODE_IN) == GPIO_MODE_IN;
-	bool is_output = (mode & GPIO_MODE_OUT) == GPIO_MODE_OUT;
-
-	// Pins can't be input and output at the same time.
-	if (is_input && is_output)
+	if (mode & GPIO_MODE_IN) {
+		cfg->func = GPIO_FUNC_IN;
+		if (mode & GPIO_MODE_OUT) {
+			return -EINVAL;
+		}
+	} else if (mode & GPIO_MODE_OUT) {
+		cfg->func = GPIO_FUNC_OUT;
+		if (mode & GPIO_MODE_IN) {
+			return -EINVAL;
+		}
+	} else {
 		return -EINVAL;
+	}
 
-	uint32_t func_value = 0;
-	if (is_input)
-		func_value |= GPIO_FUNC_IN;
-	if (is_output)
-		func_value |= GPIO_FUNC_OUT;
-
-	uint32_t pad_value = 0;
-	if (mode & GPIO_PULL_UP)
-		pad_value |= GPIO_PAD_PULL_UP;
-	if (mode & GPIO_PULL_DOWN)
-		pad_value |= GPIO_PAD_PULL_DOWN;
-
-	cfg->func = func_value;
-	cfg->pad  = pad_value;
+	if (mode & GPIO_PULL_UP) {
+		cfg->pad = GPIO_PAD_PULL_UP;
+	} else if (mode & GPIO_PULL_DOWN) {
+		cfg->pad = GPIO_PAD_PULL_DOWN;
+	} else {
+		cfg->pad = GPIO_PAD_NONE;
+	}
 
 	if (GPIO_Config(cfg) != E_NO_ERROR)
 		return -EINVAL;
@@ -55,13 +55,13 @@ int epic_gpio_get_pin_mode(uint8_t pin)
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
 	int res         = 0;
-	if ((cfg->func & GPIO_FUNC_IN) == GPIO_FUNC_IN)
+	if (cfg->func == GPIO_FUNC_IN)
 		res |= GPIO_MODE_IN;
-	if ((cfg->func & GPIO_FUNC_OUT) == GPIO_FUNC_OUT)
+	else if (cfg->func == GPIO_FUNC_OUT)
 		res |= GPIO_MODE_OUT;
-	if ((cfg->pad & GPIO_PAD_PULL_UP) == GPIO_PAD_PULL_UP)
+	if (cfg->pad == GPIO_PAD_PULL_UP)
 		res |= GPIO_PULL_UP;
-	if ((cfg->pad & GPIO_PAD_PULL_DOWN) == GPIO_PAD_PULL_DOWN)
+	else if (cfg->pad == GPIO_PAD_PULL_DOWN)
 		res |= GPIO_PULL_DOWN;
 
 	return res;
@@ -73,7 +73,7 @@ int epic_gpio_write_pin(uint8_t pin, bool on)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
-	if ((cfg->func & GPIO_FUNC_IN) == GPIO_FUNC_IN)
+	if (cfg->func == GPIO_FUNC_IN)
 		return -EINVAL;
 
 	if (on)
@@ -84,16 +84,16 @@ int epic_gpio_write_pin(uint8_t pin, bool on)
 	return 0;
 }
 
-uint32_t epic_gpio_read_pin(uint8_t pin)
+int epic_gpio_read_pin(uint8_t pin)
 {
 	if (pin < GPIO_WRISTBAND_1 || pin > GPIO_WRISTBAND_4)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
-	if ((cfg->func & GPIO_FUNC_OUT) == GPIO_FUNC_OUT) {
-		return GPIO_OutGet(cfg);
-	} else if ((cfg->func & GPIO_FUNC_IN) == GPIO_FUNC_IN) {
-		return GPIO_InGet(cfg);
+	if (cfg->func == GPIO_FUNC_OUT) {
+		return GPIO_OutGet(cfg) != 0;
+	} else if (cfg->func == GPIO_FUNC_IN) {
+		return GPIO_InGet(cfg) != 0;
 	} else {
 		return -EINVAL;
 	}
