@@ -79,6 +79,21 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_pixel_obj, 3, 3, mp_display_pixel
 );
 
+/* set display backlight brightness */
+static mp_obj_t mp_display_backlight(size_t n_args, const mp_obj_t *args)
+{
+	uint16_t brightness = mp_obj_get_int(args[0]);
+
+	int res = epic_disp_backlight(brightness);
+	if (res < 0) {
+		mp_raise_OSError(-res);
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+	display_backlight_obj, 1, 1, mp_display_backlight
+);
+
 /* draw line on the display */
 static mp_obj_t mp_display_line(size_t n_args, const mp_obj_t *args)
 {
@@ -220,6 +235,7 @@ static const mp_rom_map_elem_t display_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_close), MP_ROM_PTR(&display_close_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_print), MP_ROM_PTR(&display_print_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&display_pixel_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_backlight), MP_ROM_PTR(&display_backlight_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_line), MP_ROM_PTR(&display_line_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_rect), MP_ROM_PTR(&display_rect_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_circ), MP_ROM_PTR(&display_circ_obj) },

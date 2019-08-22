@@ -53,6 +53,7 @@ typedef _Bool bool;
 #define API_DISP_CIRC              0x27
 #define API_DISP_PIXEL             0x28
 #define API_DISP_FRAMEBUFFER       0x29
+#define API_DISP_BACKLIGHT         0x2a
 
 /* API_BATTERY_VOLTAGE              0x30 */
 #define API_BATTERY_CURRENT        0x31
@@ -1331,6 +1332,17 @@ API(API_DISP_CIRC,
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_FRAMEBUFFER, int epic_disp_framebuffer(union disp_framebuffer *fb));
+
+
+/**
+ * Set the backlight brightness value
+ *
+ * :param brightness: brightness from 0 - 100
+ * :return: ``0`` on success or negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_BACKLIGHT, int epic_disp_backlight(uint16_t brightness));
 
 
 /**

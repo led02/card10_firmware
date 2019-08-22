@@ -50,7 +50,7 @@ static void LCD_Reset(void)
 function:
 	Setting backlight
 parameter	:
-		value : Range 0~1000   Duty cycle is value/1000	
+		value : Range 0~100   Duty cycle is value/100
 *******************************************************************************/
 void LCD_SetBacklight(UWORD Value)
 {

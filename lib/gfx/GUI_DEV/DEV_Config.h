@@ -34,6 +34,7 @@
 
 #include "Debug.h"
 #include "spi.h"
+#include "tmr.h"
 #include "tmr_utils.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -72,7 +73,7 @@ void display_set_reset_pin(uint8_t state);
 **/
 
 //#define DEV_Set_BL(_Value)     DEV_BL_PIN= _Value
-#define DEV_Set_BL(_Value)
+void DEV_Set_BL(uint16_t _Value);
 /*-----------------------------------------------------------------------------*/
 
 #endif
