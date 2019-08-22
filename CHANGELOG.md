@@ -3,26 +3,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [v1.4 - 2019-08-22 20:00]
+## [v1.4] - 2019-08-22 19:43
 ### Added
 - Support for the `bme680` environmental sensor.
 - Support for the `bhi160` sensor fusion.
-- simple_menu` module for creating simple menus in Python.
-- Python power module to access the voltage and current measurements from the PMIC.
+- `simple_menu` module for creating simple menus in Python.
+- `power` module to access the voltage and current measurements from the PMIC.
+- Support for color themes in the default clock script:
+  Color themes are read from a json file, so people can customize their clock.
+  Last selected theme is saved in the `clock.json` so it is persistent.
 
 ### Changed
 - Refactored BLE card10 service.
-- Improved BLE file-transfer.
+- Improved BLE file-transfer (added security).
 - Replaced dynamic attribute creation with static attributes.
-- Clock: Added multiple color themes for the main clock.
-- Clock: Color themes are read from a json file, so people can customize their clock
-- Clock: Last selected theme is saved in the clock.json so it's persistent
-
 
 ### Fixed
 - Fixed menu listing files starting with `.`.
 - Fixed `utime.set_time()` applying the timezone offset in the wrong direction.
 - Fixed the PMIC driver not releasing some locks properly.
+
 
 ## [v1.3] - 2019-08-22 00:12
 
@@ -105,7 +105,8 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 ## [v1.0] - 2019-08-21 00:50
 Initial release.
 
-[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.3...master
+[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.4...master
+[v1.4]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.3...v1.4
 [v1.3]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.2...v1.3
 [v1.2]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.1...v1.2
 [v1.1]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.0...v1.1
