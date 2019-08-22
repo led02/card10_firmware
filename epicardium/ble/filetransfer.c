@@ -78,115 +78,101 @@ enum {
 };
 
 /* BLE File transfer Service UUID */
-static const uint8_t fileTransSvc[] = { FILE_TRANS_UUID_SUFFIX,
-					0x00,
-					FILE_TRANS_UUID_PREFIX };
+static const uint8_t fileTransSvc[]    = { FILE_TRANS_UUID_SUFFIX,
+                                        0x00,
+                                        FILE_TRANS_UUID_PREFIX };
+static const uint16_t fileTransSvc_len = sizeof(fileTransSvc);
 
 /* BLE File transfer Central TX configuration */
-static const uint8_t txChConfig[] = { ATT_PROP_WRITE_NO_RSP,
-				      UINT16_TO_BYTES(
-					      FILE_TRANS_CENTRAL_TX_VAL_HDL),
-				      FILE_TRANS_UUID_SUFFIX,
-				      0x01,
-				      FILE_TRANS_UUID_PREFIX };
+static const uint8_t txChConfig[]    = { ATT_PROP_WRITE_NO_RSP,
+                                      UINT16_TO_BYTES(
+                                              FILE_TRANS_CENTRAL_TX_VAL_HDL),
+                                      FILE_TRANS_UUID_SUFFIX,
+                                      0x01,
+                                      FILE_TRANS_UUID_PREFIX };
+static const uint16_t txChConfig_len = sizeof(txChConfig);
+
 /* BLE File transfer Central TX UUID */
 static const uint8_t attTxChConfigUuid[] = { FILE_TRANS_UUID_SUFFIX,
 					     0x01,
 					     FILE_TRANS_UUID_PREFIX };
 
 /* BLE File transfer Central RX configuration */
-static const uint8_t rxChConfig[] = { ATT_PROP_READ | ATT_PROP_NOTIFY,
-				      UINT16_TO_BYTES(
-					      FILE_TRANS_CENTRAL_RX_VAL_HDL),
-				      FILE_TRANS_UUID_SUFFIX,
-				      0x02,
-				      FILE_TRANS_UUID_PREFIX };
+static const uint8_t rxChConfig[]    = { ATT_PROP_READ | ATT_PROP_NOTIFY,
+                                      UINT16_TO_BYTES(
+                                              FILE_TRANS_CENTRAL_RX_VAL_HDL),
+                                      FILE_TRANS_UUID_SUFFIX,
+                                      0x02,
+                                      FILE_TRANS_UUID_PREFIX };
+static const uint16_t rxChConfig_len = sizeof(rxChConfig);
+
 /* BLE File transfer Central RX UUID */
 static const uint8_t attRxChConfigUuid[] = { FILE_TRANS_UUID_SUFFIX,
 					     0x02,
 					     FILE_TRANS_UUID_PREFIX };
+static uint8_t attRxChConfigValue[64];
+static uint16_t attRxChConfigValue_len = 0;
 
 /* File descriptor of the currently transferred file */
 static int file_fd = -1;
 
-/*
- * Create the BLE service description. 
- */
-static void *fileTransAddGroupDyn(void)
-{
-	void *pSHdl;
-	uint8_t initCcc[] = { UINT16_TO_BYTES(0x0000) };
-
-	/* Create the service */
-	pSHdl = AttsDynCreateGroup(FILE_TRANS_START_HDL, FILE_TRANS_END_HDL);
-
-	if (pSHdl != NULL) {
-		/* Primary service */
-		AttsDynAddAttrConst(
-			pSHdl,
-			attPrimSvcUuid,
-			fileTransSvc,
-			sizeof(fileTransSvc),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		/* File transfer Central TX characteristic */
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			txChConfig,
-			sizeof(txChConfig),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		/* File transfer Central TX, this contains information about the real data */
-		AttsDynAddAttr(
-			pSHdl,
-			attTxChConfigUuid,
-			NULL,
-			0,
-			128,
-			ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
-			ATTS_PERMIT_WRITE
-		);
-
-		/* File transfer Central RX characteristic */
-		AttsDynAddAttrConst(
-			pSHdl,
-			attChUuid,
-			rxChConfig,
-			sizeof(rxChConfig),
-			0,
-			ATTS_PERMIT_READ
-		);
-
-		/* File transfer Central RX, this contains information about the real data */
-		AttsDynAddAttr(
-			pSHdl,
-			attRxChConfigUuid,
-			NULL,
-			0,
-			64,
-			ATTS_SET_READ_CBACK,
-			ATTS_PERMIT_READ
-		);
-
-		/* File transfer Central RX notification channel */
-		AttsDynAddAttr(
-			pSHdl,
-			attCliChCfgUuid,
-			initCcc,
-			sizeof(uint16_t),
-			sizeof(uint16_t),
-			ATTS_SET_CCC,
-			ATTS_PERMIT_READ | ATTS_PERMIT_WRITE
-		);
-	}
-
-	return pSHdl;
-}
+/* Attribute list for uriCfg group */
+static const attsAttr_t fileTransCfgList[] = {
+	/* Service declaration */
+	{
+		.pUuid       = attPrimSvcUuid,
+		.pValue      = (uint8_t *)fileTransSvc,
+		.pLen        = (uint16_t *)&fileTransSvc_len,
+		.maxLen      = sizeof(fileTransSvc),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* File transfer Central TX characteristic */
+	{
+		.pUuid       = attChUuid,
+		.pValue      = (uint8_t *)txChConfig,
+		.pLen        = (uint16_t *)&txChConfig_len,
+		.maxLen      = sizeof(txChConfig),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* File transfer Central TX, this contains information about the real data */
+	{
+		.pUuid       = attTxChConfigUuid,
+		.pValue      = NULL,
+		.pLen        = NULL,
+		.maxLen      = 128,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
+		.permissions = ATTS_PERMIT_WRITE,
+	},
+	/* File transfer Central RX characteristic */
+	{
+		.pUuid       = attChUuid,
+		.pValue      = (uint8_t *)rxChConfig,
+		.pLen        = (uint16_t *)&rxChConfig_len,
+		.maxLen      = sizeof(rxChConfig),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* File transfer Central RX, this contains information about the real data */
+	{
+		.pUuid       = attRxChConfigUuid,
+		.pValue      = attRxChConfigValue,
+		.pLen        = &attRxChConfigValue_len,
+		.maxLen      = sizeof(attRxChConfigValue),
+		.settings    = ATTS_SET_VARIABLE_LEN,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* File transfer Central RX notification channel */
+	{
+		.pUuid       = attCliChCfgUuid,
+		.pValue      = attRxChConfigValue,
+		.pLen        = &attRxChConfigValue_len,
+		.maxLen      = sizeof(attRxChConfigValue),
+		.settings    = ATTS_SET_CCC,
+		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_WRITE,
+	},
+};
 
 /**
  * Send a repose with an optional CRC.
@@ -413,22 +399,17 @@ static uint8_t writeCallback(
 	}
 }
 
-static uint8_t readCallback(
-	dmConnId_t connId,
-	uint16_t handle,
-	uint8_t operation,
-	uint16_t offset,
-	attsAttr_t *pAttr
-) {
-	LOG_ERR("filetrans", "read callback\n");
-	return ATT_SUCCESS;
-}
+static attsGroup_t fileTransCfgGroup = {
+	.pAttr       = (attsAttr_t *)fileTransCfgList,
+	.writeCback  = writeCallback,
+	.startHandle = FILE_TRANS_START_HDL,
+	.endHandle   = FILE_TRANS_END_HDL,
+};
 
 /*
  * This registers and starts the BLE file transfer service.
  */
 void bleFileTransfer_init(void)
 {
-	void *pSHdl = fileTransAddGroupDyn();
-	AttsDynRegister(pSHdl, readCallback, writeCallback);
+	AttsAddGroup(&fileTransCfgGroup);
 }
