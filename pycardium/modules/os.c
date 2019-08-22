@@ -141,7 +141,7 @@ static mp_obj_t mp_os_urandom(mp_obj_t size_in)
 	vstr_t vstr;
 
 	vstr_init_len(&vstr, size);
-	epic_trng_read((uint8_t*)vstr.buf, size);
+	epic_trng_read((uint8_t *)vstr.buf, size);
 
 	return mp_obj_new_str_from_vstr(&mp_type_bytes, &vstr);
 }
