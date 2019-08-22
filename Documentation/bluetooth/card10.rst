@@ -53,12 +53,12 @@ The current draft uses following service specification:
 - LEDS dim bottom characteristic:
 
   UUID: ``42230215-2342-2342-2342-234223422342``
-  write
+  write with response
 
 - LEDs dim top characteristic:
 
   UUID: ``42230216-2342-2342-2342-234223422342``
-  write
+  write with response
 
 - LEDs powersafe characteristic:
 

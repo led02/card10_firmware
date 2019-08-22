@@ -482,7 +482,6 @@ static const attsAttr_t card10SvcAttrList[] =
 };
 /* clang-format on */
 
-
 // validating, that the service really get all charateristics
 WSF_CT_ASSERT(
 	((sizeof(card10SvcAttrList) / sizeof(card10SvcAttrList[0])) ==
@@ -582,12 +581,14 @@ static uint8_t writeCard10CB(
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
 		ui8 = pValue[0];
 		if (ui8 >= 1 && ui8 <= 8) {
-			if (operation == ATT_PDU_WRITE_CMD || operation == ATT_PDU_SIGNED_WRITE_CMD ||
-				operation == ATT_PDU_WRITE_REQ || operation == ATT_PDU_EXEC_WRITE_REQ 
-			) {
+			if (operation == ATT_PDU_WRITE_CMD ||
+			    operation == ATT_PDU_SIGNED_WRITE_CMD ||
+			    operation == ATT_PDU_WRITE_REQ ||
+			    operation == ATT_PDU_EXEC_WRITE_REQ) {
 				epic_leds_dim_bottom(pValue[0]);
 				APP_TRACE_INFO1(
-					"ble-card10: dim bottom to: %d\n", pValue[0]
+					"ble-card10: dim bottom to: %d\n",
+					pValue[0]
 				);
 				return ATT_SUCCESS;
 			} else if (operation == ATT_PDU_PREP_WRITE_REQ) {
@@ -613,12 +614,14 @@ static uint8_t writeCard10CB(
 	case CARD10_LEDS_TOP_DIM_VAL_HDL:
 		ui8 = pValue[0];
 		if (ui8 >= 1 && ui8 <= 8) {
-			if (operation == ATT_PDU_WRITE_CMD || operation == ATT_PDU_SIGNED_WRITE_CMD ||
-				operation == ATT_PDU_WRITE_REQ || operation == ATT_PDU_EXEC_WRITE_REQ 
-			) {
+			if (operation == ATT_PDU_WRITE_CMD ||
+			    operation == ATT_PDU_SIGNED_WRITE_CMD ||
+			    operation == ATT_PDU_WRITE_REQ ||
+			    operation == ATT_PDU_EXEC_WRITE_REQ) {
 				epic_leds_dim_top(pValue[0]);
 				APP_TRACE_INFO1(
-					"ble-card10: dim top to: %d\n", pValue[0]
+					"ble-card10: dim top to: %d\n",
+					pValue[0]
 				);
 				return ATT_SUCCESS;
 			} else if (operation == ATT_PDU_PREP_WRITE_REQ) {
