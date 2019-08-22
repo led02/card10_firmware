@@ -61,12 +61,12 @@ static mp_obj_t mp_display_pixel(size_t n_args, const mp_obj_t *args)
 	uint16_t col = get_color(args[2]);
 
 	//TODO: Move sanity checks to epicardium
-	if (x > 160 || x < 0) {
-		mp_raise_ValueError("X-Coords have to be 0 < x < 160");
+	if (x >= 160 || x < 0) {
+		mp_raise_ValueError("X-Coords have to be 0 <= x < 160");
 	}
 
-	if (y > 80 || y < 0) {
-		mp_raise_ValueError("Y-Coords have to be 0 < y < 80");
+	if (y >= 80 || y < 0) {
+		mp_raise_ValueError("Y-Coords have to be 0 <= y < 80");
 	}
 
 	int res = epic_disp_pixel(x, y, col);
@@ -91,12 +91,12 @@ static mp_obj_t mp_display_line(size_t n_args, const mp_obj_t *args)
 	uint16_t ps  = mp_obj_get_int(args[6]);
 
 	//TODO: Move sanity checks to epicardium
-	if (xs > 160 || xs < 0 || xe > 160 || xe < 0) {
-		mp_raise_ValueError("X-Coords have to be 0 < x < 160");
+	if (xs >= 160 || xs < 0 || xe >= 160 || xe < 0) {
+		mp_raise_ValueError("X-Coords have to be 0 <= x < 160");
 	}
 
-	if (ys > 80 || ys < 0 || ye > 80 || ye < 0) {
-		mp_raise_ValueError("Y-Coords have to be 0 < x < 80");
+	if (ys >= 80 || ys < 0 || ye >= 80 || ye < 0) {
+		mp_raise_ValueError("Y-Coords have to be 0 <= x < 80");
 	}
 
 	if (ls > 1 || ls < 0) {
@@ -125,12 +125,12 @@ static mp_obj_t mp_display_rect(size_t n_args, const mp_obj_t *args)
 	uint16_t ps  = mp_obj_get_int(args[6]);
 
 	//TODO: Move sanity checks to epicardium
-	if (xs > 160 || xs < 0 || xe > 160 || xe < 0) {
-		mp_raise_ValueError("X-Coords have to be 0 < x < 160");
+	if (xs >= 160 || xs < 0 || xe >= 160 || xe < 0) {
+		mp_raise_ValueError("X-Coords have to be 0 <= x < 160");
 	}
 
-	if (ys > 80 || ys < 0 || ye > 80 || ye < 0) {
-		mp_raise_ValueError("Y-Coords have to be 0 < x < 80");
+	if (ys >= 80 || ys < 0 || ye >= 80 || ye < 0) {
+		mp_raise_ValueError("Y-Coords have to be 0 <= x < 80");
 	}
 
 	if (fs > 1 || fs < 0) {
