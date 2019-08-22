@@ -65,9 +65,9 @@ class BHI160Accelerometer(BHI160):
     def convert(self, sample):
         return dict(
             {
-                "x": self.convert_single(sample.x()),
-                "y": self.convert_single(sample.y()),
-                "z": self.convert_single(sample.z()),
+                "x": self.convert_single(sample[0]),
+                "y": self.convert_single(sample[1]),
+                "z": self.convert_single(sample[2]),
             }
         )
 
@@ -91,8 +91,8 @@ class BHI160Gyroscope(BHI160):
     def convert(self, sample):
         return dict(
             {
-                "x": self.convert_single(sample.x()),
-                "y": self.convert_single(sample.y()),
-                "z": self.convert_single(sample.z()),
+                "x": self.convert_single(sample[0]),
+                "y": self.convert_single(sample[1]),
+                "z": self.convert_single(sample[2]),
             }
         )

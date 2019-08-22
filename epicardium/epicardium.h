@@ -154,7 +154,7 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_UART_RX                2
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
 #define EPIC_INT_RTC_ALARM              3
-/** TODO: BHI */
+/** BHI */
 #define EPIC_INT_BHI160_ACCELEROMETER   4
 API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
 #define EPIC_INT_BHI160_GYROSCOPE       5
@@ -943,6 +943,10 @@ enum bhi160_sensor_type {
 	BHI160_GEOMAGNETIC_ROTATION_VECTOR = 10,
 };
 
+enum bhi160_data_type {
+	BHI160_DATA_TYPE_VECTOR
+};
+
 /**
  * BHI160 Sensor Data Types
  * ------------------------
@@ -953,6 +957,8 @@ enum bhi160_sensor_type {
  * range.  See the individual sensor's documentation for details.
  */
 struct bhi160_data_vector {
+	enum bhi160_data_type data_type;
+
 	/** X */
 	int16_t x;
 	/** Y */

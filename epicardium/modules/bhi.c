@@ -139,8 +139,9 @@ int epic_bhi160_enable_sensor(
 			return -ENOMEM;
 		}
 
-		int streamret = stream_register(bhi160_lookup_sd(sensor_type), stream);
-	        if (streamret < 0) {
+		int streamret =
+			stream_register(bhi160_lookup_sd(sensor_type), stream);
+		if (streamret < 0) {
 			xSemaphoreGive(bhi160_mutex);
 			hwlock_release(HWLOCK_I2C);
 			return streamret;
@@ -214,54 +215,61 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 	 * Timestamp of the next samples, counting at 32 kHz.
 	 * Currently unused.
 	 */
-	static uint32_t timestamp = 0;
+	static uint32_t timestamp           = 0;
+	enum bhi160_sensor_type sensor_type = 0;
+	int epic_int                        = 0;
+	bool wakeup                         = false;
 
 	switch (sensor_id) {
-	case VS_ID_TIMESTAMP_MSW:
 	case VS_ID_TIMESTAMP_MSW_WAKEUP:
+		wakeup = true;
+		/* fall through */
+	case VS_ID_TIMESTAMP_MSW:
 		MXC_ASSERT(data_type == BHY_DATA_TYPE_SCALAR_U16);
 		timestamp = sensor_data->data_scalar_u16.data << 16;
 		break;
-	case VS_ID_TIMESTAMP_LSW:
 	case VS_ID_TIMESTAMP_LSW_WAKEUP:
+		wakeup = true;
+		/* fall through */
+	case VS_ID_TIMESTAMP_LSW:
 		MXC_ASSERT(data_type == BHY_DATA_TYPE_SCALAR_U16);
 		timestamp = (timestamp & 0xFFFF0000) |
 			    sensor_data->data_scalar_u16.data;
 		break;
-	case VS_ID_ACCELEROMETER:
 	case VS_ID_ACCELEROMETER_WAKEUP:
-		MXC_ASSERT(data_type == BHY_DATA_TYPE_VECTOR);
-		if (bhi160_streams[BHI160_ACCELEROMETER].queue == NULL) {
-			break;
-		}
-		data_vector.x = sensor_data->data_vector.x;
-		data_vector.y = sensor_data->data_vector.y;
-		data_vector.z = sensor_data->data_vector.z;
-		xQueueSend(
-			bhi160_streams[BHI160_ACCELEROMETER].queue,
-			&data_vector,
-			BHI160_MUTEX_WAIT_MS
-		);
-		if (sensor_id == VS_ID_ACCELEROMETER_WAKEUP) {
-			api_interrupt_trigger(EPIC_INT_BHI160_ACCELEROMETER);
-		}
-		break;
-	case VS_ID_GYROSCOPE:
 	case VS_ID_GYROSCOPE_WAKEUP:
-		MXC_ASSERT(data_type == BHY_DATA_TYPE_VECTOR);
-		if (bhi160_streams[BHI160_GYROSCOPE].queue == NULL) {
+		wakeup = true;
+		/* fall through */
+	case VS_ID_ACCELEROMETER:
+	case VS_ID_GYROSCOPE:
+		switch (sensor_id) {
+		case VS_ID_ACCELEROMETER_WAKEUP:
+		case VS_ID_ACCELEROMETER:
+			sensor_type = BHI160_ACCELEROMETER;
+			epic_int    = EPIC_INT_BHI160_ACCELEROMETER;
+			break;
+		case VS_ID_GYROSCOPE_WAKEUP:
+		case VS_ID_GYROSCOPE:
+			sensor_type = BHI160_GYROSCOPE;
+			epic_int    = EPIC_INT_BHI160_GYROSCOPE;
 			break;
 		}
-		data_vector.x = sensor_data->data_vector.x;
-		data_vector.y = sensor_data->data_vector.y;
-		data_vector.z = sensor_data->data_vector.z;
+
+		MXC_ASSERT(data_type == BHY_DATA_TYPE_VECTOR);
+		if (bhi160_streams[sensor_type].queue == NULL) {
+			break;
+		}
+		data_vector.data_type = BHI160_DATA_TYPE_VECTOR;
+		data_vector.x         = sensor_data->data_vector.x;
+		data_vector.y         = sensor_data->data_vector.y;
+		data_vector.z         = sensor_data->data_vector.z;
 		xQueueSend(
-			bhi160_streams[BHI160_GYROSCOPE].queue,
+			bhi160_streams[sensor_type].queue,
 			&data_vector,
 			BHI160_MUTEX_WAIT_MS
 		);
-		if (sensor_id == VS_ID_GYROSCOPE_WAKEUP) {
-			api_interrupt_trigger(EPIC_INT_BHI160_GYROSCOPE);
+		if (wakeup) {
+			api_interrupt_trigger(epic_int);
 		}
 		break;
 	default:
