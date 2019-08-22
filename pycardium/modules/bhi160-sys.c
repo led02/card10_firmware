@@ -21,6 +21,10 @@ STATIC mp_obj_t mp_bhi160_enable_sensor(size_t n_args, const mp_obj_t *args)
 	return MP_OBJ_NEW_SMALL_INT(stream_id);
 }
 
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+	mp_bhi160_enable_sensor_obj, 4, 4, mp_bhi160_enable_sensor
+);
+
 STATIC mp_obj_t mp_bhi160_read_sensor(mp_obj_t stream_id_in)
 {
 	struct bhi160_data_vector buf[100];
@@ -44,13 +48,23 @@ STATIC mp_obj_t mp_bhi160_read_sensor(mp_obj_t stream_id_in)
 	return MP_OBJ_FROM_PTR(list);
 }
 
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
-	mp_bhi160_enable_sensor_obj, 4, 4, mp_bhi160_enable_sensor
-);
-
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(
 	mp_bhi160_read_sensor_obj, mp_bhi160_read_sensor
 );
+
+STATIC mp_obj_t mp_bhi160_disable_sensor(mp_obj_t sensor_type_in)
+{
+	int sensor_type = mp_obj_get_int(sensor_type_in);
+
+	int ret = epic_bhi160_disable_sensor(sensor_type);
+
+	return MP_OBJ_NEW_SMALL_INT(ret);
+}
+
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(
+	mp_bhi160_disable_sensor_obj, mp_bhi160_disable_sensor
+);
+
 
 STATIC const mp_rom_map_elem_t bhi160_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_sys_bhi160) },
@@ -58,6 +72,8 @@ STATIC const mp_rom_map_elem_t bhi160_module_globals_table[] = {
 	  MP_ROM_PTR(&mp_bhi160_enable_sensor_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_read_sensor),
 	  MP_ROM_PTR(&mp_bhi160_read_sensor_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_disable_sensor),
+	  MP_ROM_PTR(&mp_bhi160_disable_sensor_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(bhi160_module_globals, bhi160_module_globals_table);
 

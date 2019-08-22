@@ -27,7 +27,11 @@ class BHI160:
     def close(self):
         if self.active:
             self.active = False
-            sys_bhi160.disable_sensor(self.sensor_id)
+            ret = sys_bhi160.disable_sensor(self.sensor_id)
+
+            if ret < 0:
+                raise ValueError("Disable sensor returned %i", ret)
+
             interrupt.disable_callback(self.interrupt_id)
             interrupt.set_callback(self.interrupt_id, None)
 

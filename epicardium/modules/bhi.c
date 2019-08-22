@@ -182,18 +182,27 @@ int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 		return -ENODEV;
 	}
 
-	int ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (ret < 0) {
-		return ret;
+	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (lockret < 0) {
+		return lockret;
 	}
 
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
 		struct stream_info *stream = &bhi160_streams[sensor_type];
-		stream_deregister(bhi160_lookup_sd(sensor_type), stream);
+		int streamret = stream_deregister(bhi160_lookup_sd(sensor_type), stream);
+		if (streamret < 0) {
+			xSemaphoreGive(bhi160_mutex);
+			hwlock_release(HWLOCK_I2C);
+			return streamret;
+		}
 		vQueueDelete(stream->queue);
 		stream->queue = NULL;
-
-		bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
+		int bhyret = bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
+		if (bhyret < 0) {
+			xSemaphoreGive(bhi160_mutex);
+			hwlock_release(HWLOCK_I2C);
+			return bhyret;
+		}
 		xSemaphoreGive(bhi160_mutex);
 	} else {
 		hwlock_release(HWLOCK_I2C);

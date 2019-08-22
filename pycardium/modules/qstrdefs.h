@@ -65,6 +65,7 @@ Q(RTC_ALARM)
 /* bhi160 */
 Q(sys_bhi160)
 Q(enable_sensor)
+Q(disable_sensor)
 Q(read_sensor)
 Q(x)
 Q(y)
