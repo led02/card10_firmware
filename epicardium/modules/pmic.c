@@ -231,6 +231,50 @@ int epic_read_battery_voltage(float *result)
 	return pmic_read_amux(PMIC_AMUX_BATT_U, result);
 }
 
+/*
+ * API-call for battery current
+ */
+int epic_read_battery_current(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_BATT_CHG_I, result);
+}
+
+/*
+ * API-call for charge voltage
+ */
+int epic_read_chargein_voltage(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_CHGIN_U, result);
+}
+
+/*
+ * API-call for charge voltage
+ */
+int epic_read_chargein_current(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_BATT_CHG_I, result);
+}
+
+/*
+ * API-call for system voltage
+ */
+int epic_read_system_voltage(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_SYS_U, result);
+}
+
+/*
+ * API-call for thermistor voltage
+ *
+ * Thermistor is as 10k at room temperature,
+ * voltage divided with another 10k.
+ * (50% V_bias at room temperature)
+ */
+int epic_read_thermistor_voltage(float *result)
+{
+	return pmic_read_amux(PMIC_AMUX_THM_U, result);
+}
+
 static StaticTimer_t pmic_timer_data;
 static void vPmicTimerCb(TimerHandle_t xTimer)
 {
