@@ -143,7 +143,7 @@ static const attsAttr_t fileTransCfgList[] = {
 		.pLen        = NULL,
 		.maxLen      = 128,
 		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
-		.permissions = ATTS_PERMIT_WRITE,
+		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_AUTH,
 	},
 	/* File transfer Central RX characteristic */
 	{
@@ -161,7 +161,7 @@ static const attsAttr_t fileTransCfgList[] = {
 		.pLen        = &attRxChConfigValue_len,
 		.maxLen      = sizeof(attRxChConfigValue),
 		.settings    = ATTS_SET_VARIABLE_LEN,
-		.permissions = ATTS_PERMIT_READ,
+		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_AUTH,
 	},
 	/* File transfer Central RX notification channel */
 	{
@@ -170,7 +170,8 @@ static const attsAttr_t fileTransCfgList[] = {
 		.pLen        = &attRxChConfigValue_len,
 		.maxLen      = sizeof(attRxChConfigValue),
 		.settings    = ATTS_SET_CCC,
-		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_WRITE,
+		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_AUTH |
+			       ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_AUTH,
 	},
 };
 
