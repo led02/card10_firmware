@@ -88,6 +88,8 @@ static bhy_virtual_sensor_t bhi160_lookup_vs_id(enum bhi160_sensor_type type)
 	switch (type) {
 	case BHI160_ACCELEROMETER:
 		return VS_ID_ACCELEROMETER;
+	case BHI160_ORIENTATION:
+		return VS_ID_ORIENTATION;
 	case BHI160_GYROSCOPE:
 		return VS_ID_GYROSCOPE;
 	default:
@@ -103,6 +105,8 @@ static int bhi160_lookup_sd(enum bhi160_sensor_type type)
 	switch (type) {
 	case BHI160_ACCELEROMETER:
 		return SD_BHI160_ACCELEROMETER;
+	case BHI160_ORIENTATION:
+		return SD_BHI160_ORIENTATION;
 	case BHI160_GYROSCOPE:
 		return SD_BHI160_GYROSCOPE;
 	default:
@@ -237,16 +241,23 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 			    sensor_data->data_scalar_u16.data;
 		break;
 	case VS_ID_ACCELEROMETER_WAKEUP:
+	case VS_ID_ORIENTATION_WAKEUP:
 	case VS_ID_GYROSCOPE_WAKEUP:
 		wakeup = true;
 		/* fall through */
 	case VS_ID_ACCELEROMETER:
+	case VS_ID_ORIENTATION:
 	case VS_ID_GYROSCOPE:
 		switch (sensor_id) {
 		case VS_ID_ACCELEROMETER_WAKEUP:
 		case VS_ID_ACCELEROMETER:
 			sensor_type = BHI160_ACCELEROMETER;
 			epic_int    = EPIC_INT_BHI160_ACCELEROMETER;
+			break;
+		case VS_ID_ORIENTATION_WAKEUP:
+		case VS_ID_ORIENTATION:
+			sensor_type = BHI160_ORIENTATION;
+			epic_int    = EPIC_INT_BHI160_ORIENTATION;
 			break;
 		case VS_ID_GYROSCOPE_WAKEUP:
 		case VS_ID_GYROSCOPE:

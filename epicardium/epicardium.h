@@ -157,11 +157,13 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 /** BHI */
 #define EPIC_INT_BHI160_ACCELEROMETER   4
 API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
-#define EPIC_INT_BHI160_GYROSCOPE       5
+#define EPIC_INT_BHI160_ORIENTATION     5
+API_ISR(EPIC_INT_BHI160_ORIENTATION, epic_isr_bhi160_orientation);
+#define EPIC_INT_BHI160_GYROSCOPE       6
 API_ISR(EPIC_INT_BHI160_GYROSCOPE, epic_isr_bhi160_gyroscope);
 
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    6
+#define EPIC_INT_NUM                    7
 /* clang-format on */
 
 /*
@@ -923,7 +925,7 @@ enum bhi160_sensor_type {
 	BHI160_ACCELEROMETER               = 0,
 	/** Magnetometer (**Unimplemented**) */
 	BHI160_MAGNETOMETER                = 1,
-	/** Orientation (**Unimplemented**) */
+	/** Orientation */
 	BHI160_ORIENTATION                 = 2,
 	/** Gyroscope */
 	BHI160_GYROSCOPE                   = 3,

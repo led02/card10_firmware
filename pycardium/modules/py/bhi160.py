@@ -96,3 +96,29 @@ class BHI160Gyroscope(BHI160):
                 "z": self.convert_single(sample[2]),
             }
         )
+
+
+class BHI160Orientation(BHI160):
+    def __init__(
+        self, sample_rate=4, dynamic_range=2, callback=None, sample_buffer_len=200
+    ):
+        self.sample_rate = sample_rate
+        self.dynamic_range = dynamic_range
+        self.callback = callback
+        self.sample_buffer_len = sample_buffer_len
+        self.sensor_id = 2
+        self.interrupt_id = interrupt.BHI160_ORIENTATION
+        self._callback = callback
+        self.enable_sensor()
+
+    def convert_single(self, value):
+        return 360 * value / 32768.0
+
+    def convert(self, sample):
+        return dict(
+            {
+                "x": self.convert_single(sample[0]),
+                "y": self.convert_single(sample[1]),
+                "z": self.convert_single(sample[2]),
+            }
+        )

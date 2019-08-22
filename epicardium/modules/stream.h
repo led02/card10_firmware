@@ -27,6 +27,7 @@ typedef unsigned int size_t;
 enum stream_descriptor {
 	/** BHI160 */
 	SD_BHI160_ACCELEROMETER,
+	SD_BHI160_ORIENTATION,
 	SD_BHI160_GYROSCOPE,
 	/** Highest descriptor must always be ``SD_MAX``. */
 	SD_MAX,
