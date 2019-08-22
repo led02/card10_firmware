@@ -5,6 +5,10 @@ import utime
 import math
 import leds
 import buttons
+import ujson
+import os
+
+CONFIG_NAME = "clock.json"
 
 class Time:
     def __init__(self, start = 0):
@@ -65,13 +69,33 @@ class Clock:
             },
         ]
         self.themes = self.default_themes
-        # TODO load themes from clock.json
-        # TODO load current theme from clock.json
+
+        # check for config file
+        if CONFIG_NAME in os.listdir("."):
+            self.readConfig()
+        else:
+            self.writeConfig()
 
         # load colors
-        print("theme: ", self.theme)
-        print("themes: ", self.themes)
         self.setTheme(self.theme)
+
+    def readConfig(self):
+        with open(CONFIG_NAME, 'r') as f:
+            try:
+                c = ujson.loads(f.read())
+                if "themes" in c and len(c["themes"]) > 0 and isinstance(c["themes"], list):
+                    self.themes = c["themes"]
+                if "theme" and isinstance(c["theme"], int):
+                    self.theme = c["theme"]
+            except ValueError:
+                print("parsing %s failed" % CONFIG_NAME)
+
+    def writeConfig(self):
+        with open(CONFIG_NAME, 'w') as f:
+            f.write(ujson.dumps({
+                "theme": self.theme,
+                "themes": self.themes,
+            }))
 
     def setTheme(self, theme):
         self.theme = theme % len(self.themes)
@@ -129,9 +153,11 @@ class Clock:
                     if not button_pressed and v & buttons.BOTTOM_LEFT != 0:
                         button_pressed = True
                         self.setTheme(self.theme - 1)
+                        self.writeConfig()
                     elif not button_pressed and v & buttons.BOTTOM_RIGHT != 0:
                         button_pressed = True
                         self.setTheme(self.theme + 1)
+                        self.writeConfig()
 
         except KeyboardInterrupt:
             for i in range(11):
