@@ -50,6 +50,7 @@
 #include "board.h"
 #include "mcr_regs.h"
 
+
 /***** Definitions *****/
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -63,42 +64,9 @@ volatile uint32_t eccAddr;
 
 // Find the highest address in RAM, subtract the portion taken away by ECC
 uint32_t ramTop = (MXC_SRAM_MEM_BASE + (MXC_SRAM_MEM_SIZE*0.8));
+
 /***** Functions *****/
-int PreInit(void)
-{
-    /* This PreInit overrides the default in system_max32665.c, so that
-     * ECC can be turned on before the C init routine. One must be
-     * careful not to use stack, bss/ibss, or heap in this routine.
-     */
 
-    // Turn on ECC for all banks 
-    MXC_MCR->eccen =
-        MXC_F_MCR_ECCEN_SYSRAM0ECCEN |
-        MXC_F_MCR_ECCEN_SYSRAM1ECCEN |
-        MXC_F_MCR_ECCEN_SYSRAM2ECCEN |
-        MXC_F_MCR_ECCEN_SYSRAM3ECCEN |
-        MXC_F_MCR_ECCEN_SYSRAM4ECCEN |
-        MXC_F_MCR_ECCEN_SYSRAM5ECCEN;
-
-    // Zeroize all banks, which ensures ECC bits are written for no errors 
-    MXC_GCR->memzcn =
-        MXC_F_GCR_MEMZCN_SRAM0Z |
-        MXC_F_GCR_MEMZCN_SRAM1Z |
-        MXC_F_GCR_MEMZCN_SRAM2Z |
-        MXC_F_GCR_MEMZCN_SRAM3Z |
-        MXC_F_GCR_MEMZCN_SRAM4Z |
-        MXC_F_GCR_MEMZCN_SRAM5Z;
-
-    while (MXC_GCR->memzcn & (MXC_F_GCR_MEMZCN_SRAM0Z |
-                    MXC_F_GCR_MEMZCN_SRAM1Z |
-                    MXC_F_GCR_MEMZCN_SRAM2Z |
-                    MXC_F_GCR_MEMZCN_SRAM3Z |
-                    MXC_F_GCR_MEMZCN_SRAM4Z |
-                    MXC_F_GCR_MEMZCN_SRAM5Z));
-    
-    // Per the API in system_max32665.c, return 0 so normal C init occurs 
-    return 0;
-}
 
 void ECC_IRQHandler(void) 
 {
@@ -111,6 +79,7 @@ void ECC_IRQHandler(void)
     MXC_GCR->eccnded = MXC_GCR->eccnded;
 }
 
+
 // *****************************************************************************
 int main(void)
 {
@@ -118,12 +87,12 @@ int main(void)
     volatile uint32_t *cursor;
 
     test_fail = test_pass = 0;
-    
+
     printf("\n\n***** MAX" TOSTRING(TARGET) " SRAM ECC Example *****\n\n");
     printf("This example will corrupt a word of data\n");
     printf("and ensure that the ECC interrupts on an error\n");
     printf("when the corrupted address is read\n\n");
-    
+
     // Clear all ECC Errors -- write-1-to-clear
     MXC_GCR->eccerr = MXC_GCR->eccerr;
     MXC_GCR->eccnded = MXC_GCR->eccnded;
@@ -141,7 +110,7 @@ int main(void)
     // Scan all of memory, which should not cause any errors to be detected
     printf("Preliminary scan to ensure no pre-existing ECC errors\n");
     eccFlag = 0;
-   
+
     for (i = MXC_SRAM_MEM_BASE; i < ramTop-sizeof(uint32_t); i+= sizeof(uint32_t)) {
         cursor = (uint32_t *)i;
         *cursor;
@@ -163,7 +132,7 @@ int main(void)
         
     // Initialize data
     badData = 0xDEADBEEF;
-    
+
     printf("\nData before Corruption: 0x%08x\n", badData);
     printf("Address of data: 0x%08x\n", &badData);
 

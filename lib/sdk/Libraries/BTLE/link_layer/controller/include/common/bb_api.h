@@ -176,6 +176,7 @@ typedef struct
   /* Common */
   uint16_t  clkPpm;                 /*!< Clock accuracy in PPM. */
   uint8_t   rfSetupDelayUs;         /*!< RF setup delay in microseconds. */
+  int8_t    defaultTxPower;         /*!< Defautl TX power. */
 
   /* BLE */
   uint16_t  maxScanPeriodMs;        /*!< Maximum duration to scan in a scan interval. */

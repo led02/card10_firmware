@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "wsf_types.h"
 #include "util/bstream.h"
 #include "wsf_msg.h"
@@ -57,7 +58,7 @@ struct
   uint16_t          hdlList[DM_CONN_MAX][APP_DB_HDL_LIST_LEN];   /*! Cached handle list */
   wsfHandlerId_t    handlerId;                      /*! WSF hander ID */
   bool_t            scanning;                       /*! TRUE if scanning */
-  bool_t            autoConnect;                    /*! TRUE if auto-connecting */
+  bool_t            autoConnectSync;                /*! TRUE if auto-connecting */
   uint8_t           discState[DM_CONN_MAX];         /*! Service discovery state */
   uint8_t           hdlListLen;                     /*! Cached handle list length */
 } datcCb;
@@ -72,13 +73,33 @@ typedef struct {
 
 datcConnInfo_t datcConnInfo;
 
+#ifdef BTLE_APP_ENABLE_PERIODIC
+/*! sync control block */
+typedef struct {
+  uint8_t             advSid;                       /*! Advertising SID. */
+  uint8_t             addrType;                     /*! Type of address of device to connect to */
+  bdAddr_t            addr;                         /*! Address of device to connect to */
+  uint16_t            skip;
+                                                    /*!< Number of periodic advertising */
+                                                    /*   packets that can be skipped
+                                                     *   after successful receive. */
+  uint16_t            syncTimeout;                  /*! Synchronization timeout. */
+  bool_t              doSync;                       /*! TRUE to issue sync on scan complete */
+} datcSyncInfo_t;
+datcSyncInfo_t datcSyncInfo;
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+
+
 /*! test control block */
 struct
 {
   unsigned int counter;
   unsigned int connectCount;
   unsigned int phy;
-  uint8_t connId;
+#ifdef BTLE_APP_ENABLE_PERIODIC
+  dmSyncId_t syncId;
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+  dmConnId_t connId;
   wsfTimer_t timer;
 } testCb;
 
@@ -133,6 +154,23 @@ static const appExtMasterCfg_t datcExtMasterCfg =
 };
 
 #endif /* BTLE_APP_USE_LEGACY_API */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+typedef struct
+{
+  uint16_t skip;
+                                                    /*!< Number of periodic advertising */
+                                                    /*   packets that can be skipped
+                                                     *   after successful receive. */
+  uint16_t syncTimeout;                             /*! Synchronization timeout. */
+} datcSyncCfg_t;
+
+static const datcSyncCfg_t datcSyncCfg =
+{
+  0x10,
+  0x400
+};
+#endif /* BTLE_APP_ENABLE_PERIODIC */
 
 /*! configurable parameters for security */
 static const appSecCfg_t datcSecCfg =
@@ -388,7 +426,7 @@ static void datcScanStop(dmEvt_t *pMsg)
   if (pMsg->hdr.status == HCI_SUCCESS)
   {
     datcCb.scanning = FALSE;
-    datcCb.autoConnect = FALSE;
+    datcCb.autoConnectSync = FALSE;
 
     /* Open connection */
     if (datcConnInfo.doConnect)
@@ -397,7 +435,7 @@ static void datcScanStop(dmEvt_t *pMsg)
       testCb.connId = AppConnOpen(datcConnInfo.addrType, datcConnInfo.addr, datcConnInfo.dbHdl);
 #else
       testCb.connId = AppExtConnOpen(datcExtMasterScanPhysCfg, datcConnInfo.addrType, datcConnInfo.addr, datcConnInfo.dbHdl);
-#endif
+#endif /* BTLE_APP_USE_LEGACY_API */
       datcConnInfo.doConnect = FALSE;
     }
   }
@@ -415,11 +453,19 @@ static void datcScanStop(dmEvt_t *pMsg)
 static void datcScanReport(dmEvt_t *pMsg)
 {
   uint8_t *pData;
+
   appDbHdl_t dbHdl;
   bool_t  connect = FALSE;
 
-  /* disregard if not scanning or autoconnecting */
-  if (!datcCb.scanning || !datcCb.autoConnect)
+  uint8_t *pReportName;
+  unsigned int lenPrintName;
+  unsigned int lenReportName;
+  unsigned int iPrintName;
+  unsigned int iReportName;
+  char strPrintName[32];
+
+  /* disregard if not scanning or autoconnecting or syncing */
+  if (!datcCb.scanning || !datcCb.autoConnectSync)
   {
     return;
   }
@@ -434,13 +480,55 @@ static void datcScanReport(dmEvt_t *pMsg)
 
   printf("  len %u, rssi %d, evtType %x, addrType %x", pMsg->scanReport.len, pMsg->scanReport.rssi, pMsg->scanReport.eventType, pMsg->scanReport.addrType);
 
-  if (pMsg->scanReport.pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  /* search for the friendly name. */
+  pData = NULL;
+  if ((pMsg->scanReport.pData != NULL) && (pMsg->scanReport.len > 0))
   {
-    uint8_t name[32];
-    memset(name, 0, sizeof(name));
-    memcpy(name, &pMsg->scanReport.pData[2], pMsg->scanReport.pData[0]);
-    printf(" | %s\n", name);
+    pData = DmFindAdType(DM_ADV_TYPE_LOCAL_NAME,
+        pMsg->scanReport.len, pMsg->scanReport.pData);
+
+    if (pData == NULL)
+    {
+      pData = DmFindAdType(DM_ADV_TYPE_SHORT_NAME,
+          pMsg->scanReport.len, pMsg->scanReport.pData);
+    }
   }
+
+  /* if the device has a friendly name, print friendly name in report. */
+  if (pData != NULL && pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  {
+    /* Where is and how long is the name as stored in the report. */
+    pReportName = &pData[2];
+    lenReportName = pData[0];
+
+    // Don't count type byte.
+    if (lenReportName > 0) lenReportName --;
+
+    // How long is the printed copy of the friendly name?
+    lenPrintName = sizeof(strPrintName) - 1;
+
+    // Initialize name string.
+    strPrintName[lenPrintName] = (char)0;
+
+    // Copy friendly name.
+    iPrintName = 0;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (isprint(pReportName[iReportName]))
+      {
+        strPrintName[iPrintName ++] = pReportName[iReportName];
+      }
+      else
+      {
+        snprintf(&strPrintName[iPrintName], (lenPrintName - iPrintName), "\\x%02X", pReportName[iReportName]);
+        iPrintName += 4; // strlen("\\x0");
+      }
+    }
+    if (iPrintName < lenPrintName)
+      strPrintName[iPrintName ++] = (uint8_t)0;
+    printf(" | \"%s\"\n", strPrintName);
+  }
+  /* otherwise, just print a hex dump of the advertisement payload. */
   else {
     printf(", data");
     int i;
@@ -471,20 +559,28 @@ static void datcScanReport(dmEvt_t *pMsg)
     AppMasterResolveAddr(pMsg, APP_DB_HDL_NONE, APP_RESOLVE_ADV_RPA);
   }
   /* find vendor-specific advertising data */
-  else if ((pData = DmFindAdType(DM_ADV_TYPE_MANUFACTURER, pMsg->scanReport.len,
-                                 pMsg->scanReport.pData)) != NULL)
+  else
   {
-    /* check length and vendor ID */
-    if (pData[DM_AD_LEN_IDX] >= 3 && BYTES_UINT16_CMP(&pData[DM_AD_DATA_IDX], HCI_ID_ARM))
+    pData = NULL;
+    if ((pMsg->scanReport.pData != NULL) && (pMsg->scanReport.len > 0))
     {
-      connect = TRUE;
+      pData = DmFindAdType(DM_ADV_TYPE_MANUFACTURER,
+          pMsg->scanReport.len, pMsg->scanReport.pData);
+    }
+    if (pData != NULL)
+    {
+      /* check length and vendor ID */
+      if (pData[DM_AD_LEN_IDX] >= 3 && BYTES_UINT16_CMP(&pData[DM_AD_DATA_IDX], HCI_ID_ARM))
+      {
+        connect = TRUE;
+      }
     }
   }
 
   if (connect)
   {
     /* stop scanning and connect */
-    datcCb.autoConnect = FALSE;
+    datcCb.autoConnectSync = FALSE;
     AppScanStop();
 
     /* Store peer information for connect on scan stop */
@@ -498,7 +594,7 @@ static void datcScanReport(dmEvt_t *pMsg)
 #ifndef BTLE_APP_IGNORE_EXT_EVENTS
 /*************************************************************************************************/
 /*!
- *  \brief  Handle a scan report.
+ *  \brief  Handle an extended scan report.
  *
  *  \param  pMsg    Pointer to DM callback event message.
  *
@@ -508,57 +604,112 @@ static void datcScanReport(dmEvt_t *pMsg)
 static void datcExtScanReport(dmEvt_t *pMsg)
 {
   uint8_t *pData;
-  appDbHdl_t dbHdl;
-  bool_t  connect = FALSE;
 
-  /* disregard if not scanning or autoconnecting */
-  if (!datcCb.scanning || !datcCb.autoConnect)
+  bdAddr_t nullAddr;
+
+  uint8_t *pReportName;
+  unsigned int lenPrintName;
+  unsigned int lenReportName;
+  unsigned int iPrintName;
+  unsigned int iReportName;
+  char strPrintName[32];
+
+  appDbHdl_t dbHdl;
+  bool_t selected = FALSE;
+
+  /* disregard if not scanning or autoconnecting/syncing */
+  if (!datcCb.scanning || !datcCb.autoConnectSync)
   {
     return;
   }
 
-  printf("datcExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x\n",
-      pMsg->extScanReport.addrType,
-      pMsg->extScanReport.addr[5],
-      pMsg->extScanReport.addr[4],
-      pMsg->extScanReport.addr[3],
-      pMsg->extScanReport.addr[2],
-      pMsg->extScanReport.addr[1],
-      pMsg->extScanReport.addr[0]);
+  memset(&nullAddr[0], (uint8_t)0, sizeof(nullAddr)); 
 
-  printf("  directedAddr ( %x : %02x:%02x:%02x:%02x:%02x:%02x )\n",
-      pMsg->extScanReport.directAddrType,
-      pMsg->extScanReport.directAddr[5],
-      pMsg->extScanReport.directAddr[4],
-      pMsg->extScanReport.directAddr[3],
-      pMsg->extScanReport.directAddr[2],
-      pMsg->extScanReport.directAddr[1],
-      pMsg->extScanReport.directAddr[0]);
-
-  printf("  evtType %x,\n", pMsg->extScanReport.eventType);
-  printf("  addrType %x,\n", pMsg->extScanReport.addrType);
-  printf("  priPhy %u,\n", pMsg->extScanReport.priPhy);
-  printf("  secPhy %u,\n", pMsg->extScanReport.secPhy);
-  printf("  advSid 0x%02x,\n", pMsg->extScanReport.advSid);
-  printf("  txPower %i,\n", pMsg->extScanReport.txPower);
-  printf("  rssi %d,\n", pMsg->extScanReport.rssi);
-  printf("  perAdvInter %i,\n", pMsg->extScanReport.perAdvInter);
-  printf("  directAddrType %x,\n", pMsg->extScanReport.directAddrType);
-  printf("  len %u,\n", pMsg->extScanReport.len);
-
-  if (pMsg->extScanReport.pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  if (memcmp(&pMsg->extScanReport.directAddr[0], &nullAddr[0], sizeof(nullAddr)) != 0)
   {
-    uint8_t name[32];
-    memset(name, 0, sizeof(name));
-    memcpy(name, &pMsg->extScanReport.pData[2], pMsg->extScanReport.pData[0]);
-    printf(" | %s\n", name);
+    printf("datcExtScanReport() <anonymous>");
   }
-  else {
-    printf(", data");
-    int i;
-    for (i = 0; i < pMsg->extScanReport.len; i++) {
-      printf(" %02x", pMsg->extScanReport.pData[i]);
+  else
+  {
+    printf("datcExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->extScanReport.addrType,
+        pMsg->extScanReport.addr[5],
+        pMsg->extScanReport.addr[4],
+        pMsg->extScanReport.addr[3],
+        pMsg->extScanReport.addr[2],
+        pMsg->extScanReport.addr[1],
+        pMsg->extScanReport.addr[0]);
+  }
+
+  if (memcmp(&pMsg->extScanReport.directAddr[0], &nullAddr[0], sizeof(nullAddr)) != 0)
+  {
+    printf(" -> %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->extScanReport.directAddrType,
+        pMsg->extScanReport.directAddr[5],
+        pMsg->extScanReport.directAddr[4],
+        pMsg->extScanReport.directAddr[3],
+        pMsg->extScanReport.directAddr[2],
+        pMsg->extScanReport.directAddr[1],
+        pMsg->extScanReport.directAddr[0]);
+  }
+
+  //printf("  priPhy %u,", pMsg->extScanReport.priPhy);
+  //printf("  secPhy %u,", pMsg->extScanReport.secPhy);
+  //printf("  advSid 0x%02x,", pMsg->extScanReport.advSid);
+  //printf("  txPower %i,", pMsg->extScanReport.txPower);
+  //printf("  perAdvInter %i,", pMsg->extScanReport.perAdvInter);
+  //printf("  directAddrType %x,", pMsg->extScanReport.directAddrType);
+  printf("  len %u, rssi %d, evtType %x, addrType %x", pMsg->extScanReport.len, pMsg->extScanReport.rssi, pMsg->extScanReport.eventType, pMsg->extScanReport.addrType);
+
+  /* search for the friendly name. */
+  pData = NULL;
+  if ((pMsg->extScanReport.pData != NULL) && (pMsg->extScanReport.len > 0))
+  {
+    pData = DmFindAdType(DM_ADV_TYPE_LOCAL_NAME,
+        pMsg->extScanReport.len, pMsg->extScanReport.pData);
+    if (pData == NULL)
+    {
+      pData = DmFindAdType(DM_ADV_TYPE_SHORT_NAME,
+          pMsg->extScanReport.len, pMsg->extScanReport.pData);
     }
+  }
+
+  /* if the device has a friendly name, print friendly name in report. */
+  if (pData != NULL && pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  {
+    /* Where is and how long is the name as stored in the report. */
+    pReportName = &pData[2];
+    lenReportName = pData[0];
+
+    // Don't count type byte.
+    if (lenReportName > 0) lenReportName --;
+
+    // How long is the printed copy of the friendly name?
+    lenPrintName = sizeof(strPrintName) - 1;
+
+    // Initialize name string.
+    strPrintName[lenPrintName] = (char)0;
+
+    // Copy friendly name.
+    iPrintName = 0;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (isprint(pReportName[iReportName]))
+      {
+        strPrintName[iPrintName ++] = pReportName[iReportName];
+      }
+      else
+      {
+        snprintf(&strPrintName[iPrintName], (lenPrintName - iPrintName), "\\x%02X", pReportName[iReportName]);
+        iPrintName += 4; // strlen("\\x0");
+      }
+    }
+    if (iPrintName < lenPrintName)
+      strPrintName[iPrintName ++] = (uint8_t)0;
+    printf(" | \"%s\"\n", strPrintName);
+  }
+  /* otherwise, just print a hex dump of the advertisement payload. */
+  else {
     printf("\n");
   }
 
@@ -573,7 +724,7 @@ static void datcExtScanReport(dmEvt_t *pMsg)
     }
     else
     {
-      connect = TRUE;
+      selected = TRUE;
     }
   }
   /* if the peer device uses an RPA */
@@ -583,30 +734,169 @@ static void datcExtScanReport(dmEvt_t *pMsg)
     AppMasterResolveAddr(pMsg, APP_DB_HDL_NONE, APP_RESOLVE_ADV_RPA);
   }
   /* find vendor-specific advertising data */
-  else if ((pData = DmFindAdType(DM_ADV_TYPE_MANUFACTURER, pMsg->extScanReport.len,
-                                 pMsg->extScanReport.pData)) != NULL)
+  else
   {
-    /* check length and vendor ID */
-    if (pData[DM_AD_LEN_IDX] >= 3 && BYTES_UINT16_CMP(&pData[DM_AD_DATA_IDX], HCI_ID_ARM))
+    pData = NULL;
+    if ((pMsg->extScanReport.pData != NULL) && (pMsg->extScanReport.len > 0))
     {
-      connect = TRUE;
+      pData = DmFindAdType(DM_ADV_TYPE_MANUFACTURER,
+          pMsg->extScanReport.len, pMsg->extScanReport.pData);
+    }
+    if (pData != NULL)
+    {
+      /* check length and vendor ID */
+      if (pData[DM_AD_LEN_IDX] >= 3 && BYTES_UINT16_CMP(&pData[DM_AD_DATA_IDX], HCI_ID_ARM))
+      {
+        selected = TRUE;
+      }
     }
   }
 
-  if (connect)
+  if (selected)
   {
+#ifdef BTLE_APP_ENABLE_PERIODIC
+    /* continue scanning and continue */
+    datcCb.autoConnectSync = FALSE;
+    
+    datcSyncInfo.advSid = pMsg->extScanReport.advSid;
+    datcSyncInfo.addrType = DmHostAddrType(pMsg->extScanReport.addrType);
+    memcpy(datcSyncInfo.addr, pMsg->extScanReport.addr, sizeof(bdAddr_t));
+    datcSyncInfo.skip = datcSyncCfg.skip;
+    datcSyncInfo.syncTimeout = datcSyncCfg.syncTimeout;
+    datcSyncInfo.doSync = TRUE;
+
+    /* Request syncing here, as we do not have to wait
+     * for scanning to stop. In fact, scanning can not
+     * stop before syncing to a periodic advertisement. */
+    testCb.syncId = AppSyncStart(datcSyncInfo.advSid, datcSyncInfo.addrType, datcSyncInfo.addr, datcSyncInfo.skip, datcSyncInfo.syncTimeout);
+#else /* BTLE_APP_ENABLE_PERIODIC */
     /* stop scanning and connect */
-    datcCb.autoConnect = FALSE;
     AppExtScanStop();
+
+    datcCb.autoConnectSync = FALSE;
 
     /* Store peer information for connect on scan stop */
     datcConnInfo.addrType = DmHostAddrType(pMsg->extScanReport.addrType);
     memcpy(datcConnInfo.addr, pMsg->extScanReport.addr, sizeof(bdAddr_t));
     datcConnInfo.dbHdl = dbHdl;
     datcConnInfo.doConnect = TRUE;
+#endif /* BTLE_APP_ENABLE_PERIODIC */
   }
 }
 #endif /* BTLE_APP_IGNORE_EXT_EVENTS */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+/*************************************************************************************************/
+/*!
+ *  \brief  Perform UI actions on connection open.
+ *
+ *  \param  pMsg    Pointer to DM callback event message.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+static void datcSyncEst(dmEvt_t *pMsg)
+{
+  if (!datcCb.scanning)
+  {
+    /* Scanning can stop now that we have synced to the periodic advertisements. */
+    AppScanStop();
+  }
+
+  printf("datcSyncEst() %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->perAdvSyncEst.advAddrType,
+        pMsg->perAdvSyncEst.advAddr[5],
+        pMsg->perAdvSyncEst.advAddr[4],
+        pMsg->perAdvSyncEst.advAddr[3],
+        pMsg->perAdvSyncEst.advAddr[2],
+        pMsg->perAdvSyncEst.advAddr[1],
+        pMsg->perAdvSyncEst.advAddr[0]);
+  printf("\n");
+}
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+/*************************************************************************************************/
+/*!
+ *  \brief  Perform UI actions on connection open.
+ *
+ *  \param  pMsg    Pointer to DM callback event message.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+static void datcSyncEstFail(dmEvt_t *pMsg)
+{
+  printf("datcSyncEstFail() %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->perAdvSyncEstFail.advAddrType,
+        pMsg->perAdvSyncEstFail.advAddr[5],
+        pMsg->perAdvSyncEstFail.advAddr[4],
+        pMsg->perAdvSyncEstFail.advAddr[3],
+        pMsg->perAdvSyncEstFail.advAddr[2],
+        pMsg->perAdvSyncEstFail.advAddr[1],
+        pMsg->perAdvSyncEstFail.advAddr[0]);
+  printf("\n");
+
+  if (!datcCb.scanning)
+  {
+    /* Need to make sure scanning is running for sync to work. */
+    AppExtScanStart(
+        datcExtMasterScanPhysCfg,
+        datcExtMasterCfg.discMode,
+        datcExtMasterCfg.scanType,
+        datcExtMasterCfg.scanDuration,
+        datcExtMasterCfg.scanPeriod);
+  }
+}
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+/*************************************************************************************************/
+/*!
+ *  \brief  Perform UI actions on losing a periodic sync.
+ *
+ *  \param  pMsg    Pointer to DM callback event message.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+static void datcSyncLost(dmEvt_t *pMsg)
+{
+  testCb.syncId = DM_CONN_ID_NONE;
+
+  if (!datcCb.scanning)
+  {
+    datcCb.autoConnectSync = TRUE;
+
+    /* Need to restart scanning for sync to work. */
+    AppExtScanStart(
+        datcExtMasterScanPhysCfg,
+        datcExtMasterCfg.discMode,
+        datcExtMasterCfg.scanType,
+        datcExtMasterCfg.scanDuration,
+        datcExtMasterCfg.scanPeriod);
+  }
+}
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+/*************************************************************************************************/
+/*!
+ *  \brief  Handle a periodic advertisement report.
+ *
+ *  \param  pMsg    Pointer to DM callback event message.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+static void datcPerAdvReport(dmEvt_t *pMsg)
+{
+  printf("datcPerAdvReport(): handle=0x%02X, len=%u",
+      pMsg->perAdvReport.syncHandle,
+      pMsg->perAdvReport.len);
+  printf("\n");
+}
+#endif /* BTLE_APP_ENABLE_PERIODIC */
 
 /*************************************************************************************************/
 /*!
@@ -637,7 +927,7 @@ static void datcClose(dmEvt_t *pMsg)
 
   if (!datcCb.scanning)
   {
-    datcCb.autoConnect = TRUE;
+    datcCb.autoConnectSync = TRUE;
 #ifdef BTLE_APP_USE_LEGACY_API
     AppScanStart(datcMasterCfg.discMode, datcMasterCfg.scanType, datcMasterCfg.scanDuration);
 #else /* BTLE_APP_USE_LEGACY_API */
@@ -678,7 +968,7 @@ static void datcValueNtf(attEvt_t *pMsg)
 static void datcSetup(dmEvt_t *pMsg)
 {
   datcCb.scanning = FALSE;
-  datcCb.autoConnect = FALSE;
+  datcCb.autoConnectSync = FALSE;
   datcConnInfo.doConnect = FALSE;
 
   testCb.timer.handlerId = datcCb.handlerId;
@@ -686,10 +976,12 @@ static void datcSetup(dmEvt_t *pMsg)
   WsfTimerStartMs(&testCb.timer, 1000);
   testCb.connectCount = 0x80000000;
 
-  /* Scanning will be limited to the EvKit dats peer */
+  /* Scanning will be limited to the selected peer bdaddr. */
+#ifdef BTLE_APP_ENABLE_WHITELIST
   DmDevWhiteListAdd(DM_ADDR_PUBLIC, (bdAddr_t){0x02, 0x00, 0x44, 0x8B, 0x05, 0x00});
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_SCAN, HCI_FILT_WHITE_LIST);
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_INIT, HCI_FILT_WHITE_LIST);
+#endif /* BTLE_APP_USE_WHITELIST */
 
   DmSetDefaultPhy(0, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT, HCI_PHY_LE_1M_BIT | HCI_PHY_LE_2M_BIT);
   testCb.phy = HCI_PHY_LE_1M_BIT;
@@ -836,7 +1128,7 @@ static void testTimerHandler(void)
 
   if (testCb.counter == 2)
   {
-    datcCb.autoConnect = TRUE;
+    datcCb.autoConnectSync = TRUE;
 #ifdef BTLE_APP_USE_LEGACY_API
     AppScanStart(datcMasterCfg.discMode, datcMasterCfg.scanType, datcMasterCfg.scanDuration);
 #else /* BTLE_APP_USE_LEGACY_API */
@@ -937,6 +1229,32 @@ static void datcProcMsg(dmEvt_t *pMsg)
       break;
 #endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
+#ifdef BTLE_APP_ENABLE_PERIODIC
+    case DM_PER_ADV_SYNC_EST_IND:
+      datcSyncEst(pMsg);
+      uiEvent = APP_UI_PER_ADV_SYNC_EST_IND;
+      break;
+
+    case DM_PER_ADV_SYNC_EST_FAIL_IND:
+      datcSyncEstFail(pMsg);
+      break;
+
+    case DM_PER_ADV_SYNC_LOST_IND:
+      datcSyncLost(pMsg);
+      uiEvent = APP_UI_PER_ADV_SYNC_LOST_IND;
+      break;
+
+    case DM_PER_ADV_SYNC_TRSF_EST_IND:
+    case DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND:
+    case DM_PER_ADV_SYNC_TRSF_IND:
+      break;
+
+    case DM_PER_ADV_REPORT_IND:
+      datcPerAdvReport(pMsg);
+      uiEvent = APP_UI_NONE;
+      break;
+#endif /* BTLE_APP_ENABLE_PERIODIC */
+
     case DM_CONN_OPEN_IND:
       datcOpen(pMsg);
       uiEvent = APP_UI_CONN_OPEN;
@@ -961,6 +1279,7 @@ static void datcProcMsg(dmEvt_t *pMsg)
       break;
 
     case DM_SEC_PAIR_CMPL_IND:
+      printf("Pairing completed successfully.\n");
       uiEvent = APP_UI_SEC_PAIR_CMPL;
       break;
 

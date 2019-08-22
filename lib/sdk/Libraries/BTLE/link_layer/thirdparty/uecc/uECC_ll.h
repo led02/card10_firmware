@@ -112,6 +112,20 @@ void uECC_make_key_start(const uint8_t private_key[uECC_BYTES]);
 int uECC_make_key_continue(void);
 void uECC_make_key_complete(uint8_t public_key[uECC_BYTES*2], uint8_t private_key[uECC_BYTES]);
 
+/* uECC_valid_public_key() function.
+Check to see if a public key is valid.
+
+Note that you are not required to check for a valid public key before using any other uECC
+functions. However, you may wish to avoid spending CPU time computing a shared secret or
+verifying a signature using an invalid public key.
+
+Inputs:
+    public_key - The public key to check.
+
+Returns 1 if the public key is valid, 0 if it is invalid.
+*/
+int uECC_valid_public_key(const uint8_t public_key[uECC_BYTES*2]);
+
 /* uECC_shared_secret() function.
 Compute a shared secret given your secret key and someone else's public key.
 Note: It is recommended that you hash the result of uECC_shared_secret() before using it for

@@ -25,6 +25,8 @@
 #include "hci_handler.h"
 #include "ll_init_api.h"
 #include "hci_api.h"
+#include "chci_drv.h"
+#include "hci_drv_sdma.h"
 
 #define LL_IMPL_REV             0x2303
 
@@ -72,6 +74,7 @@ const LlRtCfg_t _ll_cfg = {
 const BbRtCfg_t _bb_cfg = {
     /*clkPpm*/                  20,
     /*rfSetupDelayUsec*/        BB_RF_SETUP_DELAY_US,
+    /*defaultTxPower*/          -10,
     /*maxScanPeriodMsec*/       BB_MAX_SCAN_PERIOD_MS,
     /*schSetupDelayUsec*/       BB_SCH_SETUP_DELAY_US
 };
@@ -85,6 +88,7 @@ const BbRtCfg_t _bb_cfg = {
 /*************************************************************************************************/
 void StackInit(void)
 {
+#ifndef ENABLE_SDMA
   // wsfHandlerId_t handlerId;
   uint8_t mask[HCI_LE_EVT_MASK_LEN];
   uint32_t memUsed;
@@ -113,4 +117,8 @@ void StackInit(void)
   memset(mask, 0xFF, HCI_LE_EVT_MASK_LEN);
   HciLeSetEventMaskCmd(mask);
   HciSetEventMaskCmd(mask);
+#else
+  chciDrvInit();
+  hciDrvInit();
+#endif
 }

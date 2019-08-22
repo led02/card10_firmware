@@ -29,8 +29,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *
- * $Date: 2019-07-11 13:33:24 -0500 (Thu, 11 Jul 2019) $
- * $Revision: 44549 $
+ * $Date: 2019-07-26 10:25:33 -0500 (Fri, 26 Jul 2019) $
+ * $Revision: 44989 $
  *
  ******************************************************************************/
 
@@ -55,7 +55,7 @@
 
 /* Number of WSF buffer pools */
 #define WSF_BUF_POOLS       6
-#define WSF_BUF_SIZE        0x1048
+#define WSF_BUF_SIZE        0x1348
 
 /* Size of buffer for stdio functions */
 #define PRINTF_BUF_SIZE     128
@@ -76,7 +76,7 @@ static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
 {
   {  16,  8 },
   {  32,  4 },
-  {  64,  4 },
+  {  64,  16 },
   { 128,  4 },
   { 256,  4 },
   { 512,  4 }

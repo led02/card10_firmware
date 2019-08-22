@@ -74,7 +74,10 @@ VPATH=.
 IPATH = .
 
 # Enable assertion checking for development
-PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE 
+PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
+
+# Enable ECC by intializing. Look at the startup_max32665.S
+PROJ_AFLAGS+=-DECC_INIT_ATSTARTUP 
 
 # Specify the target revision to override default
 # "A2" in ASCII

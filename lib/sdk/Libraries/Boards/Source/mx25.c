@@ -94,7 +94,7 @@ static int write_enable()
 }
 
 /* ************************************************************************* */
-static int inline read_reg(uint8_t cmd, uint8_t* buf)
+static inline int read_reg(uint8_t cmd, uint8_t* buf)
 {
     // Send the command
     if(MX25_Board_Write(&cmd, 1, 0, SPIXFC_WIDTH_1) != 1) {
@@ -109,14 +109,14 @@ static int inline read_reg(uint8_t cmd, uint8_t* buf)
 }
 
 /* ************************************************************************* */
-static int inline write_reg(uint8_t* buf, unsigned len)
+static inline int write_reg(uint8_t* buf, unsigned len)
 {
     if(write_enable() != 0){
         return E_BAD_STATE;
     }
 
     // Send the command and data
-    if(MX25_Board_Write(buf, len, 1, SPIXFC_WIDTH_1) != len) {
+    if(MX25_Board_Write(buf, len, 1, SPIXFC_WIDTH_1) != (int)len) {
         return E_COMM_ERR;
     }
 
@@ -334,7 +334,7 @@ int MX25_Read(uint32_t address, uint8_t *rx_buf, uint32_t rx_len,
     }
 
     // Receive the data
-    if(MX25_Board_Read(rx_buf, rx_len, 1, width) != rx_len) {
+    if(MX25_Board_Read(rx_buf, rx_len, 1, width) != (int)rx_len) {
         return E_COMM_ERR;
     }
 	
@@ -406,7 +406,7 @@ int MX25_Program_Page(uint32_t address, const uint8_t *tx_buf, uint32_t tx_len,
             len     = tx_len;
         }
 
-        if(MX25_Board_Write((&tx_buf[tx_cnt*256]), len, 1, width) != len) {
+        if(MX25_Board_Write((&tx_buf[tx_cnt*256]), len, 1, width) != (int)len) {
             return E_COMM_ERR;
         }
 

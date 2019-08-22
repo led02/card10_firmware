@@ -177,8 +177,7 @@ int TPU_Cipher_Config(tpu_modesel_t mode, tpu_ciphersel_t cipher)
 static int TPU_DoOperation(const char *src, const char *iv, const char *key,
                              tpu_ciphersel_t cipher, tpu_modesel_t mode, unsigned int data_size, char *outptr)
 {
-    int i;
-    unsigned int keyLength, dataLength,numBlocks;
+    unsigned int keyLength, dataLength, numBlocks, i;
 
     if (data_size == 0) {
         return E_INVALID;

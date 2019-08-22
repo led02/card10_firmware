@@ -88,6 +88,16 @@ VPATH  = .
 # Where to find header files for this test
 IPATH  = .
 
+##############################################################################
+# OS Check/Utility definitions
+ifeq '$(findstring ;,$(PATH))' ';'
+    BUILD_OS := Windows
+else
+    BUILD_OS := $(shell uname 2>/dev/null || echo Unknown)
+    BUILD_OS := $(patsubst MSYS%,MSYS,$(BUILD_OS))
+    BUILD_OS := $(patsubst MINGW%,MSYS,$(BUILD_OS))
+endif
+
 ################################################################################
 # Project build configuration.
 
@@ -122,6 +132,25 @@ endif
 endif
 endif
 
+ifdef BTLE_APP_ENABLE_WHITELIST
+ifeq "$(BTLE_APP_ENABLE_WHITELIST)" ""
+BTLE_APP_ENABLE_WHITELIST_SPECIFIED=0
+else
+ifeq "$(BTLE_APP_ENABLE_WHITELIST)" "0"
+BTLE_APP_ENABLE_WHITELIST_SPECIFIED=0
+else
+ifeq "$(BTLE_APP_ENABLE_WHITELIST)" "FALSE"
+BTLE_APP_ENABLE_WHITELIST_SPECIFIED=0
+else
+BTLE_APP_ENABLE_WHITELIST_SPECIFIED=1
+PROJ_CFLAGS+=-DBTLE_APP_ENABLE_WHITELIST=TRUE
+endif
+endif
+endif
+else
+BTLE_APP_ENABLE_WHITELIST_SPECIFIED=0
+endif
+
 ifdef CONSOLE_UART
 ifneq "$(CONSOLE_UART)" ""
 PROJ_CFLAGS+=-DCONSOLE_UART=$(CONSOLE_UART)
@@ -131,10 +160,10 @@ endif
 ifdef ENABLE_SDMA
 ifneq "$(ENABLE_SDMA)" ""
 ifeq "$(ENABLE_SDMA)" "0"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ifeq "$(ENABLE_SDMA)" "FALSE"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ENABLE_SDMA=1
 endif
@@ -163,7 +192,6 @@ endif
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE=TRUE
-# PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=TRUE
 PROJ_CFLAGS+=-DWSF_ASSERT_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_TRACE_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_DBG_PIN_ENABLED=TRUE
@@ -181,6 +209,7 @@ PROJ_CFLAGS+=-DINIT_OBSERVER
 PROJ_CFLAGS+=-DINIT_CENTRAL
 # PROJ_CFLAGS+=-DINIT_PERIPHERAL
 PROJ_CFLAGS+=-DINIT_ENCRYPTED
+PROJ_CFLAGS+=-DLL_NUM_ADV_FILT=32
 
 ENABLE_LL_TESTER?=#1
 

@@ -162,6 +162,17 @@ void LlMathEccGenerateP256KeyPairComplete(uint8_t *pPubKey, uint8_t *pPrivKey);
 
 /*************************************************************************************************/
 /*!
+ *  \brief  Validate a P-256 public key.
+ *
+ *  \param  pPubKey     Storage for public key.
+ *
+ *  \return TRUE if valid, FALSE if invalid.
+ */
+/*************************************************************************************************/
+bool_t LlMathEccValidateP256PublicKey(const uint8_t *pPubKey);
+
+/*************************************************************************************************/
+/*!
  *  \brief  Start generating Diffie-Hellman key.
  *
  *  \param  pPubKey     Public key.

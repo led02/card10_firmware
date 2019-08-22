@@ -133,7 +133,7 @@ int SDHC_Lib_SetRCA()
 
     if ((result == E_NO_ERROR) && (card_type == CARD_SDHC)) {
         /* SD Cards tell us their address */
-        card_rca = SDHC_Get_Response32();
+        card_rca = SDHC_Get_Response32() & 0xFFFF0000;
     }
 
     return result;
@@ -159,17 +159,27 @@ int SDHC_Lib_GetCSD(mxc_sdhc_csd_regs_t *csd)
 }
 
 /* ************************************************************************** */
-unsigned int SDHC_Lib_GetCapacity(mxc_sdhc_csd_regs_t* csd)
+uint64_t SDHC_Lib_GetCapacity(mxc_sdhc_csd_regs_t* csd)
 {
-    unsigned int size = csd->csd.c_size;
-    
-    return (size*(512*1024));
+    if(csd->csd_v1.csd_structure == 0)
+    {
+        uint64_t block_len = 1 << csd->csd_v1.read_bl_len;
+        uint64_t mult = 1 << (csd->csd_v1.c_size_mult + 2);
+        uint64_t blocknr = (((csd->csd_v1.c_size_1 << 10) | csd->csd_v1.c_size_0) + 1) * mult;
+        return blocknr * block_len;
+    }
+    else
+    {
+        // Get size into 64-bit variable
+        uint64_t size = csd->csd_v2.c_size;
+        return (size + 1) * (512 * 1024);
+    }
 }
 
 /* ************************************************************************** */
 int SDHC_Lib_GetBlockSize(mxc_sdhc_csd_regs_t* csd)
 {
-    unsigned int size = csd->csd.write_bl_len;
+    unsigned int size = csd->csd_v1.write_bl_len;
     
     if (size == SDHC_LIB_DEFAULT_MAX_BLOCK_REG_VALUE) {
         return SDHC_LIB_DEFAULT_MAX_BLOCK_SIZE;

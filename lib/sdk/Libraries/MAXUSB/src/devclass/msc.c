@@ -118,8 +118,8 @@ static unsigned int ep_to_host;
 static uint32_t numBlocks;
 static uint32_t blockAddr;
 
-int (*chained_func)(usb_setup_pkt *, void *);
-void *chained_cbdata;
+static int (*chained_func)(usb_setup_pkt *, void *);
+static void *chained_cbdata;
 
 /***** Function Prototypes *****/
 static int msc_classReq(usb_setup_pkt *sud, void *cbdata);

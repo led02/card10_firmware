@@ -681,6 +681,9 @@ void lctrSlvConnRxCompletion(BbOpDesc_t *pOp, uint8_t *pRxBuf, uint8_t status)
   /*** Setup for transmit ***/
 SetupTx:
 
+  // Sent the PHY options based on what the master sent
+  pBle->chan.tifsTxPhyOptions = pConn->rxPhyOptions;
+
   /* Slave always transmits after receiving. */
   if ((txLen = lctrSetupForTx(pCtx, status, TRUE)) == 0)
   {

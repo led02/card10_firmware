@@ -75,7 +75,13 @@ shared_mem_t __attribute__ ((section (".sdma_shared"))) sdma_shared_mem;
 _Pragma("location=\".bin\"") uint8_t sdma_code[] = {
 #else
 volatile uint8_t __attribute__ ((section (".sdma_code"))) sdma_code[] = {  
+#if defined(SDMA_ADV)
+#include "sdma_adv.inc"
+#elif defined(SDMA_SCN)
+#include "sdma_scn.inc"
+#else
 #include "sdma.inc"
+#endif
 };
 #endif
 
@@ -195,6 +201,9 @@ uint16_t hciDrvWrite(uint8_t type, uint16_t len, uint8_t *pData)
     }
 
     __enable_irq();
+
+    // Wait for SDMA to process the data
+    while(!sdma_shared_mem.dirty) {}
 
     return len_written;
 }

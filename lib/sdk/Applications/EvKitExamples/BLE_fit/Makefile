@@ -29,7 +29,7 @@
 # property whatsoever. Maxim Integrated Products, Inc. retains all
 # ownership rights.
 #
-# $Id: Makefile 44577 2019-07-11 21:47:07Z kevin.gillespie $
+# $Id: Makefile 45395 2019-08-13 21:04:28Z kevin.gillespie $
 #
 ################################################################################
 
@@ -88,6 +88,16 @@ VPATH  = .
 # Where to find header files for this test
 IPATH  = .
 
+##############################################################################
+# OS Check/Utility definitions
+ifeq '$(findstring ;,$(PATH))' ';'
+    BUILD_OS := Windows
+else
+    BUILD_OS := $(shell uname 2>/dev/null || echo Unknown)
+    BUILD_OS := $(patsubst MSYS%,MSYS,$(BUILD_OS))
+    BUILD_OS := $(patsubst MINGW%,MSYS,$(BUILD_OS))
+endif
+
 ################################################################################
 # Project build configuration.
 
@@ -103,10 +113,10 @@ endif
 ifdef ENABLE_SDMA
 ifneq "$(ENABLE_SDMA)" ""
 ifeq "$(ENABLE_SDMA)" "0"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ifeq "$(ENABLE_SDMA)" "FALSE"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ENABLE_SDMA=1
 endif
@@ -122,7 +132,6 @@ endif
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE=TRUE
-PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=TRUE
 PROJ_CFLAGS+=-DWSF_ASSERT_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_TRACE_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_DBG_PIN_ENABLED=TRUE

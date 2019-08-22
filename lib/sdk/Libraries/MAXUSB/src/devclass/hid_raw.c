@@ -81,9 +81,9 @@ static const uint8_t *report_desc;
 
 static int (*callback)(void);
 
-int (*chained_func)(usb_setup_pkt *, void *);
-void *chained_cbdata;
-void (*chained_getdesc_func)(usb_setup_pkt *, const uint8_t **, uint16_t *);
+static int (*chained_func)(usb_setup_pkt *, void *);
+static void *chained_cbdata;
+static void (*chained_getdesc_func)(usb_setup_pkt *, const uint8_t **, uint16_t *);
 
 /***** Function Prototypes *****/
 static void getdescriptor(usb_setup_pkt *sud, const uint8_t **desc, uint16_t *desclen);
@@ -353,7 +353,7 @@ static void out_callback(void *cbdata)
 /******************************************************************************/
 static void svc_in_to_host(void *cbdata)
 {
-  int i;
+  unsigned i;
   uint8_t byte;
 
   /* An error will occur when the host has been disconnected. */

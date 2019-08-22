@@ -44,6 +44,7 @@
 #include "mxc_config.h"
 #include "hci_defs.h"
 #include "chci_api.h"
+#include "hci_drv.h"
 #include "chci_tr_serial.h"
 #include "uart.h"
 
@@ -90,7 +91,12 @@ void HCI_UART_Handler(uart_req_t* req, int error)
     }
 
     // Write data to the Controller HCI
+
+#ifdef ENABLE_SDMA
+    hciDrvWrite(hci_data, 0,NULL);
+#else
     chciTrSerialRxIncoming(&hci_data, 1);
+#endif
 
     /* Read next byte */
     UART_ReadAsync(HCI_UART_REG, &hci_read_req);

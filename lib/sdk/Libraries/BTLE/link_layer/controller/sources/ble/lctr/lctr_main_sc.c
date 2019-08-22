@@ -204,6 +204,12 @@ uint8_t LctrGenerateDhKey(const uint8_t *pPubKey, const uint8_t *pPrivKey)
     return LL_ERROR_CODE_CMD_DISALLOWED;
   }
 
+  /* Verify that remote public key is valid */
+  if(!LlMathEccValidateP256PublicKey(pPubKey))
+  {
+    return LL_ERROR_CODE_INVALID_HCI_CMD_PARAMS;
+  }
+
   /* Start operation. */
   lmgrScCb.eccOpActive = TRUE;
   LlMathEccGenerateDhKeyStart(pPubKey, pPrivKey);
@@ -222,6 +228,8 @@ void LctrScInit(void)
 {
   lctrEventHdlrTbl[LCTR_EVENT_SC_GENERATE_P256_KEY_PAIR] = lctrScGenerateP256KeyPairContinue;
   lctrEventHdlrTbl[LCTR_EVENT_SC_GENERATE_DHKEY] = lctrScGenerateDhKeyContinue;
+
+  lmgrPersistCb.featuresDefault |= LL_FEAT_REMOTE_PUB_KEY_VALIDATION;
 
   LlMathEccSetServiceCback(lctrScBbDrvEccServiceCback);
 }

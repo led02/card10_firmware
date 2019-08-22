@@ -581,6 +581,7 @@ static void datsProcMsg(dmEvt_t *pMsg)
       break;
 
     case DM_SEC_PAIR_CMPL_IND:
+      printf("Pairing completed successfully.\n");
       uiEvent = APP_UI_SEC_PAIR_CMPL;
       break;
 

@@ -1444,6 +1444,13 @@ uint8_t LctrIsExtAdvEnableReady(uint8_t handle)
     return LL_ERROR_CODE_CMD_DISALLOWED;
   }
 
+  if ((pAdvSet->param.advEventProp & LL_ADV_EVT_PROP_SCAN_ADV_BIT) &&
+    (pAdvSet->scanRspData.len == 0))
+  {
+    LL_TRACE_WARN1("Empty ScanRspData buffer, handle=%u", handle);
+    return LL_ERROR_CODE_CMD_DISALLOWED;
+  }
+
   switch (pAdvSet->param.ownAddrType)
   {
     case LL_ADDR_RANDOM:

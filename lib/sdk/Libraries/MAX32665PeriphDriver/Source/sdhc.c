@@ -148,12 +148,14 @@ static int  SDHC_TransSetup(sdhc_cmd_cfg_t* sd_cmd_cfg){
     
     MXC_SDHC->arg_1 = sd_cmd_cfg->arg_1;
     
+    uint32_t hc1 = sd_cmd_cfg->host_control_1;
+    
     if (sd_cmd_cfg->direction == SDHC_DIRECTION_WRITE || sd_cmd_cfg->direction == SDHC_DIRECTION_READ) {
-        sd_cmd_cfg->host_control_1 &= ~(MXC_F_SDHC_HOST_CN_1_DMA_SELECT |
+        hc1 &= ~(MXC_F_SDHC_HOST_CN_1_DMA_SELECT |
                                         MXC_F_SDHC_HOST_CN_1_CARD_DETECT_SIGNAL);
     }
     
-    MXC_SDHC->host_cn_1 = sd_cmd_cfg->host_control_1;
+    MXC_SDHC->host_cn_1 = hc1;
     
     /* Clear all flags */
     MXC_SDHC->int_stat = MXC_SDHC->int_stat;
@@ -235,15 +237,9 @@ int SDHC_SendCommandAsync(sdhc_cmd_cfg_t* sd_cmd_cfg)
     sdhc_callback = sd_cmd_cfg->callback;
 
     if (sd_cmd_cfg->direction == SDHC_DIRECTION_CFG) {
-        MXC_SDHC->int_signal |= MXC_F_SDHC_INT_SIGNAL_CMD_COMP;
-        MXC_SDHC->int_stat |= MXC_F_SDHC_INT_STAT_CMD_COMP;
+        MXC_SDHC->int_signal = MXC_F_SDHC_INT_SIGNAL_CMD_COMP;
     } else {
-        MXC_SDHC->int_signal = MXC_F_SDHC_INT_SIGNAL_BUFFER_WR |
-                               MXC_F_SDHC_INT_SIGNAL_BUFFER_RD |
-                               MXC_F_SDHC_INT_SIGNAL_TRANS_COMP;
-        MXC_SDHC->int_stat = MXC_F_SDHC_INT_STAT_BUFF_RD_READY |
-                             MXC_F_SDHC_INT_STAT_BUFF_WR_READY |
-                             MXC_F_SDHC_INT_STAT_TRANS_COMP;
+        MXC_SDHC->int_signal = MXC_F_SDHC_INT_SIGNAL_TRANS_COMP;
     }
     
     /* Start transfer */
@@ -255,28 +251,36 @@ int SDHC_SendCommandAsync(sdhc_cmd_cfg_t* sd_cmd_cfg)
 /* ************************************************************************** */
 void SDHC_Handler(void)
 {
-    int error = E_UNKNOWN;
-    int flag = 0;
+    int signal = MXC_SDHC->int_signal;
+    int flag = SDHC_GetFlags() & signal;
     
-    if ((MXC_SDHC->blk_cnt > 0) && (MXC_SDHC->int_stat & MXC_F_SDHC_INT_STAT_TRANS_COMP)) {
-        error = E_ABORT;
+    // Need to check if there is anything to do in case this function is called 
+    //  in a polling fashion instead of from the interrupt handler.
+    if(!flag) {
+        return;
     }
-    else if ((MXC_SDHC->blk_cnt > 0) &&
-            (MXC_SDHC->int_stat & MXC_F_SDHC_INT_STAT_BUFF_WR_READY) &&
-            (MXC_SDHC->int_stat & MXC_F_SDHC_INT_STAT_BUFF_RD_READY)) {
-        error = E_UNDERFLOW;
+
+    // Command complete interrupt
+    if((signal & MXC_F_SDHC_INT_SIGNAL_CMD_COMP) && (flag & MXC_F_SDHC_INT_STAT_CMD_COMP))
+    {
+        SDHC_ClearFlags(MXC_F_SDHC_INT_STAT_CMD_COMP);
+        MXC_SDHC->int_signal &= ~MXC_F_SDHC_INT_SIGNAL_CMD_COMP;
+        SDHC_FreeCallback(E_NO_ERROR);
+        return;
     }
-    else if ((MXC_SDHC->blk_cnt == 0) && (MXC_SDHC->int_stat & MXC_F_SDHC_INT_STAT_TRANS_COMP)) {
-        error = E_NO_ERROR;
-    }
-    else if (MXC_SDHC->int_stat & MXC_F_SDHC_INT_STAT_CMD_COMP) {
-        error = E_NO_ERROR;
+
+    // Transfer complete interrupt
+    if((signal & MXC_F_SDHC_INT_SIGNAL_TRANS_COMP) && (flag & MXC_F_SDHC_INT_STAT_TRANS_COMP))
+    {
+        SDHC_ClearFlags(MXC_F_SDHC_INT_STAT_TRANS_COMP);
+        MXC_SDHC->int_signal &= ~MXC_F_SDHC_INT_SIGNAL_TRANS_COMP;
+        SDHC_FreeCallback(E_NO_ERROR);
+        return;
     }
     
-    flag = SDHC_GetFlags();
     SDHC_ClearFlags(flag);
     MXC_SDHC->int_signal = 0;
-    SDHC_FreeCallback(error);
+    SDHC_FreeCallback(E_UNKNOWN);
 }
 
 /* ************************************************************************** */

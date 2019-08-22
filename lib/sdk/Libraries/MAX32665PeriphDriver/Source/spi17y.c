@@ -300,7 +300,8 @@ int SPI17Y_TransSetup(mxc_spi17y_regs_t *spi, spi17y_req_t *req, int master)
 /* ************************************************************************** */
 void SPI17Y_Handler(mxc_spi17y_regs_t *spi)
 {
-    int spi_num, rx_avail;
+    int spi_num;
+    unsigned rx_avail;
     uint32_t flags;
     
     // Clear the interrupt flags
