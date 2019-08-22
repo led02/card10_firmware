@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- **bootloader**: Add an error message when flashing fails.
+
+### Changed
+- **gpio**: Rename constants for consistency.
+
+### Fixed
+- **gpio**: Fix field-setting in `gpio_cfg_t`.
+
+
 ## [v1.4] - 2019-08-22 19:43
 ### Added
 - Support for the `bme680` environmental sensor.
@@ -25,42 +36,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 ## [v1.3] - 2019-08-22 00:12
+### Added
+- A splashscreen in Epicardium showing the version number.
+- `os.urandom()` function.
 
-```text
-e17e31cd feat(preload): update nick name preloads
-65efd6bc Merge branch 'display_multiline_fix' into 'master'
-d29f8f95 Merge branch 'ble-file-transfer-dir' into 'master'
-00578959 BLE: FileTrans: Use LOG_ERR
-2a542de3 BLE: FileTrans: Null terminate the string
-7cef2115 BLE: FileTrans: Create a directory if needed
-638ab1d5 docs: Update instructions for dependencies on Arch
-d079e3df feat: Add requirements.txt
-50eeecd9 style(ledfx): Reformat docs and comments
-ab8ee07f docs: Fix personal_state documentation
-5083858f docs: Fix os documentation
-19adf1f3 feat(pycardium): Add os.urandom()
-3a6507e3 fix(splashscreen): Adapt coding style
-00108bca fix(splashscreen): More useful message
-f97b1e53 fix(splashscreen): Print version correctly
-1427ed31 fix(splashscreen): Reduce to version
-13ad01e8 fix(splashscreen): Display useful version info
-d65034fe feat(splashscreen): Add tag/commit to epicardium splashscreen
-c3e34289 Added blacklist for write access for certain file names.
-9a2e9263 Add requirements.txt file to install working version of python packages
-c7494640 ble.py: Show MAC suffix
-ec611574 fix(ble-uart): Prevent buffer overflow
-f189fff0 I hate embedded string manipulation.
-2766e2f1 During startup of the BLE, the advert name is pulled off the random bytes of the mac in mac.txt.
-7df76031 fix(maxusb): Disable confusing message
-2e547c66 fix(serial-task): increase stack size
-7f938908 Update instructions for building on Arch
-73876f4b Merge branch 'display_multiline_fix' of https://git.card10.badge.events.ccc.de/omniskop/firmware into display_multiline_fix
-3e272a88 Merge remote-tracking branch 'original/master' into display_multiline_fix
-4edea9c1 fixed code style
-b0c748be fix(gfx): Break line before char is printed
-e287bb4d fixed code style
-52829e8b fix(gfx): Break line before char is printed
-```
+### Changed
+- BLE file-transfers now create missing folders.
+
+### Fixed
+- **gfx**: Add a linebreak before character, not after.  This prevent the last
+  character being cut off.
+- Fixed serial task overflowing because it had a too small stack size.
+- Removed confusing MAXUSB messages.
+
 
 ## [v1.2] - 2019-08-21 18:18
 
