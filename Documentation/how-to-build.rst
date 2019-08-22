@@ -146,6 +146,15 @@ Otherwise, rerunning ``./bootstrap.sh`` will also clean the build-directory.
 
 .. note::
 
+   **macOS**: If ``strip`` fails to work on the freshly compiled ``mpy-cross``:
+   "strip: object: (...)/lib/micropython/micropython/mpy-cross/mpy-cross
+   malformed object (unknown load command 9)", you a likely not using the
+   `strip` that matches to your ``clang``. Do ``which strip && which clang``,
+   and if the paths don't match, clean up your PATHs, or as a quick hack,
+   create a symlink for strip.
+
+.. note::
+
    If you try to flash pycardium_epicardium.bin (renamed to card10.bin) 
    and the bootloader does not finish updating, the file might be too large.
    ~700kB is the normal size, but problems were reported where the file size 
