@@ -12,7 +12,7 @@ static mp_obj_t mp_bme680_init()
 		mp_raise_OSError(-ret);
 	}
 
-	return 0;
+	return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(bme680_init_obj, mp_bme680_init);
 
@@ -24,7 +24,7 @@ static mp_obj_t mp_bme680_deinit()
 		mp_raise_OSError(-ret);
 	}
 
-	return 0;
+	return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(bme680_deinit_obj, mp_bme680_deinit);
 
