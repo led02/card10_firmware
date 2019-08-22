@@ -427,26 +427,26 @@ API(API_BUTTONS_READ, uint8_t epic_buttons_read(uint8_t mask));
 /** GPIO pins IDs */
 enum gpio_pin {
     /** ``1``, Wristband connector 1 */
-    GPIO_WRISTBAND_1 = 1,
+    EPIC_GPIO_WRISTBAND_1 = 1,
     /** ``2``, Wristband connector 2 */
-    GPIO_WRISTBAND_2 = 2,
+    EPIC_GPIO_WRISTBAND_2 = 2,
     /** ``3``, Wristband connector 3 */
-    GPIO_WRISTBAND_3 = 3,
+    EPIC_GPIO_WRISTBAND_3 = 3,
     /** ``4``, Wristband connector 4 */
-    GPIO_WRISTBAND_4 = 4,
+    EPIC_GPIO_WRISTBAND_4 = 4,
 };
 
 /** GPIO pin modes */
 enum gpio_mode {
     /** Configure the pin as input */
-    GPIO_MODE_IN = (1<<0),
+    EPIC_GPIO_MODE_IN = (1<<0),
     /** Configure the pin as output */
-    GPIO_MODE_OUT = (1<<1),
+    EPIC_GPIO_MODE_OUT = (1<<1),
 
     /** Enable the internal pull-up resistor */
-    GPIO_PULL_UP = (1<<6),
+    EPIC_GPIO_PULL_UP = (1<<6),
     /** Enable the internal pull-down resistor */
-    GPIO_PULL_DOWN = (1<<7),
+    EPIC_GPIO_PULL_DOWN = (1<<7),
 };
 
 /**

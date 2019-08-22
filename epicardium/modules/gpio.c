@@ -8,36 +8,48 @@
  * pins for wristband GPIO 1-4 (not 0-3 as the schematic states)
  */
 static gpio_cfg_t gpio_configs[] = {
-	[GPIO_WRISTBAND_1] = { PORT_0, PIN_21, GPIO_FUNC_OUT, GPIO_PAD_NONE },
-	[GPIO_WRISTBAND_2] = { PORT_0, PIN_22, GPIO_FUNC_OUT, GPIO_PAD_NONE },
-	[GPIO_WRISTBAND_3] = { PORT_0, PIN_29, GPIO_FUNC_OUT, GPIO_PAD_NONE },
-	[GPIO_WRISTBAND_4] = { PORT_0, PIN_20, GPIO_FUNC_OUT, GPIO_PAD_NONE },
+	[EPIC_GPIO_WRISTBAND_1] = { PORT_0,
+				    PIN_21,
+				    GPIO_FUNC_OUT,
+				    GPIO_PAD_NONE },
+	[EPIC_GPIO_WRISTBAND_2] = { PORT_0,
+				    PIN_22,
+				    GPIO_FUNC_OUT,
+				    GPIO_PAD_NONE },
+	[EPIC_GPIO_WRISTBAND_3] = { PORT_0,
+				    PIN_29,
+				    GPIO_FUNC_OUT,
+				    GPIO_PAD_NONE },
+	[EPIC_GPIO_WRISTBAND_4] = { PORT_0,
+				    PIN_20,
+				    GPIO_FUNC_OUT,
+				    GPIO_PAD_NONE },
 };
 
 int epic_gpio_set_pin_mode(uint8_t pin, uint8_t mode)
 {
-	if (pin < GPIO_WRISTBAND_1 || pin > GPIO_WRISTBAND_4)
+	if (pin < EPIC_GPIO_WRISTBAND_1 || pin > EPIC_GPIO_WRISTBAND_4)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
 
-	if (mode & GPIO_MODE_IN) {
+	if (mode & EPIC_GPIO_MODE_IN) {
 		cfg->func = GPIO_FUNC_IN;
-		if (mode & GPIO_MODE_OUT) {
+		if (mode & EPIC_GPIO_MODE_OUT) {
 			return -EINVAL;
 		}
-	} else if (mode & GPIO_MODE_OUT) {
+	} else if (mode & EPIC_GPIO_MODE_OUT) {
 		cfg->func = GPIO_FUNC_OUT;
-		if (mode & GPIO_MODE_IN) {
+		if (mode & EPIC_GPIO_MODE_IN) {
 			return -EINVAL;
 		}
 	} else {
 		return -EINVAL;
 	}
 
-	if (mode & GPIO_PULL_UP) {
+	if (mode & EPIC_GPIO_PULL_UP) {
 		cfg->pad = GPIO_PAD_PULL_UP;
-	} else if (mode & GPIO_PULL_DOWN) {
+	} else if (mode & EPIC_GPIO_PULL_DOWN) {
 		cfg->pad = GPIO_PAD_PULL_DOWN;
 	} else {
 		cfg->pad = GPIO_PAD_NONE;
@@ -50,26 +62,26 @@ int epic_gpio_set_pin_mode(uint8_t pin, uint8_t mode)
 
 int epic_gpio_get_pin_mode(uint8_t pin)
 {
-	if (pin < GPIO_WRISTBAND_1 || pin > GPIO_WRISTBAND_4)
+	if (pin < EPIC_GPIO_WRISTBAND_1 || pin > EPIC_GPIO_WRISTBAND_4)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
 	int res         = 0;
 	if (cfg->func == GPIO_FUNC_IN)
-		res |= GPIO_MODE_IN;
+		res |= EPIC_GPIO_MODE_IN;
 	else if (cfg->func == GPIO_FUNC_OUT)
-		res |= GPIO_MODE_OUT;
+		res |= EPIC_GPIO_MODE_OUT;
 	if (cfg->pad == GPIO_PAD_PULL_UP)
-		res |= GPIO_PULL_UP;
+		res |= EPIC_GPIO_PULL_UP;
 	else if (cfg->pad == GPIO_PAD_PULL_DOWN)
-		res |= GPIO_PULL_DOWN;
+		res |= EPIC_GPIO_PULL_DOWN;
 
 	return res;
 }
 
 int epic_gpio_write_pin(uint8_t pin, bool on)
 {
-	if (pin < GPIO_WRISTBAND_1 || pin > GPIO_WRISTBAND_4)
+	if (pin < EPIC_GPIO_WRISTBAND_1 || pin > EPIC_GPIO_WRISTBAND_4)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
@@ -86,7 +98,7 @@ int epic_gpio_write_pin(uint8_t pin, bool on)
 
 int epic_gpio_read_pin(uint8_t pin)
 {
-	if (pin < GPIO_WRISTBAND_1 || pin > GPIO_WRISTBAND_4)
+	if (pin < EPIC_GPIO_WRISTBAND_1 || pin > EPIC_GPIO_WRISTBAND_4)
 		return -EINVAL;
 
 	gpio_cfg_t *cfg = &gpio_configs[pin];
