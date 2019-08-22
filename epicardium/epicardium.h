@@ -820,6 +820,8 @@ enum personal_state {
     STATE_COMMUNICATION = 3,
     /** ``4``, "camp" - I am focussed on self-, camp-, or community maintenance - yellow led, fade on and off. */
     STATE_CAMP = 4,
+    /** STATE_MAX gives latest value and count of possible STATEs**/
+    STATE_MAX = 5,
 };
 
 /**
