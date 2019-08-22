@@ -123,105 +123,101 @@ int epic_bhi160_enable_sensor(
 	enum bhi160_sensor_type sensor_type,
 	struct bhi160_sensor_config *config
 ) {
+	int result = 0;
+
 	bhy_virtual_sensor_t vs_id = bhi160_lookup_vs_id(sensor_type);
 	if (vs_id < 0) {
 		return -ENODEV;
 	}
 
-	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (lockret < 0) {
-		return lockret;
+	result = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (result < 0) {
+		return result;
 	}
 
-	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
-		struct stream_info *stream = &bhi160_streams[sensor_type];
-		stream->item_size = bhi160_lookup_data_size(sensor_type);
-		/* TODO: Sanity check length */
-		stream->queue = xQueueCreate(
-			config->sample_buffer_len, stream->item_size
-		);
-		if (stream->queue == NULL) {
-			xSemaphoreGive(bhi160_mutex);
-			hwlock_release(HWLOCK_I2C);
-			return -ENOMEM;
-		}
-
-		int streamret =
-			stream_register(bhi160_lookup_sd(sensor_type), stream);
-		if (streamret < 0) {
-			xSemaphoreGive(bhi160_mutex);
-			hwlock_release(HWLOCK_I2C);
-			return streamret;
-		}
-
-		int bhyret = bhy_enable_virtual_sensor(
-			vs_id,
-			VS_WAKEUP,
-			config->sample_rate,
-			0,
-			VS_FLUSH_NONE,
-			0,
-			config->dynamic_range /* dynamic range is sensor dependent */
-		);
-		if (bhyret != BHY_SUCCESS) {
-			xSemaphoreGive(bhi160_mutex);
-			hwlock_release(HWLOCK_I2C);
-			return bhyret;
-		}
-
-		bhi160_sensor_active[sensor_type] = true;
-
-		xSemaphoreGive(bhi160_mutex);
-	} else {
-		hwlock_release(HWLOCK_I2C);
-		return -EBUSY;
+	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) != pdTRUE) {
+		result = -EBUSY;
+		goto out_free_i2c;
 	}
 
+	struct stream_info *stream = &bhi160_streams[sensor_type];
+	stream->item_size          = bhi160_lookup_data_size(sensor_type);
+	/* TODO: Sanity check length */
+	stream->queue =
+		xQueueCreate(config->sample_buffer_len, stream->item_size);
+	if (stream->queue == NULL) {
+		result = -ENOMEM;
+		goto out_free_both;
+	}
+
+	result = stream_register(bhi160_lookup_sd(sensor_type), stream);
+	if (result < 0) {
+		goto out_free_both;
+	}
+
+	result = bhy_enable_virtual_sensor(
+		vs_id,
+		VS_WAKEUP,
+		config->sample_rate,
+		0,
+		VS_FLUSH_NONE,
+		0,
+		config->dynamic_range /* dynamic range is sensor dependent */
+	);
+	if (result != BHY_SUCCESS) {
+		goto out_free_both;
+	}
+
+	bhi160_sensor_active[sensor_type] = true;
+	result                            = bhi160_lookup_sd(sensor_type);
+
+out_free_both:
+	xSemaphoreGive(bhi160_mutex);
+out_free_i2c:
 	hwlock_release(HWLOCK_I2C);
-	return bhi160_lookup_sd(sensor_type);
+	return result;
 }
 
 int epic_bhi160_disable_sensor(enum bhi160_sensor_type sensor_type)
 {
+	int result = 0;
+
 	bhy_virtual_sensor_t vs_id = bhi160_lookup_vs_id(sensor_type);
 	if (vs_id < 0) {
 		return -ENODEV;
 	}
 
-	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (lockret < 0) {
-		return lockret;
+	result = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (result < 0) {
+		return result;
 	}
 
-	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) == pdTRUE) {
-		struct stream_info *stream = &bhi160_streams[sensor_type];
-		int streamret              = stream_deregister(
-                        bhi160_lookup_sd(sensor_type), stream
-		);
-		if (streamret < 0) {
-			xSemaphoreGive(bhi160_mutex);
-			hwlock_release(HWLOCK_I2C);
-			return streamret;
-		}
-		vQueueDelete(stream->queue);
-		stream->queue = NULL;
-		int bhyret    = bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
-		if (bhyret < 0) {
-			xSemaphoreGive(bhi160_mutex);
-			hwlock_release(HWLOCK_I2C);
-			return bhyret;
-		}
-
-		bhi160_sensor_active[sensor_type] = false;
-
-		xSemaphoreGive(bhi160_mutex);
-	} else {
-		hwlock_release(HWLOCK_I2C);
-		return -EBUSY;
+	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) != pdTRUE) {
+		result = -EBUSY;
+		goto out_free_i2c;
 	}
 
+	struct stream_info *stream = &bhi160_streams[sensor_type];
+	result = stream_deregister(bhi160_lookup_sd(sensor_type), stream);
+	if (result < 0) {
+		goto out_free_both;
+	}
+
+	vQueueDelete(stream->queue);
+	stream->queue = NULL;
+	result        = bhy_disable_virtual_sensor(vs_id, VS_WAKEUP);
+	if (result < 0) {
+		goto out_free_both;
+	}
+
+	bhi160_sensor_active[sensor_type] = false;
+
+	result = 0;
+out_free_both:
+	xSemaphoreGive(bhi160_mutex);
+out_free_i2c:
 	hwlock_release(HWLOCK_I2C);
-	return 0;
+	return result;
 }
 
 void epic_bhi160_disable_all_sensors()
@@ -331,18 +327,18 @@ static int bhi160_fetch_fifo(void)
 	 * You'll probably be best of leaving it as it is ...
 	 */
 
-	int ret = BHY_SUCCESS;
+	int result = 0;
 	/* Number of bytes left in BHI160's FIFO buffer */
 	uint16_t bytes_left_in_fifo = 1;
 
-	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (lockret < 0) {
-		return lockret;
+	result = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (result < 0) {
+		return result;
 	}
 
 	if (xSemaphoreTake(bhi160_mutex, LOCK_WAIT) != pdTRUE) {
-		hwlock_release(HWLOCK_I2C);
-		return -EBUSY;
+		result = -EBUSY;
+		goto out_free_i2c;
 	}
 
 	while (bytes_left_in_fifo) {
@@ -364,14 +360,14 @@ static int bhi160_fetch_fifo(void)
 		while (bytes_left > 0) {
 			bhy_data_generic_t sensor_data;
 			bhy_data_type_t data_type;
-			ret = bhy_parse_next_fifo_packet(
+			result = bhy_parse_next_fifo_packet(
 				&fifo_ptr,
 				&bytes_left,
 				&sensor_data,
 				&data_type
 			);
 
-			if (ret == BHY_SUCCESS) {
+			if (result == BHY_SUCCESS) {
 				bhi160_handle_packet(data_type, &sensor_data);
 			} else {
 				break;
@@ -387,8 +383,9 @@ static int bhi160_fetch_fifo(void)
 	}
 
 	xSemaphoreGive(bhi160_mutex);
+out_free_i2c:
 	hwlock_release(HWLOCK_I2C);
-	return 0;
+	return result;
 }
 
 /*
