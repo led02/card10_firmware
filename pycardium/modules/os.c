@@ -4,6 +4,27 @@
 #include "py/runtime.h"
 
 #include <string.h>
+#include <strings.h>
+
+#include <stdbool.h>
+
+#include "os.h"
+
+bool pycrd_filename_restricted(const char *fname)
+{
+	// files that cannot be opened in write modes
+	const char *const forbidden_files[] = {
+		"card10.bin", "menu.py", "main.py", "card10.cfg"
+	};
+	for (int i = 0;
+	     i < sizeof(forbidden_files) / sizeof(forbidden_files[0]);
+	     i++) {
+		if (strcasecmp(fname, forbidden_files[i]) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
 
 static mp_obj_t mp_os_exit(size_t n_args, const mp_obj_t *args)
 {
@@ -89,7 +110,10 @@ static MP_DEFINE_CONST_FUN_OBJ_1(listdir_obj, mp_os_listdir);
 static mp_obj_t mp_os_unlink(mp_obj_t py_path)
 {
 	const char *path = mp_obj_str_get_str(py_path);
-	int rc           = epic_file_unlink(path);
+	if (pycrd_filename_restricted(path)) {
+		mp_raise_OSError(-EACCES);
+	}
+	int rc = epic_file_unlink(path);
 
 	if (rc < 0) {
 		mp_raise_OSError(-rc);
@@ -114,7 +138,11 @@ static mp_obj_t mp_os_rename(mp_obj_t py_oldp, mp_obj_t py_newp)
 {
 	const char *oldp = mp_obj_str_get_str(py_oldp);
 	const char *newp = mp_obj_str_get_str(py_newp);
-	int rc           = epic_file_rename(oldp, newp);
+	if (pycrd_filename_restricted(oldp) ||
+	    pycrd_filename_restricted(newp)) {
+		mp_raise_OSError(-EACCES);
+	}
+	int rc = epic_file_rename(oldp, newp);
 
 	if (rc < 0) {
 		mp_raise_OSError(-rc);

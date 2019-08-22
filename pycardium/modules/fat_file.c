@@ -11,24 +11,7 @@
 #include "py/mperrno.h"
 
 #include "epicardium.h"
-
-#include <strings.h>
-
-bool filename_restricted(const char *fname)
-{
-	// files that cannot be opened in write modes
-	const char *const forbidden_files[] = {
-		"cardio.bin", "menu.py", "main.py", "cardio.cfg"
-	};
-	for (int i = 0;
-	     i < sizeof(forbidden_files) / sizeof(forbidden_files[0]);
-	     i++) {
-		if (strcasecmp(fname, forbidden_files[i]) == 0) {
-			return true;
-		}
-	}
-	return false;
-}
+#include "os.h"
 
 extern const mp_obj_type_t mp_type_textio;
 #if MICROPY_PY_IO_FILEIO
@@ -167,8 +150,8 @@ STATIC mp_obj_t file_open(const mp_obj_type_t *type, mp_arg_val_t *args)
 
 	const char *fname = mp_obj_str_get_str(args[0].u_obj);
 
-	if (potentially_critical_access && filename_restricted(fname)) {
-		mp_raise_OSError(-EPERM);
+	if (potentially_critical_access && pycrd_filename_restricted(fname)) {
+		mp_raise_OSError(-EACCES);
 	}
 
 	int res = epic_file_open(fname, modeString);
