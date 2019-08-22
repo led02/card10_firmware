@@ -107,6 +107,10 @@ typedef _Bool bool;
 #define API_PERSONAL_STATE_GET     0xc1
 #define API_PERSONAL_STATE_IS_PERSISTENT 0xc2
 
+#define API_BME680_INIT            0xD0
+#define API_BME680_DEINIT          0xD1
+#define API_BME680_GET_DATA        0xD2
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -672,6 +676,66 @@ API(API_LEDS_SET_GAMMA_TABLE, void epic_leds_set_gamma_table(
  * :param uint8_t b: Value for the blue color channel.
  */
 API(API_LEDS_CLEAR_ALL, void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b));
+
+/**
+ * BME680
+ * ======
+ */
+
+/**
+ * BME680 Sensor Data
+ */
+struct bme680_sensor_data {
+	/** Temperature in degree celsius */
+	float temperature;
+	/** Humidity in % relative humidity */
+	float humidity;
+	/** Pressure in hPa */
+	float pressure;
+	/** Gas resistance in Ohms */
+	float gas_resistance;
+};
+
+/**
+ * Initialize the BM680 sensor.
+ *
+ * :return: 0 on success or ``-Exxx`` on error.  The following
+ *     errors might occur:
+ *
+ *     - ``-EFAULT``:  On NULL-pointer.
+ *     - ``-EINVAL``:  Invalid configuration.
+ *     - ``-EIO``:  Communication with the device failed.
+ *     - ``-ENODEV``:  Device was not found.
+ */
+API(API_BME680_INIT, int epic_bme680_init());
+
+/**
+ * De-Initialize the BM680 sensor.
+ *
+ * :return: 0 on success or ``-Exxx`` on error.  The following
+ *     errors might occur:
+ *
+ *     - ``-EFAULT``:  On NULL-pointer.
+ *     - ``-EINVAL``:  Invalid configuration.
+ *     - ``-EIO``:  Communication with the device failed.
+ *     - ``-ENODEV``:  Device was not found.
+ */
+API(API_BME680_DEINIT, int epic_bme680_deinit());
+
+/**
+ * Get the current BME680 data.
+ *
+ * :param data: Where to store the environmental data.
+ * :return: 0 on success or ``-Exxx`` on error.  The following
+ *     errors might occur:
+ *
+ *     - ``-EFAULT``:  On NULL-pointer.
+ *     - ``-EINVAL``:  Sensor not initialized.
+ *     - ``-EIO``:  Communication with the device failed.
+ *     - ``-ENODEV``:  Device was not found.
+ */
+API(API_BME680_GET_DATA,
+	int epic_bme680_read_sensors(struct bme680_sensor_data *data));
 
 /**
  * Personal State

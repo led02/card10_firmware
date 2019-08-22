@@ -231,5 +231,10 @@ int hardware_reset(void)
 	 */
 	display_init_slim();
 
+	/*
+	 * BME680 Sensor
+	 */
+	epic_bme680_deinit();
+
 	return 0;
 }
