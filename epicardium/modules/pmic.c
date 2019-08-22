@@ -43,19 +43,22 @@ void pmic_interrupt_callback(void *_)
 
 int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 {
-	int ret = 0;
+	int ret     = 0;
+	int i2c_ret = 0;
 
 	if (sig > _PMIC_AMUX_MAX) {
 		return -EINVAL;
 	}
 
-	ret = hwlock_acquire(HWLOCK_ADC, pdMS_TO_TICKS(100));
-	if (ret < 0) {
-		return ret;
+	int adc_ret = hwlock_acquire(HWLOCK_ADC, pdMS_TO_TICKS(100));
+	if (adc_ret < 0) {
+		ret = adc_ret;
+		goto done;
 	}
-	ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (ret < 0) {
-		return ret;
+	i2c_ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (i2c_ret < 0) {
+		ret = i2c_ret;
+		goto done;
 	}
 
 	/* Select the correct channel for this measurement.  */
@@ -67,10 +70,13 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 	 * release the I2C mutex.
 	 */
 	hwlock_release(HWLOCK_I2C);
+	i2c_ret = 0;
+
 	vTaskDelay(pdMS_TO_TICKS(5));
-	ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
-	if (ret < 0) {
-		return ret;
+	i2c_ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	if (i2c_ret < 0) {
+		ret = i2c_ret;
+		goto done;
 	}
 
 	uint16_t adc_data;
@@ -112,8 +118,15 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 		ret = -EINVAL;
 	}
 
-	hwlock_release(HWLOCK_I2C);
-	hwlock_release(HWLOCK_ADC);
+done:
+	if (i2c_ret == 0) {
+		hwlock_release(HWLOCK_I2C);
+	}
+
+	if (adc_ret == 0) {
+		hwlock_release(HWLOCK_ADC);
+	}
+
 	return ret;
 }
 
