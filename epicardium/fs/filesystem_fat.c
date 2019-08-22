@@ -22,6 +22,8 @@
 #include "epicardium.h"
 #include "card10.h"
 #include "modules/log.h"
+#include "modules/modules.h"
+#include "api/common.h"
 
 #define SSLOG_DEBUG(...) LOG_DEBUG("fatfs", __VA_ARGS__)
 #define SSLOG_INFO(...) LOG_INFO("fatfs", __VA_ARGS__)
@@ -44,6 +46,7 @@
 
 struct FatObject {
 	uint32_t generation;
+	int coreMask;
 	enum epic_stat_type type;
 	union {
 		FIL file;
@@ -56,6 +59,7 @@ struct EpicFileSystem {
 	uint32_t generationCount;
 	bool initialized;
 	FATFS FatFs;
+	int lockCoreMask;
 };
 
 // this table converts from FRESULT to POSIX errno
@@ -64,7 +68,7 @@ static const int s_libffToErrno[20];
 static const char *f_get_rc_string(FRESULT rc);
 static bool globalLockAccquire();
 static void globalLockRelease();
-static void efs_close_all(EpicFileSystem *fs);
+static void efs_close_all(EpicFileSystem *fs, int coreMask);
 
 /**
  * if EPICSTAT_NONE is passed to `expected`, the type is not checked.
@@ -159,7 +163,7 @@ void fatfs_detach()
 	FRESULT ff_res;
 	EpicFileSystem *fs;
 	if (efs_lock_global(&fs) == 0) {
-		efs_close_all(fs);
+		efs_close_all(fs, EPICARDIUM_COREMASK_BOTH);
 
 		//unmount by passing NULL as fs object, will destroy our sync object via ff_del_syncobj
 		ff_res = f_mount(NULL, "/", 0);
@@ -177,6 +181,14 @@ void fatfs_detach()
 	}
 }
 
+void fatfs_close_all(int coreMask)
+{
+	EpicFileSystem *fs;
+	if (efs_lock_global(&fs) == 0) {
+		efs_close_all(fs, coreMask);
+		efs_unlock_global(fs);
+	}
+}
 static const char *f_get_rc_string(FRESULT rc)
 {
 	static const TCHAR *rcstrings =
@@ -216,6 +228,11 @@ int efs_lock_global(EpicFileSystem **fs)
 		return -ENODEV;
 	}
 	*fs = &s_globalFileSystem;
+	if (xTaskGetCurrentTaskHandle() == dispatcher_task_id) {
+		s_globalFileSystem.lockCoreMask = EPICARDIUM_COREMASK_1;
+	} else {
+		s_globalFileSystem.lockCoreMask = EPICARDIUM_COREMASK_0;
+	}
 	return 0;
 }
 
@@ -292,6 +309,7 @@ static int efs_obj_init(
 	}
 	obj->type       = type;
 	obj->generation = generation;
+	obj->coreMask   = fs->lockCoreMask;
 
 	return EPIC_FAT_FD(index, generation);
 }
@@ -300,6 +318,7 @@ static void efs_obj_deinit(EpicFileSystem *fs, struct FatObject *obj)
 {
 	obj->type       = EPICSTAT_NONE;
 	obj->generation = 0;
+	obj->coreMask   = 0;
 }
 
 /* here we're trying to mirror glibc's behaviour:
@@ -392,9 +411,13 @@ int efs_close(EpicFileSystem *fs, int fd)
 	return res;
 }
 
-void efs_close_all(EpicFileSystem *fs)
+void efs_close_all(EpicFileSystem *fs, int coreMask)
 {
+	assert(coreMask != 0);
 	for (int i = 0; i < EPIC_FAT_MAX_OPENED; ++i) {
+		if (!(fs->pool[i].coreMask & coreMask)) {
+			continue;
+		}
 		switch (fs->pool[i].type) {
 		case EPICSTAT_FILE:
 			f_close(&fs->pool[i].file);

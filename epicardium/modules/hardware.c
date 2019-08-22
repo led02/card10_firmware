@@ -206,6 +206,11 @@ int hardware_reset(void)
 	api_interrupt_init();
 	api_dispatcher_init();
 
+	/*
+	 * close all FDs currently owned by core1
+	 */
+	fatfs_close_all(EPICARDIUM_COREMASK_1);
+
 	/* Personal State */
 	const int personal_state_is_persistent =
 		epic_personal_state_is_persistent();
