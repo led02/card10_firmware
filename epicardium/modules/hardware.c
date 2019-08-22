@@ -32,6 +32,10 @@ int hardware_early_init(void)
 	/*
 	 * Watchdog timer
 	 */
+#if 0
+	/*
+	 * Disabled for this release.
+	 */
 	sys_cfg_wdt_t wdt_cfg = NULL;
 	WDT_Init(MXC_WDT0, wdt_cfg);
 
@@ -45,6 +49,7 @@ int hardware_early_init(void)
 		MXC_WDT0,
 		WDT_PERIOD_2_27); /* Clocked by PCLK at 50MHz, reset at 2^27 ticks = 2.7 seconds */
 	WDT_EnableReset(MXC_WDT0, 1);
+#endif
 
 	/*
 	 * I2C bus for onboard peripherals (ie. PMIC, BMA400, BHI160, BME680,

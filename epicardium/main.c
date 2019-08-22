@@ -105,7 +105,12 @@ int main(void)
 	}
 
 	/* Watchdog petting */
+#if 0
+	/*
+	 * Disabled for this release.
+	 */
 	watchdog_clearer_init();
+#endif
 
 	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
