@@ -38,11 +38,12 @@ STATIC mp_obj_t mp_bhi160_read_sensor(mp_obj_t stream_id_in)
 			// other data types are currently not supported
 			mp_raise_OSError(EINVAL);
 		}
-		mp_obj_t tuple[3];
+		mp_obj_t tuple[4];
 		tuple[0] = mp_obj_new_int(buf[i].x);
 		tuple[1] = mp_obj_new_int(buf[i].y);
 		tuple[2] = mp_obj_new_int(buf[i].z);
-		mp_obj_list_append(list, mp_obj_new_tuple(3, tuple));
+		tuple[3] = mp_obj_new_int(buf[i].status);
+		mp_obj_list_append(list, mp_obj_new_tuple(4, tuple));
 	}
 
 	return MP_OBJ_FROM_PTR(list);

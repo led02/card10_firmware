@@ -968,6 +968,8 @@ struct bhi160_data_vector {
 	int16_t y;
 	/** Z */
 	int16_t z;
+	/** Status */
+	uint8_t status;
 };
 
 /**

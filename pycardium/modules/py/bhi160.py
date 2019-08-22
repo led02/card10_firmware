@@ -1,5 +1,8 @@
 import sys_bhi160
 import interrupt
+import ucollections
+
+DataVector = ucollections.namedtuple("DataVector", ["x", "y", "z", "status"])
 
 
 class BHI160:
@@ -49,6 +52,14 @@ class BHI160:
             if self._callback:
                 self._callback(data)
 
+    def convert_data_vector(self, sample):
+        return DataVector(
+            self.convert_single(sample[0]),
+            self.convert_single(sample[1]),
+            self.convert_single(sample[2]),
+            sample[3],
+        )
+
 
 class BHI160Accelerometer(BHI160):
     def __init__(
@@ -67,13 +78,7 @@ class BHI160Accelerometer(BHI160):
         return 2 * value / 32768.0
 
     def convert(self, sample):
-        return dict(
-            {
-                "x": self.convert_single(sample[0]),
-                "y": self.convert_single(sample[1]),
-                "z": self.convert_single(sample[2]),
-            }
-        )
+        return self.convert_data_vector(sample)
 
 
 class BHI160Gyroscope(BHI160):
@@ -93,13 +98,7 @@ class BHI160Gyroscope(BHI160):
         return 360 * value / 32768.0
 
     def convert(self, sample):
-        return dict(
-            {
-                "x": self.convert_single(sample[0]),
-                "y": self.convert_single(sample[1]),
-                "z": self.convert_single(sample[2]),
-            }
-        )
+        return self.convert_data_vector(sample)
 
 
 class BHI160Orientation(BHI160):
@@ -119,10 +118,4 @@ class BHI160Orientation(BHI160):
         return 360 * value / 32768.0
 
     def convert(self, sample):
-        return dict(
-            {
-                "x": self.convert_single(sample[0]),
-                "y": self.convert_single(sample[1]),
-                "z": self.convert_single(sample[2]),
-            }
-        )
+        return self.convert_data_vector(sample)

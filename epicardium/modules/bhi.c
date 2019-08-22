@@ -304,6 +304,7 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 		data_vector.x         = sensor_data->data_vector.x;
 		data_vector.y         = sensor_data->data_vector.y;
 		data_vector.z         = sensor_data->data_vector.z;
+		data_vector.status    = sensor_data->data_vector.status;
 		xQueueSend(
 			bhi160_streams[sensor_type].queue,
 			&data_vector,
