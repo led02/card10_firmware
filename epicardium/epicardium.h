@@ -111,6 +111,10 @@ typedef _Bool bool;
 #define API_BME680_DEINIT          0xD1
 #define API_BME680_GET_DATA        0xD2
 
+#define API_BHI160_ENABLE          0xe0
+#define API_BHI160_DISABLE         0xe1
+#define API_BHI160_DISABLE_ALL     0xe2
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -151,9 +155,16 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_UART_RX                2
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
 #define EPIC_INT_RTC_ALARM              3
+/** BHI */
+#define EPIC_INT_BHI160_ACCELEROMETER   4
+API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
+#define EPIC_INT_BHI160_ORIENTATION     5
+API_ISR(EPIC_INT_BHI160_ORIENTATION, epic_isr_bhi160_orientation);
+#define EPIC_INT_BHI160_GYROSCOPE       6
+API_ISR(EPIC_INT_BHI160_GYROSCOPE, epic_isr_bhi160_gyroscope);
 
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    4
+#define EPIC_INT_NUM                    7
 /* clang-format on */
 
 /*
@@ -858,6 +869,173 @@ API(API_PERSONAL_STATE_IS_PERSISTENT, int epic_personal_state_is_persistent());
  *    }
  */
 API(API_STREAM_READ, int epic_stream_read(int sd, void *buf, size_t count));
+
+/**
+ * BHI160 Sensor Fusion
+ * ====================
+ * card10 has a BHI160 onboard which is used as an IMU.  BHI160 exposes a few
+ * different sensors which can be accessed using Epicardium API.
+ *
+ * **Example**:
+ *
+ * .. code-block:: cpp
+ *
+ *    #include "epicardium.h"
+ *
+ *    // Configure a sensor & enable it
+ *    struct bhi160_sensor_config cfg = {0};
+ *    cfg.sample_buffer_len = 40;
+ *    cfg.sample_rate = 4;   // Hz
+ *    cfg.dynamic_range = 2; // g
+ *
+ *    int sd = epic_bhi160_enable_sensor(BHI160_ACCELEROMETER, &cfg);
+ *
+ *    // Read sensor data
+ *    while (1) {
+ *            struct bhi160_data_vector buf[10];
+ *
+ *            int n = epic_stream_read(sd, buf, sizeof(buf));
+ *
+ *            for (int i = 0; i < n; i++) {
+ *                    printf("X: %6d Y: %6d Z: %6d\n",
+ *                           buf[i].x,
+ *                           buf[i].y,
+ *                           buf[i].z);
+ *            }
+ *    }
+ *
+ *    // Disable the sensor
+ *    epic_bhi160_disable_sensor(BHI160_ACCELEROMETER);
+ */
+
+/**
+ * BHI160 Sensor Types
+ * -------------------
+ */
+
+/**
+ * BHI160 virtual sensor type.
+ */
+enum bhi160_sensor_type {
+	/**
+	 * Accelerometer
+	 *
+	 * - Data type: :c:type:`bhi160_data_vector`
+	 * - Dynamic range: g's (1x Earth Gravity, ~9.81m*s^-2)
+	 */
+	BHI160_ACCELEROMETER               = 0,
+	/** Magnetometer (**Unimplemented**) */
+	BHI160_MAGNETOMETER                = 1,
+	/** Orientation */
+	BHI160_ORIENTATION                 = 2,
+	/** Gyroscope */
+	BHI160_GYROSCOPE                   = 3,
+	/** Gravity (**Unimplemented**) */
+	BHI160_GRAVITY                     = 4,
+	/** Linear acceleration (**Unimplemented**) */
+	BHI160_LINEAR_ACCELERATION         = 5,
+	/** Rotation vector (**Unimplemented**) */
+	BHI160_ROTATION_VECTOR             = 6,
+	/** Uncalibrated magnetometer (**Unimplemented**) */
+	BHI160_UNCALIBRATED_MAGNETOMETER   = 7,
+	/** Game rotation vector (whatever that is supposed to be) */
+	BHI160_GAME_ROTATION_VECTOR        = 8,
+	/** Uncalibrated gyroscrope (**Unimplemented**) */
+	BHI160_UNCALIBRATED_GYROSCOPE      = 9,
+	/** Geomagnetic rotation vector (**Unimplemented**) */
+	BHI160_GEOMAGNETIC_ROTATION_VECTOR = 10,
+};
+
+enum bhi160_data_type {
+	BHI160_DATA_TYPE_VECTOR
+};
+
+/**
+ * BHI160 Sensor Data Types
+ * ------------------------
+ */
+
+/**
+ * Vector Data.  The scaling of these values is dependent on the chosen dynamic
+ * range.  See the individual sensor's documentation for details.
+ */
+struct bhi160_data_vector {
+	enum bhi160_data_type data_type;
+
+	/** X */
+	int16_t x;
+	/** Y */
+	int16_t y;
+	/** Z */
+	int16_t z;
+	/** Status */
+	uint8_t status;
+};
+
+/**
+ * BHI160 API
+ * ----------
+ */
+
+/**
+ * Configuration for a BHI160 sensor.
+ *
+ * This struct is used when enabling a sensor using
+ * :c:func:`epic_bhi160_enable_sensor`.
+ */
+struct bhi160_sensor_config {
+	/**
+	 * Number of samples Epicardium should keep for this sensor.  Do not set
+	 * this number too high as the sample buffer will eat RAM.
+	 */
+	size_t sample_buffer_len;
+	/**
+	 * Sample rate for the sensor in Hz.  Maximum data rate is limited
+	 * to 200 Hz for all sensors though some might be limited at a lower
+	 * rate.
+	 */
+	uint16_t sample_rate;
+	/**
+	 * Dynamic range.  Interpretation of this value depends on
+	 * the sensor type.  Please refer to the specific sensor in
+	 * :c:type:`bhi160_sensor_type` for details.
+	 */
+	uint16_t dynamic_range;
+	/** Always zero. Reserved for future parameters. */
+	uint8_t _padding[8];
+};
+
+/**
+ * Enable a BHI160 virtual sensor.  Calling this funciton will instruct the
+ * BHI160 to collect data for this specific virtual sensor.  You can then
+ * retrieve the samples using :c:func:`epic_stream_read`.
+ *
+ * :param bhi160_sensor_type sensor_type: Which sensor to enable.
+ * :param bhi160_sensor_config* config: Configuration for this sensor.
+ * :returns: A sensor descriptor which can be used with
+ *    :c:func:`epic_stream_read` or a negative error value:
+ *
+ *    - ``-EBUSY``:  The BHI160 driver is currently busy with other tasks and
+ *      could not be acquired for enabling a sensor.
+ */
+API(API_BHI160_ENABLE, int epic_bhi160_enable_sensor(
+	enum bhi160_sensor_type sensor_type,
+	struct bhi160_sensor_config *config
+));
+
+/**
+ * Disable a BHI160 sensor.
+ *
+ * :param bhi160_sensor_type sensor_type: Which sensor to disable.
+ */
+API(API_BHI160_DISABLE, int epic_bhi160_disable_sensor(
+	enum bhi160_sensor_type sensor_type
+));
+
+/**
+ * Disable all BHI160 sensors.
+ */
+API(API_BHI160_DISABLE_ALL, void epic_bhi160_disable_all_sensors());
 
 /**
  * Vibration Motor

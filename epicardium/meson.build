@@ -80,7 +80,7 @@ elf = executable(
   l0der_sources,
   ble_sources,
   version_hdr,
-  dependencies: [libcard10, max32665_startup_core0, maxusb, libff13, ble],
+  dependencies: [libcard10, max32665_startup_core0, maxusb, libff13, ble, bhy1],
   link_with: [api_dispatcher_lib, freertos],
   link_whole: [max32665_startup_core0_lib, board_card10_lib, newlib_heap_lib],
   include_directories: [freertos_includes],

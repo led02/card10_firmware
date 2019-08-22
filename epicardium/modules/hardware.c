@@ -260,6 +260,11 @@ int hardware_reset(void)
 	display_init_slim();
 
 	/*
+	 * BHI160
+	 */
+	epic_bhi160_disable_all_sensors();
+
+	/*
 	 * BME680 Sensor
 	 */
 	epic_bme680_deinit();
