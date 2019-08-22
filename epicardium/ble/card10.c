@@ -581,58 +581,66 @@ static uint8_t writeCard10CB(
 	// dim
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if (operation == ATT_PDU_PREP_WRITE_REQ) {
-			if (ui8 >= 1 && ui8 <= 8) {
+		if (ui8 >= 1 && ui8 <= 8) {
+			if (operation == ATT_PDU_WRITE_CMD || operation == ATT_PDU_SIGNED_WRITE_CMD ||
+				operation == ATT_PDU_WRITE_REQ || operation == ATT_PDU_EXEC_WRITE_REQ 
+			) {
+				epic_leds_dim_bottom(pValue[0]);
 				APP_TRACE_INFO1(
-					"ble_card10: prep to dim bottom to: %d\n",
+					"ble-card10: dim bottom to: %d\n", pValue[0]
+				);
+				return ATT_SUCCESS;
+			} else if (operation == ATT_PDU_PREP_WRITE_REQ) {
+				APP_TRACE_INFO1(
+					"ble_card10: value for dim bottom would be okay: %d\n",
 					pValue[0]
 				);
 				return ATT_SUCCESS;
+			} else {
+				APP_TRACE_INFO1(
+					"ble-card10: dim bottom with unknown operation: %d\n",
+					operation
+				);
+				return ATT_ERR_INVALID_PDU;
 			}
+		} else {
 			APP_TRACE_INFO1(
 				"ble-card: prep dim bottom invalid value (1-8): %d\n",
 				ui8
 			);
 			return ATT_ERR_RANGE;
-		} else if (operation == ATT_PDU_EXEC_WRITE_REQ) {
-			epic_leds_dim_bottom(pValue[0]);
-			APP_TRACE_INFO1(
-				"ble-card10: dim bottom to: %d\n", pValue[0]
-			);
-			return ATT_SUCCESS;
 		}
-		APP_TRACE_INFO1(
-			"ble-card10: dim bottom with unknown operation: %d\n",
-			operation
-		);
-		return ATT_ERR_INVALID_PDU;
 	case CARD10_LEDS_TOP_DIM_VAL_HDL:
 		ui8 = pValue[0];
-		if (operation == ATT_PDU_PREP_WRITE_REQ) {
-			if (ui8 >= 1 && ui8 <= 8) {
+		if (ui8 >= 1 && ui8 <= 8) {
+			if (operation == ATT_PDU_WRITE_CMD || operation == ATT_PDU_SIGNED_WRITE_CMD ||
+				operation == ATT_PDU_WRITE_REQ || operation == ATT_PDU_EXEC_WRITE_REQ 
+			) {
+				epic_leds_dim_top(pValue[0]);
 				APP_TRACE_INFO1(
-					"ble_card10: prep to dim top to: %d\n",
+					"ble-card10: dim top to: %d\n", pValue[0]
+				);
+				return ATT_SUCCESS;
+			} else if (operation == ATT_PDU_PREP_WRITE_REQ) {
+				APP_TRACE_INFO1(
+					"ble_card10: value for dim top would be okay: %d\n",
 					pValue[0]
 				);
 				return ATT_SUCCESS;
+			} else {
+				APP_TRACE_INFO1(
+					"ble-card10: dim top with unknown operation: %d\n",
+					operation
+				);
+				return ATT_ERR_INVALID_PDU;
 			}
+		} else {
 			APP_TRACE_INFO1(
 				"ble-card: prep dim top invalid value (1-8): %d\n",
 				ui8
 			);
 			return ATT_ERR_RANGE;
-		} else if (operation == ATT_PDU_EXEC_WRITE_REQ) {
-			epic_leds_dim_top(pValue[0]);
-			APP_TRACE_INFO1(
-				"ble-card10: dim top to: %d\n", pValue[0]
-			);
-			return ATT_SUCCESS;
 		}
-		APP_TRACE_INFO1(
-			"ble-card10: dim top with unknown operation: %d\n",
-			operation
-		);
-		return ATT_ERR_INVALID_PDU;
 	// led powersafe
 	case CARD10_LED_POWERSAFE_VAL_HDL:
 		epic_leds_set_powersave(pValue[0]);
