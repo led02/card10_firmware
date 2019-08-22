@@ -3,16 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [v1.4 - 2019-08-22 20:00]
 ### Added
 - Support for the `bme680` environmental sensor.
 - Support for the `bhi160` sensor fusion.
-- `simple_menu` module for creating simple menus in Python.
+- simple_menu` module for creating simple menus in Python.
+- Python power module to access the voltage and current measurements from the PMIC.
 
 ### Changed
 - Refactored BLE card10 service.
 - Improved BLE file-transfer.
 - Replaced dynamic attribute creation with static attributes.
+- Clock: Added multiple color themes for the main clock.
+- Clock: Color themes are read from a json file, so people can customize their clock
+- Clock: Last selected theme is saved in the clock.json so it's persistent
+
 
 ### Fixed
 - Fixed menu listing files starting with `.`.
