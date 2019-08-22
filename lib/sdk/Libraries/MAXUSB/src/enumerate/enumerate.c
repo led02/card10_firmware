@@ -113,7 +113,9 @@ static const usb_req_t enum_req_init = {
   0,                       /* actlen */
   0,                       /* error_code */
   status_stage_callback,   /* callback */
-  &enum_req                /* callback data */
+  &enum_req,               /* callback data */
+  MAXUSB_TYPE_TRANS,       /* type */
+  NULL                     /* driver_xtra */
 };
 
 /******************************************************************************/

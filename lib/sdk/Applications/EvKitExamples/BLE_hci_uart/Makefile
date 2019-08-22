@@ -80,6 +80,7 @@ CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 # Source files for this test (add path to VPATH below)
 SRCS  = main.c
 SRCS += chci_drv.c
+SRCS += hci_tr.c
 SRCS += stack_setup.c
 
 # Where to find source files for this test
@@ -87,6 +88,16 @@ VPATH  = .
 
 # Where to find header files for this test
 IPATH  = .
+
+##############################################################################
+# OS Check/Utility definitions
+ifeq '$(findstring ;,$(PATH))' ';'
+    BUILD_OS := Windows
+else
+    BUILD_OS := $(shell uname 2>/dev/null || echo Unknown)
+    BUILD_OS := $(patsubst MSYS%,MSYS,$(BUILD_OS))
+    BUILD_OS := $(patsubst MINGW%,MSYS,$(BUILD_OS))
+endif
 
 ################################################################################
 # Project build configuration.
@@ -106,9 +117,22 @@ ifneq "$(HCI_UART_MAP)" ""
 PROJ_CFLAGS+=-DHCI_UART_MAP=$(HCI_UART_MAP)
 endif
 
+ifdef ENABLE_SDMA
+ifneq "$(ENABLE_SDMA)" ""
+ifeq "$(ENABLE_SDMA)" "0"
+ENABLE_SDMA=
+else
+ifeq "$(ENABLE_SDMA)" "FALSE"
+ENABLE_SDMA=
+else
+ENABLE_SDMA=1
+endif
+endif
+endif
+endif
+
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DWSF_ASSERT_ENABLE=TRUE
-PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_TRACE_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_DBG_PIN_ENABLED=TRUE
 

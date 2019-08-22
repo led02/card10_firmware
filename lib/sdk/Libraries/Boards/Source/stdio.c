@@ -135,7 +135,7 @@ int _fstat(int file, struct stat *st)
 #if defined ( __GNUC__ )                        // GNUC _read function prototype
 int _read(int file, char *ptr, int len)
 {
-    unsigned int n;
+    int n;
 #elif defined ( __ICCARM__ )                    // IAR Compiler _read function prototype
 int __read(int file, unsigned char *ptr, size_t len)
 {

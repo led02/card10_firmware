@@ -98,6 +98,7 @@ const LlRtCfg_t _ll_cfg = {
 const BbRtCfg_t _bb_cfg = {
     /*clkPpm*/                  20,
     /*rfSetupDelayUsec*/        BB_RF_SETUP_DELAY_US,
+	/*defaultTxPower*/          -10,
     /*maxScanPeriodMsec*/       BB_MAX_SCAN_PERIOD_MS,
     /*schSetupDelayUsec*/       BB_SCH_SETUP_DELAY_US
 };

@@ -104,6 +104,13 @@ static bool_t myTrace(const uint8_t *pBuf, uint32_t len)
 }
 
 /*************************************************************************************************/
+void PalSysAssertTrap(void)
+{
+    printf("Assertion detected\n");
+    while(1) {}
+}
+
+/*************************************************************************************************/
 /*!
  *  \brief  Initialize WSF.
  *

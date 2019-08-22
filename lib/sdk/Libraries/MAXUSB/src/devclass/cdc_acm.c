@@ -400,7 +400,7 @@ static void out_callback(void *cbdata)
 /******************************************************************************/
 static void svc_in_to_host(void *cbdata)
 {
-  int i;
+  unsigned i;
   uint8_t byte;
 
   /* An error will occur when the host has been disconnected.

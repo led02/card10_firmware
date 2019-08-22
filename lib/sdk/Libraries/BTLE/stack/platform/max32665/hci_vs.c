@@ -70,8 +70,8 @@
 // #define HCI_OPCODE_VS_GET_AUX_SCAN_STATS        HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DB)  /*!< Get Auxiliary Scanning Statistics opcode. */
 // #define HCI_OPCODE_VS_GET_PER_SCAN_STATS        HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DC)  /*!< Get Periodic Scanning Statistics opcode. */
 
-#define HCI_OPCODE_VS_SET_DEF_TX_POWER           HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DD)  /*!< Set default transmit power. */
-#define HCI_OPCODE_VS_CALIBRATE                    HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DE)  /*!< Run AFE calibration. */
+#define HCI_OPCODE_VS_SET_DEF_TX_POWER         HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DD)  /*!< Set default transmit power. */
+#define HCI_OPCODE_VS_CALIBRATE                HCI_OPCODE(HCI_OGF_VENDOR_SPEC, 0x3DE)  /*!< Run AFE calibration. */
 
 /*************************************************************************************************/
 /*!

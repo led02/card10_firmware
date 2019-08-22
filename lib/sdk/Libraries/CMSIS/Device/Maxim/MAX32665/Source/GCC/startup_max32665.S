@@ -213,6 +213,32 @@ __isr_vector:
 Reset_Handler:
 
 
+#ifdef  ECC_INIT_ATSTARTUP
+    //
+    // Enable ECC for System RAM - this must run before the first stack or SRAM operation
+    //
+    /* Turn on ECC for all banks */
+    ldr r0, =0x40006C00                   // 0x40006C00=Addr:MXC_BASE_MCR
+    ldr r1, [r0, #0x00000000]             // 0x00000000=Addr:MXC_R_MCR_ECCEN
+    orr r1, r1, #0x3F
+    str r1, [r0, #0x00000000]             // 0x00000000=Addr:MXC_R_MCR_ECCEN
+
+    /* Zeroize all banks, which ensures ECC bits are written for no errors */
+    ldr r0, =0x40000000                   // 0x40000000=Addr:MXC_BASE_GCR
+    ldr r1, [r0, #0x0000002C]             // 0x0000002C=Addr:MXC_R_GCR_MEMZCN
+    orr r1, r1, #0x3F
+    str r1, [r0, #0x0000002C]             // 0x0000002C=Addr:MXC_R_GCR_MEMZCN
+
+    /* wait till complete */
+ecc_loop: ldr r1, [r0, #0x0000002C]       // 0x0000002C=Addr:MXC_R_GCR_MEMZCN
+         cmp r1, #0
+         beq ecc_init_exit
+         b ecc_loop;
+
+ecc_init_exit:
+
+#endif
+
 
     ldr r0, =__StackTop
     mov sp, r0

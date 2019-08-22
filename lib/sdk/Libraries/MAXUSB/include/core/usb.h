@@ -397,4 +397,13 @@ int usb_write_endpoint(usb_req_t *req);
  */
 int usb_read_endpoint(usb_req_t *req);
 
+/** 
+ * @brief Instruct hardware to transmit test mode pattern (USB 2.0 High Speed only)
+ * @detail See Universal Serial Bus Specification Revision 2.0 Section 7.1.20 for details
+ * @param value Test mode selector
+ * @return -1 if selected test mode is not supported, 0 otherwise
+ *
+ */
+int usb_test_mode(unsigned int value);
+
 #endif /* _USB_H_ */

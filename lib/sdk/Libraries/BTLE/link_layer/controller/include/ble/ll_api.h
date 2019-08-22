@@ -230,6 +230,7 @@ enum
   LL_FEAT_CH_SEL_2                    = (1 << 14),  /*!< Channel Selection Algorithm #2 supported. */
   LL_FEAT_LE_POWER_CLASS_1            = (1 << 15),  /*!< LE Power Class 1 supported. */
   LL_FEAT_MIN_NUM_USED_CHAN           = (1 << 16),  /*!< Minimum Number of Used Channels supported. */
+  LL_FEAT_REMOTE_PUB_KEY_VALIDATION   = (1 << 27),  /*!< Remote public key validation is supported. */
   /* --- */
   LL_FEAT_ALL_MASK                    = 0x1FFFF     /*!< All feature mask, need to be updated when new features are added. */
 };

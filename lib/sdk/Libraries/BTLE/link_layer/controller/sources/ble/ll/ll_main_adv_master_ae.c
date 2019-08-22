@@ -392,6 +392,12 @@ uint8_t LlAddDeviceToPeriodicAdvList(const LlDevicePerAdvList_t *pParam)
   }
 
   addr = BstreamToBda64(pParam->pAdvAddr);
+  // Invalid if device is already in list
+  if (BbBlePeriodicListCheckAddr(pParam->advAddrType, addr, pParam->advSID))
+  {
+    return LL_ERROR_CODE_INVALID_HCI_CMD_PARAMS;
+  }
+
   if (!BbBlePeriodicListAdd(pParam->advAddrType, addr, pParam->advSID))
   {
     return LL_ERROR_CODE_MEM_CAP_EXCEEDED;

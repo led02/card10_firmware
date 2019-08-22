@@ -664,7 +664,8 @@ static void I2C_MasterHandler(mxc_i2c_regs_t *i2c)
 {
 
     uint32_t int0, inten0 = 0;
-    int rx_remain, tx_remain, i2c_num;
+    int i2c_num;
+    unsigned rx_remain, tx_remain;
     i2c_req_t *req;
 
     i2c_num = MXC_I2C_GET_IDX(i2c);

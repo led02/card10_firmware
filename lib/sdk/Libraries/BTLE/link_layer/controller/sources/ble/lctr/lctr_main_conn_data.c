@@ -475,8 +475,10 @@ void lctrTxDataPduQueue(lctrConnCtx_t *pCtx, uint16_t fragLen, lctrAclHdr_t *pAc
 {
   uint16_t fragOffset = 0;
   uint16_t aclLen = pAclHdr->len;
+#ifdef LCTR_CONN_NO_TIFS_REASSEMBLY
   uint8_t *pData;
   uint8_t *pAclBufStart;
+#endif
 
   lctrTxBufDesc_t *pDesc;
 

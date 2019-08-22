@@ -4,9 +4,5 @@
 # Set to 0 to use 5.0 extended advertisements.
 BTLE_APP_USE_LEGACY_API?=1
 
-# UART used for console output.
-# 1 by default.
-CONSOLE_UART?=1
-
 # Run link layer using SDMA.
 ENABLE_SDMA?=0

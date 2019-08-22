@@ -1,3 +1,15 @@
+###### Changes in version 0.2.1-5 #############################################
+* Removed the CONSOLE_UART override in the config.mk files for BLE.
+* Addressed an issue with the BLE scanning apps that was causing a hard fault.
+* Added board support files for the MAX66900 and FTHR boards.
+* Made cmsis-dap the default debugger for the BLE apps.
+* Added configuration option to enable ECC.  Adjusted the example to use the
+  configuration option instead of setting up the ECC in the PreInit function.
+* Fixed bug in mxc_delay when dealing with very small delay times.
+* Fixed bug in SDHC code that affected asynchronous operations.
+* Fixed bug in SDHC_Lib_GetCapacity function.
+* Added a function to USB code to transmit test pattern.
+
 ###### Changes in version 0.2.1-2 #############################################
 * Resolved parser errors when importing projects into Eclipse.
 * Added calls to LlGetBdAddr in SetAddress functions of the BLE examples.

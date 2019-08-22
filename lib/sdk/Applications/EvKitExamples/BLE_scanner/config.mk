@@ -7,9 +7,8 @@ BTLE_APP_USE_LEGACY_API?=1
 # Specifies whether scan requests should be transmitted.
 BTLE_APP_USE_ACTIVE_SCANNING?=1
 
-# UART used for console output.
-# 1 by default.
-CONSOLE_UART?=1
+# Specifies whether whitelisting should be enabled.
+BTLE_APP_ENABLE_WHITELIST?=0
 
 # Run link layer using SDMA.
 ENABLE_SDMA?=0

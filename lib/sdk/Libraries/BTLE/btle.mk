@@ -29,7 +29,7 @@
 # property whatsoever. Maxim Integrated Products, Inc. retains all
 # ownership rights.
 #
-# $Id: btle.mk 44576 2019-07-11 21:30:22Z kevin.gillespie $
+# $Id: btle.mk 45434 2019-08-14 18:28:59Z kevin.gillespie $
 #
 ################################################################################
 
@@ -44,137 +44,91 @@ endif
 TARGET_UC:=$(shell echo $(TARGET) | tr a-z A-Z)
 TARGET_LC:=$(shell echo $(TARGET) | tr A-Z a-z)
 
-CORDIO_DIR := $(abspath $(CORDIO_DIR))
-CORDIO_PATH = ${CORDIO_DIR}
+ROOT_DIR            := $(abspath $(CORDIO_DIR))
+CORDIO_PATH          = ${ROOT_DIR}
 
-# WSF (RTOS)
-CORDIO_PATH += ${CORDIO_DIR}/wsf
-CORDIO_PATH += ${CORDIO_DIR}/wsf/include
-CORDIO_PATH += ${CORDIO_DIR}/wsf/include/util
-CORDIO_PATH += ${CORDIO_DIR}/wsf/sources
-CORDIO_PATH += ${CORDIO_DIR}/wsf/sources/util
-CORDIO_PATH += ${CORDIO_DIR}/wsf/sources/port
-CORDIO_PATH += ${CORDIO_DIR}/wsf/sources/port/baremetal
+LINKLAYER_DIR       := ${ROOT_DIR}/link_layer
+LINKLAYER_BUILD_DIR := ${LINKLAYER_DIR}/build
+LINKLAYER_LIB_DIR   := ${LINKLAYER_BUILD_DIR}/library
+LINKLAYER_LIB       := ${LINKLAYER_LIB_DIR}/liblinklayer.a
 
-# Stack (Host and Application Profile)
-CORDIO_PATH += ${CORDIO_DIR}/stack
-CORDIO_PATH += ${CORDIO_DIR}/stack/platform
-CORDIO_PATH += ${CORDIO_DIR}/stack/platform/${TARGET_LC}
-CORDIO_PATH += ${CORDIO_DIR}/stack/platform/include
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/include
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/include/app
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/apps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/apps/app
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/apps/app/common
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/anpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/bas
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/blpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/blps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/cpp
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/cscp
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/dis
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/fmpl
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/gap
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/gatt
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/glpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/glps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/hid
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/hrpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/hrps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/htpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/htps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/include
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/paspc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/plxpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/plxps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/rscp
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/scpps
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/sensor
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/tipc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/udsc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/uribeacon
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/wdxc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/wdxs
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/wpc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/profiles/wspc
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/sources/services
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-profiles/build
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/include
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/sec
-# CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/sec/pal
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/sec/common
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/hci
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/hci/dual_chip
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/hci/common
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/att
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/l2c
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/hci
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/smp
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/dm
-CORDIO_PATH += ${CORDIO_DIR}/stack/ble-host/sources/stack/cfg
+STACK_DIR           := ${ROOT_DIR}/stack
+STACK_BUILD_DIR     := ${STACK_DIR}/build
+STACK_LIB_DIR       := ${STACK_BUILD_DIR}/library
+STACK_LIB           := ${STACK_LIB_DIR}/libstack.a
 
-# Link Layer
-CORDIO_PATH += ${CORDIO_DIR}/link_layer
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/${TARGET_LC}
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/include
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/sources
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/sources/chci
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/sources/bb
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/sources/bb/ble
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/platform/common/sources/ll
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/include
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/include/common
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/include/ble
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/common
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/common/bb
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/common/sch
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/lhci
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/init
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/bb
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/sch
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/include
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/ll
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/lmgr
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/controller/sources/ble/lctr
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/thirdparty
-CORDIO_PATH += ${CORDIO_DIR}/link_layer/thirdparty/uecc
+WSF_DIR             := ${ROOT_DIR}/wsf
+WSF_BUILD_DIR       := ${WSF_DIR}/build
+WSF_LIB_DIR         := ${WSF_BUILD_DIR}/library
+WSF_LIB             := ${WSF_LIB_DIR}/libwsf.a
+
+# Add to libraries list
+LIBS += $(LINKLAYER_LIB)
+LIBS += $(STACK_LIB)
+LIBS += $(WSF_LIB)
+LIBS += $(notdir $(wildcard $(ROOT_DIR)/cordio-phy.a))
 
 # Physical Layer
-CORDIO_PATH += ${CORDIO_DIR}/phy
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/shared
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble/pan2g5
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble/pan2g5/include
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble/pan2g5/afe
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble/pan2g5/afe/${TARGET_LC}
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/prot/ble/pan2g5/afe/${TARGET_LC}/include
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/control
-CORDIO_PATH += ${CORDIO_DIR}/phy/dbb/control/pan
-CORDIO_PATH += ${CORDIO_DIR}/phy/bb
-CORDIO_PATH += ${CORDIO_DIR}/phy/debug
-CORDIO_PATH += ${CORDIO_DIR}/phy/include
-CORDIO_PATH += ${CORDIO_DIR}/phy/llc
-CORDIO_PATH += ${CORDIO_DIR}/phy/llc/shared
-CORDIO_PATH += ${CORDIO_DIR}/phy/llc/ble
+CORDIO_PATH += ${ROOT_DIR}/phy
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/shared
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble/pan2g5
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble/pan2g5/include
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble/pan2g5/afe
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble/pan2g5/afe/${TARGET_LC}
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/prot/ble/pan2g5/afe/${TARGET_LC}/include
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/control
+CORDIO_PATH += ${ROOT_DIR}/phy/dbb/control/pan
+CORDIO_PATH += ${ROOT_DIR}/phy/bb
+CORDIO_PATH += ${ROOT_DIR}/phy/debug
+CORDIO_PATH += ${ROOT_DIR}/phy/include
+CORDIO_PATH += ${ROOT_DIR}/phy/llc
+CORDIO_PATH += ${ROOT_DIR}/phy/llc/shared
+CORDIO_PATH += ${ROOT_DIR}/phy/llc/ble
 
 # Add to source directory list
 VPATH += ${CORDIO_PATH}
 
 # Add to include directory list
 IPATH += ${CORDIO_PATH}
+
+# Add Link Layer include paths
+IPATH += ${ROOT_DIR}/link_layer/platform/common/include
+IPATH += ${ROOT_DIR}/link_layer/controller/include/ble
+IPATH += ${ROOT_DIR}/link_layer/controller/include/common
+IPATH += ${ROOT_DIR}/link_layer/controller/sources/ble/include
+
+# Add Stack include paths
+IPATH += ${ROOT_DIR}/stack/platform/$(TARGET_LC)
+IPATH += ${ROOT_DIR}/stack/ble-host/sources/stack/cfg
+IPATH += ${ROOT_DIR}/stack/ble-host/include
+IPATH += ${ROOT_DIR}/stack/ble-host/sources/stack/hci
+IPATH += ${ROOT_DIR}/stack/ble-host/sources/hci/dual_chip
+IPATH += ${ROOT_DIR}/stack/ble-profiles/include/app
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/app
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/cycling
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/datc
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/dats
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/fit
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/gluc
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/hidapp
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/medc
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/meds
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/sensor
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/tag
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/uribeacon
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/watch
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/apps/wdxs
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/services
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/profiles
+IPATH += ${ROOT_DIR}/stack/ble-profiles/sources/profiles/include
+
+# Add WSF include paths
+IPATH += ${ROOT_DIR}/wsf/include
+IPATH += ${ROOT_DIR}/wsf/include/util
 
 # Add sources
 ifneq "$(CORDIO_PATH_FILTER)" ""
@@ -183,6 +137,22 @@ else
 BTLE_SRCS := $(notdir $(foreach dir, $(CORDIO_PATH), $(wildcard $(dir)/*.c)))
 endif
 
+# Add configurable sources
+BTLE_SRCS += hci_drv_sdma.c
+BTLE_SRCS += hci_drv.c
+BTLE_SRCS += hci_vs.c
+BTLE_SRCS += hci_tr.c
+BTLE_SRCS += lctr_main_tester.c
+BTLE_SRCS += init_ctr.c
+BTLE_SRCS += init_ctr_ext.c
+BTLE_SRCS += init_ext.c
+BTLE_SRCS += init.c
+
+VPATH     += ${ROOT_DIR}/stack/platform/${TARGET_LC}
+VPATH     += ${ROOT_DIR}/link_layer/controller/sources/ble/lctr
+VPATH     += ${ROOT_DIR}/link_layer/controller/sources/ble/init
+
+# Filter sources based on configuration
 FILTERED_SRCS :=
 ifeq ($(ENABLE_LL_TESTER),)
 FILTERED_SRCS+=lctr_main_tester.c
@@ -194,14 +164,26 @@ ifeq ($(ENABLE_SDMA),)
 FILTERED_SRCS+=hci_drv_sdma.c
 else
 PROJ_CFLAGS+=-DENABLE_SDMA=TRUE
-PROJ_AFLAGS +=-D__SDMA_SIZE=0x40000
 FILTERED_SRCS+=hci_drv.c
+
+ifeq ($(SDMA_ADV),)
+ifeq ($(SDMA_SCN),)
+PROJ_AFLAGS +=-D__SDMA_SIZE=0x2E000
+endif
+endif
+
+ifneq ($(SDMA_ADV),)
+PROJ_CFLAGS+=-DSDMA_ADV=TRUE
+PROJ_AFLAGS +=-D__SDMA_SIZE=0x20800 # Adv/Slave only
+endif
+
+ifneq ($(SDMA_SCN),)
+PROJ_CFLAGS+=-DSDMA_SCN=TRUE
+PROJ_AFLAGS +=-D__SDMA_SIZE=0x27800 # Scan/Master only
+endif
 endif
 
 SRCS+=$(filter-out $(FILTERED_SRCS),$(BTLE_SRCS))
-
-# Add object files.
-LIBS += $(notdir $(wildcard $(CORDIO_DIR)/cordio-phy.a))
 
 # Add definitions
 PROJ_CFLAGS+=-DLHCI_ENABLE_VS=TRUE
@@ -210,3 +192,32 @@ PROJ_CFLAGS+=-DLCTR_CONN_NO_TIFS_REASSEMBLY=1
 PROJ_CFLAGS+=-DBB_ENABLE_INLINE_ENC_TX=1
 PROJ_CFLAGS+=-DBB_ENABLE_INLINE_DEC_RX=1
 PROJ_CFLAGS+=-DFORCE_PMU_WAKEUP=1
+PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=1
+
+# Build libraries
+export ROOT_DIR
+export PROJ_CFLAGS
+export IPATH
+
+include ${LINKLAYER_BUILD_DIR}/sources_ll.mk
+${LINKLAYER_LIB}: ${LINKLAYER_C_FILES} ${LINKLAYER_H_FILES}
+	$(MAKE) -C ${LINKLAYER_BUILD_DIR} lib
+
+include ${STACK_BUILD_DIR}/sources_stack.mk
+${STACK_LIB}: ${STACK_C_FILES} ${STACK_H_FILES}
+	$(MAKE) -C ${STACK_BUILD_DIR} lib
+
+include ${WSF_BUILD_DIR}/sources_wsf.mk
+${WSF_LIB}: ${WSF_C_FILES} ${WSF_H_FILES}
+	$(MAKE) -C ${WSF_BUILD_DIR} lib
+
+clean.stack:
+	@rm -rf $(STACK_LIB_DIR)/*
+
+clean.linklayer:
+	@rm -rf $(LINKLAYER_LIB_DIR)/*
+
+clean.wsf:
+	@rm -rf $(WSF_LIB_DIR)/*
+
+clean.ble: clean.stack clean.linklayer clean.wsf

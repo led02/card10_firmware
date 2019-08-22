@@ -19,6 +19,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+#ifdef HAVE_ALLOCA
+#include <alloca.h>
+#endif /*  HAVE_ALLOCA */
 #include "wsf_types.h"
 #include "util/bstream.h"
 #include "wsf_msg.h"
@@ -217,7 +221,20 @@ static void scannerScanStop(dmEvt_t *pMsg)
 /*************************************************************************************************/
 static void scannerScanReport(dmEvt_t *pMsg)
 {
-  /* disregard if not scanning */
+  uint8_t *pData;
+
+  uint8_t *pReportName;
+  unsigned int lenPrintName;
+  unsigned int lenReportName;
+  unsigned int iPrintName;
+  unsigned int iReportName;
+#ifdef HAVE_ALLOCA
+  char * strPrintName;
+#else /* HAVE_ALLOCA */
+  char strPrintName[32];
+#endif /* HAVE_ALLOCA */
+
+   /* disregard if not scanning */
   if (!scannerCb.scanning)
   {
     return;
@@ -232,6 +249,71 @@ static void scannerScanReport(dmEvt_t *pMsg)
                                                                   pMsg->scanReport.addr[0]);
 
   printf("  len %u, rssi %d, evtType %x, addrType %x\n", pMsg->scanReport.len, pMsg->scanReport.rssi, pMsg->scanReport.eventType, pMsg->scanReport.addrType);
+
+  /* search for the friendly name. */
+  pData = NULL;
+  if ((pMsg->scanReport.pData != NULL) && (pMsg->scanReport.len > 0))
+  {
+    pData = DmFindAdType(DM_ADV_TYPE_LOCAL_NAME,
+        pMsg->scanReport.len, pMsg->scanReport.pData);
+
+    if (pData == NULL)
+    {
+      pData = DmFindAdType(DM_ADV_TYPE_SHORT_NAME,
+          pMsg->scanReport.len, pMsg->scanReport.pData);
+    }
+  }
+
+  /* if the device has a friendly name, print friendly name in report. */
+  if (pData != NULL && pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  {
+    /* Where is and how long is the name as stored in the report. */
+    pReportName = &pData[2];
+    lenReportName = pData[0];
+
+    // Don't count type byte.
+    if (lenReportName > 0) lenReportName --;
+
+    // How long is the printed copy of the friendly name?
+#ifdef HAVE_ALLOCA
+    lenPrintName = lenReportName;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (!isprint(pReportName[iReportName]))
+        lenPrintName += 3; // strlen("\\x0");
+    }
+#else /* HAVE_ALLOCA */
+    lenPrintName = sizeof(strPrintName) - 1;
+#endif /* HAVE_ALLOCA */
+
+    // Allocate/initialize name string.
+#ifdef HAVE_ALLOCA
+    strPrintName = alloca(lenPrintName + 1); // + 1 for terminating null.
+#endif /* HAVE_ALLOCA */
+    strPrintName[lenPrintName] = (char)0;
+
+    // Copy friendly name.
+    iPrintName = 0;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (isprint(pReportName[iReportName]))
+      {
+        strPrintName[iPrintName ++] = pReportName[iReportName];
+      }
+      else
+      {
+        snprintf(&strPrintName[iPrintName], (lenPrintName - iPrintName), "\\x%02X", pReportName[iReportName]);
+        iPrintName += 4; // strlen("\\x0");
+      }
+    }
+    if (iPrintName < lenPrintName)
+      strPrintName[iPrintName ++] = (uint8_t)0;
+    printf(" | \"%s\"\n", strPrintName);
+  }
+  /* otherwise, don't print anything but a newline. */
+  else {
+    printf("\n");
+  }
 }
 
 #ifndef BTLE_APP_IGNORE_EXT_EVENTS
@@ -246,21 +328,131 @@ static void scannerScanReport(dmEvt_t *pMsg)
 /*************************************************************************************************/
 static void scannerExtScanReport(dmEvt_t *pMsg)
 {
+  uint8_t *pData;
+
+  bdAddr_t nullAddr;
+
+  uint8_t *pReportName;
+  unsigned int lenPrintName;
+  unsigned int lenReportName;
+  unsigned int iPrintName;
+  unsigned int iReportName;
+#ifdef HAVE_ALLOCA
+  char * strPrintName;
+#else /* HAVE_ALLOCA */
+  char strPrintName[32];
+#endif /* HAVE_ALLOCA */
+
   /* disregard if not scanning */
   if (!scannerCb.scanning)
   {
     return;
   }
 
-  printf("scannerExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x", pMsg->extScanReport.addrType,
-                                                                      pMsg->extScanReport.addr[5],
-                                                                      pMsg->extScanReport.addr[4],
-                                                                      pMsg->extScanReport.addr[3],
-                                                                      pMsg->extScanReport.addr[2],
-                                                                      pMsg->extScanReport.addr[1],
-                                                                      pMsg->extScanReport.addr[0]);
+  memset(&nullAddr[0], (uint8_t)0, sizeof(nullAddr)); 
 
-  printf("  len %u, rssi %d, evtType %x, addrType %x\n", pMsg->extScanReport.len, pMsg->extScanReport.rssi, pMsg->extScanReport.eventType, pMsg->extScanReport.addrType);
+  if (memcmp(&pMsg->extScanReport.directAddr[0], &nullAddr[0], sizeof(nullAddr)) != 0)
+  {
+    printf("scannerExtScanReport() <anonymous>");
+  }
+  else
+  {
+    printf("scannerExtScanReport() %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->extScanReport.addrType,
+        pMsg->extScanReport.addr[5],
+        pMsg->extScanReport.addr[4],
+        pMsg->extScanReport.addr[3],
+        pMsg->extScanReport.addr[2],
+        pMsg->extScanReport.addr[1],
+        pMsg->extScanReport.addr[0]);
+  }
+
+  if (memcmp(&pMsg->extScanReport.directAddr[0], &nullAddr[0], sizeof(nullAddr)) != 0)
+  {
+    printf(" -> %x : %02x:%02x:%02x:%02x:%02x:%02x",
+        pMsg->extScanReport.directAddrType,
+        pMsg->extScanReport.directAddr[5],
+        pMsg->extScanReport.directAddr[4],
+        pMsg->extScanReport.directAddr[3],
+        pMsg->extScanReport.directAddr[2],
+        pMsg->extScanReport.directAddr[1],
+        pMsg->extScanReport.directAddr[0]);
+  }
+  //printf("  priPhy %u,", pMsg->extScanReport.priPhy);
+  //printf("  secPhy %u,", pMsg->extScanReport.secPhy);
+  //printf("  advSid 0x%02x,", pMsg->extScanReport.advSid);
+  //printf("  txPower %i,", pMsg->extScanReport.txPower);
+  //printf("  perAdvInter %i,", pMsg->extScanReport.perAdvInter);
+  //printf("  directAddrType %x,", pMsg->extScanReport.directAddrType);
+  printf("  len %u,", pMsg->extScanReport.len);
+  printf("  rssi %d,", pMsg->extScanReport.rssi);
+  printf("  evtType %x,", pMsg->extScanReport.eventType);
+  printf("  addrType %x,", pMsg->extScanReport.addrType);
+  printf("\n");
+
+  /* search for the friendly name. */
+  pData = NULL;
+  if ((pMsg->extScanReport.pData != NULL) && (pMsg->extScanReport.len > 0))
+  {
+    pData = DmFindAdType(DM_ADV_TYPE_LOCAL_NAME,
+        pMsg->extScanReport.len, pMsg->extScanReport.pData);
+    if (pData == NULL)
+    {
+      pData = DmFindAdType(DM_ADV_TYPE_SHORT_NAME,
+          pMsg->extScanReport.len, pMsg->extScanReport.pData);
+    }
+  }
+
+  /* if the device has a friendly name, print friendly name in report. */
+  if (pData != NULL && pData[1] == DM_ADV_TYPE_LOCAL_NAME)
+  {
+    /* Where is and how long is the name as stored in the report. */
+    pReportName = &pData[2];
+    lenReportName = pData[0];
+
+    // Don't count type byte.
+    if (lenReportName > 0) lenReportName --;
+
+    // How long is the printed copy of the friendly name?
+#ifdef HAVE_ALLOCA
+    lenPrintName = lenReportName;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (!isprint(pReportName[iReportName]))
+        lenPrintName += 3; // strlen("\\x0");
+    }
+#else /* HAVE_ALLOCA */
+    lenPrintName = sizeof(strPrintName) - 1;
+#endif /* HAVE_ALLOCA */
+
+    // Allocate/initialize name string.
+#ifdef HAVE_ALLOCA
+    strPrintName = alloca(lenPrintName + 1); // + 1 for terminating null.
+#endif /* HAVE_ALLOCA */
+    strPrintName[lenPrintName] = (char)0;
+
+    // Copy friendly name.
+    iPrintName = 0;
+    for (iReportName = 0; iReportName < lenReportName; iReportName ++)
+    {
+      if (isprint(pReportName[iReportName]))
+      {
+        strPrintName[iPrintName ++] = pReportName[iReportName];
+      }
+      else
+      {
+        snprintf(&strPrintName[iPrintName], (lenPrintName - iPrintName), "\\x%02X", pReportName[iReportName]);
+        iPrintName += 4; // strlen("\\x0");
+      }
+    }
+    if (iPrintName < lenPrintName)
+      strPrintName[iPrintName ++] = (uint8_t)0;
+    printf(" | \"%s\"\n", strPrintName);
+  }
+  /* otherwise, don't print anything but a newline. */
+  else {
+    printf("\n");
+  }
 }
 #endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
@@ -282,7 +474,7 @@ static void scannerSetup(dmEvt_t *pMsg)
   WsfTimerStartMs(&testCb.timer, 1000);
 
   /* If this is defined to one, scanning will be limited to the peer */
-#if 0
+#ifdef BTLE_APP_ENABLE_WHITELIST
   DmDevWhiteListAdd(DM_ADDR_PUBLIC, (bdAddr_t){0x02, 0x00, 0x44, 0x8B, 0x05, 0x00});
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_SCAN, HCI_FILT_WHITE_LIST);
   DmDevSetFilterPolicy(DM_FILT_POLICY_MODE_INIT, HCI_FILT_WHITE_LIST);

@@ -73,7 +73,7 @@ static volatile uint8_t *get_fifo_ptr(unsigned int ep)
     return (volatile uint8_t *)ptr;
 }
 
-static void load_fifo(volatile uint8_t *fifoptr, uint8_t *dataptr, unsigned int len)
+static void load_fifo(volatile uint8_t *fifoptr, const uint8_t *dataptr, unsigned int len)
 {
     volatile uint32_t *fifoptr_32 = (uint32_t *)fifoptr;
     uint32_t *dataptr_32 = (uint32_t *)dataptr;
@@ -699,7 +699,7 @@ void usb_irq_handler(maxusb_usbio_events_t *evt)
 
     /* Map hardware-specific signals to generic stack events */
     evt->dpact  = !!(usb_flags & MXC_F_USBHS_INTRUSB_SOF_INT);
-    evt->rwudn  = 0;
+    evt->rwudn  = 0; /* Not supported by this hardware */
     evt->bact   = !!(usb_flags & MXC_F_USBHS_INTRUSB_SOF_INT);
     evt->brst   = !!(usb_flags & MXC_F_USBHS_INTRUSB_RESET_INT);
     evt->susp   = !!(usb_flags & MXC_F_USBHS_INTRUSB_SUSPEND_INT);
@@ -881,10 +881,7 @@ int usb_get_setup(usb_setup_pkt *sud)
     MXC_USBHS->index = 0;
 
     if ((sud == NULL) || !(MXC_USBHS->csr0 & MXC_F_USBHS_CSR0_OUTPKTRDY)) {
-#if MAXUSB_DEBUG
-        printf("MAXUSB ISSUE 3\n");
-#endif
-        MAXUSB_EXIT_CRITICAL();
+	MAXUSB_EXIT_CRITICAL();
         return -1;
     }
 
@@ -986,7 +983,7 @@ int usb_write_endpoint(usb_req_t *req)
     /* clear errors */
     req->error_code = 0;
 
-    /* Determine if DMA can be used for this transmit */
+    /* Placeholder for DMA code */
     armed = 0;
 
     if (!armed) {
@@ -1063,13 +1060,13 @@ int usb_read_endpoint(usb_req_t *req)
     /* Select endpoint */
     MXC_USBHS->index = ep;
 
-    /* Since the OUT interrupt for EP 0 doesn't really exist, only do this logic for other endpoints */
+    /* Since the OUT interrupt for EP 0 doesn't really exist, only do this for others */
     if (ep) {
-
+	/* Placeholder for DMA code */
 	armed = 0;
         
         if (!armed) {
-            /* EP0 or no free DMA channel found, fall back to PIO */
+	    /* No free DMA channel found, fall back to PIO */
             
             /* See if data already in FIFO for this EP */
             if (MXC_USBHS->outcsrl & MXC_F_USBHS_OUTCSRL_OUTPKTRDY) {
@@ -1087,7 +1084,7 @@ int usb_read_endpoint(usb_req_t *req)
             
 
                 if ((req->type == MAXUSB_TYPE_PKT) || (req->actlen == req->reqlen)) {
-                    /* Done */
+		    /* Done with request, callback fires if configured */
                     MAXUSB_EXIT_CRITICAL();
                     
                     usb_request[ep] = NULL;
@@ -1095,27 +1092,23 @@ int usb_read_endpoint(usb_req_t *req)
                     if (req->callback) {
                         req->callback(req->cbdata);
                     }
-                    
+#if MAXUSB_DEBUG
+                    printf("MAXUSB ISSUE 4\n");
+#endif
+                    MAXUSB_EXIT_CRITICAL();
+		    return 0;
                 } else {
 		    /* Not done, more data requested */
                     MXC_USBHS->introuten |= (1 << ep);
-
-                    MAXUSB_EXIT_CRITICAL();
                 }
             } else {
                 /* No data, will need an interrupt to service later */
                 MXC_USBHS->introuten |= (1 << ep);
-
-                MAXUSB_EXIT_CRITICAL();
             }
         }
-    } else {
-#if MAXUSB_DEBUG
-        printf("MAXUSB ISSUE 2\n");
-#endif
-        MAXUSB_EXIT_CRITICAL();
     }
 
+    MAXUSB_EXIT_CRITICAL();
     return 0;
 }
 
@@ -1126,4 +1119,43 @@ void usb_remote_wakeup(void)
         driver_opts.delay_us(10000);
         MXC_USBHS->power &= ~MXC_F_USBHS_POWER_RESUME;
     }
+}
+
+int usb_test_mode(unsigned int value)
+{
+    const uint8_t test_packet[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				   0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
+				   0xAA, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE,
+				   0xEE, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+				   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0xBF, 0xDF,
+				   0xEF, 0xF7, 0xFB, 0xFD, 0xFC, 0x7E, 0xBF, 0xDF,
+				   0xEF, 0xF7, 0xFB, 0xFD, 0x7E};
+	
+    switch (value) {
+	case 0x01:
+	    /* Test_J */
+	    MXC_USBHS->testmode = MXC_F_USBHS_TESTMODE_TEST_J;
+	    break;
+	case 0x02:
+	    /* Test_K */
+	    MXC_USBHS->testmode = MXC_F_USBHS_TESTMODE_TEST_K;
+	    break;
+	case 0x03:
+	    /* Test_SE0_NAK */
+	    MXC_USBHS->testmode = MXC_F_USBHS_TESTMODE_TEST_SE0_NAK;
+	    break;
+	case 0x04:
+	    /* Test_Packet */
+	    /* Load EP 0 with data provided by section 11.4 of musbhsfc_pg.pdf */
+	    /* sizeof() considered safe, since we use uint8_t explicitly */
+	    load_fifo(get_fifo_ptr(0), test_packet, sizeof(test_packet));
+	    MXC_USBHS->csr0 |= MXC_F_USBHS_CSR0_INPKTRDY;
+	    MXC_USBHS->testmode = MXC_F_USBHS_TESTMODE_TEST_PKT;
+	    break;
+	default:
+	    /* Unsupported */
+	    return -1;
+    }
+
+    return 0;
 }

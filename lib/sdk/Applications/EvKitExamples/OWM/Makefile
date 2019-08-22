@@ -57,11 +57,11 @@ BOARD=EvKit_V1
 endif
 
 # This is the path to the CMSIS root directory
-#ifeq "$(MAXIM_PATH)" ""
+ifeq "$(MAXIM_PATH)" ""
 LIBS_DIR=../../../Libraries
-#else
+else
 LIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Firmware/$(TARGET_UC)/Libraries)
-#endif
+endif
 CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
 # Source files for this test (add path to VPATH below)

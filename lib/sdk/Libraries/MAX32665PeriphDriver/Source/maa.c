@@ -141,7 +141,7 @@ int MAA_Shutdown(void)
 int MAA_Compute(tpu_maa_clcsel_t clc, char *multiplier, char *multiplicand, char *exp, char *mod,
                 int *result, unsigned int len)
 {
-    int i;
+    unsigned i;
     
     // Check that we're performing a valid operation
     if (clc >= 0x6) {

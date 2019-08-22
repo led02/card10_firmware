@@ -41,6 +41,11 @@
   Macros
 **************************************************************************************************/
 
+// Defined in dm_adv_ae.c
+#define DM_ADV_SCANNABLE(advType)           (((advType) == DM_ADV_CONN_UNDIRECT)      || \
+                                             ((advType) == DM_ADV_SCAN_UNDIRECT)      || \
+                                             ((advType) == DM_EXT_ADV_SCAN_DIRECT))
+
 /**************************************************************************************************
   Configurable Parameters
 **************************************************************************************************/
@@ -95,18 +100,47 @@ static const uint8_t beaconAdvDataDisc[] =
 static const uint8_t beaconScanDataDisc[] =
 {
   /*! device name */
-  8,                                      /*! length */
+  13,                                     /*! length */
   DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
-  'D',
+  'M',
   'a',
-  't',
-  's',
+  'x',
+  'i',
+  'm',
   ' ',
-  'T',
-  'X'
+  'B',
+  'e',
+  'a',
+  'c',
+  'o',
+  'n'
 };
 
 #else /* BTLE_APP_USE_LEGACY_API */
+
+#if (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE)))
+
+static const uint8_t beaconExtScanDataDisc[] =
+{
+  /*! device name */
+  13,                                    /*! length */
+  DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
+  'M',
+  'a',
+  'x',
+  'i',
+  'm',
+  ' ',
+  'B',
+  'e',
+  'a',
+  'c',
+  'o',
+  'n'
+};
+
+#else /* (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE))) */
+
 /*! extended advertising and scan data, discoverable mode */
 static const uint8_t beaconExtAdvDataDisc[] =
 {
@@ -122,30 +156,54 @@ static const uint8_t beaconExtAdvDataDisc[] =
   UINT16_TO_BYTES(HCI_ID_ARM),            /*! company ID */
 
   /*! device name */
-  8,                                     /*! length */
+  13,                                     /*! length */
   DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
-  'D',
+  'M',
   'a',
-  't',
-  's',
+  'x',
+  'i',
+  'm',
   ' ',
-  'T',
-  'X'
+  'B',
+  'e',
+  'a',
+  'c',
+  'o',
+  'n'
 };
 
-static const uint8_t beaconExtScanDataDisc[] =
+#endif /* (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE))) */
+
+#ifdef BTLE_APP_ENABLE_PERIODIC
+static const uint8_t beaconPerAdvData[] =
 {
   /*! device name */
-  8,                                     /*! length */
+  22,                                    /*! length */
   DM_ADV_TYPE_LOCAL_NAME,                 /*! AD type */
-  'D',
+  'M',
   'a',
-  't',
-  's',
+  'x',
+  'i',
+  'm',
   ' ',
-  'T',
-  'X'
+  'P',
+  'e',
+  'r',
+  'i',
+  'o',
+  'd',
+  'i',
+  'c',
+  ' ',
+  'B',
+  'e',
+  'a',
+  'c',
+  'o',
+  'n'
 };
+
+#endif /* BTLE_APP_ENABLE_PERIODIC */
 
 #endif /* BTLE_APP_USE_LEGACY_API */
 
@@ -211,31 +269,52 @@ void beaconDisplayStackVersion(const char *pVersion)
 static void beaconSetup(dmEvt_t *pMsg)
 {
 #ifndef BTLE_APP_USE_LEGACY_API
-  uint8_t advHandle;
+  uint8_t aAdvHandles[1];
+  const size_t nAdvHandles = (sizeof(aAdvHandles)/sizeof(aAdvHandles[0]));
+#endif /* BTLE_APP_USE_LEGACY_API */
+
+  /* For extended advertisements, select handle. */
+#ifndef BTLE_APP_USE_LEGACY_API
+  aAdvHandles[0] = DM_ADV_HANDLE_DEFAULT;
 #endif /* BTLE_APP_USE_LEGACY_API */
 
   /* Send scannable advertisements. */
-  AppSetAdvType(DM_ADV_SCAN_UNDIRECT);
+#ifdef BTLE_APP_ADV_TYPE
+#ifdef BTLE_APP_USE_LEGACY_API
+  AppSetAdvType(BTLE_APP_ADV_TYPE);
+#else /* BTLE_APP_USE_LEGACY_API */
+  AppExtSetAdvType(aAdvHandles[0], BTLE_APP_ADV_TYPE);
+#endif /* BTLE_APP_USE_LEGACY_API */
+#endif /* BTLE_APP_ADV_TYPE */
 
   /* set advertising and scan response data for discoverable mode */
 #ifdef BTLE_APP_USE_LEGACY_API
   AppAdvSetData(APP_ADV_DATA_DISCOVERABLE, sizeof(beaconAdvDataDisc), (uint8_t *) beaconAdvDataDisc);
   AppAdvSetData(APP_SCAN_DATA_DISCOVERABLE, sizeof(beaconScanDataDisc), (uint8_t *) beaconScanDataDisc);
 #else /* BTLE_APP_USE_LEGACY_API */
-  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_ADV_DATA_DISCOVERABLE, sizeof(beaconExtAdvDataDisc), (uint8_t *) beaconExtAdvDataDisc, HCI_EXT_ADV_DATA_LEN);
-  AppExtAdvSetData(DM_ADV_HANDLE_DEFAULT, APP_SCAN_DATA_DISCOVERABLE, sizeof(beaconExtScanDataDisc), (uint8_t *) beaconExtScanDataDisc, HCI_EXT_ADV_DATA_LEN);
+#if (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE)))
+  AppExtAdvSetData(aAdvHandles[0], APP_SCAN_DATA_DISCOVERABLE, sizeof(beaconExtScanDataDisc), (uint8_t *) beaconExtScanDataDisc, HCI_EXT_ADV_DATA_LEN);
+#else /* (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE))) */
+  AppExtAdvSetData(aAdvHandles[0], APP_ADV_DATA_DISCOVERABLE, sizeof(beaconExtAdvDataDisc), (uint8_t *) beaconExtAdvDataDisc, HCI_EXT_ADV_DATA_LEN);
+#endif /* (defined(BTLE_APP_ADV_TYPE) && (DM_ADV_SCANNABLE(BTLE_APP_ADV_TYPE))) */
 #endif /* BTLE_APP_USE_LEGACY_API */
+
+  /* set periodic advertisement data. */
+#ifdef BTLE_APP_ENABLE_PERIODIC
+  AppPerAdvSetData(aAdvHandles[0], sizeof(beaconPerAdvData), (uint8_t *) beaconPerAdvData, HCI_EXT_ADV_DATA_LEN);
+#endif /* BTLE_APP_ENABLE_PERIODIC */
 
   /* start advertising; automatically set connectable/discoverable mode and bondable mode */
-#ifndef BTLE_APP_USE_LEGACY_API
-  advHandle = DM_ADV_HANDLE_DEFAULT;
-#endif /* BTLE_APP_USE_LEGACY_API */
-
 #ifdef BTLE_APP_USE_LEGACY_API
   AppAdvStart(APP_MODE_DISCOVERABLE);
 #else /* BTLE_APP_USE_LEGACY_API */
-  AppExtAdvStart(1, &advHandle, APP_MODE_DISCOVERABLE);
+  AppExtAdvStart(nAdvHandles, &aAdvHandles[0], APP_MODE_DISCOVERABLE);
 #endif /* BTLE_APP_USE_LEGACY_API */
+
+  /* start periodic advertisements */
+#ifdef BTLE_APP_ENABLE_PERIODIC
+  AppPerAdvStart(aAdvHandles[0]);
+#endif /* BTLE_APP_ENABLE_PERIODIC */
 }
 
 /*************************************************************************************************/
@@ -266,6 +345,10 @@ static void beaconProcMsg(dmEvt_t *pMsg)
     case DM_ADV_SET_START_IND:
       uiEvent = APP_UI_ADV_SET_START_IND;
       break;
+
+    case DM_PER_ADV_SET_START_IND:
+      uiEvent = APP_UI_PER_ADV_SET_START_IND;
+      break;
 #endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 
     case DM_ADV_STOP_IND:
@@ -275,6 +358,10 @@ static void beaconProcMsg(dmEvt_t *pMsg)
 #ifndef BTLE_APP_IGNORE_EXT_EVENTS
      case DM_ADV_SET_STOP_IND:
       uiEvent = APP_UI_ADV_SET_STOP_IND;
+      break;
+
+    case DM_PER_ADV_SET_STOP_IND:
+      uiEvent = APP_UI_PER_ADV_SET_STOP_IND;
       break;
 #endif /* BTLE_APP_IGNORE_EXT_EVENTS */
 

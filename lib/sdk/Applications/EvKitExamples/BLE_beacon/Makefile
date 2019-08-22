@@ -88,6 +88,16 @@ VPATH  = .
 # Where to find header files for this test
 IPATH  = .
 
+##############################################################################
+# OS Check/Utility definitions
+ifeq '$(findstring ;,$(PATH))' ';'
+    BUILD_OS := Windows
+else
+    BUILD_OS := $(shell uname 2>/dev/null || echo Unknown)
+    BUILD_OS := $(patsubst MSYS%,MSYS,$(BUILD_OS))
+    BUILD_OS := $(patsubst MINGW%,MSYS,$(BUILD_OS))
+endif
+
 ################################################################################
 # Project build configuration.
 
@@ -96,15 +106,57 @@ IPATH  = .
 
 ifdef BTLE_APP_USE_LEGACY_API
 ifeq "$(BTLE_APP_USE_LEGACY_API)" ""
+BTLE_APP_USE_LEGACY_API_SPECIFIED=1
 PROJ_CFLAGS+=-DBTLE_APP_USE_LEGACY_API=TRUE
 else
 ifeq "$(BTLE_APP_USE_LEGACY_API)" "0"
+BTLE_APP_USE_LEGACY_API_SPECIFIED=0
 else
 ifeq "$(BTLE_APP_USE_LEGACY_API)" "FALSE"
+BTLE_APP_USE_LEGACY_API_SPECIFIED=0
 else
+BTLE_APP_USE_LEGACY_API_SPECIFIED=1
 PROJ_CFLAGS+=-DBTLE_APP_USE_LEGACY_API=TRUE
 endif
 endif
+endif
+else
+BTLE_APP_USE_LEGACY_API_SPECIFIED=1
+PROJ_CFLAGS+=-DBTLE_APP_USE_LEGACY_API=TRUE
+endif
+
+ifdef BTLE_APP_ENABLE_PERIODIC
+ifeq "$(BTLE_APP_ENABLE_PERIODIC)" ""
+BTLE_APP_ENABLE_PERIODIC_SPECIFIED=0
+else
+ifeq "$(BTLE_APP_ENABLE_PERIODIC)" "0"
+BTLE_APP_ENABLE_PERIODIC_SPECIFIED=0
+else
+ifeq "$(BTLE_APP_ENABLE_PERIODIC)" "FALSE"
+BTLE_APP_ENABLE_PERIODIC_SPECIFIED=0
+else
+BTLE_APP_ENABLE_PERIODIC_SPECIFIED=1
+PROJ_CFLAGS+=-DBTLE_APP_ENABLE_PERIODIC=TRUE
+endif
+endif
+endif
+else
+BTLE_APP_ENABLE_PERIODIC_SPECIFIED=0
+endif
+ifeq "$(BTLE_APP_USE_LEGACY_API_SPECIFIED)" "1"
+ifeq "$(BTLE_APP_ENABLE_PERIODIC_SPECIFIED)" "1"
+$(error Periodic advertising not compatible with legacy API.)
+endif
+endif
+ifneq "$(BTLE_APP_ADV_TYPE)" "DM_ADV_NONCONN_UNDIRECT"
+ifeq "$(BTLE_APP_ENABLE_PERIODIC_SPECIFIED)" "1"
+$(error Periodic advertising not compatible with scannable or connectable modes.)
+endif
+endif
+
+ifdef BTLE_APP_ADV_TYPE
+ifneq "$(BTLE_APP_ADV_TYPE)" ""
+PROJ_CFLAGS+=-DBTLE_APP_ADV_TYPE=$(BTLE_APP_ADV_TYPE)
 endif
 endif
 
@@ -114,30 +166,25 @@ PROJ_CFLAGS+=-DCONSOLE_UART=$(CONSOLE_UART)
 endif
 endif
 
+ENABLE_SDMA_SPECIFIED=0
 ifdef ENABLE_SDMA
 ifneq "$(ENABLE_SDMA)" ""
 ifeq "$(ENABLE_SDMA)" "0"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ifeq "$(ENABLE_SDMA)" "FALSE"
-undefine ENABLE_SDMA
+ENABLE_SDMA=
 else
 ENABLE_SDMA=1
+ENABLE_SDMA_SPECIFIED=1
 endif
 endif
 endif
 endif
 
-ifneq "$(ENABLE_SDMA)" ""
-ifdef BTLE_APP_USE_LEGACY_API
-ifneq "$(BTLE_APP_USE_LEGACY_API)" ""
-ifeq "$(BTLE_APP_USE_LEGACY_API)" "0"
+ifeq "$(ENABLE_SDMA_SPECIFIED)" "1"
+ifeq "$(BTLE_APP_USE_LEGACY_API_SPECIFIED)" "0"
 $(error SDMA currently requires BTLE_APP_USE_LEGACY_API)
-endif
-ifeq "$(BTLE_APP_USE_LEGACY_API)" "FALSE"
-$(error SDMA currently requires BTLE_APP_USE_LEGACY_API)
-endif
-endif
 endif
 endif
 
@@ -149,7 +196,6 @@ endif
 
 # Enable assertion checking for development
 PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE=TRUE
-PROJ_CFLAGS+=-DWSF_TRACE_ENABLED=TRUE
 PROJ_CFLAGS+=-DWSF_ASSERT_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_TRACE_ENABLED=TRUE
 # PROJ_CFLAGS+=-DLL_DBG_PIN_ENABLED=TRUE

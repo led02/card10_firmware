@@ -71,7 +71,7 @@ static const uint8_t *report_desc;
 
 static int (*chained_func)(usb_setup_pkt *, void *);
 static void *chained_cbdata;
-void (*chained_getdesc_func)(usb_setup_pkt *, const uint8_t **, uint16_t *);
+static void (*chained_getdesc_func)(usb_setup_pkt *, const uint8_t **, uint16_t *);
 
 /***** Function Prototypes *****/
 static void getdescriptor(usb_setup_pkt *sud, const uint8_t **desc, uint16_t *desclen);
