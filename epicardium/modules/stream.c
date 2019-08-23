@@ -24,50 +24,63 @@ int stream_init()
 
 int stream_register(int sd, struct stream_info *stream)
 {
+	int ret = 0;
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
 		LOG_WARN("stream", "Lock contention error");
-		return -EBUSY;
+		ret = -EBUSY;
+		goto out;
 	}
 
 	if (sd < 0 || sd >= SD_MAX) {
-		return -EINVAL;
+		ret = -EINVAL;
+		goto out_release;
 	}
 
 	if (stream_table[sd] != NULL) {
 		/* Stream already registered */
-		return -EACCES;
+		ret = -EACCES;
+		goto out_release;
 	}
 
 	stream_table[sd] = stream;
 
+out_release:
 	xSemaphoreGive(stream_table_lock);
-	return 0;
+out:
+	return ret;
 }
 
 int stream_deregister(int sd, struct stream_info *stream)
 {
+	int ret = 0;
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
 		LOG_WARN("stream", "Lock contention error");
-		return -EBUSY;
+		ret = -EBUSY;
+		goto out;
 	}
 
 	if (sd < 0 || sd >= SD_MAX) {
-		return -EINVAL;
+		ret = -EINVAL;
+		goto out_release;
 	}
 
 	if (stream_table[sd] != stream) {
 		/* Stream registered by someone else */
-		return -EACCES;
+		ret = -EACCES;
+		goto out_release;
 	}
 
 	stream_table[sd] = NULL;
 
+out_release:
 	xSemaphoreGive(stream_table_lock);
-	return 0;
+out:
+	return ret;
 }
 
 int epic_stream_read(int sd, void *buf, size_t count)
 {
+	int ret = 0;
 	/*
 	 * TODO: In theory, multiple reads on different streams can happen
 	 * simulaneously.  I don't know what the most efficient implementation
@@ -75,29 +88,33 @@ int epic_stream_read(int sd, void *buf, size_t count)
 	 */
 	if (xSemaphoreTake(stream_table_lock, STREAM_MUTEX_WAIT) != pdTRUE) {
 		LOG_WARN("stream", "Lock contention error");
-		return -EBUSY;
+		ret = -EBUSY;
+		goto out;
 	}
 
 	if (sd < 0 || sd >= SD_MAX) {
-		return -EBADF;
+		ret = -EBADF;
+		goto out_release;
 	}
 
 	struct stream_info *stream = stream_table[sd];
 	if (stream == NULL) {
-		return -ENODEV;
+		ret = -ENODEV;
+		goto out_release;
 	}
 
 	/* Poll the stream, if a poll_stream function exists */
 	if (stream->poll_stream != NULL) {
 		int ret = stream->poll_stream();
 		if (ret < 0) {
-			return ret;
+			goto out_release;
 		}
 	}
 
 	/* Check buffer size is a multiple of the data packet size */
 	if (count % stream->item_size != 0) {
-		return -EINVAL;
+		ret = -EINVAL;
+		goto out_release;
 	}
 
 	size_t i;
@@ -107,6 +124,10 @@ int epic_stream_read(int sd, void *buf, size_t count)
 		}
 	}
 
+	ret = i / stream->item_size;
+
+out_release:
 	xSemaphoreGive(stream_table_lock);
-	return i / stream->item_size;
+out:
+	return ret;
 }
