@@ -135,12 +135,12 @@ void gfx_clear(struct gfx_region *reg)
 
 void gfx_circle(struct gfx_region *reg, int x, int y, int r, int t, Color c)
 {
+	int outer = (r + t) * (r + t);
+	int inner = r * r;
 	for (int y_ = y - r - t; y_ <= y + r + t; y_++) {
 		for (int x_ = x - r - t; x_ <= x + r + t; x_++) {
-			int dx    = (x_ - x) * (x_ - x);
-			int dy    = (y_ - y) * (y_ - y);
-			int outer = (r + t) * (r + t);
-			int inner = r * r;
+			int dx   = (x_ - x) * (x_ - x);
+			int dy   = (y_ - y) * (y_ - y);
 			int edge = ((dx + dy) >= inner) && ((dx + dy) <= outer);
 			if (edge)
 				gfx_setpixel(reg, x_, y_, c);
@@ -150,11 +150,11 @@ void gfx_circle(struct gfx_region *reg, int x, int y, int r, int t, Color c)
 
 void gfx_circle_fill(struct gfx_region *reg, int x, int y, int r, Color c)
 {
+	int edge = r * r;
 	for (int y_ = y - r; y_ <= y + r; y_++) {
 		for (int x_ = x - r; x_ <= x + r; x_++) {
 			int dx   = (x_ - x) * (x_ - x);
 			int dy   = (y_ - y) * (y_ - y);
-			int edge = r * r;
 			int fill = (dx + dy) <= edge;
 			if (fill)
 				gfx_setpixel(reg, x_, y_, c);
