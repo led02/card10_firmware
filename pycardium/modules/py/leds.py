@@ -72,6 +72,27 @@ def set_rocket(led, value):
     sys_leds.set_rocket(led, value)
 
 
+def get_rocket(led):
+    """
+    Get brightness of one of the rocket LEDs.
+
+    :param int led: Choose your rocket!
+
+       +-------+--------+----------+
+       |   ID  | Color  | Location |
+       +=======+========+==========+
+       | ``0`` | Blue   | Left     |
+       +-------+--------+----------+
+       | ``1`` | Yellow | Top      |
+       +-------+--------+----------+
+       | ``2`` | Green  | Right    |
+       +-------+--------+----------+
+    :rtype: int
+    :returns: Brightness of LED (value between 0 and 31).
+    """
+    return sys_leds.get_rocket(led)
+
+
 def dim_top(value):
     """
     Set global brightness for top RGB LEDs.

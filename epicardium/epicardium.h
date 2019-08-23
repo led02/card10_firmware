@@ -96,6 +96,7 @@ typedef _Bool bool;
 #define API_LEDS_SET_ALL_HSV       0x6b
 #define API_LEDS_SET_GAMMA_TABLE   0x6c
 #define API_LEDS_CLEAR_ALL         0x6d
+#define API_LEDS_GET_ROCKET        0x6e
 #define API_LEDS_GET               0x6f
 
 #define API_VIBRA_SET              0x70
@@ -738,6 +739,24 @@ API(API_LEDS_UPDATE, void epic_leds_update(void));
  * :param uint8_t value:  Brightness of LED (value between 0 and 31).
  */
 API(API_LEDS_SET_ROCKET, void epic_leds_set_rocket(int led, uint8_t value));
+
+/**
+ * Get the brightness of one of the rocket LEDs.
+ *
+ * :param int led:  Which LED to get.
+ *
+ *    +-------+--------+----------+
+ *    |   ID  | Color  | Location |
+ *    +=======+========+==========+
+ *    | ``0`` | Blue   | Left     |
+ *    +-------+--------+----------+
+ *    | ``1`` | Yellow | Top      |
+ *    +-------+--------+----------+
+ *    | ``2`` | Green  | Right    |
+ *    +-------+--------+----------+
+ * :returns value:  Brightness of LED (value between 0 and 31)  or ``-EINVAL`` if the LED/rocket does not exists.
+ */
+API(API_LEDS_GET_ROCKET, int epic_leds_get_rocket(int led));
 
 /**
  * Turn on the bright side LED which can serve as a flashlight if worn on the left wrist or as a rad tattoo illuminator if worn on the right wrist.

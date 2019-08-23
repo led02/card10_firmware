@@ -3,6 +3,7 @@
 #include "MAX77650-Arduino-Library.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <errno.h>
 
 static const gpio_cfg_t pmic_interrupt_pin = {
 	PORT_0, PIN_12, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
@@ -121,6 +122,20 @@ void pmic_poll(void)
 void pmic_set_button_callback(pmic_button_callback_fn cb)
 {
 	pmic_button_callback = cb;
+}
+
+int pmic_get_led(uint8_t led)
+{
+	if (led == 0) {
+		return MAX77650_getBRT_LED0();
+	}
+	if (led == 1) {
+		return MAX77650_getBRT_LED1();
+	}
+	if (led == 2) {
+		return MAX77650_getBRT_LED2();
+	}
+	return -EINVAL;
 }
 
 void pmic_set_led(uint8_t led, uint8_t val)
