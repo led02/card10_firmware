@@ -816,9 +816,9 @@ enum personal_state {
     STATE_NO_CONTACT = 1,
     /** ``2``, "chaos" - Adventure time - blue led, short blink, long blink. */
     STATE_CHAOS = 2,
-    /** ``3``, "communication" - want to learn something or have a nice conversation - green led, long blinks. */
+    /** ``3``, "communication" - want to learn something or have a nice conversation - yellow led, long blinks. */
     STATE_COMMUNICATION = 3,
-    /** ``4``, "camp" - I am focussed on self-, camp-, or community maintenance - yellow led, fade on and off. */
+    /** ``4``, "camp" - I am focussed on self-, camp-, or community maintenance - green led, fade on and off. */
     STATE_CAMP = 4,
     /** STATE_MAX gives latest value and count of possible STATEs**/
     STATE_MAX = 5,
