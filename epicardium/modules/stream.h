@@ -29,6 +29,7 @@ enum stream_descriptor {
 	SD_BHI160_ACCELEROMETER,
 	SD_BHI160_ORIENTATION,
 	SD_BHI160_GYROSCOPE,
+	SD_MAX30001_ECG,
 	/** Highest descriptor must always be ``SD_MAX``. */
 	SD_MAX,
 };

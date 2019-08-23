@@ -73,7 +73,8 @@ void hwlock_init(void);
 enum hwlock_periph {
 	HWLOCK_I2C = 0,
 	HWLOCK_ADC,
-    HWLOCK_LED,
+	HWLOCK_LED,
+	HWLOCK_SPI_ECG,
 	_HWLOCK_MAX,
 };
 
@@ -89,5 +90,8 @@ void disp_forcelock();
 #define BHI160_MUTEX_WAIT_MS          50
 void vBhi160Task(void *pvParameters);
 
+#define MAX30001_FIFO_SIZE             128
+#define MAX30001_MUTEX_WAIT_MS          50
+void vMAX30001Task(void *pvParameters);
 
 #endif /* MODULES_H */

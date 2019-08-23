@@ -62,6 +62,17 @@ int main(void)
 		abort();
 	}
 
+	/* MAX30001 */
+	if (xTaskCreate(
+		    vMAX30001Task,
+		    (const char *)"MAX30001 Driver",
+		    configMINIMAL_STACK_SIZE * 2,
+		    NULL,
+		    tskIDLE_PRIORITY + 1,
+		    NULL) != pdPASS) {
+		LOG_CRIT("startup", "Failed to create %s task!", "MAX30001");
+		abort();
+	}
 	/* API */
 	if (xTaskCreate(
 		    vApiDispatcher,
