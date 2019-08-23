@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+
+## [v1.6] - 2019-08-23 20:30 - [Fennel]
 - Maxim BLE SDK update
 
 ### Added
 - **BLE**: Added personal state API to card10 SVC.
+- **ECG**: Support for ECG + Python app
+- **BLE**: Characteristic to read the time
 
 ### Changed
 - Improved performance of circle-drawing algorithm.
