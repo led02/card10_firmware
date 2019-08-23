@@ -90,7 +90,6 @@ void disp_forcelock();
 #define BHI160_MUTEX_WAIT_MS          50
 void vBhi160Task(void *pvParameters);
 
-#define MAX30001_FIFO_SIZE             128
 #define MAX30001_MUTEX_WAIT_MS          50
 void vMAX30001Task(void *pvParameters);
 

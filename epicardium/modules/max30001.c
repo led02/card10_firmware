@@ -32,10 +32,10 @@ static const gpio_cfg_t analog_switch = {
 
 /* clang-format on */
 
-/* BHI160 Task ID */
+/* MAX30001 Task ID */
 static TaskHandle_t max30001_task_id = NULL;
 
-/* BHI160 Mutex */
+/* MAX30001 Mutex */
 static StaticSemaphore_t max30001_mutex_data;
 static SemaphoreHandle_t max30001_mutex = NULL;
 
@@ -383,7 +383,7 @@ void vMAX30001Task(void *pvParameters)
 
 	/* Take Mutex during initialization, just in case */
 	if (xSemaphoreTake(max30001_mutex, 0) != pdTRUE) {
-		LOG_CRIT("max30001", "Failed to acquire BHI160 mutex!");
+		LOG_CRIT("max30001", "Failed to acquire MAX30001 mutex!");
 		vTaskDelay(portMAX_DELAY);
 	}
 
