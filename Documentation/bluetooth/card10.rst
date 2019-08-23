@@ -18,7 +18,7 @@ The current draft uses following service specification:
 - Time update characteristic:
 
   UUID: ``42230201-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Vibra characteristic:
 
@@ -70,6 +70,11 @@ The current draft uses following service specification:
   UUID: ``42230218-2342-2342-2342-234223422342``
   write no response
 
+- Personal State characteristic:
+
+  UUID: ``42230219-2342-2342-2342-234223422342``
+  read and write with response
+
 - LEDs above characteristic:
 
   UUID: ``42230220-2342-2342-2342-234223422342``
@@ -83,7 +88,7 @@ The current draft uses following service specification:
 Time update characteristic
 ---------------------------------
 
-The time update characteristic makes it possible to set the current time given in milliseconds after 1.1.1970 in the UTC timezone. The value is represented as a big endian ``uint64``
+The time update characteristic makes it possible to set and get the current time given in milliseconds after 1.1.1970 in the UTC timezone. The value is represented as a big endian ``uint64``
 
 - Thu Aug 15 19:40:45 UTC 2019 : ``0x0 0x0 0x1 0x6c 0x96 0xcb 0xf8 0xcc``
 
@@ -152,6 +157,16 @@ This characteristic makes it possible to activate the flashlight.
 
 - enabled:   ``0x01``
 - disabled:  ``0x00``
+
+Personal state characteristic
+---------------------------------
+This characteristic makes it possible to read and write the personal state.
+It writes always as persistant and it gives feedback if the value is in range and your firmware support it.
+
+- No State ``0x0000``
+- No Contact ``0x0100``
+- Chaos ``0x0100``
+- ...
 
 LEDs above characteristic
 ---------------------------------

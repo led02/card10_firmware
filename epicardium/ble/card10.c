@@ -27,8 +27,8 @@ enum {
 	/*!< \brief card10 service declaration */
 	CARD10_SVC_HDL = CARD10_START_HDL,
 	/*!< \brief time update characteristic */
-	CARD10_TIME_UPDATE_CH_HDL,
-	CARD10_TIME_UPDATE_VAL_HDL,
+	CARD10_TIME_CH_HDL,
+	CARD10_TIME_VAL_HDL,
 	/*!< \brief vibra characteristic */
 	CARD10_VIRBA_CH_HDL,
 	CARD10_VIBRA_VAL_HDL,
@@ -81,12 +81,16 @@ static const uint16_t UUID_len = sizeof(UUID_svc);
 
 // starting at 0x01 with write (non visual) charateristics
 
-/* BLE UUID for card10 time update */
+/* BLE UUID for card10 time */
 static const uint8_t UUID_char_time[] = {
-	ATT_PROP_WRITE_NO_RSP,
-	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
+	(ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP),
+	UINT16_TO_BYTES(CARD10_TIME_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
+
+static uint8_t timeValue[] = { UINT32_TO_BYTES(0), UINT32_TO_BYTES(0) };
+static uint16_t timeLen = sizeof(timeValue);
+
 // works vor everyone?
 static const uint16_t UUID_char_len = sizeof(UUID_char_time);
 
@@ -245,280 +249,236 @@ static const uint8_t UUID_attChar_light_sensor[] = {
 
 static uint8_t initLightSensorValue[] = { UINT16_TO_BYTES(0) };
 static uint16_t initLightSensorLen = sizeof(initLightSensorValue);
+/* clang-format on */
 
 /*
  * Create the BLE service description. 
  */
 
-static const attsAttr_t card10SvcAttrList[] =
-{
-	{
-		.pUuid = attPrimSvcUuid,
-		.pValue = (uint8_t *) UUID_svc,
-		.pLen = (uint16_t *) &UUID_len,
-		.maxLen = sizeof(UUID_svc),
-		.permissions = ATTS_PERMIT_READ
-	},
+static const attsAttr_t card10SvcAttrList[] = {
+	{ .pUuid       = attPrimSvcUuid,
+	  .pValue      = (uint8_t *)UUID_svc,
+	  .pLen        = (uint16_t *)&UUID_len,
+	  .maxLen      = sizeof(UUID_svc),
+	  .permissions = ATTS_PERMIT_READ },
 
 	// TIME
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_time,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_time),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_time,
-		.pValue = NULL,
-		.maxLen = sizeof(uint64_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_time,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_time),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_time,
+	  .pValue   = timeValue,
+	  .pLen     = &timeLen,
+	  .maxLen   = sizeof(uint64_t),
+	  .settings = (ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK),
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+		   ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH) },
 
 	// VIBRA
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_vibra,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_vibra),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_vibra,
-		.pValue = NULL,
-		.maxLen = sizeof(uint16_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_vibra,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_vibra),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_vibra,
+	  .pValue   = NULL,
+	  .maxLen   = sizeof(uint16_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// ROCKETS
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_rockets,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_rockets),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_rockets,
-		.pValue = NULL,
-		.maxLen = 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_rockets,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_rockets),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_rockets,
+	  .pValue   = NULL,
+	  .maxLen   = 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// BG LED Bottom left
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_led_bg_bottom_left,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_led_bg_bottom_left),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_led_bg_bottom_left,
-		.pValue = NULL,
-		.maxLen = 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_led_bg_bottom_left,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_led_bg_bottom_left),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_led_bg_bottom_left,
+	  .pValue   = NULL,
+	  .maxLen   = 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// BG LED Bottom right
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_led_bg_bottom_right,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_led_bg_bottom_right),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_led_bg_bottom_right,
-		.pValue = NULL,
-		.maxLen = 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_led_bg_bottom_right,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_led_bg_bottom_right),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_led_bg_bottom_right,
+	  .pValue   = NULL,
+	  .maxLen   = 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// BG LED top right
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_led_bg_top_right,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_led_bg_top_right),
-		.settings = 0,
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_led_bg_top_right,
-		.pValue = NULL,
-		.maxLen = 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_led_bg_top_right,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_led_bg_top_right),
+	  .settings    = 0,
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_led_bg_top_right,
+	  .pValue   = NULL,
+	  .maxLen   = 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// BG LED top left
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_led_bg_top_left,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_led_bg_top_left),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_led_bg_top_left,
-		.pValue = NULL,
-		.maxLen = 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_led_bg_top_left,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_led_bg_top_left),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_led_bg_top_left,
+	  .pValue   = NULL,
+	  .maxLen   = 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// Dim bottom module
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_leds_bottom_dim,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_leds_bottom_dim),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_leds_bottom_dim,
-		.pValue = NULL,
-		.pLen = 0,
-		.maxLen = sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_leds_bottom_dim,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_leds_bottom_dim),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_leds_bottom_dim,
+	  .pValue   = NULL,
+	  .pLen     = 0,
+	  .maxLen   = sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// Dim top module
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_leds_top_dim,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_leds_top_dim),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_leds_top_dim,
-		.pValue = NULL,
-		.maxLen = sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_leds_top_dim,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_leds_top_dim),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_leds_top_dim,
+	  .pValue   = NULL,
+	  .maxLen   = sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// led powersafe
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_led_powersafe,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_led_powersafe),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_led_powersafe,
-		.pValue = NULL,
-		.maxLen = sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_led_powersafe,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_led_powersafe),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_led_powersafe,
+	  .pValue   = NULL,
+	  .maxLen   = sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// flashlight
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_flashlight,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_flashlight),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_flashlight,
-		.pValue = NULL,
-		.maxLen = sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_flashlight,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_flashlight),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_flashlight,
+	  .pValue   = NULL,
+	  .maxLen   = sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// personal state
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_personal_state,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_personal_state),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_personal_state,
-		.pValue = &personalStateValue,
-		.pLen = &personalStateLen,
-		.maxLen = sizeof(uint16_t),
-		.settings = (ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK),
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH |
-				ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
-				ATTS_PERMIT_READ_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_personal_state,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_personal_state),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_personal_state,
+	  .pValue   = &personalStateValue,
+	  .pLen     = &personalStateLen,
+	  .maxLen   = sizeof(uint16_t),
+	  .settings = (ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK),
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+		   ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH) },
 
 	// ABOVE LEDS
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_leds_above,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_leds_above),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_leds_above,
-		.pValue = NULL,
-		.maxLen = 11 * 3 * sizeof(uint8_t),
-		.settings = ATTS_SET_WRITE_CBACK,
-		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_leds_above,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_leds_above),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_leds_above,
+	  .pValue   = NULL,
+	  .maxLen   = 11 * 3 * sizeof(uint8_t),
+	  .settings = ATTS_SET_WRITE_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+		   ATTS_PERMIT_WRITE_AUTH) },
 
 	// Light sensor
 
-	{
-		.pUuid = attChUuid,
-		.pValue = (uint8_t *) UUID_char_light_sensor,
-		.pLen = (uint16_t *) &UUID_char_len,
-		.maxLen = sizeof(UUID_char_light_sensor),
-		.permissions = ATTS_PERMIT_READ
-	},
-	{
-		.pUuid = UUID_attChar_light_sensor,
-		.pValue = initLightSensorValue,
-		.pLen = &initLightSensorLen,
-		.maxLen = sizeof(uint8_t),
-		.settings = ATTS_SET_READ_CBACK,
-		.permissions = (ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
-				ATTS_PERMIT_READ_AUTH)
-	},
+	{ .pUuid       = attChUuid,
+	  .pValue      = (uint8_t *)UUID_char_light_sensor,
+	  .pLen        = (uint16_t *)&UUID_char_len,
+	  .maxLen      = sizeof(UUID_char_light_sensor),
+	  .permissions = ATTS_PERMIT_READ },
+	{ .pUuid    = UUID_attChar_light_sensor,
+	  .pValue   = initLightSensorValue,
+	  .pLen     = &initLightSensorLen,
+	  .maxLen   = sizeof(uint8_t),
+	  .settings = ATTS_SET_READ_CBACK,
+	  .permissions =
+		  (ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+		   ATTS_PERMIT_READ_AUTH) },
 };
-/* clang-format on */
 
 // validating, that the service really get all charateristics
 WSF_CT_ASSERT(
@@ -536,7 +496,7 @@ static uint8_t setTime(uint8_t *pValue)
 	time = __bswap64(timeNet);
 	epic_rtc_set_milliseconds(time);
 
-	APP_TRACE_INFO1("ble-card10: set time to: %d\n", time);
+	APP_TRACE_INFO0("ble-card10: set time");
 	return ATT_SUCCESS;
 }
 
@@ -558,7 +518,7 @@ static uint8_t writeCard10CB(
 
 	switch (handle) {
 	// time
-	case CARD10_TIME_UPDATE_VAL_HDL:
+	case CARD10_TIME_VAL_HDL:
 		return setTime(pValue);
 	// vibra
 	case CARD10_VIBRA_VAL_HDL:
@@ -764,8 +724,18 @@ static uint8_t readCard10CB(
 	attsAttr_t *pAttr
 ) {
 	uint16_t ui16 = 0;
+	uint64_t ui64 = 0;
 
 	switch (handle) {
+	case CARD10_TIME_VAL_HDL:
+		ui64 = epic_rtc_get_milliseconds();
+		uint64_t time;
+
+		time = __bswap64(ui64);
+		memcpy(pAttr->pValue, &time, sizeof(time));
+
+		APP_TRACE_INFO0("ble-card10: read time\n");
+		return ATT_SUCCESS;
 	case CARD10_PERSONAL_STATE_VAL_HDL:
 		ui16           = epic_personal_state_get();
 		*pAttr->pValue = ui16;
