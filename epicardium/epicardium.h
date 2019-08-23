@@ -124,6 +124,10 @@ typedef _Bool bool;
 #define API_BHI160_DISABLE         0xe1
 #define API_BHI160_DISABLE_ALL     0xe2
 
+#define API_MAX86150_INIT		0xf0
+#define API_MAX86150_GET_DATA		0xf1
+#define API_MAX86150_SET_LED_AMPLITUDE	0xf2
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
