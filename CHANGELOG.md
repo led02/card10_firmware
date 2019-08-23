@@ -7,7 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Maxim BLE SDK update
 
 ### Added
-- **BLE**: Add personal state API to card10 SVC
+- **BLE**: Added personal state API to card10 SVC.
+
+### Changed
+- Improved performance of circle-drawing algorithm.
+
+### Fixed
+- Removed a debug print in the `bhi160` module.
 
 
 ## [v1.5] - 2019-08-23 00:18 - [Eggppppplant]
