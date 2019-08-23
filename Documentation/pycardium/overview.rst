@@ -49,6 +49,16 @@ and power it on::
 
    leds.set_rocket(0, 31)
 
+.. note::
+
+   If you're using iOS/Mac then you can connect to your serial console using:
+
+   .. code-block:: shell-session
+
+      screen /dev/tty.usbmodem* 115200
+
+   You can now see in your console what buttons you have pressed and your
+   console outputs/logs.  With ``CTRL+C`` you exit the console.
 
 REPL modes
 ^^^^^^^^^^
