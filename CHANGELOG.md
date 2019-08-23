@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 - Maxim BLE SDK update
 
+### Added
+- **BLE**: Add personal state API to card10 SVC
+
+
 ## [v1.5] - 2019-08-23 00:18 - [Eggppppplant]
 [Eggppppplant]: https://card10.badge.events.ccc.de/release/card10-v1.5-Eggppppplant.zip
 
