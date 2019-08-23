@@ -127,6 +127,9 @@ typedef _Bool bool;
 #define API_MAX30001_ENABLE        0xf0
 #define API_MAX30001_DISABLE       0xf1
 
+#define API_MAX86150_INIT		0x0100
+#define API_MAX86150_GET_DATA		0x0101
+#define API_MAX86150_SET_LED_AMPLITUDE	0x0102
 
 /* clang-format on */
 
