@@ -48,7 +48,6 @@ class BHI160:
     def _interrupt(self, _):
         if self.active:
             data = self.read()
-            print(data)
             if self._callback:
                 self._callback(data)
 
