@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 ## [v1.6] - 2019-08-23 20:30 - [Fennel]
+[Fennel]: https://card10.badge.events.ccc.de/release/card10-v1.6-Fennel.zip
+
 - Maxim BLE SDK update
 
 ### Added
@@ -122,7 +124,8 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 ## [v1.0] - 2019-08-21 00:50
 Initial release.
 
-[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.5...master
+[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.6...master
+[v1.6]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.5...v1.6
 [v1.5]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.4...v1.5
 [v1.4]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.3...v1.4
 [v1.3]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.2...v1.3
