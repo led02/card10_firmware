@@ -165,7 +165,7 @@ It writes always as persistant and it gives feedback if the value is in range an
 
 - No State ``0x0000``
 - No Contact ``0x0100``
-- Chaos ``0x0100``
+- Chaos ``0x0200``
 - ...
 
 LEDs above characteristic
