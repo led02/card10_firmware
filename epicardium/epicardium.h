@@ -131,8 +131,6 @@ typedef _Bool bool;
 #define API_MAX86150_GET_DATA		0x0101
 #define API_MAX86150_SET_LED_AMPLITUDE	0x0102
 
->>>>>>> 4f32a5ceaf749a0f8bc8b2b6ec706e118dd368fd
-
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
