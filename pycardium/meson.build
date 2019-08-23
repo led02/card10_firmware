@@ -9,6 +9,7 @@ modsrc = files(
   'modules/interrupt.c',
   'modules/sys_leds.c',
   'modules/light_sensor.c',
+  'modules/max30001-sys.c',
   'modules/os.c',
   'modules/personal_state.c',
   'modules/power.c',

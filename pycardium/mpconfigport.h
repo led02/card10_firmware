@@ -53,6 +53,7 @@ int mp_hal_trng_read_int(void);
 #define MODULE_INTERRUPT_ENABLED            (1)
 #define MODULE_LEDS_ENABLED                 (1)
 #define MODULE_LIGHT_SENSOR_ENABLED         (1)
+#define MODULE_MAX30001_ENABLED             (1)
 #define MODULE_OS_ENABLED                   (1)
 #define MODULE_PERSONAL_STATE_ENABLED       (1)
 #define MODULE_POWER_ENABLED                (1)
