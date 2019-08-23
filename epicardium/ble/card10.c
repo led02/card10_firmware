@@ -27,8 +27,8 @@ enum {
 	/*!< \brief card10 service declaration */
 	CARD10_SVC_HDL = CARD10_START_HDL,
 	/*!< \brief time update characteristic */
-	CARD10_TIME_UPDATE_CH_HDL,
-	CARD10_TIME_UPDATE_VAL_HDL,
+	CARD10_TIME_CH_HDL,
+	CARD10_TIME_VAL_HDL,
 	/*!< \brief vibra characteristic */
 	CARD10_VIRBA_CH_HDL,
 	CARD10_VIBRA_VAL_HDL,
@@ -81,12 +81,16 @@ static const uint16_t UUID_len = sizeof(UUID_svc);
 
 // starting at 0x01 with write (non visual) charateristics
 
-/* BLE UUID for card10 time update */
+/* BLE UUID for card10 time */
 static const uint8_t UUID_char_time[] = {
-	ATT_PROP_WRITE_NO_RSP,
-	UINT16_TO_BYTES(CARD10_TIME_UPDATE_VAL_HDL),
+	(ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP),
+	UINT16_TO_BYTES(CARD10_TIME_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x01, CARD10_UUID_PREFIX
 };
+
+static uint8_t timeValue[] = { UINT32_TO_BYTES(0), UINT32_TO_BYTES(0) };
+static uint16_t timeLen = sizeof(timeValue);
+
 // works vor everyone?
 static const uint16_t UUID_char_len = sizeof(UUID_char_time);
 
@@ -271,11 +275,14 @@ static const attsAttr_t card10SvcAttrList[] =
 	},
 	{
 		.pUuid = UUID_attChar_time,
-		.pValue = NULL,
+		.pValue = timeValue,
+		.pLen = &timeLen,
 		.maxLen = sizeof(uint64_t),
-		.settings = ATTS_SET_WRITE_CBACK,
+		.settings = (ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK),
 		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-				ATTS_PERMIT_WRITE_AUTH)
+				ATTS_PERMIT_WRITE_AUTH | 
+				ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+				ATTS_PERMIT_READ_AUTH)
 	},
 
 	// VIBRA
@@ -536,7 +543,7 @@ static uint8_t setTime(uint8_t *pValue)
 	time = __bswap64(timeNet);
 	epic_rtc_set_milliseconds(time);
 
-	APP_TRACE_INFO1("ble-card10: set time to: %d\n", time);
+	APP_TRACE_INFO0("ble-card10: set time");
 	return ATT_SUCCESS;
 }
 
@@ -558,7 +565,7 @@ static uint8_t writeCard10CB(
 
 	switch (handle) {
 	// time
-	case CARD10_TIME_UPDATE_VAL_HDL:
+	case CARD10_TIME_VAL_HDL:
 		return setTime(pValue);
 	// vibra
 	case CARD10_VIBRA_VAL_HDL:
@@ -764,8 +771,18 @@ static uint8_t readCard10CB(
 	attsAttr_t *pAttr
 ) {
 	uint16_t ui16 = 0;
+	uint64_t ui64 = 0;
 
 	switch (handle) {
+	case CARD10_TIME_VAL_HDL:
+		ui64 = epic_rtc_get_milliseconds();
+		uint64_t time;
+
+		time = __bswap64(ui64);
+		memcpy(pAttr->pValue, &time, sizeof(time));
+
+		APP_TRACE_INFO0("ble-card10: read time\n");
+		return ATT_SUCCESS;
 	case CARD10_PERSONAL_STATE_VAL_HDL:
 		ui16           = epic_personal_state_get();
 		*pAttr->pValue = ui16;

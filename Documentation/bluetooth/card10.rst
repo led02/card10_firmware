@@ -18,7 +18,7 @@ The current draft uses following service specification:
 - Time update characteristic:
 
   UUID: ``42230201-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Vibra characteristic:
 
@@ -88,7 +88,7 @@ The current draft uses following service specification:
 Time update characteristic
 ---------------------------------
 
-The time update characteristic makes it possible to set the current time given in milliseconds after 1.1.1970 in the UTC timezone. The value is represented as a big endian ``uint64``
+The time update characteristic makes it possible to set and get the current time given in milliseconds after 1.1.1970 in the UTC timezone. The value is represented as a big endian ``uint64``
 
 - Thu Aug 15 19:40:45 UTC 2019 : ``0x0 0x0 0x1 0x6c 0x96 0xcb 0xf8 0xcc``
 
