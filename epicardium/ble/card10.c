@@ -59,6 +59,9 @@ enum {
 	/*!< \brief flashlight characteristic */
 	CARD10_FLASHLIGHT_CH_HDL,
 	CARD10_FLASHLIGHT_VAL_HDL,
+	/*!< \brief flashlight characteristic */
+	CARD10_PERSONAL_STATE_CH_HDL,
+	CARD10_PERSONAL_STATE_VAL_HDL,
 	/*!< \brief leds above characteristic */
 	CARD10_LEDS_ABOVE_CH_HDL,
 	CARD10_LEDS_ABOVE_VAL_HDL,
@@ -203,6 +206,20 @@ static const uint8_t UUID_char_flashlight[] = {
 static const uint8_t UUID_attChar_flashlight[] = {
 	CARD10_UUID_SUFFIX, 0x18, CARD10_UUID_PREFIX
 };
+
+/* BLE UUID for card10 personal state */
+static const uint8_t UUID_char_personal_state[] = {
+	ATT_PROP_READ | ATT_PROP_WRITE,
+	UINT16_TO_BYTES(CARD10_PERSONAL_STATE_VAL_HDL),
+	CARD10_UUID_SUFFIX, 0x19, CARD10_UUID_PREFIX
+};
+
+static const uint8_t UUID_attChar_personal_state[] = {
+	CARD10_UUID_SUFFIX, 0x19, CARD10_UUID_PREFIX
+};
+
+static uint8_t personalStateValue = 0; 
+static uint16_t personalStateLen = sizeof(personalStateValue);
 
 /* BLE UUID for card10 above leds */
 static const uint8_t UUID_char_leds_above[] = {
@@ -443,6 +460,27 @@ static const attsAttr_t card10SvcAttrList[] =
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
+	// personal state
+
+	{
+		.pUuid = attChUuid,
+		.pValue = (uint8_t *) UUID_char_personal_state,
+		.pLen = (uint16_t *) &UUID_char_len,
+		.maxLen = sizeof(UUID_char_personal_state),
+		.permissions = ATTS_PERMIT_READ
+	},
+	{
+		.pUuid = UUID_attChar_personal_state,
+		.pValue = &personalStateValue,
+		.pLen = &personalStateLen,
+		.maxLen = sizeof(uint16_t),
+		.settings = (ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK),
+		.permissions = (ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+				ATTS_PERMIT_WRITE_AUTH |
+				ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+				ATTS_PERMIT_READ_AUTH)
+	},
+
 	// ABOVE LEDS
 
 	{
@@ -461,7 +499,7 @@ static const attsAttr_t card10SvcAttrList[] =
 				ATTS_PERMIT_WRITE_AUTH)
 	},
 
-	// ABOVE LEDS
+	// Light sensor
 
 	{
 		.pUuid = attChUuid,
@@ -654,6 +692,41 @@ static uint8_t writeCard10CB(
 		epic_set_flashlight(pValue[0]);
 		APP_TRACE_INFO1("set flashlight to: %d\n", pValue[0]);
 		return ATT_SUCCESS;
+	// personal state
+	case CARD10_PERSONAL_STATE_VAL_HDL:
+		BYTES_TO_UINT16(ui16, pValue);
+		if (ui16 <= STATE_MAX) {
+			if (operation == ATT_PDU_WRITE_CMD ||
+			    operation == ATT_PDU_SIGNED_WRITE_CMD ||
+			    operation == ATT_PDU_WRITE_REQ ||
+			    operation == ATT_PDU_EXEC_WRITE_REQ) {
+				epic_personal_state_set(ui16, true);
+				APP_TRACE_INFO1(
+					"ble-card10: set personal state to: %d\n",
+					ui16
+				);
+				return ATT_SUCCESS;
+			} else if (operation == ATT_PDU_PREP_WRITE_REQ) {
+				APP_TRACE_INFO1(
+					"ble_card10: personal state would be okay: %d\n",
+					ui16
+				);
+				return ATT_SUCCESS;
+			} else {
+				APP_TRACE_INFO1(
+					"ble-card10: personal state with unknown operation: %d\n",
+					operation
+				);
+				return ATT_ERR_INVALID_PDU;
+			}
+		} else {
+			APP_TRACE_INFO2(
+				"ble-card: personal state invalid value (0-%d): %d\n",
+				STATE_MAX - 1,
+				ui16
+			);
+			return ATT_ERR_RANGE;
+		}
 	// leds above
 	case CARD10_LEDS_ABOVE_VAL_HDL:
 		for (ui16 = 0; ui16 < 11; ui16++) {
@@ -693,6 +766,11 @@ static uint8_t readCard10CB(
 	uint16_t ui16 = 0;
 
 	switch (handle) {
+	case CARD10_PERSONAL_STATE_VAL_HDL:
+		ui16           = epic_personal_state_get();
+		*pAttr->pValue = ui16;
+		APP_TRACE_INFO1("ble-card10: read personal state: %d\n", ui16);
+		return ATT_SUCCESS;
 	case CARD10_LIGHT_SENSOR_VAL_HDL:
 		epic_light_sensor_get(&ui16);
 		*pAttr->pValue = ui16;
