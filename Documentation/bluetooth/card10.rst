@@ -70,6 +70,11 @@ The current draft uses following service specification:
   UUID: ``42230218-2342-2342-2342-234223422342``
   write no response
 
+- Personal State characteristic:
+
+  UUID: ``42230219-2342-2342-2342-234223422342``
+  read and write with response
+
 - LEDs above characteristic:
 
   UUID: ``42230220-2342-2342-2342-234223422342``
@@ -152,6 +157,16 @@ This characteristic makes it possible to activate the flashlight.
 
 - enabled:   ``0x01``
 - disabled:  ``0x00``
+
+Personal state characteristic
+---------------------------------
+This characteristic makes it possible to read and write the personal state.
+It writes always as persistant and it gives feedback if the value is in range and your firmware support it.
+
+- No State ``0x0000``
+- No Contact ``0x0100``
+- Chaos ``0x0100``
+- ...
 
 LEDs above characteristic
 ---------------------------------
