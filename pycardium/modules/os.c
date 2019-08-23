@@ -10,12 +10,20 @@
 
 #include "os.h"
 
-bool pycrd_filename_restricted(const char *fname)
+bool pycrd_filename_restricted(const char *path)
 {
 	// files that cannot be opened in write modes
 	const char *const forbidden_files[] = {
 		"card10.bin", "menu.py", "main.py", "card10.cfg"
 	};
+
+	const char *fname = strchr(path, '/');
+	while (fname) {
+		path  = fname + 1;
+		fname = strchr(path, '/');
+	}
+	fname = path;
+
 	for (int i = 0;
 	     i < sizeof(forbidden_files) / sizeof(forbidden_files[0]);
 	     i++) {
