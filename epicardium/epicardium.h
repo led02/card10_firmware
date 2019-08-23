@@ -124,6 +124,10 @@ typedef _Bool bool;
 #define API_BHI160_DISABLE         0xe1
 #define API_BHI160_DISABLE_ALL     0xe2
 
+#define API_MAX30001_ENABLE        0xf0
+#define API_MAX30001_DISABLE       0xf1
+
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -171,9 +175,11 @@ API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
 API_ISR(EPIC_INT_BHI160_ORIENTATION, epic_isr_bhi160_orientation);
 #define EPIC_INT_BHI160_GYROSCOPE       6
 API_ISR(EPIC_INT_BHI160_GYROSCOPE, epic_isr_bhi160_gyroscope);
+#define EPIC_INT_MAX30001_ECG           7
+API_ISR(EPIC_INT_MAX30001_ECG, epic_isr_max30001_ecg);
 
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    7
+#define EPIC_INT_NUM                    8
 /* clang-format on */
 
 /*
@@ -1627,5 +1633,69 @@ API_ISR(EPIC_INT_RTC_ALARM, epic_isr_rtc_alarm);
  *    - ``-EFAULT``: Invalid destination address.
  */
 API(API_TRNG_READ, int epic_trng_read(uint8_t *dest, size_t size));
+
+/**
+ * MAX30001 API
+ * ----------
+ */
+
+/**
+ * Configuration for a MAX30001 sensor.
+ *
+ * This struct is used when enabling the sensor using
+ * :c:func:`epic_max30001_enable_sensor`.
+ */
+struct max30001_sensor_config {
+	/**
+	 * Number of samples Epicardium should keep for this sensor.  Do not set
+	 * this number too high as the sample buffer will eat RAM.
+	 */
+	size_t sample_buffer_len;
+	/**
+	 * Sample rate for the sensor in Hz.
+	 */
+	uint16_t sample_rate;
+
+	/**
+	 * Set to true if the second lead comes from USB-C
+	 */
+	bool usb;
+
+	/**
+	* Set to true if the interal lead bias of the MAX30001 is to be used.
+	*/
+	bool bias;
+
+	/** Always zero. Reserved for future parameters. */
+	uint8_t _padding[8];
+};
+
+/**
+ * Enable a MAX30001 ecg sensor.  Calling this funciton will instruct the
+ * MAX30001 to collect data for this sensor.  You can then
+ * retrieve the samples using :c:func:`epic_stream_read`.
+ *
+ * :param max30001_sensor_config* config: Configuration for this sensor.
+ * :returns: A sensor descriptor which can be used with
+ *    :c:func:`epic_stream_read` or a negative error value:
+ *
+ *    - ``-EBUSY``:  The MAX30001 driver is currently busy with other tasks and
+ *      could not be acquired for enabling a sensor.
+ *
+ * .. versionadded:: 1.6
+ */
+API(API_MAX30001_ENABLE, int epic_max30001_enable_sensor(
+	struct max30001_sensor_config *config
+));
+
+/**
+ * Disable MAX30001
+ *
+ * .. versionadded:: 1.6
+ */
+API(API_MAX30001_DISABLE, int epic_max30001_disable_sensor(
+void
+));
+
 
 #endif /* _EPICARDIUM_H */

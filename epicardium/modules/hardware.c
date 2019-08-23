@@ -269,5 +269,7 @@ int hardware_reset(void)
 	 */
 	epic_bme680_deinit();
 
+	epic_max30001_disable_sensor();
+
 	return 0;
 }
