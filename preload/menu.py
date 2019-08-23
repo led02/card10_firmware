@@ -14,7 +14,10 @@ import ujson
 import sys
 
 BUTTON_TIMER_POPPED = -1
-COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
+COLOR_BG = color.CHAOSBLUE_DARK
+COLOR_BG_SEL = color.CHAOSBLUE
+COLOR_ARROW = color.COMMYELLOW
+COLOR_TEXT = color.COMMYELLOW
 MAXCHARS = 11
 
 
@@ -166,7 +169,7 @@ def draw_menu(disp, applist, pos, appcount, lineoffset):
                 (i - start) * 20,
                 159,
                 (i - start) * 20 + 20,
-                col=COLOR1 if i == pos else COLOR2,
+                col=COLOR_BG_SEL if i == pos else COLOR_BG,
             )
 
             line = app[1]["name"]
@@ -186,10 +189,11 @@ def draw_menu(disp, applist, pos, appcount, lineoffset):
             disp.print(
                 " " + line[off : (off + (MAXCHARS - 1))],
                 posy=(i - start) * 20,
-                bg=COLOR1 if i == pos else COLOR2,
+                fg=COLOR_TEXT,
+                bg=COLOR_BG_SEL if i == pos else COLOR_BG,
             )
             if i == pos:
-                disp.print(">", posy=(i - start) * 20, fg=color.COMMYELLOW, bg=COLOR1)
+                disp.print(">", posy=(i - start) * 20, fg=COLOR_ARROW, bg=COLOR_BG_SEL)
 
             if linelength > (MAXCHARS - 1) and off < linelength - (MAXCHARS - 1):
                 triangle(disp, 153, (i - start) * 20 + 6, False, 6)
@@ -215,21 +219,9 @@ def main():
     timercountpopped = 0
     for ev in button_events(10):
         if numapps == 0:
-            disp.clear(color.COMMYELLOW)
-            disp.print(
-                " No apps ",
-                posx=17,
-                posy=20,
-                fg=color.COMMYELLOW_DARK,
-                bg=color.COMMYELLOW,
-            )
-            disp.print(
-                "available",
-                posx=17,
-                posy=40,
-                fg=color.COMMYELLOW_DARK,
-                bg=color.COMMYELLOW,
-            )
+            disp.clear(COLOR_BG)
+            disp.print(" No apps ", posx=17, posy=20, fg=COLOR_TEXT, bg=COLOR_BG)
+            disp.print("available", posx=17, posy=40, fg=COLOR_TEXT, bg=COLOR_BG)
             disp.update()
             continue
 
