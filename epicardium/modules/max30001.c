@@ -154,11 +154,14 @@ static void max30001_handle_samples(int16_t *sensor_data, int16_t n)
 	}
 
 	while (n--) {
+		uint16_t data = -*sensor_data++;
 		if (xQueueSend(
 			    max30001_stream.queue,
-			    sensor_data++,
+			    &data,
 			    MAX30001_MUTEX_WAIT_MS) != pdTRUE) {
-			// TODO; handle queue full
+			LOG_WARN(
+				"max30001",
+				"queue full"); // TODO; handle queue full
 		}
 	}
 	api_interrupt_trigger(EPIC_INT_MAX30001_ECG);
@@ -336,9 +339,10 @@ static int max30001_fetch_fifo(void)
 
 		// Check if FIFO has overflowed
 		if (ETAG[readECGSamples - 1] == FIFO_OVF_MASK) {
-			ecg_write_reg(
-				FIFO_RST,
-				0); // Reset FIFO TODO: report overflow
+			ecg_write_reg(FIFO_RST, 0); // Reset FIFO
+			LOG_WARN(
+				"max30001",
+				"fifo overflow"); // TODO; handle fifo full
 		}
 		max30001_handle_samples(ecgSample, readECGSamples);
 	}
