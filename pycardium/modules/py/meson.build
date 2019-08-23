@@ -4,6 +4,7 @@ python_modules = files(
   'htmlcolor.py',
   'display.py',
   'leds.py',
+  'max30001.py',
   'pride.py',
   'ledfx.py',
   'simple_menu.py',
