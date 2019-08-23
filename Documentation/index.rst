@@ -22,6 +22,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
 
    pycardium/overview
    pycardium/stdlib
+   pycardium/bhi160
    pycardium/bme680
    pycardium/buttons
    pycardium/color
@@ -32,10 +33,10 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/os
    pycardium/personal_state
    pycardium/power
+   pycardium/pride
    pycardium/simple_menu
    pycardium/utime
    pycardium/vibra
-   pycardium/pride
 
 .. toctree::
    :maxdepth: 1

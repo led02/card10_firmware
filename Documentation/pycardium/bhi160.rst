@@ -1,0 +1,102 @@
+.. py:module:: bhi160
+
+``bhi160`` - Sensor Fusion
+==========================
+.. versionadded:: 1.4
+
+Supports the BHI160 sensor on the card10 for accelerometer, gyroscope...
+
+**Example**:
+
+.. code-block:: python
+
+   import bhi160
+   import utime
+   
+   bhi = bhi160.BHI160Orientation()
+
+    while True:
+        samples = bhi.read()
+        print(samples)
+        utime.sleep(0.5)
+
+
+.. class:: bhi160.BHI160Orientation(sample_rate,dynamic_range,callback,sample_buffer_len)
+
+    Orientation of the BHI160
+
+    Parameters:
+        sample_rate: int, optional
+            Sample rate (default is 4)
+        dynamic_range: int, optional
+            Dynamic range (default is 2)
+        callback: callable, optional
+            Call this callback when enough data is collected (default is None)
+
+            .. todo:: The callback functionality is untested, so do not be confused if it does not work.
+        sample_buffer_len: int, optional
+            Length of sample buffer (default is 200)
+
+   .. py:method:: read():
+
+   Read sensor values
+
+   :returns: Collected sensor values as list
+
+   .. py:method:: close():
+
+   Close the connection to the sensor
+
+   
+.. class:: bhi160.BHI160Accelerometer
+
+    Accelerometer of the BHI160
+
+    Parameters:
+        sample_rate: int, optional
+            Sample rate (default is 4)
+        dynamic_range: int, optional
+            Dynamic range (default is 2)
+        callback: callable, optional
+            Call this callback when enough data is collected (default is None)
+
+            .. todo:: The callback functionality is untested, so do not be confused if it does not work.
+        sample_buffer_len: int, optional
+            Length of sample buffer (default is 200)
+
+   .. py:method:: read():
+
+   Read sensor values
+
+   :returns: Collected sensor values as list
+
+   .. py:method:: close():
+
+   Close the connection to the sensor
+
+.. class:: bhi160.BHI160Gyroscope
+
+    Gyroscope of the BHI160
+
+    Parameters:
+        sample_rate: int, optional
+            Sample rate (default is 4)
+        dynamic_range: int, optional
+            Dynamic range (default is 2)
+        callback: callable, optional
+            Call this callback when enough data is collected (default is None)
+
+            .. todo:: The callback functionality is untested, so do not be confused if it does not work.
+        sample_buffer_len: int, optional
+            Length of sample buffer (default is 200)
+
+   .. py:method:: read():
+
+   Read sensor values
+
+   :returns: Collected sensor values as list
+
+   .. py:method:: close():
+
+   Close the connection to the sensor
+
