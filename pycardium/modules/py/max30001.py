@@ -74,7 +74,7 @@ class MAX30001:
 
         if self.active:
             self.active = False
-            ret = sys_max30001.disable_sensor(self.sensor_id)
+            ret = sys_max30001.disable_sensor()
 
             if ret < 0:
                 raise ValueError("Disable sensor returned %i", ret)
