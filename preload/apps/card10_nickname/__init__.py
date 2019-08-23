@@ -7,9 +7,9 @@ import light_sensor
 import ujson
 import os
 
-FILENAME = 'nickname.txt'
-FILENAME_ADV = 'nickname.json'
-ANIM_TYPES = ['none', 'led', 'fade', 'gay', 'rainbow', 'rnd_led']
+FILENAME = "nickname.txt"
+FILENAME_ADV = "nickname.json"
+ANIM_TYPES = ["none", "led", "fade", "gay", "rainbow", "rnd_led"]
 
 
 def wheel(pos):
@@ -40,7 +40,7 @@ def random_rgb():
     """
     rgb = []
     for i in range(0, 3):
-        rand = int.from_bytes(os.urandom(1), 'little')
+        rand = int.from_bytes(os.urandom(1), "little")
         if rand > 255:
             rand = 255
         rgb.append(rand)
@@ -112,15 +112,15 @@ def get_time():
     Generates a nice timestamp in format hh:mm:ss from the devices localtime
     :return: timestamp
     """
-    timestamp = ''
+    timestamp = ""
     if utime.localtime()[3] < 10:
-        timestamp = timestamp + '0'
-    timestamp = timestamp + str(utime.localtime()[3]) + ':'
+        timestamp = timestamp + "0"
+    timestamp = timestamp + str(utime.localtime()[3]) + ":"
     if utime.localtime()[4] < 10:
-        timestamp = timestamp + '0'
-    timestamp = timestamp + str(utime.localtime()[4]) + ':'
+        timestamp = timestamp + "0"
+    timestamp = timestamp + str(utime.localtime()[4]) + ":"
     if utime.localtime()[5] < 10:
-        timestamp = timestamp + '0'
+        timestamp = timestamp + "0"
     timestamp = timestamp + str(utime.localtime()[5])
     return timestamp
 
@@ -154,7 +154,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
     """
     anim = mode
     posy = 30
-    if sub != '':
+    if sub != "":
         posy = 18
     r = 255
     g = 0
@@ -164,7 +164,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
     last_btn_poll = utime.time() - 2
     while True:
         sleep = 0.5
-        if sub == '#time':
+        if sub == "#time":
             r_sub = get_time()
         dark = 0
         if light_sensor.get_reading() < 30:
@@ -175,9 +175,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
         r_bg_sub_color = bg_sub[dark]
         r_bg = main_bg[dark]
         # Button handling
-        pressed = buttons.read(
-            buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT
-        )
+        pressed = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT)
         if utime.time() - last_btn_poll >= 1:
             last_btn_poll = utime.time()
             if pressed & buttons.BOTTOM_RIGHT != 0:
@@ -191,7 +189,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
                     anim = len(ANIM_TYPES) - 1
                 blink_led(0)
         # Animations
-        if ANIM_TYPES[anim] == 'fade':
+        if ANIM_TYPES[anim] == "fade":
             sleep = 0.1
             leds.clear()
             toggle_rockets(False)
@@ -207,7 +205,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
             r_bg = [r, g, b]
             r_bg_color = r_bg
             r_bg_sub_color = r_bg
-        if ANIM_TYPES[anim] == 'led':
+        if ANIM_TYPES[anim] == "led":
             if dark == 1:
                 for i in range(0, 11):
                     leds.prep(i, r_bg)
@@ -217,7 +215,7 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
             else:
                 leds.clear()
                 toggle_rockets(False)
-        if ANIM_TYPES[anim] == 'rnd_led':
+        if ANIM_TYPES[anim] == "rnd_led":
             if dark == 1:
                 for i in range(0, 11):
                     leds.prep(i, random_rgb())
@@ -227,10 +225,10 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
             else:
                 leds.clear()
                 toggle_rockets(False)
-        if ANIM_TYPES[anim] == 'gay':
+        if ANIM_TYPES[anim] == "gay":
             toggle_rockets(False)
             leds.gay(0.4)
-        if ANIM_TYPES[anim] == 'rainbow':
+        if ANIM_TYPES[anim] == "rainbow":
             for i in range(0, 11):
                 lr, lg, lb = wheel(rainbow_led_pos + i * 3)
                 leds.prep(i, [lr, lg, lb])
@@ -240,16 +238,28 @@ def render_nickname(title, sub, fg, bg, fg_sub, bg_sub, main_bg, mode, bat):
             leds.update()
             leds.dim_top(3)
             toggle_rockets(True)
-        if ANIM_TYPES[anim] == 'none':
+        if ANIM_TYPES[anim] == "none":
             leds.clear()
             toggle_rockets(False)
         with display.open() as disp:
             disp.rect(0, 0, 160, 80, col=r_bg, filled=True)
             if bat[0]:
                 render_battery(disp, bat)
-            disp.print(title, fg=r_fg_color, bg=r_bg_color, posx=80 - round(len(title) / 2 * 14), posy=posy)
-            if r_sub != '':
-                disp.print(r_sub, fg=r_fg_sub_color, bg=r_bg_sub_color, posx=80 - round(len(r_sub) / 2 * 14), posy=42)
+            disp.print(
+                title,
+                fg=r_fg_color,
+                bg=r_bg_color,
+                posx=80 - round(len(title) / 2 * 14),
+                posy=posy,
+            )
+            if r_sub != "":
+                disp.print(
+                    r_sub,
+                    fg=r_fg_sub_color,
+                    bg=r_bg_sub_color,
+                    posx=80 - round(len(r_sub) / 2 * 14),
+                    posy=42,
+                )
             disp.update()
             disp.close()
         utime.sleep(sleep)
@@ -274,49 +284,63 @@ with display.open() as disp:
     disp.clear().update()
     disp.close()
 if FILENAME_ADV in os.listdir("."):
-    f = open(FILENAME_ADV, 'r')
+    f = open(FILENAME_ADV, "r")
     try:
         c = ujson.loads(f.read())
         f.close()
         # parse config
-        nick = get_key(c, 'nickname', 'no nick')
-        sub = get_key(c, 'subtitle', '')
-        mode = get_key(c, 'mode', 0)
+        nick = get_key(c, "nickname", "no nick")
+        sub = get_key(c, "subtitle", "")
+        mode = get_key(c, "mode", 0)
         # battery
-        battery_show = get_key(c, 'battery', True)
-        battery_c_good = get_key(c, 'battery_color_good', [0, 230, 00])
-        battery_c_ok = get_key(c, 'battery_color_ok', [255, 215, 0])
-        battery_c_bad = get_key(c, 'battery_color_bad', [255, 0, 0])
+        battery_show = get_key(c, "battery", True)
+        battery_c_good = get_key(c, "battery_color_good", [0, 230, 00])
+        battery_c_ok = get_key(c, "battery_color_ok", [255, 215, 0])
+        battery_c_bad = get_key(c, "battery_color_bad", [255, 0, 0])
         # daytime values
-        background = get_key(c, 'background', [0, 0, 0])
-        fg_color = get_key(c, 'fg_color', [255, 255, 255])
-        bg_color = get_key(c, 'bg_color', background)
-        fg_sub_color = get_key(c, 'fg_sub_color', [255, 255, 255])
-        bg_sub_color = get_key(c, 'bg_sub_color', background)
+        background = get_key(c, "background", [0, 0, 0])
+        fg_color = get_key(c, "fg_color", [255, 255, 255])
+        bg_color = get_key(c, "bg_color", background)
+        fg_sub_color = get_key(c, "fg_sub_color", [255, 255, 255])
+        bg_sub_color = get_key(c, "bg_sub_color", background)
         # nighttime values
-        background_night = get_key(c, 'background_night', [0, 0, 0])
-        fg_color_night = get_key(c, 'fg_color_night', [255, 255, 255])
-        bg_color_night = get_key(c, 'bg_color_night', background_night)
-        fg_sub_color_night = get_key(c, 'fg_sub_color_night', [255, 255, 255])
-        bg_sub_color_night = get_key(c, 'bg_sub_color_night', background_night)
+        background_night = get_key(c, "background_night", [0, 0, 0])
+        fg_color_night = get_key(c, "fg_color_night", [255, 255, 255])
+        bg_color_night = get_key(c, "bg_color_night", background_night)
+        fg_sub_color_night = get_key(c, "fg_sub_color_night", [255, 255, 255])
+        bg_sub_color_night = get_key(c, "bg_sub_color_night", background_night)
         # render nickname
-        render_nickname(nick, sub, (fg_color, fg_color_night), (bg_color, bg_color_night),
-                        (fg_sub_color, fg_sub_color_night), (bg_sub_color, bg_sub_color_night),
-                        (background, background_night), mode,
-                        (battery_show, battery_c_good, battery_c_ok, battery_c_bad))
+        render_nickname(
+            nick,
+            sub,
+            (fg_color, fg_color_night),
+            (bg_color, bg_color_night),
+            (fg_sub_color, fg_sub_color_night),
+            (bg_sub_color, bg_sub_color_night),
+            (background, background_night),
+            mode,
+            (battery_show, battery_c_good, battery_c_ok, battery_c_bad),
+        )
     except ValueError:
-        render_error('invalid', 'json')
+        render_error("invalid", "json")
 else:
     if FILENAME not in os.listdir("."):
-        render_error('file not', 'found')
+        render_error("file not", "found")
     else:
-        f = open(FILENAME, 'r')
+        f = open(FILENAME, "r")
         nick = f.read()
         f.close()
         if len(nick) > 11:
-            render_error('name too', 'long')
+            render_error("name too", "long")
         if len(nick) < 1:
-            render_error('nick file', 'empty')
+            render_error("nick file", "empty")
         else:
-            render_nickname(nick, '', ([255, 255, 255], [255, 255, 255]), ([0, 0, 0], [0, 0, 0]),
-                            ([255, 255, 255], [255, 255, 255]), ([0, 0, 0], [0, 0, 0]), ([0, 0, 0], [0, 0, 0]))
+            render_nickname(
+                nick,
+                "",
+                ([255, 255, 255], [255, 255, 255]),
+                ([0, 0, 0], [0, 0, 0]),
+                ([255, 255, 255], [255, 255, 255]),
+                ([0, 0, 0], [0, 0, 0]),
+                ([0, 0, 0], [0, 0, 0]),
+            )

@@ -10,7 +10,7 @@ CONFIG_NAME = "at-timestamp.json"
 def init():
     if CONFIG_NAME not in os.listdir("."):
         at_config = {"time_start": "unset"}
-        f = open(CONFIG_NAME, 'w')
+        f = open(CONFIG_NAME, "w")
         f.write(ujson.dumps(at_config))
         f.close()
 
@@ -21,7 +21,7 @@ def init():
 
 
 def is_timestamp_set():
-    f = open(CONFIG_NAME, 'r')
+    f = open(CONFIG_NAME, "r")
     c = ujson.loads(f.read())
     f.close()
     if c["time_start"] == "unset":
@@ -39,29 +39,29 @@ def triangle(disp, x, y, left):
 
 
 def timestamp_reset():
-    f = open(CONFIG_NAME, 'r')
+    f = open(CONFIG_NAME, "r")
     c = ujson.loads(f.read())
     c["time_start"] = "unset"
     f.close()
-    f = open(CONFIG_NAME, 'w')
+    f = open(CONFIG_NAME, "w")
     f.write(ujson.dumps(c))
     f.close()
 
 
 def timestamp_read():
     global time_start
-    f = open(CONFIG_NAME, 'r')
+    f = open(CONFIG_NAME, "r")
     c = ujson.loads(f.read())
     time_start = c["time_start"]
     f.close()
 
 
 def timestamp_write():
-    f = open(CONFIG_NAME, 'r')
+    f = open(CONFIG_NAME, "r")
     c = ujson.loads(f.read())
     c["time_start"] = utime.time()
     f.close()
-    f = open(CONFIG_NAME, 'w')
+    f = open(CONFIG_NAME, "w")
     f.write(ujson.dumps(c))
     f.close()
 

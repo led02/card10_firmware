@@ -16,6 +16,7 @@ SPECIAL_EXIT = "[ exit ]"
 SPECIAL_EMPTY = "# empty file"
 BUTTON_TIMER_POPPED = -1
 
+
 def list_files():
     """Create a list of available text files."""
     files = sorted(os.listdir("/"))
@@ -30,9 +31,9 @@ def triangle(disp, x, y, left):
     """Draw a triangle to show there's more text in this line"""
     yf = 1 if left else -1
     scale = 6
-    disp.line(x - scale * yf, int(y + scale / 2), x, y, col=[255,0,0])
-    disp.line(x, y, x, y + scale, col=[255,0,0])
-    disp.line(x, y + scale, x - scale * yf, y + int(scale / 2), col=[255,0,0])
+    disp.line(x - scale * yf, int(y + scale / 2), x, y, col=[255, 0, 0])
+    disp.line(x, y, x, y + scale, col=[255, 0, 0])
+    disp.line(x, y + scale, x - scale * yf, y + int(scale / 2), col=[255, 0, 0])
 
 
 def button_events(timeout=0):
@@ -68,6 +69,7 @@ def button_events(timeout=0):
 
 COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
 
+
 def file_len(filename):
     i = -1
     with open(filename) as fh:
@@ -76,23 +78,19 @@ def file_len(filename):
     return i + 1
 
 
-def draw_filecontent(disp, filename, pos, linecount, lineoffset = 0):
+def draw_filecontent(disp, filename, pos, linecount, lineoffset=0):
     disp.clear()
     with open(filename) as fh:
 
         # stop if file is empty
         if linecount <= 0:
-            disp.print(
-                SPECIAL_EMPTY,
-                posy=20,
-                bg=color.BLACK
-            )
+            disp.print(SPECIAL_EMPTY, posy=20, bg=color.BLACK)
             return
 
         # calc start position
         start = 0
         if pos > 0:
-            start = pos-1
+            start = pos - 1
         if start + 4 > linecount:
             start = linecount - 4
         if start < 0:
@@ -104,21 +102,26 @@ def draw_filecontent(disp, filename, pos, linecount, lineoffset = 0):
                 break
             if i >= start:
                 disp.rect(
-                    0, (i - start) * 20, 159, (i - start) * 20 + 20,
-                    col=COLOR1 if i == pos else COLOR2
+                    0,
+                    (i - start) * 20,
+                    159,
+                    (i - start) * 20 + 20,
+                    col=COLOR1 if i == pos else COLOR2,
                 )
 
                 off = 0
                 linelength = len(line)
                 if i == pos and linelength > 11 and lineoffset > 0:
-                    off = lineoffset if lineoffset + 11 < linelength else linelength - 11
+                    off = (
+                        lineoffset if lineoffset + 11 < linelength else linelength - 11
+                    )
                 if lineoffset > linelength:
                     off = 0
 
                 disp.print(
-                    line[off:(off+11)],
+                    line[off : (off + 11)],
                     posy=(i - start) * 20,
-                    bg=COLOR1 if i == pos else COLOR2
+                    bg=COLOR1 if i == pos else COLOR2,
                 )
                 if linelength > 11 and off < linelength - 11:
                     triangle(disp, 153, (i - start) * 20 + 6, False)
@@ -133,7 +136,7 @@ def draw_filelist(disp, filelist, pos, filecount, lineoffset):
 
     start = 0
     if pos > 0:
-        start = pos-1
+        start = pos - 1
     if start + 4 > filecount:
         start = filecount - 4
     if start < 0:
@@ -144,8 +147,11 @@ def draw_filelist(disp, filelist, pos, filecount, lineoffset):
             break
         if i >= start:
             disp.rect(
-                0, (i - start) * 20, 159, (i - start) * 20 + 20,
-                col=COLOR1 if i == pos else COLOR2
+                0,
+                (i - start) * 20,
+                159,
+                (i - start) * 20 + 20,
+                col=COLOR1 if i == pos else COLOR2,
             )
 
             off = 0
@@ -156,9 +162,9 @@ def draw_filelist(disp, filelist, pos, filecount, lineoffset):
                 off = 0
 
             disp.print(
-                " " + line[off:(off+10)],
+                " " + line[off : (off + 10)],
                 posy=(i - start) * 20,
-                bg=COLOR1 if i == pos else COLOR2
+                bg=COLOR1 if i == pos else COLOR2,
             )
             if i == pos:
                 disp.print(">", posy=(i - start) * 20, fg=color.COMMYELLOW, bg=COLOR1)
@@ -214,11 +220,14 @@ def main():
 
             elif ev == BUTTON_TIMER_POPPED:
                 timercountpopped += 1
-                if timercountpopped >= timerstartscroll and (timercountpopped - timerstartscroll) % timerscrollspeed == 0:
+                if (
+                    timercountpopped >= timerstartscroll
+                    and (timercountpopped - timerstartscroll) % timerscrollspeed == 0
+                ):
                     lineoffset += 1
 
             elif ev == buttons.TOP_RIGHT:
-                filename = filelist [ current_file % numfiles ]
+                filename = filelist[current_file % numfiles]
 
                 # exit or ignore
                 if filename == SPECIAL_EXIT:
@@ -267,7 +276,10 @@ def main():
 
             elif ev == BUTTON_TIMER_POPPED:
                 timercountpopped += 1
-                if timercountpopped >= timerstartscroll and (timercountpopped - timerstartscroll) % timerscrollspeed == 0:
+                if (
+                    timercountpopped >= timerstartscroll
+                    and (timercountpopped - timerstartscroll) % timerscrollspeed == 0
+                ):
                     lineoffset += 1
 
             elif ev == buttons.TOP_RIGHT:
