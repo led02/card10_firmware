@@ -16,8 +16,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define FACTOR  2
 #define WSF_BUF_POOLS 6
-#define WSF_BUF_SIZE 0x1048
+#define WSF_BUF_SIZE (0x1048 * FACTOR)
 
 uint32_t SystemHeapSize = WSF_BUF_SIZE;
 uint32_t SystemHeap[WSF_BUF_SIZE / 4];
@@ -30,12 +31,12 @@ static TaskHandle_t ble_task_id = NULL;
 /* clang-format off */
 static wsfBufPoolDesc_t mainPoolDesc[WSF_BUF_POOLS] =
 {
-  {  16,  8 },
-  {  32,  4 },
-  {  64,  4 },
-  { 128,  4 },
-  { 256,  4 },
-  { 512,  4 }
+  {  16,  8*FACTOR },
+  {  32,  4*FACTOR },
+  {  64,  4*FACTOR },
+  { 128,  4*FACTOR },
+  { 256,  4*FACTOR },
+  { 512,  4*FACTOR }
 };
 /* clang-format on */
 
