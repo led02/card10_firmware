@@ -85,13 +85,12 @@ static const attsAttr_t uartAttrCfgList[] = {
 		.permissions = ATTS_PERMIT_READ,
 	},
 	/* UART tx value */
-	/* TODO: do we need ATTS_SET_READ_CBACK ? */
 	{
 		.pUuid       = attUartTxChUuid,
 		.pValue      = uartTxCh_buf,
 		.pLen        = &uartTxCh_buf_len,
 		.maxLen      = sizeof(uartTxCh_buf),
-		.settings    = ATTS_SET_READ_CBACK,
+		.settings    = 0,
 		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
 			       ATTS_PERMIT_READ_AUTH,
 	},
@@ -109,17 +108,6 @@ static const attsAttr_t uartAttrCfgList[] = {
 };
 
 dmConnId_t active_connection = 0;
-
-static uint8_t UARTReadCback(
-	dmConnId_t connId,
-	uint16_t handle,
-	uint8_t operation,
-	uint16_t offset,
-	attsAttr_t *pAttr
-) {
-	printf("read callback\n");
-	return ATT_SUCCESS;
-}
 
 static uint8_t UARTWriteCback(
 	dmConnId_t connId,
@@ -197,7 +185,6 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 
 static attsGroup_t uartCfgGroup = {
 	.pAttr       = (attsAttr_t *)uartAttrCfgList,
-	.readCback   = UARTReadCback,
 	.writeCback  = UARTWriteCback,
 	.startHandle = UART_START_HDL,
 	.endHandle   = UART_END_HDL,
