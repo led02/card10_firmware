@@ -27,7 +27,21 @@ static QueueHandle_t read_queue;
  */
 void epic_uart_write_str(const char *str, intptr_t length)
 {
+	uint32_t basepri = __get_BASEPRI();
+	if (xPortIsInsideInterrupt()) {
+		taskENTER_CRITICAL_FROM_ISR();
+	} else {
+		taskENTER_CRITICAL();
+	}
+
 	UART_Write(ConsoleUart, (uint8_t *)str, length);
+
+	if (xPortIsInsideInterrupt()) {
+		taskEXIT_CRITICAL_FROM_ISR(basepri);
+	} else {
+		taskEXIT_CRITICAL();
+	}
+
 	cdcacm_write((uint8_t *)str, length);
 	ble_uart_write((uint8_t *)str, length);
 }
