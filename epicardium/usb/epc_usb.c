@@ -365,8 +365,7 @@ static void usb_app_wakeup(void)
 static void cb_timerReset(TimerHandle_t t)
 {
 	(void)t;
-	int s = usb_get_status();
-	LOG_DEBUG("usb", "cb_timerReset %08x", s);
+	LOG_DEBUG("usb", "cb_timerReset %08x", usb_get_status());
 
 	LOG_DEBUG("usb", "SYS_USBHS_Shutdown");
 	SYS_USBHS_Shutdown();
