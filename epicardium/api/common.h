@@ -38,7 +38,7 @@ struct api_call_mem {
 	api_id_t id;
 
 	/* ID of the current interrupt */
-	api_int_id_t int_id;
+	volatile api_int_id_t int_id;
 
 	/*
 	 * Buffer for arguments/return value.  This buffer will be
