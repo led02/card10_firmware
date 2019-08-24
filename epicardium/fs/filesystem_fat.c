@@ -16,6 +16,7 @@
 
 #include <FreeRTOS.h>
 #include <semphr.h>
+#include <timers.h>
 
 #include "fs/internal.h"
 #include "modules/filesystem.h"
@@ -57,7 +58,7 @@ struct FatObject {
 struct EpicFileSystem {
 	struct FatObject pool[EPIC_FAT_MAX_OPENED];
 	uint32_t generationCount;
-	bool initialized;
+	bool attached;
 	FATFS FatFs;
 	int lockCoreMask;
 };
@@ -102,6 +103,11 @@ static StaticSemaphore_t s_globalLockBuffer;
 
 static SemaphoreHandle_t s_globalLock = NULL;
 
+static void cb_attachTimer(void *a, uint32_t b)
+{
+	fatfs_attach();
+}
+
 void fatfs_init()
 {
 	static volatile bool s_initCalled = false;
@@ -117,6 +123,7 @@ void fatfs_init()
 #else
 	s_globalLock = xSemaphoreCreateMutex();
 #endif
+
 	s_globalFileSystem.generationCount = 1;
 	fatfs_attach();
 }
@@ -137,11 +144,11 @@ int fatfs_attach()
 	int rc = 0;
 	if (globalLockAccquire()) {
 		EpicFileSystem *fs = &s_globalFileSystem;
-		if (!fs->initialized) {
+		if (!fs->attached) {
 			ff_res = f_mount(&fs->FatFs, "/", 0);
 			if (ff_res == FR_OK) {
-				fs->initialized = true;
-				SSLOG_DEBUG("FatFs mounted\n");
+				fs->attached = true;
+				SSLOG_INFO("attached\n");
 			} else {
 				SSLOG_ERR(
 					"f_mount error %s\n",
@@ -158,25 +165,38 @@ int fatfs_attach()
 	return rc;
 }
 
+void fatfs_schedule_attach(void)
+{
+	//if we're running in thread context, cont't call the *FromISR version
+	if (xPortIsInsideInterrupt()) {
+		xTimerPendFunctionCallFromISR(cb_attachTimer, NULL, 0, NULL);
+	} else {
+		xTimerPendFunctionCall(
+			cb_attachTimer, NULL, 0, 1); //wait 1 tick
+	}
+}
+
 void fatfs_detach()
 {
 	FRESULT ff_res;
 	EpicFileSystem *fs;
 	if (efs_lock_global(&fs) == 0) {
-		efs_close_all(fs, EPICARDIUM_COREMASK_BOTH);
+		if (fs->attached) {
+			efs_close_all(fs, EPICARDIUM_COREMASK_BOTH);
 
-		//unmount by passing NULL as fs object, will destroy our sync object via ff_del_syncobj
-		ff_res = f_mount(NULL, "/", 0);
-		if (ff_res != FR_OK) {
-			SSLOG_ERR(
-				"f_mount (unmount) error %s\n",
-				f_get_rc_string(ff_res)
-			);
+			//unmount by passing NULL as fs object, will destroy our sync object via ff_del_syncobj
+			ff_res = f_mount(NULL, "/", 0);
+			if (ff_res != FR_OK) {
+				SSLOG_ERR(
+					"f_mount (unmount) error %s\n",
+					f_get_rc_string(ff_res)
+				);
+			}
+
+			fs->attached = false;
+			disk_deinitialize();
+			SSLOG_INFO("detached\n");
 		}
-
-		fs->initialized = false;
-		disk_deinitialize();
-		SSLOG_INFO("detached\n");
 		efs_unlock_global(fs);
 	}
 }
@@ -223,7 +243,7 @@ int efs_lock_global(EpicFileSystem **fs)
 	if (!globalLockAccquire()) {
 		return -EBUSY;
 	}
-	if (!s_globalFileSystem.initialized) {
+	if (!s_globalFileSystem.attached) {
 		globalLockRelease();
 		return -ENODEV;
 	}

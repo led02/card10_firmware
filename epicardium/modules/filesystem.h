@@ -16,8 +16,18 @@ void fatfs_init(void);
 
 /**
  * initialize and mount the FLASH storage
+ * 
+ * NOTE: not safe to be called from an ISR
  */
 int fatfs_attach(void);
+
+
+/**
+ * asynchronously attach the FLASH storage
+ * 
+ * safe to be called from an ISR
+ */
+void fatfs_schedule_attach(void);
 
 /** close all opened FDs, sync and deinitialize FLASH layer */
 void fatfs_detach(void);

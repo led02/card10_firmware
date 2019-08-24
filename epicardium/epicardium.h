@@ -131,6 +131,10 @@ typedef _Bool bool;
 #define API_MAX86150_GET_DATA		0x0101
 #define API_MAX86150_SET_LED_AMPLITUDE	0x0102
 
+#define API_USB_SHUTDOWN           0x110
+#define API_USB_STORAGE            0x111
+#define API_USB_CDCACM             0x112
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -1700,5 +1704,20 @@ API(API_MAX30001_DISABLE, int epic_max30001_disable_sensor(
 void
 ));
 
+/**
+ * De-initialize the currently configured USB device (if any)
+ *
+ */
+API(API_USB_SHUTDOWN, int epic_usb_shutdown(void));
+/**
+ * Configure the USB peripheral to export the internal FLASH
+ * as a Mass Storage device
+ */
+API(API_USB_STORAGE, int epic_usb_storage(void));
+/**
+ * Configure the USB peripheral to provide card10's stdin/stdout
+ * on a USB CDC-ACM device
+ */
+API(API_USB_CDCACM, int epic_usb_cdcacm(void));
 
 #endif /* _EPICARDIUM_H */

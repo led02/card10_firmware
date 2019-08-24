@@ -4,7 +4,7 @@
 #include "modules/modules.h"
 
 #include "max32665.h"
-#include "cdcacm.h"
+#include "usb/cdcacm.h"
 #include "uart.h"
 
 #include "FreeRTOS.h"
