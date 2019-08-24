@@ -6,12 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Enabled the Hardware Watchdog;  Card10 will reset itself if the firmware crashes
+- The name of the offending app is printed to the serial console, if an app
+  crashes the metatdata parser.
 
 ### Changed
 - Improved log messages in cases of lock-contention.
 
 ### Fixed
 - "Card10 Nickname" crashing if only `nickname.txt` exists.
+- Lockup when debug prints are enabled.
+- Delayed BHI160 startup a bit so the PMIC task can check the battery first.
+- Relaxed the PMIC lock-timeouts so other task can take a little more time.
 
 
 ## [v1.6] - 2019-08-23 20:30 - [Fennel]
