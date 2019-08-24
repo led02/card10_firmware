@@ -11,12 +11,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Improved log messages in cases of lock-contention.
+- Menu will show an error message if a crash occurs.
 
 ### Fixed
 - "Card10 Nickname" crashing if only `nickname.txt` exists.
 - Lockup when debug prints are enabled.
 - Delayed BHI160 startup a bit so the PMIC task can check the battery first.
 - Relaxed the PMIC lock-timeouts so other task can take a little more time.
+- Fixed off-by-one error in `gfx_line()`.
+- Fixed the API interrupts sometimes getting stuck.
+- Fixed binary building on MacOS.
+- Fixed race-conditions in serial console prints by introducing a queue.
 
 
 ## [v1.6] - 2019-08-23 20:30 - [Fennel]
