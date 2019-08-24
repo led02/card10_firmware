@@ -12,6 +12,8 @@
 
 int main(void)
 {
+	watchdog_init();
+
 	LOG_INFO("startup", "Epicardium startup ...");
 	LOG_INFO("startup", "Version " CARD10_VERSION);
 
@@ -126,14 +128,6 @@ int main(void)
 		LOG_CRIT("startup", "Failed to create %s task!", "Lifecycle");
 		abort();
 	}
-
-	/* Watchdog petting */
-#if 0
-	/*
-	 * Disabled for this release.
-	 */
-	watchdog_clearer_init();
-#endif
 
 	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
