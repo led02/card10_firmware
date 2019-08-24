@@ -72,7 +72,8 @@ static const attsAttr_t uartAttrCfgList[] = {
 		.pLen        = NULL,
 		.maxLen      = 128,
 		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
-		.permissions = ATTS_PERMIT_WRITE,
+		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+			       ATTS_PERMIT_WRITE_AUTH,
 	},
 	/* UART tx characteristic */
 	{
@@ -91,7 +92,8 @@ static const attsAttr_t uartAttrCfgList[] = {
 		.pLen        = &uartTxCh_buf_len,
 		.maxLen      = sizeof(uartTxCh_buf),
 		.settings    = ATTS_SET_READ_CBACK,
-		.permissions = ATTS_PERMIT_READ,
+		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+			       ATTS_PERMIT_READ_AUTH,
 	},
 	/* UART tx CCC descriptor */
 	{
@@ -100,7 +102,9 @@ static const attsAttr_t uartAttrCfgList[] = {
 		.pLen        = NULL,
 		.maxLen      = 0,
 		.settings    = ATTS_SET_CCC,
-		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_WRITE,
+		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 };
 
