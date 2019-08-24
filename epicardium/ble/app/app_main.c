@@ -37,6 +37,8 @@
 #include "app_main.h"
 #include "app_ui.h"
 
+#include "modules/log.h"
+
 /**************************************************************************************************
   Global Variables
 **************************************************************************************************/
@@ -282,6 +284,8 @@ void AppHandlePasskey(dmSecAuthReqIndEvt_t *pAuthReq)
 void AppHandleNumericComparison(dmSecCnfIndEvt_t *pCnfInd)
 {
   uint32_t confirm = DmSecGetCompareValue(pCnfInd->confirm);
+
+  LOG_INFO("ble", "Confirm Value: %ld", confirm);
 
   /* display confirmation value */
   AppUiDisplayConfirmValue(confirm);

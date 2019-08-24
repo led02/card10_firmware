@@ -38,6 +38,8 @@
 #include "hrps/hrps_api.h"
 #include "rscp/rscp_api.h"
 
+#include "modules/log.h"
+
 /**************************************************************************************************
   Macros
 **************************************************************************************************/
@@ -373,6 +375,7 @@ static void bleSetup(bleMsg_t *pMsg)
 static void bleProcMsg(bleMsg_t *pMsg)
 {
   uint8_t uiEvent = APP_UI_NONE;
+  hciLeConnCmplEvt_t *connOpen;
 
   switch(pMsg->hdr.event)
   {
@@ -395,36 +398,88 @@ static void bleProcMsg(bleMsg_t *pMsg)
       break;
 
     case DM_ADV_START_IND:
+      LOG_INFO("ble", "Advertisement started");
       uiEvent = APP_UI_ADV_START;
       break;
 
     case DM_ADV_STOP_IND:
+      LOG_INFO("ble", "Advertisement stopped");
       uiEvent = APP_UI_ADV_STOP;
       break;
 
     case DM_CONN_OPEN_IND:
+      connOpen = &pMsg->dm.connOpen;
+      LOG_INFO("ble", "connection from %02X:%02X:%02X:%02X:%02X:%02X opened",
+               connOpen->peerAddr[0], connOpen->peerAddr[1],
+               connOpen->peerAddr[2], connOpen->peerAddr[3],
+               connOpen->peerAddr[4], connOpen->peerAddr[5]);
       BasProcMsg(&pMsg->hdr);
       uiEvent = APP_UI_CONN_OPEN;
       break;
 
     case DM_CONN_CLOSE_IND:
+      switch (pMsg->dm.connClose.reason)
+      {
+        case HCI_ERR_CONN_TIMEOUT:
+          LOG_INFO("ble", "Connection closed (0x%02X), Connection timeout",
+                   pMsg->dm.connClose.reason);
+          break;
+        case HCI_ERR_LOCAL_TERMINATED:
+          LOG_INFO("ble", "Connection closed (0x%02X), Connection terminated by local host",
+                   pMsg->dm.connClose.reason);
+          break;
+        case HCI_ERR_REMOTE_TERMINATED:
+          LOG_INFO("ble", "Connection closed (0x%02X), Remote user terminated connection",
+                   pMsg->dm.connClose.reason);
+          break;
+        case HCI_ERR_CONN_FAIL:
+          LOG_INFO("ble", "Connection closed (0x%02X), Connection failed to be established",
+                   pMsg->dm.connClose.reason);
+          break;
+        case HCI_ERR_MIC_FAILURE:
+          LOG_INFO("ble", "Connection closed (0x%02X), Connection terminated due to MIC failure",
+                   pMsg->dm.connClose.reason);
+          break;
+        default:
+          LOG_INFO("ble", "Connection closed (0x%02X)",
+                   pMsg->dm.connClose.reason);
+          break;
+      }
       bleClose(pMsg);
       uiEvent = APP_UI_CONN_CLOSE;
       break;
 
     case DM_SEC_PAIR_CMPL_IND:
+      LOG_INFO("ble", "Secure pairing successful, auth: 0x%02X",
+               pMsg->dm.pairCmpl.auth);
       uiEvent = APP_UI_SEC_PAIR_CMPL;
       break;
 
     case DM_SEC_PAIR_FAIL_IND:
+      switch (pMsg->hdr.status) {
+        case SMP_ERR_TIMEOUT:
+          LOG_INFO("ble", "Secure pairing failed (0x%02X), Transaction timeout",
+                   pMsg->hdr.status);
+          break;
+        case SMP_ERR_ATTEMPTS:
+          LOG_INFO("ble", "Secure pairing failed (0x%02X), Repeated attempts",
+                   pMsg->hdr.status);
+          break;
+        default:
+          LOG_INFO("ble", "Secure pairing failed (0x%02X)",
+                   pMsg->hdr.status);
+          break;
+      }
       uiEvent = APP_UI_SEC_PAIR_FAIL;
       break;
 
     case DM_SEC_ENCRYPT_IND:
+      LOG_INFO("ble", "Encrypted handshake successful");
       uiEvent = APP_UI_SEC_ENCRYPT;
       break;
 
     case DM_SEC_ENCRYPT_FAIL_IND:
+      LOG_INFO("ble", "Encrypted handshake failed");
       uiEvent = APP_UI_SEC_ENCRYPT_FAIL;
       break;
 
@@ -441,6 +496,7 @@ static void bleProcMsg(bleMsg_t *pMsg)
       break;
 
     case DM_HW_ERROR_IND:
+      LOG_ERR("ble", "HW Error");
       uiEvent = APP_UI_HW_ERROR;
       break;
 
