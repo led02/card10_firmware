@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 ## [v1.7] - 2019-08-24 21:48 - [Garlic]
+[Garlic]: https://card10.badge.events.ccc.de/release/card10-v1.7-Garlic.zip
+
 ### Added
 - **ESB**: Epic Serial Bus (Better than USB!), stability improvements of the
   USB module.  Preparation for mass-storage access in the Firmware.
