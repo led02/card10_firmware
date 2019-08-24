@@ -18,6 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define LOCK_WAIT pdMS_TO_TICKS(1000)
+
 /* Task ID for the pmic handler */
 static TaskHandle_t pmic_task_id = NULL;
 
@@ -51,12 +53,12 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 		return -EINVAL;
 	}
 
-	int adc_ret = hwlock_acquire(HWLOCK_ADC, pdMS_TO_TICKS(100));
+	int adc_ret = hwlock_acquire(HWLOCK_ADC, LOCK_WAIT);
 	if (adc_ret < 0) {
 		ret = adc_ret;
 		goto done;
 	}
-	i2c_ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	i2c_ret = hwlock_acquire(HWLOCK_I2C, LOCK_WAIT);
 	if (i2c_ret < 0) {
 		ret = i2c_ret;
 		goto done;
@@ -71,10 +73,9 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 	 * release the I2C mutex.
 	 */
 	hwlock_release(HWLOCK_I2C);
-	i2c_ret = 0;
 
 	vTaskDelay(pdMS_TO_TICKS(5));
-	i2c_ret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
+	i2c_ret = hwlock_acquire(HWLOCK_I2C, LOCK_WAIT);
 	if (i2c_ret < 0) {
 		ret = i2c_ret;
 		goto done;
@@ -138,7 +139,7 @@ done:
 static void
 pmic_poll_interrupts(TickType_t *button_start_tick, TickType_t duration)
 {
-	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(500)) < 0) {
+	while (hwlock_acquire(HWLOCK_I2C, LOCK_WAIT) < 0) {
 		LOG_WARN("pmic", "Failed to acquire I2C. Retrying ...");
 		xTaskNotify(pmic_task_id, PMIC_NOTIFY_IRQ, eSetBits);
 		return;
