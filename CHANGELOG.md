@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Enabled the Hardware Watchdog;  Card10 will reset itself if the firmware crashes
 - The name of the offending app is printed to the serial console, if an app
   crashes the metatdata parser.
+- **ESB**: Epic Serial Bus (Better than USB!), stability improvements of the
+  USB module.  Preparation for mass-storage access in the Firmware.
 
 ### Changed
 - Improved log messages in cases of lock-contention.
@@ -22,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed the API interrupts sometimes getting stuck.
 - Fixed binary building on MacOS.
 - Fixed race-conditions in serial console prints by introducing a queue.
+- Fixed API mutex being disabled late sometimes.
+- Fixed wrong stripe width in bi flag.
 
 
 ## [v1.6] - 2019-08-23 20:30 - [Fennel]
