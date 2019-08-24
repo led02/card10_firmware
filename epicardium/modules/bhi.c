@@ -415,7 +415,7 @@ void vBhi160Task(void *pvParameters)
 	/*
 	 * Wait a little before initializing BHI160.
 	 */
-	vTaskDelay(pdMS_TO_TICKS(500));
+	vTaskDelay(pdMS_TO_TICKS(3));
 
 	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
 	if (lockret < 0) {
