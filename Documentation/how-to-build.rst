@@ -143,3 +143,13 @@ In order to do a rebuild you can issue a clean command to ninja via
   $ ninja -C build/ -t clean
 
 Otherwise, rerunning ``./bootstrap.sh`` will also clean the build-directory.
+
+.. note::
+
+   If you try to flash pycardium_epicardium.bin (renamed to card10.bin) 
+   and the bootloader does not finish updating, the file might be too large.
+   ~700kB is the normal size, but problems were reported where the file size 
+   was >1MB. This was caused by the ``tr`` tool in the build process 
+   (it's supposed to create a large file with 0xff in it) - this requires the 
+   LC_ALL environment variable to be not set, or set to "C" 
+   (but not UTF8 or similar).
