@@ -17,6 +17,7 @@
 #include "cdc_acm.h"
 
 #include "modules/log.h"
+#include "modules/modules.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -118,8 +119,11 @@ void USB_IRQHandler(void)
 
 	if (serial_task_id != NULL) {
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-		vTaskNotifyGiveFromISR(
-			serial_task_id, &xHigherPriorityTaskWoken
+		xTaskNotifyFromISR(
+			serial_task_id,
+			SERIAL_READ_NOTIFY,
+			eSetBits,
+			&xHigherPriorityTaskWoken
 		);
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	}

@@ -10,40 +10,115 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "stream_buffer.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
+/* The serial console in use (UART0) */
+extern mxc_uart_regs_t *ConsoleUart;
+
 /* Task ID for the serial handler */
 TaskHandle_t serial_task_id = NULL;
 
-/* The serial console in use (UART0) */
-extern mxc_uart_regs_t *ConsoleUart;
 /* Read queue, filled by both UART and CDCACM */
 static QueueHandle_t read_queue;
+/* Stream Buffer for handling all writes to serial */
+static StreamBufferHandle_t write_stream_buffer = NULL;
+
+void serial_init()
+{
+	/* Setup read queue */
+	static uint8_t buffer[sizeof(char) * SERIAL_READ_BUFFER_SIZE];
+	static StaticQueue_t read_queue_data;
+	read_queue = xQueueCreateStatic(
+		SERIAL_READ_BUFFER_SIZE, sizeof(char), buffer, &read_queue_data
+	);
+
+	/* Setup write queue */
+	static uint8_t ucWrite_stream_buffer[SERIAL_WRITE_STREAM_BUFFER_SIZE];
+	static StaticStreamBuffer_t xStream_buffer_struct;
+	write_stream_buffer = xStreamBufferCreateStatic(
+		sizeof(ucWrite_stream_buffer),
+		1,
+		ucWrite_stream_buffer,
+		&xStream_buffer_struct
+	);
+}
 
 /*
  * API-call to write a string.  Output goes to both CDCACM and UART
  */
 void epic_uart_write_str(const char *str, intptr_t length)
 {
-	uint32_t basepri = __get_BASEPRI();
+	if (length == 0) {
+		return;
+	}
+
+	/*
+	 * Check if the stream buffer is even initialized yet
+	 */
+	if (write_stream_buffer == NULL) {
+		UART_Write(ConsoleUart, (uint8_t *)str, length);
+		cdcacm_write((uint8_t *)str, length);
+		return;
+	}
+
 	if (xPortIsInsideInterrupt()) {
+		BaseType_t resched1 = pdFALSE;
+		BaseType_t resched2 = pdFALSE;
+
+		/*
+		 * Enter a critial section so no other task can write to the
+		 * stream buffer.
+		 */
+		uint32_t basepri = __get_BASEPRI();
 		taskENTER_CRITICAL_FROM_ISR();
-	} else {
-		taskENTER_CRITICAL();
-	}
 
-	UART_Write(ConsoleUart, (uint8_t *)str, length);
+		xStreamBufferSendFromISR(
+			write_stream_buffer, str, length, &resched1
+		);
 
-	if (xPortIsInsideInterrupt()) {
 		taskEXIT_CRITICAL_FROM_ISR(basepri);
-	} else {
-		taskEXIT_CRITICAL();
-	}
 
-	cdcacm_write((uint8_t *)str, length);
-	ble_uart_write((uint8_t *)str, length);
+		if (serial_task_id != NULL) {
+			xTaskNotifyFromISR(
+				serial_task_id,
+				SERIAL_WRITE_NOTIFY,
+				eSetBits,
+				&resched2
+			);
+		}
+
+		/* Yield if this write woke up a higher priority task */
+		portYIELD_FROM_ISR(resched1 || resched2);
+	} else {
+		size_t bytes_sent = 0;
+		size_t index      = 0;
+		do {
+			taskENTER_CRITICAL();
+			/*
+			 * Wait time needs to be zero, because we are in a
+			 * critical section.
+			 */
+			bytes_sent = xStreamBufferSend(
+				write_stream_buffer,
+				&str[index],
+				length - index,
+				0
+			);
+			index += bytes_sent;
+			taskEXIT_CRITICAL();
+			if (serial_task_id != NULL) {
+				xTaskNotify(
+					serial_task_id,
+					SERIAL_WRITE_NOTIFY,
+					eSetBits
+				);
+				portYIELD();
+			}
+		} while (index < length);
+	}
 }
 
 /*
@@ -101,7 +176,12 @@ void UART0_IRQHandler(void)
 static void uart_callback(uart_req_t *req, int error)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	vTaskNotifyGiveFromISR(serial_task_id, &xHigherPriorityTaskWoken);
+	xTaskNotifyFromISR(
+		serial_task_id,
+		SERIAL_READ_NOTIFY,
+		eSetBits,
+		&xHigherPriorityTaskWoken
+	);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -122,15 +202,7 @@ void serial_enqueue_char(char chr)
 
 void vSerialTask(void *pvParameters)
 {
-	static uint8_t buffer[sizeof(char) * SERIAL_READ_BUFFER_SIZE];
-	static StaticQueue_t read_queue_data;
-
 	serial_task_id = xTaskGetCurrentTaskHandle();
-
-	/* Setup read queue */
-	read_queue = xQueueCreateStatic(
-		SERIAL_READ_BUFFER_SIZE, sizeof(char), buffer, &read_queue_data
-	);
 
 	/* Setup UART interrupt */
 	NVIC_ClearPendingIRQ(UART0_IRQn);
@@ -145,6 +217,9 @@ void vSerialTask(void *pvParameters)
 		.callback = uart_callback,
 	};
 
+	uint8_t rx_data[20];
+	size_t received_bytes;
+
 	while (1) {
 		int ret = UART_ReadAsync(ConsoleUart, &read_req);
 		if (ret != E_NO_ERROR && ret != E_BUSY) {
@@ -152,18 +227,55 @@ void vSerialTask(void *pvParameters)
 			vTaskDelay(portMAX_DELAY);
 		}
 
-		ulTaskNotifyTake(pdTRUE, portTICK_PERIOD_MS * 1000);
+		ret = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-		if (read_req.num > 0) {
-			serial_enqueue_char(*read_req.data);
+		if (ret & SERIAL_WRITE_NOTIFY) {
+			do {
+				received_bytes = xStreamBufferReceive(
+					write_stream_buffer,
+					(void *)rx_data,
+					sizeof(rx_data),
+					0
+				);
+
+				if (received_bytes == 0) {
+					break;
+				}
+
+				/*
+				 * The SDK-driver for UART is not reentrant
+				 * which means we need to perform UART writes
+				 * in a critical section.
+				 */
+				taskENTER_CRITICAL();
+				UART_Write(
+					ConsoleUart,
+					(uint8_t *)&rx_data,
+					received_bytes
+				);
+				taskEXIT_CRITICAL();
+
+				cdcacm_write(
+					(uint8_t *)&rx_data, received_bytes
+				);
+				ble_uart_write(
+					(uint8_t *)&rx_data, received_bytes
+				);
+			} while (received_bytes > 0);
 		}
 
-		while (UART_NumReadAvail(ConsoleUart) > 0) {
-			serial_enqueue_char(UART_ReadByte(ConsoleUart));
-		}
+		if (ret & SERIAL_READ_NOTIFY) {
+			if (read_req.num > 0) {
+				serial_enqueue_char(*read_req.data);
+			}
 
-		while (cdcacm_num_read_avail() > 0) {
-			serial_enqueue_char(cdcacm_read());
+			while (UART_NumReadAvail(ConsoleUart) > 0) {
+				serial_enqueue_char(UART_ReadByte(ConsoleUart));
+			}
+
+			while (cdcacm_num_read_avail() > 0) {
+				serial_enqueue_char(cdcacm_read());
+			}
 		}
 	}
 }
