@@ -412,6 +412,11 @@ void vBhi160Task(void *pvParameters)
 	bhi160_task_id = xTaskGetCurrentTaskHandle();
 	bhi160_mutex   = xSemaphoreCreateMutexStatic(&bhi160_mutex_data);
 
+	/*
+	 * Wait a little before initializing BHI160.
+	 */
+	vTaskDelay(pdMS_TO_TICKS(500));
+
 	int lockret = hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(100));
 	if (lockret < 0) {
 		LOG_CRIT("bhi160", "Failed to acquire I2C lock!");
