@@ -206,6 +206,13 @@ void leds_prep(uint8_t led, uint8_t r, uint8_t g, uint8_t b)
 	leds[led][2] = b;
 }
 
+void leds_get_rgb(uint8_t led, uint8_t *rgb)
+{
+	rgb[0] = leds[led][0];
+	rgb[1] = leds[led][1];
+	rgb[2] = leds[led][2];
+}
+
 #if 0
 //don't use, is buggy
 void leds_set_autodim(uint8_t led, uint8_t r, uint8_t g, uint8_t b)

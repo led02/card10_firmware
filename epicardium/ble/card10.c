@@ -125,7 +125,7 @@ static const uint8_t UUID_attChar_rockets[] = {
 
 /* BLE UUID for card10 led background bottom left */
 static const uint8_t UUID_char_led_bg_bottom_left[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
 };
@@ -134,9 +134,13 @@ static const uint8_t UUID_attChar_led_bg_bottom_left[] = {
 	CARD10_UUID_SUFFIX, 0x11, CARD10_UUID_PREFIX
 };
 
+static uint8_t ledBGBottomLeftValue[] = { 0,0,0 };
+// works vor everyone?
+static uint16_t rgbLen = sizeof(ledBGBottomLeftValue);
+
 /* BLE UUID for card10 led background bottom right */
 static const uint8_t UUID_char_led_bg_bottom_right[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
 };
@@ -145,9 +149,11 @@ static const uint8_t UUID_attChar_led_bg_bottom_right[] = {
 	CARD10_UUID_SUFFIX, 0x12, CARD10_UUID_PREFIX
 };
 
+static uint8_t ledBGBottomRightValue[] = { 0,0,0 };
+
 /* BLE UUID for card10 led background top right */
 static const uint8_t UUID_char_led_bg_top_right[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_RIGHT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
 };
@@ -156,9 +162,11 @@ static const uint8_t UUID_attChar_led_bg_top_right[] = {
 	CARD10_UUID_SUFFIX, 0x13, CARD10_UUID_PREFIX
 };
 
+static uint8_t ledBGTopRightValue[] = { 0,0,0 };
+
 /* BLE UUID for card10 led background top left */
 static const uint8_t UUID_char_led_bg_top_left[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LED_BG_TOP_LEFT_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
 };
@@ -166,6 +174,8 @@ static const uint8_t UUID_char_led_bg_top_left[] = {
 static const uint8_t UUID_attChar_led_bg_top_left[] = {
 	CARD10_UUID_SUFFIX, 0x14, CARD10_UUID_PREFIX
 };
+
+static uint8_t ledBGTopLeftValue[] = { 0,0,0 };
 
 /* BLE UUID for card10 dim leds on bottom */
 static const uint8_t UUID_char_leds_bottom_dim[] = {
@@ -227,7 +237,7 @@ static uint16_t personalStateLen = sizeof(personalStateValue);
 
 /* BLE UUID for card10 above leds */
 static const uint8_t UUID_char_leds_above[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_LEDS_ABOVE_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
 };
@@ -235,6 +245,21 @@ static const uint8_t UUID_char_leds_above[] = {
 static const uint8_t UUID_attChar_leds_above[] = {
 	CARD10_UUID_SUFFIX, 0x20, CARD10_UUID_PREFIX
 };
+static uint8_t aboveLEDsValue[] = {
+	0,0,0, //  0
+	0,0,0, //  1
+	0,0,0, //  2
+	0,0,0, //  3
+	0,0,0, //  4
+	0,0,0, //  5
+	0,0,0, //  6
+	0,0,0, //  7
+	0,0,0, //  8
+	0,0,0, //  9
+	0,0,0, // 10
+};
+static uint16_t aboveLEDsLen = sizeof(aboveLEDsValue);
+
 // starting at 0xf0 with read only characteristics
 
 /* BLE UUID for card10 char light sensor */
@@ -331,11 +356,13 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_led_bg_bottom_left,
-		.pValue      = NULL,
+		.pValue      = ledBGBottomLeftValue,
+		.pLen        = &rgbLen,
 		.maxLen      = 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// BG LED Bottom right
@@ -349,15 +376,16 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_led_bg_bottom_right,
-		.pValue      = NULL,
+		.pValue      = ledBGBottomRightValue,
+		.pLen        = &rgbLen,
 		.maxLen      = 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// BG LED top right
-
 	{
 		.pUuid       = attChUuid,
 		.pValue      = (uint8_t *)UUID_char_led_bg_top_right,
@@ -368,11 +396,13 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_led_bg_top_right,
-		.pValue      = NULL,
+		.pValue      = ledBGTopRightValue,
+		.pLen        = &rgbLen,
 		.maxLen      = 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// BG LED top left
@@ -386,11 +416,13 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_led_bg_top_left,
-		.pValue      = NULL,
+		.pValue      = ledBGTopLeftValue,
+		.pLen        = &rgbLen,
 		.maxLen      = 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// Dim bottom module
@@ -497,11 +529,13 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_leds_above,
-		.pValue      = NULL,
+		.pValue      = aboveLEDsValue,
+		.pLen        = &aboveLEDsLen,
 		.maxLen      = 11 * 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// Light sensor
@@ -545,6 +579,38 @@ static uint8_t setTime(uint8_t *pValue)
 }
 
 /*
+ * Set a rgb led
+ */
+static uint8_t setRGBLed(uint8_t led, uint8_t *pValue)
+{
+	epic_leds_set(led, pValue[0], pValue[1], pValue[2]);
+	APP_TRACE_INFO4(
+		"ble-card10: set rgb led %d: #%02x%02x%02x\n",
+		led,
+		pValue[0],
+		pValue[1],
+		pValue[2]
+	);
+	return ATT_SUCCESS;
+}
+
+/*
+ * Get value of a rgb led
+ */
+static uint8_t getRGBLed(uint8_t led, attsAttr_t *pAttr)
+{
+	epic_leds_get_rgb(led, pAttr->pValue);
+	APP_TRACE_INFO4(
+		"ble-card10: set rgb led %d: #%02x%02x%02x\n",
+		led,
+		pAttr->pValue[0],
+		pAttr->pValue[1],
+		pAttr->pValue[2]
+	);
+	return ATT_SUCCESS;
+}
+
+/*
  * BLE card10 write callback.
  */
 
@@ -584,41 +650,13 @@ static uint8_t writeCard10CB(
 		return ATT_SUCCESS;
 	// bg leds
 	case CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL:
-		epic_leds_set(11, pValue[0], pValue[1], pValue[2]);
-		APP_TRACE_INFO3(
-			"ble-card10: set bg bottom left: #%02x%02x%02x\n",
-			pValue[0],
-			pValue[1],
-			pValue[2]
-		);
-		return ATT_SUCCESS;
+		return setRGBLed(11, pValue);
 	case CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL:
-		epic_leds_set(12, pValue[0], pValue[1], pValue[2]);
-		APP_TRACE_INFO3(
-			"ble-card10: set bg bottom right: #%02x%02x%02x\n",
-			pValue[0],
-			pValue[1],
-			pValue[2]
-		);
-		return ATT_SUCCESS;
+		return setRGBLed(12, pValue);
 	case CARD10_LED_BG_TOP_RIGHT_VAL_HDL:
-		epic_leds_set(13, pValue[0], pValue[1], pValue[2]);
-		APP_TRACE_INFO3(
-			"ble-card10: set bg top right: #%02x%02x%02x\n",
-			pValue[0],
-			pValue[1],
-			pValue[2]
-		);
-		return ATT_SUCCESS;
+		return setRGBLed(13, pValue);
 	case CARD10_LED_BG_TOP_LEFT_VAL_HDL:
-		epic_leds_set(14, pValue[0], pValue[1], pValue[2]);
-		APP_TRACE_INFO3(
-			"ble-card10: set bg top left: #%02x%02x%02x\n",
-			pValue[0],
-			pValue[1],
-			pValue[2]
-		);
-		return ATT_SUCCESS;
+		return setRGBLed(14, pValue);
 	// dim
 	case CARD10_LEDS_BOTTOM_DIM_VAL_HDL:
 		ui8 = pValue[0];
@@ -769,8 +807,10 @@ static uint8_t readCard10CB(
 ) {
 	uint16_t ui16 = 0;
 	uint64_t ui64 = 0;
+	uint8_t rgb[] = { 0, 0, 0 };
 
 	switch (handle) {
+	// time
 	case CARD10_TIME_VAL_HDL:
 		ui64 = epic_rtc_get_milliseconds();
 		uint64_t time;
@@ -780,11 +820,38 @@ static uint8_t readCard10CB(
 
 		APP_TRACE_INFO0("ble-card10: read time\n");
 		return ATT_SUCCESS;
+	// background leds
+	case CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL:
+		return getRGBLed(11, pAttr);
+	case CARD10_LED_BG_BOTTOM_RIGHT_VAL_HDL:
+		return getRGBLed(12, pAttr);
+	case CARD10_LED_BG_TOP_RIGHT_VAL_HDL:
+		return getRGBLed(13, pAttr);
+	case CARD10_LED_BG_TOP_LEFT_VAL_HDL:
+		return getRGBLed(14, pAttr);
+	// personal state
 	case CARD10_PERSONAL_STATE_VAL_HDL:
 		ui16           = epic_personal_state_get();
 		*pAttr->pValue = ui16;
 		APP_TRACE_INFO1("ble-card10: read personal state: %d\n", ui16);
 		return ATT_SUCCESS;
+	// leds above
+	case CARD10_LEDS_ABOVE_VAL_HDL:
+		for (ui16 = 0; ui16 < 11; ui16++) {
+			epic_leds_get_rgb(ui16, rgb);
+			pAttr->pValue[ui16 * 3]     = rgb[0];
+			pAttr->pValue[ui16 * 3 + 1] = rgb[1];
+			pAttr->pValue[ui16 * 3 + 2] = rgb[2];
+			APP_TRACE_INFO4(
+				"ble-card10: get led %ld above to #%02x%02x%02x\n",
+				ui16,
+				pAttr->pValue[ui16 * 3],
+				pAttr->pValue[ui16 * 3 + 1],
+				pAttr->pValue[ui16 * 3 + 2]
+			);
+		}
+		return ATT_SUCCESS;
+	// light sensor
 	case CARD10_LIGHT_SENSOR_VAL_HDL:
 		epic_light_sensor_get(&ui16);
 		*pAttr->pValue = ui16;

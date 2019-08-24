@@ -49,6 +49,17 @@ void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b)
 	leds_prep(led, r, g, b);
 }
 
+int epic_leds_get_rgb(int led, uint8_t *rgb)
+{
+	if (led == PERSONAL_STATE_LED && personal_state_enabled())
+		return -EPERM;
+	if (led < 0 || led >= NUM_LEDS)
+		return -EINVAL;
+
+	leds_get_rgb(led, rgb);
+	return 0;
+}
+
 void epic_leds_prep_hsv(int led, float h, float s, float v)
 {
 	if (led == PERSONAL_STATE_LED && personal_state_enabled())

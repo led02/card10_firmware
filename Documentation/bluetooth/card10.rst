@@ -33,22 +33,22 @@ The current draft uses following service specification:
 - Background LED Bottom Left characteristic:
 
   UUID: ``42230211-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Background LED Bottom Right characteristic:
 
   UUID: ``42230212-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Background LED Top Right characteristic:
 
   UUID: ``42230213-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Background LED Top Left characteristic:
 
   UUID: ``42230214-2342-2342-2342-234223422342``
-  write no reponse
+  read and write no reponse
 
 - LEDS dim bottom characteristic:
 
@@ -78,7 +78,7 @@ The current draft uses following service specification:
 - LEDs above characteristic:
 
   UUID: ``42230220-2342-2342-2342-234223422342``
-  write no reponse
+  read and write no reponse
 
 - Light sensor characteristic:
 
@@ -120,7 +120,7 @@ Background LED <Position> characteristic
 ----------------------------------------
 
 The Background LEDs <Position> characteristic makes it possible to address the bottom LEDs by position.
-Just write there three ``uint8`` for the rgb color.
+Just write there three ``uint8`` for the rgb color or read the current value.
 
 Dataformat:
 
@@ -170,7 +170,7 @@ It writes always as persistant and it gives feedback if the value is in range an
 
 LEDs above characteristic
 ---------------------------------
-This characteristic set every 11 leds on the top module at once.
+This characteristic set or read the current value of every 11 leds on the top module at once.
 By defining 11x rgb from left to right. You need also to set exchange a bigger MTU to use this feature.
 
 - set a rainbow beginnig with red on the right edge: ``0xff0000ff8b00e8ff005dff0000ff2e00ffb900b9ff002eff5d00ffe800ffff008b``
