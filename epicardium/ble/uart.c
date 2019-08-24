@@ -41,8 +41,8 @@ static const uint8_t uartTxCh[] = {ATT_PROP_READ | ATT_PROP_NOTIFY, UINT16_TO_BY
 static const uint16_t uartTxCh_len = sizeof(uartTxCh);
 static const uint8_t attUartTxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
 
-static uint8_t uartTxCh_buf[128];
-static uint16_t uartTxCh_buf_len = sizeof(uartTxCh_buf);
+static uint8_t ble_uart_tx_buf[128];
+static uint16_t ble_uart_buf_tx_fill = 0;
 /* clang-format on */
 
 /* Attribute list for uriCfg group */
@@ -87,9 +87,9 @@ static const attsAttr_t uartAttrCfgList[] = {
 	/* UART tx value */
 	{
 		.pUuid       = attUartTxChUuid,
-		.pValue      = uartTxCh_buf,
-		.pLen        = &uartTxCh_buf_len,
-		.maxLen      = sizeof(uartTxCh_buf),
+		.pValue      = ble_uart_tx_buf,
+		.pLen        = &ble_uart_buf_tx_fill,
+		.maxLen      = sizeof(ble_uart_tx_buf),
 		.settings    = 0,
 		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
 			       ATTS_PERMIT_READ_AUTH,
@@ -137,8 +137,6 @@ static uint8_t UARTWriteCback(
 	return ATT_SUCCESS;
 }
 
-static uint8_t ble_uart_tx_buf[128];
-static uint8_t ble_uart_buf_tx_fill;
 static int ble_uart_lasttick = 0;
 
 void ble_uart_write(uint8_t *pValue, uint8_t len)
@@ -152,11 +150,6 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 		if (ble_uart_buf_tx_fill == 128 || pValue[i] == '\r' ||
 		    pValue[i] == '\n') {
 			if (ble_uart_buf_tx_fill > 0) {
-				AttsSetAttr(
-					UART_TX_HDL,
-					ble_uart_buf_tx_fill,
-					ble_uart_tx_buf
-				);
 				if (active_connection) {
 					int x = xTaskGetTickCount() -
 						ble_uart_lasttick;
