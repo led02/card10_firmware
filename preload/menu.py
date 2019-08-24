@@ -32,6 +32,7 @@ def read_metadata(app_folder):
             information = f.read()
         return ujson.loads(information)
     except BaseException as e:
+        print("Failed to read metadata for %s" % (app_folder))
         sys.print_exception(e)
         return {
             "author": "",
