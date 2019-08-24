@@ -41,7 +41,13 @@ def set_flashlight(on):
     This LED can serve as a flashlight if worn on the left wrist or as a rad
     tattoo illuminator if worn on the right wrist.
 
-    :param bool on:  Side LED on if true.
+    .. warning::
+
+        Because of a small error in the Harmonic Board layout, we could not
+        populate the flashlight LEDs in the production run.  You can handsolder
+        it, though you have to reverse the direction.
+
+    :param bool on:  Side LED on if ``True``.
     """
     sys_leds.set_flashlight(on)
 
