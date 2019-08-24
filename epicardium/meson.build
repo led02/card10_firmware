@@ -80,7 +80,9 @@ endif
 
 elf = executable(
   name + '.elf',
-  'cdcacm.c',
+  'usb/epc_usb.c',
+  'usb/cdcacm.c',
+  'usb/mass_storage.c',
   'main.c',
   'support.c',
   'fs/filesystem_fat.c',

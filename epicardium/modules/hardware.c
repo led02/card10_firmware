@@ -2,7 +2,7 @@
 
 #include "api/dispatcher.h"
 #include "api/interrupt-sender.h"
-#include "cdcacm.h"
+#include "usb/epc_usb.h"
 #include "modules/filesystem.h"
 #include "modules/log.h"
 #include "modules/modules.h"
@@ -152,8 +152,8 @@ int hardware_early_init(void)
 	/*
 	 * USB-Serial
 	 */
-	if (cdcacm_init() < 0) {
-		LOG_ERR("init", "USB-Serial unavailable");
+	if (epic_usb_cdcacm() < 0) {
+		LOG_ERR("startup", "USB-Serial unavailable");
 	}
 
 	/*
