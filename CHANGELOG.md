@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Enabled the Hardware Watchdog;  Card10 will reset itself if the firmware crashes
+
+### Changed
+- Improved log messages in cases of lock-contention.
+
+### Fixed
+- "Card10 Nickname" crashing if only `nickname.txt` exists.
 
 
 ## [v1.6] - 2019-08-23 20:30 - [Fennel]
