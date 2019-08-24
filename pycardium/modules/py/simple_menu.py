@@ -167,7 +167,7 @@ class Menu:
             )
 
         self.disp.line(4, 22, 11, 29, col=self.color_sel, size=2)
-        self.disp.line(3, 37, 11, 29, col=self.color_sel, size=2)
+        self.disp.line(4, 36, 11, 29, col=self.color_sel, size=2)
 
         self.disp.update()
 
