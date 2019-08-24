@@ -9,6 +9,7 @@
 
 /* ---------- Dispatcher --------------------------------------------------- */
 void vApiDispatcher(void *pvParameters);
+void dispatcher_mutex_init(void);
 extern SemaphoreHandle_t api_mutex;
 extern TaskHandle_t dispatcher_task_id;
 

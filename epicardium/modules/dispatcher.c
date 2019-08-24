@@ -13,14 +13,17 @@ TaskHandle_t dispatcher_task_id;
 static StaticSemaphore_t api_mutex_data;
 SemaphoreHandle_t api_mutex = NULL;
 
+void dispatcher_mutex_init(void)
+{
+	api_mutex = xSemaphoreCreateMutexStatic(&api_mutex_data);
+}
+
 /*
  * API dispatcher task.  This task will sleep until an API call is issued and
  * then wake up to dispatch it.
  */
 void vApiDispatcher(void *pvParameters)
 {
-	api_mutex = xSemaphoreCreateMutexStatic(&api_mutex_data);
-
 	LOG_DEBUG("dispatcher", "Ready.");
 	while (1) {
 		if (api_dispatcher_poll()) {

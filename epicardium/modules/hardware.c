@@ -177,6 +177,11 @@ int hardware_early_init(void)
 	 */
 	hwlock_init();
 
+	/*
+	 * API Dispatcher Mutex
+	 */
+	dispatcher_mutex_init();
+
 	return 0;
 }
 
