@@ -16,6 +16,13 @@ static void watchdog_clearer_callback()
 
 void watchdog_init()
 {
+	/*
+	 * Don't enable the the watchdog when a debugger is connected.
+	 */
+	if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0) {
+		return;
+	}
+
 	sys_cfg_wdt_t wdt_cfg = NULL;
 	WDT_Init(MXC_WDT0, wdt_cfg);
 
