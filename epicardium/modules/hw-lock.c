@@ -25,13 +25,25 @@ int hwlock_acquire(enum hwlock_periph p, TickType_t wait)
 	if (p >= _HWLOCK_MAX) {
 		return -EINVAL;
 	}
+	TaskHandle_t task = xTaskGetCurrentTaskHandle();
 
 	if (xSemaphoreTake(hwlock_mutex[p], wait) != pdTRUE) {
-		LOG_WARN("hwlock", "Lock %u is busy.", p);
+		LOG_WARN(
+			"hwlock",
+			"Lock %u is busy, held by: %s, attempt to accquire by: %s",
+			p,
+			pcTaskGetName(hwlock_tasks[p]),
+			pcTaskGetName(task)
+		);
+		LOG_DEBUG(
+			"hwlock",
+			"...attempted to lock from pc %p",
+			__builtin_return_address(0)
+		);
 		return -EBUSY;
 	}
 
-	hwlock_tasks[p] = xTaskGetCurrentTaskHandle();
+	hwlock_tasks[p] = task;
 
 	return 0;
 }

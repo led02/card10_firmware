@@ -16,6 +16,7 @@
 #include "timers.h"
 
 #include <stdio.h>
+#include <string.h>
 
 /* Task ID for the pmic handler */
 static TaskHandle_t pmic_task_id = NULL;
@@ -207,7 +208,10 @@ static void pmic_check_battery()
 
 	res = pmic_read_amux(PMIC_AMUX_BATT_U, &u_batt);
 	if (res < 0) {
-		LOG_ERR("pmic", "Failed reading battery voltage: %d", res);
+		LOG_ERR("pmic",
+			"Failed reading battery voltage: %s (%d)",
+			strerror(-res),
+			res);
 		return;
 	}
 
