@@ -1638,8 +1638,8 @@ API_ISR(EPIC_INT_RTC_ALARM, epic_isr_rtc_alarm);
 API(API_TRNG_READ, int epic_trng_read(uint8_t *dest, size_t size));
 
 /**
- * MAX30001 API
- * ----------
+ * MAX30001
+ * ========
  */
 
 /**

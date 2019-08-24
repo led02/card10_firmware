@@ -88,9 +88,11 @@ html_context = {
 
 # -- Options for Auto-Doc ---------------------------------------------------- {{{
 autodoc_mock_imports = [
+    "buttons",
+    "interrupt",
     "sys_display",
     "sys_leds",
-    "buttons",
+    "sys_max30001",
     "ucollections",
     "urandom",
     "utime",

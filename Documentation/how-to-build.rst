@@ -28,20 +28,23 @@ Dependencies
     .. code-block:: shell-session
 
         dnf install arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib
-        
+
   - macOS (Note: The card10 firmware team used Linux so far. macOS recommendations here are experimental.) 
-    
-    You can use `Homebrew`_ to install the required tools.
-    The version of the Arm crosscompiler tool chain is quite important; with the wrong version, e.g. strip and/or ld might throw strange errors.
-    
+
+    You can use `Homebrew`_ to install the required tools.  The version of the
+    ARM crosscompiler tool chain is quite important; with the wrong version,
+    e.g. strip and/or ld might throw strange errors.
+
     .. code-block:: shell-session
-            
+
         brew tap px4/px4
         brew install px4/px4/gcc-arm-none-eabi-63
         brew install coreutils
 
+    .. _Homebrew: https://brew.sh/
+
   - Alternative: Download `ARM's GNU toolchain`_.  **TODO**
-.. _Homebrew: https://brew.sh/
+
 
 * **python3**:  For meson and various scripts needed for building.
 * **meson** (>0.43.0) & **ninja**:  Unfortunately most distros only have very old versions
