@@ -5,17 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
-- Enabled the Hardware Watchdog;  Card10 will reset itself if the firmware crashes
-- The name of the offending app is printed to the serial console, if an app
-  crashes the metatdata parser.
 - **ESB**: Epic Serial Bus (Better than USB!), stability improvements of the
   USB module.  Preparation for mass-storage access in the Firmware.
+- Enabled the Hardware Watchdog;  Card10 will reset itself if the firmware crashes
+- Log messages when BLE is pairing / connected.
+- The name of the offending app is printed to the serial console, if an app
+  crashes the metatdata parser.
 
 ### Changed
 - Improved log messages in cases of lock-contention.
 - Menu will show an error message if a crash occurs.
 
 ### Fixed
+- Fixed race-conditions in serial writes by using a queue.
 - "Card10 Nickname" crashing if only `nickname.txt` exists.
 - Lockup when debug prints are enabled.
 - Delayed BHI160 startup a bit so the PMIC task can check the battery first.
@@ -24,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed the API interrupts sometimes getting stuck.
 - Fixed binary building on MacOS.
 - Fixed race-conditions in serial console prints by introducing a queue.
-- Fixed API mutex being disabled late sometimes.
+- Fixed API & MAX30001 mutexes being initialized late sometimes.
 - Fixed wrong stripe width in bi flag.
 
 
