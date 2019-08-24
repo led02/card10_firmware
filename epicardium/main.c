@@ -24,7 +24,7 @@ int main(void)
 	 * Version Splash
 	 */
 	const char *version_buf = CARD10_VERSION;
-	const int offset = (160 - (int)strlen(version_buf) * 14) / 2;
+	const int offset        = (160 - (int)strlen(version_buf) * 14) / 2;
 	epic_disp_clear(0x3b7);
 	epic_disp_print(10, 20, "Epicardium", 0x290, 0x3b7);
 	epic_disp_print(offset > 0 ? offset : 0, 40, version_buf, 0x290, 0x3b7);
@@ -39,7 +39,7 @@ int main(void)
 		    (const char *)"Serial",
 		    configMINIMAL_STACK_SIZE * 2,
 		    NULL,
-		    tskIDLE_PRIORITY + 1,
+		    tskIDLE_PRIORITY + 3,
 		    NULL) != pdPASS) {
 		LOG_CRIT("startup", "Failed to create %s task!", "Serial");
 		abort();
@@ -133,6 +133,11 @@ int main(void)
 		LOG_CRIT("startup", "Failed to create %s task!", "Lifecycle");
 		abort();
 	}
+
+	/*
+	 * Initialize serial driver data structures.
+	 */
+	serial_init();
 
 	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
