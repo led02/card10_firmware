@@ -198,7 +198,7 @@ static void plot_line_low(
 
 	int d = 2 * dy - dx;
 	int y = y0;
-	for (int x = x0; x < x1; x++) {
+	for (int x = x0; x <= x1; x++) {
 		if (t > 1) {
 			gfx_circle_fill(reg, x, y, t, c);
 		} else {
@@ -231,7 +231,7 @@ static void plot_line_high(
 
 	int d = 2 * dx - dy;
 	int x = x0;
-	for (int y = y0; y < y1; y++) {
+	for (int y = y0; y <= y1; y++) {
 		if (t > 1) {
 			gfx_circle_fill(reg, x, y, t, c);
 		} else {
