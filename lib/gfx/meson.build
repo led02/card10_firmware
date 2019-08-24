@@ -10,11 +10,9 @@ sources = files(
   './LCD/LCD_Driver.c',
   './Fonts/font8.c',
   './Fonts/font12.c',
-  './Fonts/font12CN.c',
   './Fonts/font16.c',
   './Fonts/font20.c',
   './Fonts/font24.c',
-  './Fonts/font24CN.c',
   'framebuffer.c',
   'gfx.c',
   'textbuffer.c'
