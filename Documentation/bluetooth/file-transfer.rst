@@ -77,8 +77,10 @@ CHUNK_ACK:
 ===== ===
   0   1-4
 ----- ---
-  C   CRC
+  C   CRC(*)
 ===== ===
+
+CRC32 of the whole CHUNK packet including first byte, offset and payload.
 
 FINISH:
 
