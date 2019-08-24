@@ -28,9 +28,14 @@ int hwlock_acquire(enum hwlock_periph p, TickType_t wait)
 	TaskHandle_t task = xTaskGetCurrentTaskHandle();
 
 	if (xSemaphoreTake(hwlock_mutex[p], wait) != pdTRUE) {
+		/* Don't print warnings for 0 wait acquires */
+		if (wait == 0) {
+			return -EBUSY;
+		}
+
 		LOG_WARN(
 			"hwlock",
-			"Lock %u is busy, held by: %s, attempt to accquire by: %s",
+			"Lock %u is busy! Held by \"%s\" and attempted to accquire by \"%s\"",
 			p,
 			pcTaskGetName(hwlock_tasks[p]),
 			pcTaskGetName(task)
