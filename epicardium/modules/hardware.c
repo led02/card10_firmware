@@ -182,6 +182,11 @@ int hardware_early_init(void)
 	 */
 	dispatcher_mutex_init();
 
+	/*
+	 * MAX30001 mutex init
+	 */
+	max30001_mutex_init();
+
 	return 0;
 }
 

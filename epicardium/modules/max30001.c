@@ -370,10 +370,14 @@ static void max300001_interrupt_callback(void *_)
 }
 /* }}} */
 
+void max30001_mutex_init(void)
+{
+	max30001_mutex = xSemaphoreCreateMutexStatic(&max30001_mutex_data);
+}
+
 void vMAX30001Task(void *pvParameters)
 {
 	max30001_task_id = xTaskGetCurrentTaskHandle();
-	max30001_mutex   = xSemaphoreCreateMutexStatic(&max30001_mutex_data);
 
 	int lockret = hwlock_acquire(HWLOCK_SPI_ECG, pdMS_TO_TICKS(100));
 	if (lockret < 0) {

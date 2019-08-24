@@ -92,7 +92,9 @@ void disp_forcelock();
 #define BHI160_MUTEX_WAIT_MS          50
 void vBhi160Task(void *pvParameters);
 
+/* ---------- MAX30001 ----------------------------------------------------- */
 #define MAX30001_MUTEX_WAIT_MS          50
 void vMAX30001Task(void *pvParameters);
+void max30001_mutex_init(void);
 
 #endif /* MODULES_H */
