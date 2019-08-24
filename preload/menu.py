@@ -31,7 +31,7 @@ def read_metadata(app_folder):
         with open(info_file) as f:
             information = f.read()
         return ujson.loads(information)
-    except BaseException as e:
+    except Exception as e:
         print("Failed to read metadata for %s" % (app_folder))
         sys.print_exception(e)
         return {
@@ -268,4 +268,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        sys.print_exception(e)
+        with display.open() as d:
+            d.clear(color.COMMYELLOW)
+            d.print("Menu", posx=52, posy=20, fg=color.COMMYELLOW_DARK, bg=color.COMMYELLOW)
+            d.print("crashed", posx=31, posy=40, fg=color.COMMYELLOW_DARK, bg=color.COMMYELLOW)
+            d.update()
+            utime.sleep(2)
+        os.exit(1)
