@@ -42,11 +42,18 @@ static mp_obj_t mp_light_sensor_stop()
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(light_sensor_stop_obj, mp_light_sensor_stop);
 
+static mp_obj_t mp_light_sensor_read()
+{
+	return mp_obj_new_int_from_uint(epic_light_sensor_read());
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(light_sensor_read_obj, mp_light_sensor_read);
+
 static const mp_rom_map_elem_t light_sensor_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_light_sensor) },
 	{ MP_ROM_QSTR(MP_QSTR_start), MP_ROM_PTR(&light_sensor_start_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_stop), MP_ROM_PTR(&light_sensor_stop_obj) },
-	{ MP_ROM_QSTR(MP_QSTR_get_reading), MP_ROM_PTR(&light_sensor_get_obj) }
+	{ MP_ROM_QSTR(MP_QSTR_get_reading), MP_ROM_PTR(&light_sensor_get_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_read), MP_ROM_PTR(&light_sensor_read_obj) },
 };
 static MP_DEFINE_CONST_DICT(
 	light_sensor_module_globals, light_sensor_module_globals_table
