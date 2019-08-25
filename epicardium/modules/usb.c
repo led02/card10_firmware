@@ -196,7 +196,7 @@ static struct config_descriptor_cdcacm config_descriptor_cdcacm = {
         .bNumEndpoints      = 0x01,
         .bInterfaceClass    = CLS_COMM,
         .bInterfaceSubClass = SCLS_ACM,
-        .bInterfaceProtocol = PROT_AT_CMDS,
+        .bInterfaceProtocol = 0x00,
         .iInterface         = 0x00,
     },
     .header_functional = {
