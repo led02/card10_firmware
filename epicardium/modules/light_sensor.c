@@ -29,8 +29,14 @@ static int light_sensor_init()
 
 uint16_t epic_light_sensor_read()
 {
+	if (hwlock_acquire(HWLOCK_ADC, pdMS_TO_TICKS(1000)) != 0) {
+		return 0;
+	}
+
 	ADC_StartConvert(ADC_CH_7, 0, 0);
 	ADC_GetData(&last_value);
+
+	hwlock_release(HWLOCK_ADC);
 	return last_value;
 }
 
