@@ -37,7 +37,7 @@ def read_metadata(app_folder):
         return {
             "author": "",
             "name": app_folder,
-            "descriptionr": "",
+            "description": "",
             "category": "",
             "revision": 0,
         }
@@ -71,7 +71,12 @@ def list_apps():
     # with or without metadata.json
     for appFolder in dirlist:
         if not (appFolder.endswith(".py") or appFolder.endswith(".elf")):
-            apps.append(["/apps/%s/__init__.py" % appFolder, read_metadata(appFolder)])
+            metadata = read_metadata(appFolder)
+            if not metadata.get("bin", None):
+                fileName = "/apps/%s/__init__.py" % appFolder
+            else:
+                fileName = "/apps/%s/%s" % (appFolder, metadata["bin"])
+            apps.append([fileName, metadata])
 
     # list simple python scripts
     for pyFile in dirlist:
