@@ -102,6 +102,7 @@ typedef _Bool bool;
 #define API_LIGHT_SENSOR_RUN       0x80
 #define API_LIGHT_SENSOR_GET       0x81
 #define API_LIGHT_SENSOR_STOP      0x82
+#define API_LIGHT_SENSOR_READ	   0x83
 
 #define API_BUTTONS_READ           0x90
 
@@ -1398,6 +1399,14 @@ API(API_LIGHT_SENSOR_GET, int epic_light_sensor_get(uint16_t* value));
  *      - ``-EBUSY``: The timer stop could not be scheduled.
  */
 API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
+
+/**
+ * Get the light level directly. Each call has an intrinsic delay of about 240us, I recommend another 100-300us delay via utime.sleep_ms() between calls. Whether or not the IR LED is fast enough is another issue.
+ *
+ * :return: Light level
+ */
+API(API_LIGHT_SENSOR_READ, uint16_t epic_light_sensor_read(void));
+
 
 /**
  * File

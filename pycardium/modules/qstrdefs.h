@@ -97,6 +97,7 @@ Q(light_sensor)
 Q(start)
 Q(get_reading)
 Q(stop)
+Q(read)
 
 /* bme680 */
 Q(bme680)
