@@ -173,11 +173,7 @@ int epic_disp_framebuffer(union disp_framebuffer *fb)
 
 int epic_disp_backlight(uint16_t brightness)
 {
-	int cl = check_lock();
-	if (cl < 0) {
-		return cl;
-	}
-
+	/* TODO: lock? */
 	LCD_SetBacklight(brightness);
 	return 0;
 }
