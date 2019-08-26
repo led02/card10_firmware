@@ -1401,9 +1401,15 @@ API(API_LIGHT_SENSOR_GET, int epic_light_sensor_get(uint16_t* value));
 API(API_LIGHT_SENSOR_STOP, int epic_light_sensor_stop());
 
 /**
- * Get the light level directly. Each call has an intrinsic delay of about 240us, I recommend another 100-300us delay via utime.sleep_ms() between calls. Whether or not the IR LED is fast enough is another issue.
+ * Get the light level directly.
+ *
+ * Each call has an intrinsic delay of about 240us, I recommend another
+ * 100-300us delay  between calls. Whether or not the IR LED is fast enough is
+ * another issue.
  *
  * :return: Light level
+ *
+ * .. versionadded:: 1.8
  */
 API(API_LIGHT_SENSOR_READ, uint16_t epic_light_sensor_read(void));
 

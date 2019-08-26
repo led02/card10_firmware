@@ -25,3 +25,13 @@ be fairly stable.
 .. py:function:: stop()
 
    Stop the ADC.
+
+.. py:function:: read()
+
+   Direct readout of the light-sensor.
+
+   Use this function for low latency readout.  The time between polls can have
+   an effect on the values measures.  If you do not need low latency, prefer
+   :py:func:`light_sensor.get_reading`.
+
+   .. versionadded:: 1.8
