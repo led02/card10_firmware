@@ -5,12 +5,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
-- `ls_cmsis_dap`: A tool to enumerate CMSIS-DAP debuggers
+- `tools/pycard10.py`: Tool to interact with card10's serial connection and
+  upload files directly:
+  ```bash
+  ./tools/pycard10.py path/to/python-script.py
+  ```
+- `epic_disp_print_adv` & `Display.print(font=...)`: Print with different
+  fonts!  The following fonts are supported: `8px`, `12px`, `16px`, `20px`,
+  and `24px`.
+- **pycardium**: Support for RAW REPL mode.
+- **bhi160**: Function to disable all sensors (`bhi160.disable_all_sensors()`).
+- `ls_cmsis_dap`: A tool to enumerate CMSIS-DAP debuggers.
 
 ### Changed
 - `main.py` was moved into an app to allow easier reconfiguration of the
   default app.  The new `main.py` points to the "old" one so behavior is not
   changed.
+- After a timeout, the menu will close and `main.py` will run again.
+
+### Removed
+- Some unused font files.
+
+### Fixed
+- Fixed a regression which made the ECG app no longer work.
+
 
 
 ## [v1.8] - 2019-08-27 11:38 - [HabaneroChilli]
