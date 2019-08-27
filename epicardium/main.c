@@ -24,10 +24,10 @@ int main(void)
 	 * Version Splash
 	 */
 	const char *version_buf = CARD10_VERSION;
-	const int offset        = (160 - (int)strlen(version_buf) * 14) / 2;
-	epic_disp_clear(0x3b7);
-	epic_disp_print(10, 20, "Epicardium", 0x290, 0x3b7);
-	epic_disp_print(offset > 0 ? offset : 0, 40, version_buf, 0x290, 0x3b7);
+	const int off           = (160 - (int)strlen(version_buf) * 14) / 2;
+	epic_disp_clear(0x9dc0);
+	epic_disp_print(10, 20, "Epicardium", 0x6c20, 0x9dc0);
+	epic_disp_print(off > 0 ? off : 0, 40, version_buf, 0x6c20, 0x9dc0);
 	epic_disp_update();
 	mxc_delay(2000000);
 
