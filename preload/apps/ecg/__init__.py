@@ -1,5 +1,6 @@
 import os
 import display
+import leds
 import utime
 import buttons
 import max30001
@@ -35,6 +36,10 @@ pause_histogram = False
 histogram_offset = 0
 sensor = 0
 disp = display.open()
+
+leds.dim_top(1)
+COLORS = [((23 + (15 * i)) % 360, 1.0, 1.0) for i in range(11)]
+colors = COLORS
 
 
 def callback_ecg(datasets):
@@ -161,6 +166,14 @@ def toggle_pause():
     histogram_offset = 0
 
 
+def draw_leds(val):
+    global colors
+    # val should be in [0, 11]
+    for i in range(11):
+        leds.prep_hsv(10 - i, COLORS[10 - i] if i < val else (0, 0, 0))
+    leds.update()
+
+
 def draw_histogram():
     global disp, history, current_mode, bias, write, pause_screen, update_screen
 
@@ -211,6 +224,7 @@ def draw_histogram():
             old = value
             x += 1
 
+    draw_leds((60 - int((max(history[-3:]) * scale + OFFSET) - 20)) * 11 / 60)
     # draw text: mode/bias/write
     if pause_histogram == True:
         disp.print(
