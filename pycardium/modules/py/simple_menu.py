@@ -1,6 +1,8 @@
 import buttons
 import color
 import display
+import sys
+import utime
 
 
 def button_events():
@@ -171,18 +173,55 @@ class Menu:
 
         self.disp.update()
 
+    def error(self, line1, line2=""):
+        """
+        Display an error message.
+
+        :param str line1: First line of the error message.
+        :param str line2: Second line of the error message.
+
+        .. versionadded:: 1.9
+        """
+        self.disp.clear(color.COMMYELLOW)
+
+        offset = max(0, (160 - len(line1) * 14) // 2)
+        self.disp.print(
+            line1, posx=offset, posy=20, fg=color.COMMYELLOW_DARK, bg=color.COMMYELLOW
+        )
+
+        offset = max(0, (160 - len(line2) * 14) // 2)
+        self.disp.print(
+            line2, posx=offset, posy=40, fg=color.COMMYELLOW_DARK, bg=color.COMMYELLOW
+        )
+
+        self.disp.update()
+
     def run(self):
         """Start the event-loop."""
         for ev in button_events():
             if ev == buttons.BOTTOM_RIGHT:
                 self.draw_menu(-8)
                 self.idx = (self.idx + 1) % len(self.entries)
-                self.on_scroll(self.entries[self.idx], self.idx)
+                try:
+                    self.on_scroll(self.entries[self.idx], self.idx)
+                except Exception as e:
+                    print("Exception during menu.on_scroll():")
+                    sys.print_exception(e)
             elif ev == buttons.BOTTOM_LEFT:
                 self.draw_menu(8)
                 self.idx = (self.idx + len(self.entries) - 1) % len(self.entries)
-                self.on_scroll(self.entries[self.idx], self.idx)
+                try:
+                    self.on_scroll(self.entries[self.idx], self.idx)
+                except Exception as e:
+                    print("Exception during menu.on_scroll():")
+                    sys.print_exception(e)
             elif ev == buttons.TOP_RIGHT:
-                self.on_select(self.entries[self.idx], self.idx)
+                try:
+                    self.on_select(self.entries[self.idx], self.idx)
+                except Exception as e:
+                    print("Menu crashed!")
+                    sys.print_exception(e)
+                    self.error("Menu", "crashed")
+                    utime.sleep(1.0)
 
             self.draw_menu()
