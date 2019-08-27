@@ -66,6 +66,17 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(
 	mp_bhi160_disable_sensor_obj, mp_bhi160_disable_sensor
 );
 
+STATIC mp_obj_t mp_bhi160_disable_all_sensors()
+{
+	epic_bhi160_disable_all_sensors();
+
+	return mp_const_none;
+}
+
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(
+	mp_bhi160_disable_all_sensors_obj, mp_bhi160_disable_all_sensors
+);
+
 STATIC const mp_rom_map_elem_t bhi160_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_sys_bhi160) },
 	{ MP_ROM_QSTR(MP_QSTR_enable_sensor),
@@ -74,6 +85,8 @@ STATIC const mp_rom_map_elem_t bhi160_module_globals_table[] = {
 	  MP_ROM_PTR(&mp_bhi160_read_sensor_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_disable_sensor),
 	  MP_ROM_PTR(&mp_bhi160_disable_sensor_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_disable_all_sensors),
+	  MP_ROM_PTR(&mp_bhi160_disable_all_sensors_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(bhi160_module_globals, bhi160_module_globals_table);
 
