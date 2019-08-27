@@ -16,6 +16,7 @@ import sys
 BUTTON_TIMER_POPPED = -1
 COLOR1, COLOR2 = (color.CHAOSBLUE_DARK, color.CHAOSBLUE)
 MAXCHARS = 11
+HOMEAPP = "main.py"
 
 
 def create_folders():
@@ -49,10 +50,10 @@ def list_apps():
 
     # add main application
     for mainFile in os.listdir("/"):
-        if mainFile == "main.py":
+        if mainFile == HOMEAPP:
             apps.append(
                 [
-                    "/main.py",
+                    "/%s" % HOMEAPP,
                     {
                         "author": "card10badge Team",
                         "name": "Home",
@@ -219,6 +220,7 @@ def main():
     timerscrollspeed = 1
     timerstartscroll = 5
     timercountpopped = 0
+    timerinactivity = 100
     for ev in button_events(10):
         if numapps == 0:
             disp.clear(color.COMMYELLOW)
@@ -258,6 +260,16 @@ def main():
                 and (timercountpopped - timerstartscroll) % timerscrollspeed == 0
             ):
                 lineoffset += 1
+
+            if applist[0][0] == "/%s" % HOMEAPP and timercountpopped >= timerinactivity:
+                print("Inactivity timer popped")
+                disp.clear().update()
+                disp.close()
+                try:
+                    os.exec("/%s" % HOMEAPP)
+                except OSError as e:
+                    print("Loading failed: ", e)
+                    os.exit(1)
 
         elif ev == buttons.TOP_RIGHT:
             # Select & start
