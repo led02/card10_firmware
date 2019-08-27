@@ -60,7 +60,18 @@ int main(void)
 		}
 
 		epic_uart_write_str(header, sizeof(header));
-		pyexec_friendly_repl();
+
+		for (;;) {
+			if (pyexec_mode_kind == PYEXEC_MODE_RAW_REPL) {
+				if (pyexec_raw_repl() != 0) {
+					break;
+				}
+			} else {
+				if (pyexec_friendly_repl() != 0) {
+					break;
+				}
+			}
+		}
 
 		mp_deinit();
 	}

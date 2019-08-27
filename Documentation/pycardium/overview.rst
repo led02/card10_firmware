@@ -36,8 +36,46 @@ Baud-rate is 115200.  Some options are:
 * **screen**: ``sudo screen /dev/ttyACM0 115200``
 * **picocom**: ``sudo picocom -b 115200 /dev/ttyACM0``
 
-After connecting, reboot card10 and you should see the MicroPython REPL pop up.
+After connecting, reboot reset the card10 via the power button (left upper
+corner) and you should see the output of **menu.py** script (it's located in
+*preload/menu.py*). You can press CTRL-C to interrupt the script and jump into
+the MicroPython prompt.
 
-.. todo::
+To switch on the blue fairy dust you must import the led python module::
 
-   Getting Started Guide for people interested in writing Python code.
+   import leds
+
+and power it on::
+
+   leds.set_rocket(0, 31)
+
+
+REPL modes
+^^^^^^^^^^
+
+MicroPython supports a different REPL modes over the serial console. The modes
+can be changed on every new line.
+
+Normal mode
+"""""""""""
+This is the mode you will first see. You can switch to it by pressing CTRL-B.
+If you are in a other mode you can return to this mode by pressing CTRL-B too.
+
+Paste mode
+""""""""""
+You can enter the paste mode by pressing CTRL-E and you can simple copy 'n'
+paste your source code into the console and it will be interpreted and executed
+line by line. Every new line will be reply by the prompt with **===**.
+
+RAW mode
+""""""""
+The RAW mode to be intendend for the usage with tools. By pressing CTRL-A you
+will enter the RAW REPL mode. The type in code will not printed. By pressing
+CTRL-D the whole entered code will be evaluated and executed. The board will
+reply with **OK** and print after that the output (print commands) of the code
+or give you tracebacks if an error occured.
+
+You can use **pycard10** (tools/pycard10.py) to execute python files from your
+PC directly on the card10.
+
+
