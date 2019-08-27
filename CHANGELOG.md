@@ -5,9 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
-- Pause mode in ECG-App
-- `bin` field in metatdata for an alternate entrypoint
-- API-call for direct light-sensor readout: `epic_light_sensor_read`
+- API-call for direct light-sensor readout: `epic_light_sensor_read`.
+- Pause mode in ECG-App.
+- `bin` field in metatdata for an alternate entrypoint.
+- `shell.nix`: Nix-Shell which installs patched OpenOCD and dependencies.
+- Cool LED animation in default ECG app.
 
 ### Changed
 - No longer require locking the display for setting the backlight.
