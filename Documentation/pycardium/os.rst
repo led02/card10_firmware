@@ -72,3 +72,28 @@ Card10-Specific
 
       Please only call this function if absolutely necessary.  In most cases
       you'll want to just :py:func:`os.exit` instead.
+
+.. py:function:: usbconfig(config_type)
+
+   Change active USB configuration. By default, card10 boots with
+   :py:data:`os.USB_SERIAL` active.
+
+   This will deactivate the currently active USB configuration. This means
+   that, if you activate :py:data:`os.USB_FLASH` while :py:data:`os.USB_SERIAL`
+   was active, the USB serial will be disconnected.
+
+   :param config_type: Selects which config to activate. Possible
+      values are :py:data:`os.USB_SERIAL`, :py:data:`os.USB_FLASH`,
+      or :py:data:`os.USB_NONE`.
+
+.. py:data:: USB_NONE
+
+   No USB device active.
+
+.. py:data:: USB_SERIAL
+
+   CDC-ACM serial device active.
+
+.. py:data:: USB_FLASH
+
+   Mass-Storage device active.
