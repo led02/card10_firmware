@@ -33,7 +33,7 @@ struct gfx_region gfx_screen(struct framebuffer *fb)
 	return r;
 }
 
-static inline int letter_bit(sFONT *font, char c, int x, int y)
+static inline int letter_bit(const sFONT *font, char c, int x, int y)
 {
 	if (x < 0 || y < 0)
 		return 0;
@@ -53,7 +53,7 @@ static inline int letter_bit(sFONT *font, char c, int x, int y)
 }
 
 void gfx_putchar(
-	sFONT *font,
+	const sFONT *font,
 	struct gfx_region *r,
 	int x,
 	int y,
@@ -78,7 +78,7 @@ void gfx_putchar(
 }
 
 void gfx_puts(
-	sFONT *font,
+	const sFONT *font,
 	struct gfx_region *r,
 	int x,
 	int y,

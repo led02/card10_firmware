@@ -54,6 +54,7 @@ typedef _Bool bool;
 #define API_DISP_PIXEL             0x28
 #define API_DISP_FRAMEBUFFER       0x29
 #define API_DISP_BACKLIGHT         0x2a
+#define API_DISP_PRINT_ADV         0x2b
 
 /* API_BATTERY_VOLTAGE              0x30 */
 #define API_BATTERY_CURRENT        0x31
@@ -1238,6 +1239,40 @@ API(API_DISP_PRINT,
 	    uint16_t fg,
 	    uint16_t bg)
     );
+
+/*
+ * Font Selection
+ */
+enum disp_font_name {
+	DISP_FONT8  = 0, 
+	DISP_FONT12 = 1,
+	DISP_FONT16 = 2,
+	DISP_FONT20 = 3,
+	DISP_FONT24 = 4,
+};
+
+/**
+ * Prints a string into the display framebuffer with font type selectable
+ *
+ * :param fontName: number of font, use FontName enum
+ * :param posx: x position to print to. 0 <= x <= 160
+ * :param posy: y position to print to. 0 <= y <= 80
+ * :param pString: string to print
+ * :param fg: foreground color in rgb565
+ * :param bg: background color in rgb565
+ * :return: ``0`` on success or a negative value in case of an error:
+ *
+ *    - ``-EBUSY``: Display was already locked from another task.
+ */
+API(API_DISP_PRINT_ADV,
+	int epic_disp_print_adv(
+		uint8_t font,
+		uint16_t posx,
+		uint16_t posy,
+		const char *pString,
+		uint16_t fg,
+		uint16_t bg)
+);
 
 /**
  * Fills the whole screen with one color

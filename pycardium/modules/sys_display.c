@@ -53,6 +53,30 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_print_obj, 5, 5, mp_display_print
 );
 
+/* print something on the display */
+static mp_obj_t mp_display_print_adv(size_t n_args, const mp_obj_t *args)
+{
+	if (!mp_obj_is_str_or_bytes(args[0])) {
+		mp_raise_TypeError("input text must be a string");
+	}
+	GET_STR_DATA_LEN(args[0], print, print_len);
+	uint32_t posx    = mp_obj_get_int(args[1]);
+	uint32_t posy    = mp_obj_get_int(args[2]);
+	uint32_t fg      = get_color(args[3]);
+	uint32_t bg      = get_color(args[4]);
+	uint8_t fontName = mp_obj_get_int(args[5]);
+	int res          = epic_disp_print_adv(
+                fontName, posx, posy, (const char *)print, fg, bg
+	);
+	if (res < 0) {
+		mp_raise_OSError(-res);
+	}
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+	display_print_adv_obj, 6, 6, mp_display_print_adv
+);
+
 /* draw pixel on the display */
 static mp_obj_t mp_display_pixel(size_t n_args, const mp_obj_t *args)
 {
@@ -234,6 +258,7 @@ static const mp_rom_map_elem_t display_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&display_open_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_close), MP_ROM_PTR(&display_close_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_print), MP_ROM_PTR(&display_print_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_print_adv), MP_ROM_PTR(&display_print_adv_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&display_pixel_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_backlight), MP_ROM_PTR(&display_backlight_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_line), MP_ROM_PTR(&display_line_obj) },
