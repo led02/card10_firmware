@@ -224,7 +224,7 @@ def draw_histogram():
             old = value
             x += 1
 
-    draw_leds((60 - int((max(history[-3:]) * scale + OFFSET) - 20)) * 11 / 60)
+    draw_leds((60 - int((max(history[-3:]) * scale + OFFSET_Y) - 20)) * 11 / 60)
     # draw text: mode/bias/write
     if pause_histogram == True:
         disp.print(
