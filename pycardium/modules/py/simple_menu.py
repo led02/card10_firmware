@@ -73,6 +73,10 @@ def button_events(timeout=None):
             yield buttons.TOP_RIGHT
 
 
+class _ExitMenuException(Exception):
+    pass
+
+
 class Menu:
     """
     A simple menu for card10.
@@ -101,6 +105,13 @@ class Menu:
     color_sel = color.COMMYELLOW
     """Color of the selector."""
 
+    scroll_speed = 0.5
+    """
+    Time to wait before scrolling to the right.
+
+    .. versionadded:: 1.9
+    """
+
     def on_scroll(self, item, index):
         """
         Hook when the selector scrolls to a new item.
@@ -126,12 +137,21 @@ class Menu:
         """
         pass
 
+    def exit(self):
+        """
+        Exit the event-loop.  This should be called from inside an ``on_*`` hook.
+
+        .. versionadded:: 1.9
+        """
+        raise _ExitMenuException()
+
     def __init__(self, entries):
         if len(entries) == 0:
             raise ValueError("at least one entry is required")
 
         self.entries = entries
         self.idx = 0
+        self.select_time = utime.time_ms()
         self.disp = display.open()
 
     def entry2name(self, value):
@@ -166,8 +186,21 @@ class Menu:
             but **not** an index into ``entries``.
         :param int offset: Y-offset for this entry.
         """
+        string = self.entry2name(value)
+
+        if offset != 20 or len(string) < 10:
+            string = " " + string + " " * 9
+        else:
+            # Slowly scroll entry to the side
+            time_offset = (utime.time_ms() - self.select_time) // int(
+                self.scroll_speed * 1000
+            )
+            time_offset = time_offset % (len(string) - 7) - 1
+            time_offset = min(len(string) - 10, max(0, time_offset))
+            string = " " + string[time_offset:]
+
         self.disp.print(
-            " " + self.entry2name(value) + " " * 9,
+            string,
             posy=offset,
             fg=self.color_text,
             bg=self.color_1 if index % 2 == 0 else self.color_2,
@@ -220,30 +253,36 @@ class Menu:
 
     def run(self):
         """Start the event-loop."""
-        for ev in button_events():
-            if ev == buttons.BOTTOM_RIGHT:
-                self.draw_menu(-8)
-                self.idx = (self.idx + 1) % len(self.entries)
-                try:
-                    self.on_scroll(self.entries[self.idx], self.idx)
-                except Exception as e:
-                    print("Exception during menu.on_scroll():")
-                    sys.print_exception(e)
-            elif ev == buttons.BOTTOM_LEFT:
-                self.draw_menu(8)
-                self.idx = (self.idx + len(self.entries) - 1) % len(self.entries)
-                try:
-                    self.on_scroll(self.entries[self.idx], self.idx)
-                except Exception as e:
-                    print("Exception during menu.on_scroll():")
-                    sys.print_exception(e)
-            elif ev == buttons.TOP_RIGHT:
-                try:
-                    self.on_select(self.entries[self.idx], self.idx)
-                except Exception as e:
-                    print("Menu crashed!")
-                    sys.print_exception(e)
-                    self.error("Menu", "crashed")
-                    utime.sleep(1.0)
+        try:
+            for ev in button_events(timeout=self.scroll_speed):
+                if ev == buttons.BOTTOM_RIGHT:
+                    self.select_time = utime.time_ms()
+                    self.draw_menu(-8)
+                    self.idx = (self.idx + 1) % len(self.entries)
+                    try:
+                        self.on_scroll(self.entries[self.idx], self.idx)
+                    except Exception as e:
+                        print("Exception during menu.on_scroll():")
+                        sys.print_exception(e)
+                elif ev == buttons.BOTTOM_LEFT:
+                    self.select_time = utime.time_ms()
+                    self.draw_menu(8)
+                    self.idx = (self.idx + len(self.entries) - 1) % len(self.entries)
+                    try:
+                        self.on_scroll(self.entries[self.idx], self.idx)
+                    except Exception as e:
+                        print("Exception during menu.on_scroll():")
+                        sys.print_exception(e)
+                elif ev == buttons.TOP_RIGHT:
+                    try:
+                        self.on_select(self.entries[self.idx], self.idx)
+                        self.select_time = utime.time_ms()
+                    except Exception as e:
+                        print("Menu crashed!")
+                        sys.print_exception(e)
+                        self.error("Menu", "crashed")
+                        utime.sleep(1.0)
 
-            self.draw_menu()
+                self.draw_menu()
+        except _ExitMenuException:
+            pass
