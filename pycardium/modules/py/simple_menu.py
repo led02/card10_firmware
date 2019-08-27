@@ -112,6 +112,14 @@ class Menu:
     .. versionadded:: 1.9
     """
 
+    timeout = None
+    """
+    Optional timeout for inactivity.  Once this timeout is reached,
+    :py:meth:`~simple_menu.Menu.on_timeout` will be called.
+
+    .. versionadded:: 1.9
+    """
+
     def on_scroll(self, item, index):
         """
         Hook when the selector scrolls to a new item.
@@ -136,6 +144,15 @@ class Menu:
         :param int index: Index into the ``entries`` list of the ``item``.
         """
         pass
+
+    def on_timeout(self):
+        """
+        The inactivity timeout has been triggered.  See
+        :py:attr:`simple_menu.Menu.timeout`.
+
+        .. versionadded:: 1.9
+        """
+        self.exit()
 
     def exit(self):
         """
@@ -254,7 +271,11 @@ class Menu:
     def run(self):
         """Start the event-loop."""
         try:
-            for ev in button_events(timeout=self.scroll_speed):
+            timeout = self.scroll_speed
+            if self.timeout is not None and self.timeout < self.scroll_speed:
+                timeout = self.timeout
+
+            for ev in button_events(timeout):
                 if ev == buttons.BOTTOM_RIGHT:
                     self.select_time = utime.time_ms()
                     self.draw_menu(-8)
@@ -284,5 +305,10 @@ class Menu:
                         utime.sleep(1.0)
 
                 self.draw_menu()
+
+                if self.timeout is not None and (
+                    utime.time_ms() - self.select_time
+                ) > int(self.timeout * 1000):
+                    self.on_timeout()
         except _ExitMenuException:
             pass
