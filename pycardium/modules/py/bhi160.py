@@ -5,6 +5,15 @@ import ucollections
 DataVector = ucollections.namedtuple("DataVector", ["x", "y", "z", "status"])
 
 
+def disable_all_sensors():
+    """
+    Disable all sensor also if they are already deactivated.
+
+    :returns: None
+    """
+    sys_bhi160.disable_all_sensors()
+
+
 class BHI160:
     def enable_sensor(self):
         interrupt.disable_callback(self.interrupt_id)
