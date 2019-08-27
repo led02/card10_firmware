@@ -1,6 +1,13 @@
 import sys_display
 import color
 
+# font enumeration
+FONT8 = 0
+FONT12 = 1
+FONT16 = 2
+FONT20 = 3
+FONT24 = 4
+
 
 class Display:
     """
@@ -61,7 +68,7 @@ class Display:
         sys_display.clear(col)
         return self
 
-    def print(self, text, *, fg=None, bg=None, posx=0, posy=0):
+    def print(self, text, *, fg=None, bg=None, posx=0, posy=0, font=FONT20):
         """
         Prints a string on the display. Font size is locked to 20px
 
@@ -70,11 +77,29 @@ class Display:
         :param bg: Background color (expects RGB triple)
         :param posx: X-Position of the first character, 0 <= posx <= 160
         :param posy: Y-Position of the first character, 0 <= posy <= 80
+        :param font: 0 <= font <= 4 (currently) selects a font
+
+        Avaiable Fonts:
+
+         - :py:data:`display.FONT8`
+         - :py:data:`display.FONT12`
+         - :py:data:`display.FONT16`
+         - :py:data:`display.FONT20`
+         - :py:data:`display.FONT24`
+
+         **Example:**
+
+        .. code-block:: python
+
+            with display.open() as d:
+                d.clear()
+                d.print('Hello Earth!', font=display.FONT24)
+                d.update()
         """
         fg = fg or color.WHITE
         bg = bg or color.BLACK
 
-        sys_display.print(text, posx, posy, fg, bg)
+        sys_display.print_adv(text, posx, posy, fg, bg, font)
         return self
 
     def pixel(self, x, y, *, col=None):

@@ -14,9 +14,9 @@ struct gfx_region {
 
 void gfx_setpixel(struct gfx_region *r, int x, int y, Color c);
 struct gfx_region gfx_screen(struct framebuffer *fb);
-void gfx_putchar(sFONT *font, struct gfx_region *reg, int x, int y, char ch,
+void gfx_putchar(const sFONT *font, struct gfx_region *reg, int x, int y, char ch,
 						        Color fg, Color bg);
-void gfx_puts(sFONT *font, struct gfx_region *reg, int x, int y,
+void gfx_puts(const sFONT *font, struct gfx_region *reg, int x, int y,
 			   const char *str, Color fg, Color bg);
 Color gfx_color_rgb_f(struct gfx_region *reg, float r, float g, float b);
 Color gfx_color_rgb(struct gfx_region *reg, uint8_t r, uint8_t g, uint8_t b);

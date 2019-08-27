@@ -28,11 +28,39 @@ int epic_disp_print(
 	uint16_t fg,
 	uint16_t bg
 ) {
+	return epic_disp_print_adv(DISP_FONT20, posx, posy, pString, fg, bg);
+}
+
+static const sFONT *font_map[] = {
+	[DISP_FONT8] = &Font8,   [DISP_FONT12] = &Font12,
+	[DISP_FONT16] = &Font16, [DISP_FONT20] = &Font20,
+	[DISP_FONT24] = &Font24,
+};
+
+int epic_disp_print_adv(
+	uint8_t font,
+	uint16_t posx,
+	uint16_t posy,
+	const char *pString,
+	uint16_t fg,
+	uint16_t bg
+) {
 	int cl = check_lock();
+	if (font >= (sizeof(font_map) / sizeof(sFONT *))) {
+		return -EINVAL;
+	}
 	if (cl < 0) {
 		return cl;
 	} else {
-		gfx_puts(&Font20, &display_screen, posx, posy, pString, fg, bg);
+		gfx_puts(
+			font_map[font],
+			&display_screen,
+			posx,
+			posy,
+			pString,
+			fg,
+			bg
+		);
 		return 0;
 	}
 }
