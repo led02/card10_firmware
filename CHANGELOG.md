@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Changed
+- `main.py` was moved into an app to allow easier reconfiguration of the
+  default app.  The new `main.py` points to the "old" one so behavior is not
+  changed.
 
 
 ## [v1.8] - 2019-08-27 11:38 - [HabaneroChilli]
