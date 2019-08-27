@@ -6,23 +6,26 @@
 int main(int argc, char *argv[])
 {
 	int rc = 0;
-	if( (rc = hid_init()) ){
+	if ((rc = hid_init())) {
 		fprintf(stderr, "hid_init: %d\n", rc);
 		goto done;
 	}
 
 	struct hid_device_info *hid_devs = hid_enumerate(0x0d28, 0x0204);
-	if( !hid_devs ){
+	if (!hid_devs) {
 		fprintf(stderr, "hid_enumerate: NULL\n");
-		rc = 1; goto done;
+		rc = 1;
+		goto done;
 	}
 
-	for( struct hid_device_info *dev = hid_devs; dev ; dev = dev->next ){
+	for (struct hid_device_info *dev = hid_devs; dev; dev = dev->next) {
 		fprintf(stdout, "%s\n", dev->path);
 	}
 
 done:
-	if( hid_devs ){ hid_free_enumeration(hid_devs); }
+	if (hid_devs) {
+		hid_free_enumeration(hid_devs);
+	}
 	hid_exit();
 	return -1;
 }
