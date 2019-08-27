@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+
+## [v1.8] - 2019-08-27 11:38 - [HabaneroChilli]
+[HabaneroChilli]: https://card10.badge.events.ccc.de/release/card10-v1.8-HabaneroChilli.zip
+
 ### Added
 - API-call for direct light-sensor readout: `epic_light_sensor_read`.
 - Pause mode in ECG-App.
@@ -162,7 +167,8 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 ## [v1.0] - 2019-08-21 00:50
 Initial release.
 
-[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.7...master
+[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.8...master
+[v1.8]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.7...v1.8
 [v1.7]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.6...v1.7
 [v1.6]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.5...v1.6
 [v1.5]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.4...v1.5
