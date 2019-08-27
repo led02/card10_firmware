@@ -4,8 +4,11 @@ import display
 import sys
 import utime
 
+TIMEOUT = 0x100
+""":py:func:`~simple_menu.button_events` timeout marker."""
 
-def button_events():
+
+def button_events(timeout=None):
     """
     Iterate over button presses (event-loop).
 
@@ -28,11 +31,30 @@ def button_events():
                 pass
 
     .. versionadded:: 1.4
+
+    :param float,optional timeout:
+       Timeout after which the generator should yield in any case.  If a
+       timeout is defined, the generator will periodically yield
+       :py:data:`simple_menu.TIMEOUT`.
+
+       .. versionadded:: 1.9
     """
     yield 0
+
     v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT)
     button_pressed = True if v != 0 else False
+
+    if timeout is not None:
+        timeout = int(timeout * 1000)
+        next_tick = utime.time_ms() + timeout
+
     while True:
+        if timeout is not None:
+            current_time = utime.time_ms()
+            if current_time >= next_tick:
+                next_tick += timeout
+                yield TIMEOUT
+
         v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT)
 
         if v == 0:
