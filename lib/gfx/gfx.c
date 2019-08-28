@@ -174,8 +174,8 @@ void gfx_rectangle(
 void gfx_rectangle_fill(
 	struct gfx_region *reg, int x, int y, int w, int h, Color c
 ) {
-	for (int y_ = y; y_ < y + h; y_++) {
-		for (int x_ = x; x_ < x + w; x_++)
+	for (int y_ = y; y_ <= y + h; y_++) {
+		for (int x_ = x; x_ <= x + w; x_++)
 			gfx_setpixel(reg, x_, y_, c);
 	}
 }
