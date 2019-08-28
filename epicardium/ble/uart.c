@@ -31,65 +31,83 @@ enum { UART_SVC_HDL = UART_START_HDL, /*!< \brief UART service declaration */
 
 /* clang-format off */
 static const uint8_t UARTSvc[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x01,0x00,0x40,0x6E};
+static const uint16_t UARTSvc_len = sizeof(UARTSvc);
 
 static const uint8_t uartRxCh[] = {ATT_PROP_WRITE, UINT16_TO_BYTES(UART_RX_HDL), 0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x02,0x00,0x40,0x6E};
-const uint8_t attUartRxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x02,0x00,0x40,0x6E};
+static const uint16_t uartRxCh_len = sizeof(uartRxCh);
+static const uint8_t attUartRxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x02,0x00,0x40,0x6E};
 
 static const uint8_t uartTxCh[] = {ATT_PROP_READ | ATT_PROP_NOTIFY, UINT16_TO_BYTES(UART_TX_HDL), 0x9E,0xCA,0xDC,0x24,0x0E,0xE5,0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
-const uint8_t attUartTxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
+static const uint16_t uartTxCh_len = sizeof(uartTxCh);
+static const uint8_t attUartTxChUuid[] = {0x9E,0xCA,0xDC,0x24,0x0E,0xE5, 0xA9,0xE0,0x93,0xF3,0xA3,0xB5,0x03,0x00,0x40,0x6E};
+
+static uint8_t ble_uart_tx_buf[128];
+static uint16_t ble_uart_buf_tx_fill = 0;
 /* clang-format on */
 
-static void *SvcUARTAddGroupDyn(void)
-{
-	void *pSHdl;
-	uint8_t initCcc[] = { UINT16_TO_BYTES(0x0000) };
-
-	/* Create the service */
-	pSHdl = AttsDynCreateGroup(UART_START_HDL, UART_END_HDL);
-
-	if (pSHdl != NULL) {
-		/* clang-format off */
-		/* Primary service */
-		AttsDynAddAttrConst( pSHdl, attPrimSvcUuid, UARTSvc, sizeof(UARTSvc),
-			0, ATTS_PERMIT_READ);
-
-		/* UART rx characteristic */
-		AttsDynAddAttrConst( pSHdl, attChUuid, uartRxCh, sizeof(uartRxCh),
-			0, ATTS_PERMIT_READ);
-		// XXX: attUartRxChUuid is 16 bytes but nothing says so....
-		/* UART rx value */
-		// XXX: not sure if max value of 128 is fine...
-		AttsDynAddAttr( pSHdl, attUartRxChUuid, NULL, 0, 128,
-			ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN, ATTS_PERMIT_WRITE);
-
-		/* UART tx characteristic */
-		AttsDynAddAttrConst( pSHdl, attChUuid, uartTxCh, sizeof(uartTxCh),
-			0, ATTS_PERMIT_READ);
-		/* UART tx value */
-		/* TODO: do we need ATTS_SET_READ_CBACK ? */
-		AttsDynAddAttr( pSHdl, attUartTxChUuid, NULL, 0, sizeof(uint8_t),
-			ATTS_SET_READ_CBACK, ATTS_PERMIT_READ);
-		/* UART tx CCC descriptor */
-		AttsDynAddAttr( pSHdl, attCliChCfgUuid, initCcc, sizeof(uint16_t), sizeof(uint16_t),
-			ATTS_SET_CCC, ATTS_PERMIT_READ | ATTS_PERMIT_WRITE);
-		/* clang-format on */
-	}
-
-	return pSHdl;
-}
+/* Attribute list for uriCfg group */
+static const attsAttr_t uartAttrCfgList[] = {
+	/* Primary service */
+	{
+		.pUuid       = attPrimSvcUuid,
+		.pValue      = (uint8_t *)UARTSvc,
+		.pLen        = (uint16_t *)&UARTSvc_len,
+		.maxLen      = sizeof(UARTSvc),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* UART rx characteristic */
+	{
+		.pUuid       = attChUuid,
+		.pValue      = (uint8_t *)uartRxCh,
+		.pLen        = (uint16_t *)&uartRxCh_len,
+		.maxLen      = sizeof(uartRxCh),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* UART rx value */
+	{
+		.pUuid       = attUartRxChUuid,
+		.pValue      = NULL,
+		.pLen        = NULL,
+		.maxLen      = 128,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_VARIABLE_LEN,
+		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+			       ATTS_PERMIT_WRITE_AUTH,
+	},
+	/* UART tx characteristic */
+	{
+		.pUuid       = attChUuid,
+		.pValue      = (uint8_t *)uartTxCh,
+		.pLen        = (uint16_t *)&uartTxCh_len,
+		.maxLen      = sizeof(uartTxCh),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ,
+	},
+	/* UART tx value */
+	{
+		.pUuid       = attUartTxChUuid,
+		.pValue      = ble_uart_tx_buf,
+		.pLen        = &ble_uart_buf_tx_fill,
+		.maxLen      = sizeof(ble_uart_tx_buf),
+		.settings    = 0,
+		.permissions = ATTS_PERMIT_READ | ATTS_PERMIT_READ_ENC |
+			       ATTS_PERMIT_READ_AUTH,
+	},
+	/* UART tx CCC descriptor */
+	{
+		.pUuid       = attCliChCfgUuid,
+		.pValue      = NULL,
+		.pLen        = NULL,
+		.maxLen      = 0,
+		.settings    = ATTS_SET_CCC,
+		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
+	},
+};
 
 dmConnId_t active_connection = 0;
-
-static uint8_t UARTReadCback(
-	dmConnId_t connId,
-	uint16_t handle,
-	uint8_t operation,
-	uint16_t offset,
-	attsAttr_t *pAttr
-) {
-	printf("read callback\n");
-	return ATT_SUCCESS;
-}
 
 static uint8_t UARTWriteCback(
 	dmConnId_t connId,
@@ -119,8 +137,6 @@ static uint8_t UARTWriteCback(
 	return ATT_SUCCESS;
 }
 
-static uint8_t ble_uart_tx_buf[128];
-static uint8_t ble_uart_buf_tx_fill;
 static int ble_uart_lasttick = 0;
 
 void ble_uart_write(uint8_t *pValue, uint8_t len)
@@ -134,11 +150,6 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 		if (ble_uart_buf_tx_fill == 128 || pValue[i] == '\r' ||
 		    pValue[i] == '\n') {
 			if (ble_uart_buf_tx_fill > 0) {
-				AttsSetAttr(
-					UART_TX_HDL,
-					ble_uart_buf_tx_fill,
-					ble_uart_tx_buf
-				);
 				if (active_connection) {
 					int x = xTaskGetTickCount() -
 						ble_uart_lasttick;
@@ -165,11 +176,15 @@ void ble_uart_write(uint8_t *pValue, uint8_t len)
 	}
 }
 
+static attsGroup_t uartCfgGroup = {
+	.pAttr       = (attsAttr_t *)uartAttrCfgList,
+	.writeCback  = UARTWriteCback,
+	.startHandle = UART_START_HDL,
+	.endHandle   = UART_END_HDL,
+};
+
 void bleuart_init(void)
 {
-	/* Add the UART service dynamically */
-	void *pSHdl;
-	pSHdl = SvcUARTAddGroupDyn();
-	AttsDynRegister(pSHdl, UARTReadCback, UARTWriteCback);
-	//AttsDynRegister(pSHdl, NULL, UARTWriteCback);
+	/* Add the UART service */
+	AttsAddGroup(&uartCfgGroup);
 }
