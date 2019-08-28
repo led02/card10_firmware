@@ -16,18 +16,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **pycardium**: Support for RAW REPL mode.
 - **bhi160**: Function to disable all sensors (`bhi160.disable_all_sensors()`).
 - `ls_cmsis_dap`: A tool to enumerate CMSIS-DAP debuggers.
+- Tons of new features to `simple_menu`: Timeout, scrolling of long texts,
+  robustness against crashes, and proper exiting.
+- `card10.cfg` config file which allows enabling *ELF* files.
+- Analog read for wristband GPIOs.
 
 ### Changed
+- Refactored *menu* and *personal-state* apps.
 - `main.py` was moved into an app to allow easier reconfiguration of the
   default app.  The new `main.py` points to the "old" one so behavior is not
   changed.
 - After a timeout, the menu will close and `main.py` will run again.
+- BLE security updates.
+- More detailed battery state display in nickname app.
+- Improved ECG app.
 
 ### Removed
 - Some unused font files.
 
 ### Fixed
 - Fixed a regression which made the ECG app no longer work.
+- Fixed card10 advertising support for AT-commands.
+- Rectangles being one pixel too small.
 
 
 
