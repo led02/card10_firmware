@@ -25,4 +25,6 @@ displaying menus.  You can use it like this:
 .. autoclass:: simple_menu.Menu
    :members:
 
+.. autodata:: simple_menu.TIMEOUT
+
 .. autofunction:: simple_menu.button_events
