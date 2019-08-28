@@ -52,7 +52,7 @@ output in your scripts.
    :returns: Current value of the GPIO pin.
       If the pin is configured as ADC, the value returned
       will be between 0 and 1000, representing voltages from
-      0V to 3.3V
+      0V to 3.3V (:py:data:`gpio.ADC` is only available in 1.9+).
 
 .. py:data:: WRISTBAND_1
 
@@ -80,6 +80,12 @@ output in your scripts.
 .. py:data:: INPUT
 
    Configures a pin as input.
+
+.. py:data:: ADC
+
+   Configure pin as ADC input.
+
+   .. versionadded: 1.9
 
 .. py:data:: PULL_UP
 
