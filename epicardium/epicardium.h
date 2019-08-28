@@ -459,6 +459,7 @@ enum gpio_mode {
     EPIC_GPIO_MODE_IN = (1<<0),
     /** Configure the pin as output */
     EPIC_GPIO_MODE_OUT = (1<<1),
+    EPIC_GPIO_MODE_ADC = (1<<2),
 
     /** Enable the internal pull-up resistor */
     EPIC_GPIO_PULL_UP = (1<<6),
