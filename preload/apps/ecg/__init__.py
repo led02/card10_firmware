@@ -39,7 +39,6 @@ disp = display.open()
 
 leds.dim_top(1)
 COLORS = [((23 + (15 * i)) % 360, 1.0, 1.0) for i in range(11)]
-colors = COLORS
 
 
 def callback_ecg(datasets):
@@ -47,22 +46,18 @@ def callback_ecg(datasets):
     update_screen += len(datasets)
 
     # update histogram datalist
-    if pause_histogram == False:
-        if len(datasets) > 0:
-            for value in datasets:
-                history.append(value)
-        if len(history) > HISTORY_MAX:
-            r = len(history) - HISTORY_MAX
-            for i in range(r):
-                history.pop(0)
+    if not pause_histogram:
+        history += datasets
+
+        # trim old elements
+        history = history[-HISTORY_MAX:]
 
     # buffer for writes
     if write > 0:
-        if len(datasets) > 0:
-            for value in datasets:
-                filebuffer.extend(struct.pack("h", value))
-                if len(filebuffer) >= FILEBUFFERBLOCK:
-                    write_filebuffer()
+        for value in datasets:
+            filebuffer.extend(struct.pack("h", value))
+            if len(filebuffer) >= FILEBUFFERBLOCK:
+                write_filebuffer()
 
     # don't update on every callback
     if update_screen >= DRAW_AFTER_SAMPLES:
@@ -74,14 +69,7 @@ def write_filebuffer():
     # write to file
     chars = ""
     lt = utime.localtime(write)
-    filename = "/ecg-%04d-%02d-%02d_%02d%02d%02d.log" % (
-        lt[0],
-        lt[1],
-        lt[2],
-        lt[3],
-        lt[4],
-        lt[5],
-    )
+    filename = "/ecg-{:04d}-{:02d}-{:02d}_{:02d}{:02d}{:02d}.log".format(*lt)
 
     # write stuff to disk
     try:
@@ -104,13 +92,12 @@ def write_filebuffer():
         write = 0
 
     filebuffer = bytearray()
-    return
 
 
 def open_sensor():
     global sensor
     sensor = max30001.MAX30001(
-        usb=(False if current_mode == MODE_FINGER else True),
+        usb=(current_mode == MODE_USB),
         bias=bias,
         sample_rate=ECG_RATE,
         callback=callback_ecg,
@@ -132,9 +119,8 @@ def toggle_mode():
 def toggle_bias():
     global bias
     close_sensor()
-    bias = False if bias == True else True
+    bias = not bias
     open_sensor()
-    return
 
 
 def toggle_write():
@@ -153,12 +139,11 @@ def toggle_write():
         disp.print("logging", posx=30, posy=40, fg=COLOR_TEXT)
 
     disp.update()
-    return
 
 
 def toggle_pause():
     global pause_histogram, histogram_offset, history
-    if pause_histogram == True:
+    if pause_histogram:
         pause_histogram = False
         history = []
     else:
@@ -167,7 +152,6 @@ def toggle_pause():
 
 
 def draw_leds(val):
-    global colors
     # val should be in [0, 11]
     for i in range(11):
         leds.prep_hsv(10 - i, COLORS[10 - i] if i < val else (0, 0, 0))
@@ -190,47 +174,30 @@ def draw_histogram():
     disp.clear(COLOR_BACKGROUND)
 
     # offset in pause_histogram mode
-    samples = len(history)
-    s_start = samples - (histogram_offset + (ECG_RATE * 2))
-    s_end = samples - (histogram_offset + 1)
-    s_draw = s_end - (WIDTH - 1)
+    window_end = int(len(history) - histogram_offset)
+    s_start = max(0, window_end - (ECG_RATE * 2))
+    s_end = max(0, window_end)
+    s_draw = max(0, s_end - WIDTH)
 
     # get max value and calc scale
-    value_max = 0
-    for i, value in enumerate(history):
-        if i >= s_start and i <= s_end and abs(value) > value_max:
-            value_max = abs(value)
+    value_max = max(abs(x) for x in history[s_start:s_end])
     scale = SCALE_FACTOR / (value_max if value_max > 0 else 1)
 
     # draw histogram
-    old = False
-    x = 0
-    for i, value in enumerate(history):
-        if old == False:
-            old = value
-            x += 1
-            continue
-        elif i > s_start and i > s_draw and i < s_end:
+    # values need to be inverted so high values are drawn with low pixel coordinates (at the top of the screen)
+    draw_points = (int(-x * scale + OFFSET_Y) for x in history[s_draw:s_end])
 
-            oldy = int(old * scale)
-            if oldy < -SCALE_FACTOR:
-                oldy = -SCALE_FACTOR
-            elif oldy > SCALE_FACTOR:
-                oldy = SCALE_FACTOR
+    prev = next(draw_points)
+    for x, value in enumerate(draw_points):
+        disp.line(x, prev, x + 1, value, col=COLOR_LINE)
+        prev = value
 
-            disp.line(
-                x - 1, oldy + OFFSET_Y, x, int(value * scale) + OFFSET_Y, col=COLOR_LINE
-            )
-            old = value
-            x += 1
-
-    draw_leds((60 - int((max(history[-3:]) * scale + OFFSET_Y) - 20)) * 11 / 60)
     # draw text: mode/bias/write
-    if pause_histogram == True:
+    if pause_histogram:
         disp.print(
             "Pause"
             + (
-                " -%0.1fs" % (histogram_offset / ECG_RATE)
+                " -{:0.1f}s".format(histogram_offset / ECG_RATE)
                 if histogram_offset > 0
                 else ""
             ),
@@ -239,6 +206,7 @@ def draw_histogram():
             fg=COLOR_TEXT,
         )
     else:
+        draw_leds((max(history[-5:]) * scale + SCALE_FACTOR) * 11 / (SCALE_FACTOR * 2))
         disp.print(
             current_mode + ("+Bias" if bias else ""),
             posx=0,
@@ -277,11 +245,11 @@ def main():
                 buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT
             )
 
-            # BUTTOM LEFT
+            # BOTTOM LEFT
 
             if button_pressed["BOTTOM_LEFT"] == 0 and v & buttons.BOTTOM_LEFT != 0:
                 button_pressed["BOTTOM_LEFT"] = utime.time_ms()
-                if pause_histogram == False:
+                if not pause_histogram:
                     toggle_write()
                 else:
                     l = len(history)
@@ -293,11 +261,11 @@ def main():
                 duration = utime.time_ms() - button_pressed["BOTTOM_LEFT"]
                 button_pressed["BOTTOM_LEFT"] = 0
 
-            # BUTTOM RIGHT
+            # BOTTOM RIGHT
 
             if button_pressed["BOTTOM_RIGHT"] == 0 and v & buttons.BOTTOM_RIGHT != 0:
                 button_pressed["BOTTOM_RIGHT"] = utime.time_ms()
-                if pause_histogram == False:
+                if not pause_histogram:
                     toggle_bias()
                 else:
                     histogram_offset -= ECG_RATE / 2
@@ -330,12 +298,10 @@ def main():
             elif button_pressed["TOP_RIGHT"] > 0 and v & buttons.TOP_RIGHT == 0:
                 duration = utime.time_ms() - button_pressed["TOP_RIGHT"]
                 button_pressed["TOP_RIGHT"] = 0
-                if pause_histogram == True:
+                if pause_histogram:
                     toggle_pause()
                 else:
                     toggle_mode()
-
-        pass
 
 
 if __name__ == "__main__":
