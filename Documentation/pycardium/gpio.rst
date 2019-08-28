@@ -25,7 +25,10 @@ output in your scripts.
    :param int pin: ID of the pin to be configured.
    :param int mode: An integer with the bits for the wanted mode set. Create your
       integer by ORing :py:data:`gpio.mode.OUTPUT`, :py:data:`gpio.mode.INPUT`,
-      :py:data:`gpio.mode.PULL_UP`, :py:data:`gpio.mode.PULL_DOWN`.
+      :py:data:`gpio.mode.ADC`, :py:data:`gpio.mode.PULL_UP`,
+      :py:data:`gpio.mode.PULL_DOWN`.
+
+   .. note:: On WRISTBAND_3, there is no ADC functionality available
 
 .. py:function:: get_mode(pin)
 
@@ -47,6 +50,9 @@ output in your scripts.
 
    :param int pin: ID of the pin of to get the mode of.
    :returns: Current value of the GPIO pin.
+      If the pin is configured as ADC, the value returned
+      will be between 0 and 1000, representing voltages from
+      0V to 3.3V
 
 .. py:data:: WRISTBAND_1
 
