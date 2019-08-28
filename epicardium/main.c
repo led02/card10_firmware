@@ -28,9 +28,9 @@ int main(void)
 	 */
 	const char *version_buf = CARD10_VERSION;
 	const int off           = (160 - (int)strlen(version_buf) * 14) / 2;
-	epic_disp_clear(0x9dc0);
-	epic_disp_print(10, 20, "Epicardium", 0x6c20, 0x9dc0);
-	epic_disp_print(off > 0 ? off : 0, 40, version_buf, 0x6c20, 0x9dc0);
+	epic_disp_clear(0x0000);
+	epic_disp_print(10, 20, "Epicardium", 0xfe20, 0x0000);
+	epic_disp_print(off > 0 ? off : 0, 40, version_buf, 0xfe20, 0x0000);
 	epic_disp_update();
 	mxc_delay(2000000);
 
