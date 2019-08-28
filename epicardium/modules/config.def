@@ -1,0 +1,11 @@
+#ifndef CARD10_SETTING
+#  define CARD10_SETTING(identifier, spelling, type, default_value)
+#endif
+
+CARD10_SETTING(ExecuteElf, "execute_elf", Boolean, false)
+//CARD10_SETTING(Nick, "nick", String, "an0n")
+//CARD10_SETTING(Timeout, "timeout", Integer, 123)
+//CARD10_SETTING(Dampening, "dampening", Float, 420)
+
+
+#undef CARD10_SETTING

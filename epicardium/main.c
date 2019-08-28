@@ -1,6 +1,7 @@
 #include "modules/modules.h"
 #include "modules/log.h"
 #include "modules/filesystem.h"
+#include "modules/config.h"
 #include "card10-version.h"
 
 #include "FreeRTOS.h"
@@ -19,6 +20,8 @@ int main(void)
 
 	LOG_DEBUG("startup", "Initializing hardware ...");
 	hardware_early_init();
+
+	load_config();
 
 	/*
 	 * Version Splash

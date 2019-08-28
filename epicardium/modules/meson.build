@@ -21,5 +21,6 @@ module_sources = files(
   'trng.c',
   'vibra.c',
   'watchdog.c',
-  'usb.c'
+  'usb.c',
+  'config.c',
 )
