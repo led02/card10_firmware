@@ -1,6 +1,7 @@
 #include "epicardium.h"
 #include "modules/log.h"
 #include "modules/modules.h"
+#include "modules/config.h"
 #include "api/dispatcher.h"
 #include "api/interrupt-sender.h"
 #include "l0der/l0der.h"
@@ -49,6 +50,7 @@ static volatile struct load_info async_load = {
 
 /* Whether to write the menu script before attempting to load. */
 static volatile bool write_menu = false;
+static bool execute_elfs        = false;
 
 /* Helpers {{{ */
 
@@ -88,9 +90,7 @@ static int load_stat(char *name)
  */
 static int do_load(struct load_info *info)
 {
-#if defined(JAILBREAK_CARD10) && (JAILBREAK_CARD10 == 1)
 	struct l0dable_info l0dable;
-#endif
 	int res;
 
 	if (*info->name == '\0') {
@@ -129,18 +129,22 @@ static int do_load(struct load_info *info)
 	case PL_PYTHON_INTERP:
 		core1_load(PYCARDIUM_IVT, info->name);
 		break;
-#if defined(JAILBREAK_CARD10) && (JAILBREAK_CARD10 == 1)
 	case PL_L0DABLE:
-		res = l0der_load_path(info->name, &l0dable);
-		if (res != 0) {
-			LOG_ERR("lifecycle", "l0der failed: %d\n", res);
-			xSemaphoreGive(api_mutex);
-			return -ENOEXEC;
+		if (execute_elfs) {
+			res = l0der_load_path(info->name, &l0dable);
+			if (res != 0) {
+				LOG_ERR("lifecycle", "l0der failed: %d\n", res);
+				xSemaphoreGive(api_mutex);
+				return -ENOEXEC;
+			}
+			core1_load(l0dable.isr_vector, "");
+		} else {
+			LOG_WARN(
+				"lifecycle",
+				"Execution of .elf l0dables is disabled"
+			);
 		}
-		core1_load(l0dable.isr_vector, "");
-
 		break;
-#endif
 	default:
 		LOG_ERR("lifecyle",
 			"Attempted to load invalid payload (%s)",
@@ -378,6 +382,8 @@ void vLifecycleTask(void *pvParameters)
 	}
 
 	hardware_init();
+
+	execute_elfs = config_get_boolean(OptionExecuteElf);
 
 	/* When triggered, reset core 1 to menu */
 	while (1) {

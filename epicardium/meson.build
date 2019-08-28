@@ -70,7 +70,7 @@ subdir('ble/')
 
 subdir('l0der/')
 
-epicardium_cargs = []
+epicardium_cargs = ['-D_POSIX_C_SOURCE=200809']
 if get_option('jailbreak_card10')
   epicardium_cargs += [
     '-DJAILBREAK_CARD10=1',
