@@ -80,17 +80,17 @@ def get_bat_color(bat):
     Voltage threshold's are currently estimates as voltage isn't that great of an indicator for
     battery charge.
     :param bat: battery config tuple (boolean: indicator on/off, array: good rgb, array: ok rgb, array: bad rgb)
-    :return: false if old firmware, RGB color array otherwise
+    :return: battery status tuple (float: battery voltage, false if old firmware, RGB color array otherwise)
     """
     try:
         v = os.read_battery()
         if v > 3.8:
-            return bat[1]
+            return (v, bat[1])
         if v > 3.6:
-            return bat[2]
-        return bat[3]
+            return (v, bat[2])
+        return (v, bat[3])
     except AttributeError:
-        return False
+        return (0, False)
 
 
 def render_battery(disp, bat):
@@ -100,10 +100,15 @@ def render_battery(disp, bat):
     :param disp: open display
     :param bat: battery config tuple (boolean: indicator on/off, array: good rgb, array: ok rgb, array: bad rgb)
     """
-    c = get_bat_color(bat)
+    v, c = get_bat_color(bat)
     if not c:
         return
-    disp.rect(140, 2, 155, 9, filled=True, col=c)
+    if v > 4.0:
+        disp.rect(140, 2, 155, 9, filled=True, col=c)
+    else:
+        disp.rect(140, 2, 154, 8, filled=False, col=c)
+        if v > 3.5:
+            disp.rect(141, 3, 142 + int((v - 3.5) * 24), 8, filled=True, col=c)
     disp.rect(155, 4, 157, 7, filled=True, col=c)
 
 
