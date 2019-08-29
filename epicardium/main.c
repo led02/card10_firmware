@@ -4,6 +4,10 @@
 #include "modules/config.h"
 #include "card10-version.h"
 
+#include "gfx.h"
+#include "display.h"
+#include "version-splash.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "mxc_delay.h"
@@ -27,10 +31,19 @@ int main(void)
 	 * Version Splash
 	 */
 	const char *version_buf = CARD10_VERSION;
-	const int off           = (160 - (int)strlen(version_buf) * 14) / 2;
+	mxc_delay(500000);
 	epic_disp_clear(0x0000);
-	epic_disp_print(10, 20, "Epicardium", 0xfe20, 0x0000);
-	epic_disp_print(off > 0 ? off : 0, 40, version_buf, 0xfe20, 0x0000);
+	if (strcmp(CARD10_VERSION, "v1.10") == 0) {
+		gfx_copy_region_raw(
+			&display_screen, 0, 0, 160, 80, 2, version_splash
+		);
+	} else {
+		const int off = (160 - (int)strlen(version_buf) * 14) / 2;
+		epic_disp_print(10, 20, "Epicardium", 0xfe20, 0x0000);
+		epic_disp_print(
+			off > 0 ? off : 0, 40, version_buf, 0xfe20, 0x0000
+		);
+	}
 	epic_disp_update();
 	mxc_delay(2000000);
 
