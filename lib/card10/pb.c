@@ -42,6 +42,7 @@
 #include <stddef.h>
 
 static const uint8_t expander_pins[] = { 5, 0x0, 3, 6 };
+static pb_callback pb_callbacks[4]   = { NULL };
 
 /******************************************************************************/
 int PB_Init(void)
@@ -62,6 +63,23 @@ int PB_Init(void)
 	return retval;
 }
 
+static void pe_pb_callback(gpio_int_pol_t edge_type, void *cbdata)
+{
+	unsigned int pb = (unsigned int)cbdata;
+	if (pb_callbacks[pb - 1]) {
+		pb_callbacks[pb - 1](pb, edge_type == GPIO_INT_FALLING);
+	}
+}
+
+static void gpio_pb_callback(void *cbdata)
+{
+	unsigned int pb = (unsigned int)cbdata;
+	if (pb_callbacks[pb - 1]) {
+		int level = GPIO_InGet(&pb_pin[pb - 1]);
+		pb_callbacks[pb - 1](pb, !level);
+	}
+}
+
 /******************************************************************************/
 int PB_RegisterCallback(unsigned int pb, pb_callback callback)
 {
@@ -71,29 +89,29 @@ int PB_RegisterCallback(unsigned int pb, pb_callback callback)
 		return E_INVALID;
 	}
 
+	pb_callbacks[pb - 1] = callback;
+
 	uint8_t mask = (1 << expander_pins[pb - 1]);
 
 	if (callback) {
 		if (portexpander_detected()) {
 			// Register callback
 			portexpander_register_callback(
-				mask, callback, (void *)pb
+				mask, pe_pb_callback, (void *)pb
 			);
 
 			// Configure and enable interrupt
-			portexpander_int_config(mask, GPIO_INT_FALLING);
+			portexpander_int_config(mask, GPIO_INT_BOTH);
 			portexpander_int_enable(mask);
 		} else {
 			// Register callback
 			GPIO_RegisterCallback(
-				&pb_pin[pb - 1], callback, (void *)pb
+				&pb_pin[pb - 1], gpio_pb_callback, (void *)pb
 			);
 
 			// Configure and enable interrupt
 			GPIO_IntConfig(
-				&pb_pin[pb - 1],
-				GPIO_INT_EDGE,
-				GPIO_INT_FALLING
+				&pb_pin[pb - 1], GPIO_INT_EDGE, GPIO_INT_BOTH
 			);
 			GPIO_IntEnable(&pb_pin[pb - 1]);
 			NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(

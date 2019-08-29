@@ -329,7 +329,7 @@ void portexpander_poll()
 						 GPIO_INT_FALLING);
 				if ((int_edge_config[pin] == GPIO_INT_BOTH) ||
 				    (edge_type == int_edge_config[pin])) {
-					callbacks[pin](cbparam[pin]);
+					callbacks[pin](edge_type, cbparam[pin]);
 				}
 			}
 		}

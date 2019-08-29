@@ -16,7 +16,7 @@ typedef struct {
 } portexpander_cfg_t;
 
 
-typedef void (*pe_callback)(void *cbdata);
+typedef void (*pe_callback)(gpio_int_pol_t edge_type, void *cbdata);
 
 int portexpander_init(void);
 bool portexpander_detected(void);
