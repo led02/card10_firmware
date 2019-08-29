@@ -254,6 +254,12 @@ int hardware_reset(void)
 	 * Display
 	 */
 	display_init_slim();
+	epic_disp_backlight(20);
+
+	/*
+	 * Vibration Motor
+	 */
+	epic_vibra_set(false);
 
 	/*
 	 * BHI160
