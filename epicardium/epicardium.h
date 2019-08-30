@@ -96,6 +96,7 @@ typedef _Bool bool;
 #define API_LEDS_SET_ALL_HSV       0x6b
 #define API_LEDS_SET_GAMMA_TABLE   0x6c
 #define API_LEDS_CLEAR_ALL         0x6d
+#define API_LEDS_GET               0x6f
 
 #define API_VIBRA_SET              0x70
 #define API_VIBRA_VIBRATE          0x71
@@ -589,6 +590,19 @@ API(API_GPIO_READ_PIN, int epic_gpio_read_pin(uint8_t pin));
  * :param uint8_t b:  Blue component of the color.
  */
 API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
+
+
+/**
+ * Get one of card10's RGB LEDs in format of RGB.
+ *
+ * :c:func:`epic_leds_get_rgb` will get the value of a RGB  LED described by ``led``.
+ *
+ * :param int led:  Which LED to get.  0-10 are the LEDs on the top and 11-14
+ *    are the 4 "ambient" LEDs.
+ * :param uint8_t * rgb:  need tree byte array to get the value of red, green and blue.
+ * :returns: ``0`` on success or ``-EPERM`` if the LED is blocked by personal-state.
+ */
+API(API_LEDS_GET, int epic_leds_get_rgb(int led, uint8_t * rgb));
 
 /**
  * Set one of card10's RGB LEDs to a certain color in HSV format.

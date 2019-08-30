@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 
-
 static mp_obj_t mp_leds_set(mp_obj_t led_in, mp_obj_t color_in)
 {
 	int led = mp_obj_get_int(led_in);
@@ -78,6 +77,33 @@ static mp_obj_t mp_leds_prep(mp_obj_t led_in, mp_obj_t color_in)
 	return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_2(leds_prep_obj, mp_leds_prep);
+
+static mp_obj_t mp_leds_get_rgb(mp_obj_t led_in)
+{
+	int led       = mp_obj_get_int(led_in);
+	uint8_t rgb[] = { 0, 0, 0 };
+	int retAPI    = epic_leds_get_rgb(led, rgb);
+	if (retAPI == -EPERM) {
+		mp_raise_ValueError(
+			"no permission: maybe blocked by personal state"
+		);
+	}
+	if (retAPI == -EINVAL) {
+		mp_raise_ValueError(
+			"invalid value: maybe the led does not exists"
+		);
+	}
+
+	mp_obj_t ret          = mp_obj_new_tuple(3, NULL);
+	mp_obj_tuple_t *tuple = MP_OBJ_TO_PTR(ret);
+
+	tuple->items[0] = MP_OBJ_NEW_SMALL_INT(rgb[0]);
+	tuple->items[1] = MP_OBJ_NEW_SMALL_INT(rgb[1]);
+	tuple->items[2] = MP_OBJ_NEW_SMALL_INT(rgb[2]);
+
+	return ret;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(leds_get_rgb_obj, mp_leds_get_rgb);
 
 static mp_obj_t mp_leds_prep_hsv(mp_obj_t led_in, mp_obj_t color_in)
 {
@@ -238,6 +264,7 @@ static const mp_rom_map_elem_t leds_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_set), MP_ROM_PTR(&leds_set_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_hsv), MP_ROM_PTR(&leds_set_hsv_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_prep), MP_ROM_PTR(&leds_prep_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_get_rgb), MP_ROM_PTR(&leds_get_rgb_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_prep_hsv), MP_ROM_PTR(&leds_prep_hsv_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_all), MP_ROM_PTR(&leds_set_all_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_all_hsv), MP_ROM_PTR(&leds_set_all_hsv_obj) },

@@ -8,6 +8,7 @@
 Q(sys_leds)
 Q(update)
 Q(set)
+Q(get_rgb)
 Q(set_hsv)
 Q(prep)
 Q(prep_hsv)

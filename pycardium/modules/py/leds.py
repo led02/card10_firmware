@@ -131,6 +131,17 @@ def set(led, color):
     sys_leds.set(led, color)
 
 
+def get_rgb(led):
+    """
+    Get the current RGB value for an RGB LED.
+
+    :param int led: Which LED to set. 0-10 are the LEDs on the top and 11-14
+       are the 4 "ambient" LEDs
+    :return [r,g,b] color: RGB triplet
+    """
+    return sys_leds.get_rgb(led)
+
+
 def set_hsv(led, color):
     """
     Prepare an RGB LED to be set to an HSV value.
