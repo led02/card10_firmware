@@ -52,6 +52,8 @@ Q(monotonic)
 Q(monotonic_ms)
 Q(time)
 Q(time_ms)
+Q(unix_time)
+Q(unix_time_ms)
 Q(set_time)
 Q(set_unix_time)
 
