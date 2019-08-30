@@ -3,6 +3,7 @@
 #define MICROPY_HW_MCU_NAME "max32666"
 
 /* MicroPython Config Options */
+#define MICROPY_PY_MICROPYTHON_MEM_INFO     (1)
 
 /* We raise asynchronously from an interrupt handler */
 #define MICROPY_ASYNC_KBD_INTR              (1)
