@@ -86,7 +86,7 @@ int pmic_read_amux(enum pmic_amux_signal sig, float *result)
 	ADC_GetData(&adc_data);
 
 	/* Turn MUX back to neutral so it does not waste power.  */
-	MAX77650_setMUX_SEL(sig);
+	MAX77650_setMUX_SEL(PMIC_AMUX_DISABLED);
 
 	/* Convert ADC measurement to SI Volts */
 	float adc_voltage = (float)adc_data / 1023.0f * 1.22f;
