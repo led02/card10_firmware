@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- `micropython.mem_use()` function.
+- High-pass filter and pulse detection in default ECG app.
+
+### Fixed
+- Backlight and Vibration motor were not reset when switching apps.
+- Mismatch in default settings of the *Card10 Nickname* app.
 
 
 ## [v1.9] - 2019-08-28 23:23 - [IcebergLettuce]
