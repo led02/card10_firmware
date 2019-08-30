@@ -148,6 +148,13 @@ typedef uint32_t api_int_id_t;
  * the other direction.  These interrupts can be enabled/disabled
  * (masked/unmasked) using :c:func:`epic_interrupt_enable` and
  * :c:func:`epic_interrupt_disable`.
+ *
+ * .. warning::
+ *
+ *    Never attempt to call the API from inside an ISR.  This might trigger an
+ *    assertion if a call is already being made from thread context.  We plan to
+ *    lift this restriction at some point, but for the time being, this is how
+ *    it is.
  */
 
 /**
@@ -175,17 +182,16 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_CTRL_C                 1
 /** UART Receive interrupt.  See :c:func:`epic_isr_uart_rx`. */
 #define EPIC_INT_UART_RX                2
-/** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm` */
+/** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm`. */
 #define EPIC_INT_RTC_ALARM              3
-/** BHI */
+/** BHI180 Accelerometer.  See :c:func:`epic_isr_bhi160_accelerometer`. */
 #define EPIC_INT_BHI160_ACCELEROMETER   4
-API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
+/** BHI180 Orientation Sensor.  See :c:func:`epic_isr_bhi160_orientation`. */
 #define EPIC_INT_BHI160_ORIENTATION     5
-API_ISR(EPIC_INT_BHI160_ORIENTATION, epic_isr_bhi160_orientation);
+/** BHI180 Gyroscope.  See :c:func:`epic_isr_bhi160_gyroscope`. */
 #define EPIC_INT_BHI160_GYROSCOPE       6
-API_ISR(EPIC_INT_BHI160_GYROSCOPE, epic_isr_bhi160_gyroscope);
+/** MAX30001 ECG.  See :c:func:`epic_isr_max30001_ecg`. */
 #define EPIC_INT_MAX30001_ECG           7
-API_ISR(EPIC_INT_MAX30001_ECG, epic_isr_max30001_ecg);
 
 /* Number of defined interrupts. */
 #define EPIC_INT_NUM                    8
@@ -330,7 +336,7 @@ API(API_UART_READ_CHAR, int epic_uart_read_char(void));
 API(API_UART_READ_STR, int epic_uart_read_str(char *buf, size_t cnt));
 
 /**
- * **Interrupt Service Routine**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_UART_RX`
  *
  * UART receive interrupt.  This interrupt is triggered whenever a new character
  * becomes available on any connected UART device.  This function is weakly
@@ -360,7 +366,7 @@ API(API_UART_READ_STR, int epic_uart_read_str(char *buf, size_t cnt));
 API_ISR(EPIC_INT_UART_RX, epic_isr_uart_rx);
 
 /**
- * **Interrupt Service Routine**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_CTRL_C`
  *
  * A user-defineable ISR which is triggered when a ``^C`` (``0x04``) is received
  * on any serial input device.  This function is weakly aliased to
@@ -1108,6 +1114,36 @@ API(API_BHI160_DISABLE, int epic_bhi160_disable_sensor(
 API(API_BHI160_DISABLE_ALL, void epic_bhi160_disable_all_sensors());
 
 /**
+ * BHI160 Interrupt Handlers
+ * -------------------------
+ */
+
+/**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_BHI160_ACCELEROMETER`
+ *
+ * :c:func:`epic_isr_bhi160_accelerometer` is called whenever the BHI160
+ * accelerometer has new data available.
+ */
+API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
+
+/**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_BHI160_ORIENTATION`
+ *
+ * :c:func:`epic_isr_bhi160_orientation` is called whenever the BHI160
+ * orientation sensor has new data available.
+ */
+API_ISR(EPIC_INT_BHI160_ORIENTATION, epic_isr_bhi160_orientation);
+
+/**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_BHI160_GYROSCOPE`
+ *
+ * :c:func:`epic_isr_bhi160_orientation` is called whenever the BHI160
+ * gyroscrope has new data available.
+ */
+API_ISR(EPIC_INT_BHI160_GYROSCOPE, epic_isr_bhi160_gyroscope);
+
+
+/**
  * Vibration Motor
  * ===============
  */
@@ -1668,7 +1704,7 @@ API(API_RTC_SET_MILLISECONDS, void epic_rtc_set_milliseconds(uint64_t millisecon
 API(API_RTC_SCHEDULE_ALARM, int epic_rtc_schedule_alarm(uint32_t timestamp));
 
 /**
- * **Interrupt Service Routine**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_RTC_ALARM`
  *
  * ``epic_isr_rtc_alarm()`` is called when the RTC alarm triggers.  The RTC alarm
  * can be scheduled using :c:func:`epic_rtc_schedule_alarm`.
@@ -1756,18 +1792,33 @@ void
 ));
 
 /**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_MAX30001_ECG`
+ *
+ * This interrupt handler is called whenever the MAX30001 ECG has new data
+ * available.
+ */
+API_ISR(EPIC_INT_MAX30001_ECG, epic_isr_max30001_ecg);
+
+/**
+ * USB
+ * ===
+ */
+
+/**
  * De-initialize the currently configured USB device (if any)
  *
  */
 API(API_USB_SHUTDOWN, int epic_usb_shutdown(void));
+
 /**
  * Configure the USB peripheral to export the internal FLASH
- * as a Mass Storage device
+ * as a Mass Storage device.
  */
 API(API_USB_STORAGE, int epic_usb_storage(void));
+
 /**
  * Configure the USB peripheral to provide card10's stdin/stdout
- * on a USB CDC-ACM device
+ * on a USB CDC-ACM device.
  */
 API(API_USB_CDCACM, int epic_usb_cdcacm(void));
 
