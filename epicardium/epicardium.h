@@ -309,8 +309,7 @@ API(API_THERMISTOR_VOLTAGE, int epic_read_thermistor_voltage(float *result));
  * :param length:  Amount of bytes to print.
  */
 API(API_UART_WRITE_STR, void epic_uart_write_str(
-	const char *str,
-	intptr_t length
+	const char *str, intptr_t length
 ));
 
 /**
@@ -494,7 +493,9 @@ enum gpio_mode {
  * :param uint8_t mode: Mode to be configured. Use a combination of the :c:type:`gpio_mode` flags.
  * :returns: ``0`` if the mode was set, ``-EINVAL`` if ``pin`` is not valid or the mode could not be set.
  */
-API(API_GPIO_SET_PIN_MODE, int epic_gpio_set_pin_mode(uint8_t pin, uint8_t mode));
+API(API_GPIO_SET_PIN_MODE, int epic_gpio_set_pin_mode(
+	uint8_t pin, uint8_t mode
+));
 
 /**
  * Get the mode of a card10 GPIO pin.
@@ -601,7 +602,9 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  * :param float s:  Saturation component of the color. (0 <= s <= 1)
  * :param float v:  Value/Brightness component of the color. (0 <= v <= 0)
  */
-API(API_LEDS_SET_HSV, void epic_leds_set_hsv(int led, float h, float s, float v));
+API(API_LEDS_SET_HSV, void epic_leds_set_hsv(
+	int led, float h, float s, float v
+));
 
 /**
  * Set multiple of card10's RGB LEDs to a certain color in RGB format.
@@ -624,7 +627,9 @@ API(API_LEDS_SET_ALL, void epic_leds_set_all(uint8_t *pattern, uint8_t len));
  *    LEDs. (0 <= h < 360, 0 <= s <= 1, 0 <= v <= 1)
  * :param uint8_t len: Length of 1st dimension of ``pattern``, see above.
  */
-API(API_LEDS_SET_ALL_HSV, void epic_leds_set_all_hsv(float *pattern, uint8_t len));
+API(API_LEDS_SET_ALL_HSV, void epic_leds_set_all_hsv(
+	float *pattern, uint8_t len
+));
 
 /**
  * Prepare one of card10's RGB LEDs to be set to a certain color in RGB format.
@@ -637,7 +642,9 @@ API(API_LEDS_SET_ALL_HSV, void epic_leds_set_all_hsv(float *pattern, uint8_t len
  * :param uint8_t g:  Green component of the color.
  * :param uint8_t b:  Blue component of the color.
  */
-API(API_LEDS_PREP, void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b));
+API(API_LEDS_PREP, void epic_leds_prep(
+	int led, uint8_t r, uint8_t g, uint8_t b
+));
 
 /**
  * Prepare one of card10's RGB LEDs to be set to a certain color in HSV format.
@@ -650,7 +657,9 @@ API(API_LEDS_PREP, void epic_leds_prep(int led, uint8_t r, uint8_t g, uint8_t b)
  * :param uint8_t s:  Saturation component of the color. (float, 0 <= s <= 1)
  * :param uint8_t v:  Value/Brightness component of the color. (float, 0 <= v <= 0)
  */
-API(API_LEDS_PREP_HSV, void epic_leds_prep_hsv(int led, float h, float s, float v));
+API(API_LEDS_PREP_HSV, void epic_leds_prep_hsv(
+	int led, float h, float s, float v
+));
 
 /**
  * Set global brightness for top RGB LEDs.
@@ -733,8 +742,7 @@ API(API_LEDS_SET_FLASHLIGHT, void epic_set_flashlight(bool power));
  * :param uint8_t[256] gamma_table: Gamma lookup table. (default = 4th order power function rounded up)
  */
 API(API_LEDS_SET_GAMMA_TABLE, void epic_leds_set_gamma_table(
-	uint8_t rgb_channel,
-	uint8_t *gamma_table
+	uint8_t rgb_channel, uint8_t *gamma_table
 ));
 
 /**
@@ -744,7 +752,9 @@ API(API_LEDS_SET_GAMMA_TABLE, void epic_leds_set_gamma_table(
  * :param uint8_t g: Value for the green color channel.
  * :param uint8_t b: Value for the blue color channel.
  */
-API(API_LEDS_CLEAR_ALL, void epic_leds_clear_all(uint8_t r, uint8_t g, uint8_t b));
+API(API_LEDS_CLEAR_ALL, void epic_leds_clear_all(
+	uint8_t r, uint8_t g, uint8_t b
+));
 
 /**
  * BME680
@@ -811,8 +821,9 @@ API(API_BME680_DEINIT, int epic_bme680_deinit());
  *     - ``-EIO``:  Communication with the device failed.
  *     - ``-ENODEV``:  Device was not found.
  */
-API(API_BME680_GET_DATA,
-	int epic_bme680_read_sensors(struct bme680_sensor_data *data));
+API(API_BME680_GET_DATA, int epic_bme680_read_sensors(
+	struct bme680_sensor_data *data
+));
 
 /**
  * Personal State
@@ -855,8 +866,9 @@ enum personal_state {
  * :param bool persistent: Indicates whether the configured personal state will remain set and active on pycardium application restart/change.
  * :returns: ``0`` on success, ``-EINVAL`` if an invalid state was requested.
  */
-API(API_PERSONAL_STATE_SET, int epic_personal_state_set(uint8_t state,
-                                                        bool persistent));
+API(API_PERSONAL_STATE_SET, int epic_personal_state_set(
+	uint8_t state, bool persistent
+));
 
 /**
  * Get the users personal state.
@@ -1281,7 +1293,7 @@ API(API_DISP_PRINT,
  * Font Selection
  */
 enum disp_font_name {
-	DISP_FONT8  = 0, 
+	DISP_FONT8  = 0,
 	DISP_FONT12 = 1,
 	DISP_FONT16 = 2,
 	DISP_FONT20 = 3,
@@ -1301,15 +1313,14 @@ enum disp_font_name {
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_PRINT_ADV,
-	int epic_disp_print_adv(
-		uint8_t font,
-		uint16_t posx,
-		uint16_t posy,
-		const char *pString,
-		uint16_t fg,
-		uint16_t bg)
-);
+API(API_DISP_PRINT_ADV, int epic_disp_print_adv(
+	uint8_t font,
+	uint16_t posx,
+	uint16_t posy,
+	const char *pString,
+	uint16_t fg,
+	uint16_t bg
+));
 
 /**
  * Fills the whole screen with one color
@@ -1331,12 +1342,9 @@ API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_PIXEL,
-    int epic_disp_pixel(
-	    uint16_t x,
-	    uint16_t y,
-	    uint16_t color)
-    );
+API(API_DISP_PIXEL, int epic_disp_pixel(
+	uint16_t x, uint16_t y, uint16_t color
+));
 
 /**
  * Draws a line on the display
@@ -1352,16 +1360,15 @@ API(API_DISP_PIXEL,
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_LINE,
-    int epic_disp_line(
-	    uint16_t xstart,
-	    uint16_t ystart,
-	    uint16_t xend,
-	    uint16_t yend,
-	    uint16_t color,
-	    enum disp_linestyle linestyle,
-	    uint16_t pixelsize)
-    );
+API(API_DISP_LINE, int epic_disp_line(
+	uint16_t xstart,
+	uint16_t ystart,
+	uint16_t xend,
+	uint16_t yend,
+	uint16_t color,
+	enum disp_linestyle linestyle,
+	uint16_t pixelsize
+));
 
 /**
  * Draws a rectangle on the display
@@ -1377,16 +1384,15 @@ API(API_DISP_LINE,
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_RECT,
-    int epic_disp_rect(
-	    uint16_t xstart,
-	    uint16_t ystart,
-	    uint16_t xend,
-	    uint16_t yend,
-	    uint16_t color,
-	    enum disp_fillstyle fillstyle,
-	    uint16_t pixelsize)
-    );
+API(API_DISP_RECT, int epic_disp_rect(
+	uint16_t xstart,
+	uint16_t ystart,
+	uint16_t xend,
+	uint16_t yend,
+	uint16_t color,
+	enum disp_fillstyle fillstyle,
+	uint16_t pixelsize
+));
 
 /**
  * Draws a circle on the display
@@ -1401,15 +1407,14 @@ API(API_DISP_RECT,
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_CIRC,
-    int epic_disp_circ(
-	    uint16_t x,
-	    uint16_t y,
-	    uint16_t rad,
-	    uint16_t color,
-	    enum disp_fillstyle fillstyle,
-	    uint16_t pixelsize)
-    );
+API(API_DISP_CIRC, int epic_disp_circ(
+	uint16_t x,
+	uint16_t y,
+	uint16_t rad,
+	uint16_t color,
+	enum disp_fillstyle fillstyle,
+	uint16_t pixelsize
+));
 
 /**
  * Immediately send the contents of a framebuffer to the display. This overrides
@@ -1420,7 +1425,9 @@ API(API_DISP_CIRC,
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
-API(API_DISP_FRAMEBUFFER, int epic_disp_framebuffer(union disp_framebuffer *fb));
+API(API_DISP_FRAMEBUFFER, int epic_disp_framebuffer(
+	union disp_framebuffer *fb
+));
 
 
 /**
@@ -1521,10 +1528,9 @@ API(API_FILE_READ, int epic_file_read(int fd, void* buf, size_t nbytes));
  * :return: ``< 0`` on error, ``nbytes`` on success. (Partial writes don't occur on success!)
  *
 */
-API(
-	API_FILE_WRITE,
-	int epic_file_write(int fd, const void* buf, size_t nbytes)
-);
+API(API_FILE_WRITE, int epic_file_write(
+	int fd, const void* buf, size_t nbytes
+));
 
 /** */
 API(API_FILE_FLUSH, int epic_file_flush(int fd));
@@ -1690,7 +1696,9 @@ API(API_RTC_GET_MILLISECONDS, uint64_t epic_rtc_get_milliseconds(void));
 /**
  * Sets the current RTC time in milliseconds
  */
-API(API_RTC_SET_MILLISECONDS, void epic_rtc_set_milliseconds(uint64_t milliseconds));
+API(API_RTC_SET_MILLISECONDS, void epic_rtc_set_milliseconds(
+	uint64_t milliseconds
+));
 
 /**
  * Schedule the RTC alarm for the given timestamp.
@@ -1756,8 +1764,8 @@ struct max30001_sensor_config {
 	bool usb;
 
 	/**
-	* Set to true if the interal lead bias of the MAX30001 is to be used.
-	*/
+	 * Set to true if the interal lead bias of the MAX30001 is to be used.
+	 */
 	bool bias;
 
 	/** Always zero. Reserved for future parameters. */
@@ -1765,9 +1773,10 @@ struct max30001_sensor_config {
 };
 
 /**
- * Enable a MAX30001 ecg sensor.  Calling this funciton will instruct the
- * MAX30001 to collect data for this sensor.  You can then
- * retrieve the samples using :c:func:`epic_stream_read`.
+ * Enable a MAX30001 ecg sensor.
+ *
+ * Calling this funciton will instruct the MAX30001 to collect data for this
+ * sensor.  You can then retrieve the samples using :c:func:`epic_stream_read`.
  *
  * :param max30001_sensor_config* config: Configuration for this sensor.
  * :returns: A sensor descriptor which can be used with
@@ -1787,9 +1796,7 @@ API(API_MAX30001_ENABLE, int epic_max30001_enable_sensor(
  *
  * .. versionadded:: 1.6
  */
-API(API_MAX30001_DISABLE, int epic_max30001_disable_sensor(
-void
-));
+API(API_MAX30001_DISABLE, int epic_max30001_disable_sensor());
 
 /**
  * **Interrupt Service Routine** for :c:data:`EPIC_INT_MAX30001_ECG`
