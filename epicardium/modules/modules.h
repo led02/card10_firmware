@@ -52,6 +52,7 @@ void watchdog_clearer_init();
 #define BATTERY_CRITICAL   3.40f
 
 enum pmic_amux_signal {
+	PMIC_AMUX_DISABLED    = 0x0,
 	PMIC_AMUX_CHGIN_U     = 0x1,
 	PMIC_AMUX_CHGIN_I     = 0x2,
 	PMIC_AMUX_BATT_U      = 0x3,
