@@ -41,16 +41,83 @@ leds.dim_top(1)
 COLORS = [((23 + (15 * i)) % 360, 1.0, 1.0) for i in range(11)]
 
 
+# variables for high-pass filter
+moving_average = 0
+alpha = 2
+beta = 3
+
+
+def update_history(datasets):
+    global history, moving_average, alpha, beta
+    for val in datasets:
+        history.append(val - moving_average)
+        moving_average = (alpha * moving_average + beta * val) / (alpha + beta)
+
+    # trim old elements
+    history = history[-HISTORY_MAX:]
+
+
+# variables for pulse detection
+pulse = -1
+samples_since_last_pulse = 0
+q_threshold = -1
+r_threshold = 1
+q_spike = -ECG_RATE
+
+
+def neighbours(n, lst):
+    """
+    neighbours(2, "ABCDE") = ("AB", "BC", "CD", "DE")
+    neighbours(3, "ABCDE") = ("ABC", "BCD", "CDE")
+    """
+
+    for i in range(len(lst) - (n - 1)):
+        yield lst[i : i + n]
+
+
+def detect_pulse(num_new_samples):
+    global history, pulse, samples_since_last_pulse, q_threshold, r_threshold, q_spike
+
+    # look at 3 consecutive samples, starting 2 samples before the samples that were just added, e.g.:
+    # existing samples: "ABCD"
+    # new samples: "EF" => "ABCDEF"
+    # consider ["CDE", "DEF"]
+    # new samples: "GHI" => "ABCDEFGHI"
+    # consider ["EFG", "FGH", "GHI"]
+    for [prev, cur, next_] in neighbours(3, history[-(num_new_samples + 2) :]):
+        samples_since_last_pulse += 1
+
+        if prev > cur < next_ and cur < q_threshold:
+            q_spike = samples_since_last_pulse
+            # we expect the next q-spike to be at least 60% as high as this one
+            q_threshold = (cur * 3) // 5
+        elif (
+            prev < cur > next_
+            and cur > r_threshold
+            and samples_since_last_pulse - q_spike < ECG_RATE // 10
+        ):
+            # the full QRS complex is < 0.1s long, so the q and r spike in particular cannot be more than ECG_RATE//10 samples apart
+            pulse = 60 * ECG_RATE // samples_since_last_pulse
+            samples_since_last_pulse = 0
+            q_spike = -ECG_RATE
+            if pulse < 30 or pulse > 210:
+                pulse = -1
+            # we expect the next r-spike to be at least 60% as high as this one
+            r_threshold = (cur * 3) // 5
+        elif samples_since_last_pulse > 2 * ECG_RATE:
+            q_threshold = -1
+            r_threshold = 1
+            pulse = -1
+
+
 def callback_ecg(datasets):
     global update_screen, history, filebuffer, write
     update_screen += len(datasets)
 
     # update histogram datalist
     if not pause_histogram:
-        history += datasets
-
-        # trim old elements
-        history = history[-HISTORY_MAX:]
+        update_history(datasets)
+        detect_pulse(len(datasets))
 
     # buffer for writes
     if write > 0:
@@ -207,12 +274,24 @@ def draw_histogram():
         )
     else:
         draw_leds((max(history[-5:]) * scale + SCALE_FACTOR) * 11 / (SCALE_FACTOR * 2))
-        disp.print(
-            current_mode + ("+Bias" if bias else ""),
-            posx=0,
-            posy=0,
-            fg=(COLOR_MODE_FINGER if current_mode == MODE_FINGER else COLOR_MODE_USB),
-        )
+        if pulse < 0:
+            disp.print(
+                current_mode + ("+Bias" if bias else ""),
+                posx=0,
+                posy=0,
+                fg=(
+                    COLOR_MODE_FINGER if current_mode == MODE_FINGER else COLOR_MODE_USB
+                ),
+            )
+        else:
+            disp.print(
+                "BPM: {}".format(pulse),
+                posx=0,
+                posy=0,
+                fg=(
+                    COLOR_MODE_FINGER if current_mode == MODE_FINGER else COLOR_MODE_USB
+                ),
+            )
 
     # announce writing ecg log
     if write > 0:
