@@ -5,6 +5,7 @@
 
 #include "py/mpconfig.h"
 #include "py/obj.h"
+#include "py/objint.h"
 #include "py/runtime.h"
 #include "extmod/utime_mphal.h"
 
@@ -26,6 +27,17 @@ static mp_obj_t time_set_time(mp_obj_t secs)
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(time_set_time_obj, time_set_time);
 
+static mp_obj_t time_set_time_ms(mp_obj_t msecs_obj)
+{
+	uint64_t msecs = 0;
+	mp_obj_int_to_bytes_impl(msecs_obj, false, 8, (byte *)&msecs);
+	uint64_t timestamp =
+		msecs + EPOCH_OFFSET * 1000ULL - TZONE_OFFSET * 1000ULL;
+	epic_rtc_set_milliseconds(timestamp);
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(time_set_time_ms_obj, time_set_time_ms);
+
 static mp_obj_t time_set_unix_time(mp_obj_t secs)
 {
 	uint64_t timestamp = mp_obj_get_int(secs) * 1000ULL;
@@ -33,6 +45,17 @@ static mp_obj_t time_set_unix_time(mp_obj_t secs)
 	return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(time_set_unix_time_obj, time_set_unix_time);
+
+static mp_obj_t time_set_unix_time_ms(mp_obj_t msecs_obj)
+{
+	uint64_t timestamp = 0;
+	mp_obj_int_to_bytes_impl(msecs_obj, false, 8, (byte *)&timestamp);
+	epic_rtc_set_milliseconds(timestamp);
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(
+	time_set_unix_time_ms_obj, time_set_unix_time_ms
+);
 
 static mp_obj_t time_time(void)
 {
@@ -131,8 +154,11 @@ static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&time_time_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_time_ms), MP_ROM_PTR(&time_time_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_time), MP_ROM_PTR(&time_set_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_set_time_ms), MP_ROM_PTR(&time_set_time_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_unix_time),
 	  MP_ROM_PTR(&time_set_unix_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_set_unix_time_ms),
+	  MP_ROM_PTR(&time_set_unix_time_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_localtime), MP_ROM_PTR(&time_localtime_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_mktime), MP_ROM_PTR(&time_mktime_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_sleep), MP_ROM_PTR(&mp_utime_sleep_obj) },

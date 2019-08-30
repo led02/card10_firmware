@@ -50,7 +50,9 @@ Q(mktime)
 Q(time)
 Q(time_ms)
 Q(set_time)
+Q(set_time_ms)
 Q(set_unix_time)
+Q(set_unix_time_ms)
 
 /* vibra */
 Q(vibra)
