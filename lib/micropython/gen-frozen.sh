@@ -14,5 +14,5 @@ QSTR_HEADER="$(dirname "$QSTR_HEADER")/qstrdefs.preprocessed.h"
 "$PYTHON" "$SOURCE_DIR"/micropython/tools/mpy-tool.py \
     --freeze \
     --qstr-header "$QSTR_HEADER" \
-    -mlongint-impl longlong \
+    -mlongint-impl mpz \
     "$@" >"$OUTPUT"
