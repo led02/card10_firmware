@@ -2,6 +2,7 @@
 
 ``bme680`` - Environmental Sensor
 =================================
+Allows access to environmental data of card10's surroundings.
 
 **Example**:
 
@@ -9,17 +10,28 @@
 
    import bme680, utime
 
-   bme680.init()
+   with bme680.Bme680() as environment:
+       while True:
+           d = environment.get_data()
 
-   while True:
-       temperature, humidity, pressure, resistance = bme680.get_data()
+           print("Temperature:    {:10.2f} °C".format(d.temperature))
+           print("Humidity:       {:10.2f} % r.h.".format(d.humidity))
+           print("Pressure:       {:10.2f} hPa".format(d.pressure))
+           print("Gas Resistance: {:10.2f} Ω".format(d.resistance))
 
-       print("Temperature:    {:10.2f} °C".format(temperature))
-       print("Humidity:       {:10.2f} % r.h.".format(humidity))
-       print("Pressure:       {:10.2f} hPa".format(pressure))
-       print("Gas Resistance: {:10.2f} Ω".format(resistance))
+           utime.sleep(1)
 
-       utime.sleep(1)
+Sensor Class
+------------
+
+.. autoclass:: bme680.Bme680
+   :members:
+
+Deprecated Interface
+--------------------
+The following functions should no longer be used directly.  The only exist for
+compatibility as they were the old BME680 interface in previous firmware
+versions.
 
 .. py:function:: init()
 
@@ -29,6 +41,8 @@
    :py:func:`bme680.init`.
 
    .. versionadded:: 1.4
+   .. deprecated:: 1.10
+      Use the :py:class:`bme680.Bme680` class instead.
 
 .. py:function:: get_data()
 
@@ -38,9 +52,13 @@
       ``pressure`` (hPa) and ``gas resistance`` (Ohm).
 
    .. versionadded:: 1.4
+   .. deprecated:: 1.10
+      Use the :py:class:`bme680.Bme680` class instead.
 
 .. py:function:: deinit()
 
    Deinitialize the sensor.
 
    .. versionadded:: 1.4
+   .. deprecated:: 1.10
+      Use the :py:class:`bme680.Bme680` class instead.
