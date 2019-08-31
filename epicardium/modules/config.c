@@ -31,17 +31,17 @@ struct config_option {
 
 static struct config_option s_options[_EpicOptionCount] = {
 /* clang-format off */
-	#define INIT_Boolean(v)		        { .boolean        = (v) }
-	#define INIT_Int(v)  		        { .integer        = (v) }
-	#define INIT_Float(v)  		        { .floating_point = (v) }
-	#define INIT_String(v)  	        { .string         = (v) }
-	#define INIT_(tp, v)                INIT_ ## tp (v)
-	#define INIT(tp, v)                 INIT_ (tp, v)
+	#define INIT_Boolean(v)  { .boolean        = (v) }
+	#define INIT_Int(v)      { .integer        = (v) }
+	#define INIT_Float(v)    { .floating_point = (v) }
+	#define INIT_String(v)   { .string         = (v) }
+	#define INIT_(tp, v)     INIT_ ## tp (v)
+	#define INIT(tp, v)      INIT_ (tp, v)
 
-	#define CARD10_SETTING(identifier, spelling, tp, default_value)     \
+	#define CARD10_SETTING(identifier, spelling, tp, default_value)         \
 		[Option ## identifier] = { .name  = (spelling),                 \
-					               .type  = OptionType_ ## tp,          \
-					               .value = INIT(tp, (default_value)) },
+		                           .type  = OptionType_ ## tp,          \
+		                           .value = INIT(tp, (default_value)) },
 
 	#include "modules/config.def"
 	/* clang-format on */
