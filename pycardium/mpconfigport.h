@@ -60,6 +60,7 @@ int mp_hal_trng_read_int(void);
 #define MODULE_POWER_ENABLED                (1)
 #define MODULE_UTIME_ENABLED                (1)
 #define MODULE_VIBRA_ENABLED                (1)
+#define MODULE_WS2812_ENABLED               (1)
 
 /*
  * This port is intended to be 32-bit, but unfortunately, int32_t for

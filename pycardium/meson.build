@@ -16,7 +16,8 @@ modsrc = files(
   'modules/sys_display.c',
   'modules/utime.c',
   'modules/vibra.c',
-  'modules/bme680.c'
+  'modules/bme680.c',
+  'modules/ws2812.c'
 )
 
 #################################

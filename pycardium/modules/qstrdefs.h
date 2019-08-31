@@ -170,3 +170,7 @@ Q(COMMUNICATION)
 Q(CAMP)
 
 Q(MAX30001_ECG)
+
+/* ws2812 */
+Q(ws2812)
+Q(set_all)
