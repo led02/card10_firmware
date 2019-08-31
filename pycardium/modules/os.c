@@ -22,6 +22,11 @@ bool pycrd_filename_restricted(const char *path)
 		path  = fname + 1;
 		fname = strchr(path, '/');
 	}
+	fname = strchr(path, '\\');
+	while (fname) {
+		path  = fname + 1;
+		fname = strchr(path, '\\');
+	}
 	fname = path;
 
 	for (int i = 0;
