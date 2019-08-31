@@ -5,12 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- **ws2812**: Connect Neopixels to the wristband GPIOs and make your card10
+  even more colorful!
 - `micropython.mem_use()` function.
 - High-pass filter and pulse detection in default ECG app.
+- `leds.get_rgb()`: Get the current color of an LED.
+- `leds.get_rocket()`: Get the current brightness of one of the rockets.
+
+### Changed
+- **Pycardium**: Switched from `long-long` to `mpz` integer representation.
+  This should resolve any issues with large numbers which had popped up so far.
 
 ### Fixed
 - Backlight and Vibration motor were not reset when switching apps.
 - Mismatch in default settings of the *Card10 Nickname* app.
+- Fixed the PMIC ADC muxer not being properly reset to neutral after a
+  measurement.
 
 
 ## [v1.9] - 2019-08-28 23:23 - [IcebergLettuce]
