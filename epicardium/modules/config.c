@@ -175,7 +175,7 @@ static void configure(const char *key, const char *value, int lineNumber)
 static void doline(char *line, char *eol, int lineNumber)
 {
 	//skip leading whitespace
-	while (*line && isspace(*line))
+	while (*line && isspace((int)*line))
 		++line;
 
 	char *key = line;
@@ -199,7 +199,7 @@ static void doline(char *line, char *eol, int lineNumber)
 
 	char *e_key = eq - 1;
 	//skip trailing whitespace in key
-	while (e_key > key && isspace(*e_key))
+	while (e_key > key && isspace((int)*e_key))
 		--e_key;
 	e_key[1] = '\0';
 	if (*key == '\0') {
@@ -209,12 +209,12 @@ static void doline(char *line, char *eol, int lineNumber)
 
 	char *value = eq + 1;
 	//skip leading whitespace
-	while (*value && isspace(*value))
+	while (*value && isspace((int)*value))
 		++value;
 
 	char *e_val = eol - 1;
 	//skip trailing whitespace
-	while (e_val > value && isspace(*e_val))
+	while (e_val > value && isspace((int)*e_val))
 		--e_val;
 	if (*value == '\0') {
 		LOG_WARN(
