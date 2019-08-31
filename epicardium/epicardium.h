@@ -138,6 +138,8 @@ typedef _Bool bool;
 #define API_USB_STORAGE            0x111
 #define API_USB_CDCACM             0x112
 
+#define API_WS2812_WRITE           0x0120
+
 /* clang-format on */
 
 typedef uint32_t api_int_id_t;
@@ -1843,4 +1845,20 @@ API(API_USB_STORAGE, int epic_usb_storage(void));
  */
 API(API_USB_CDCACM, int epic_usb_cdcacm(void));
 
+/**
+ * WS2812
+ * ======
+ */
+
+/**
+ * Takes a gpio pin specified with the gpio module and transmits
+ * the led data. The format `GG:RR:BB` is expected.
+ *
+ * :param uint8_t pin: The gpio pin to be used for data.
+ * :param uint8_t * pixels: The buffer, in which the pixel data is stored.
+ * :param uint32_t n_bytes: The size of the buffer.
+ */
+API(API_WS2812_WRITE, void epic_ws2812_write(uint8_t pin, uint8_t *pixels, uint32_t n_bytes));
+
 #endif /* _EPICARDIUM_H */
+

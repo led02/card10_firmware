@@ -3,6 +3,7 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "gpio.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -105,5 +106,9 @@ void vBhi160Task(void *pvParameters);
 #define MAX30001_MUTEX_WAIT_MS          50
 void vMAX30001Task(void *pvParameters);
 void max30001_mutex_init(void);
+
+/* ---------- GPIO --------------------------------------------------------- */
+#define MAX30001_MUTEX_WAIT_MS          50
+extern gpio_cfg_t gpio_configs[];
 
 #endif /* MODULES_H */

@@ -11,7 +11,7 @@
  * Despite what the schematic (currently, 2019-08-18) says these are the correct
  * pins for wristband GPIO 1-4 (not 0-3 as the schematic states)
  */
-static gpio_cfg_t gpio_configs[] = {
+gpio_cfg_t gpio_configs[] = {
 	[EPIC_GPIO_WRISTBAND_1] = { PORT_0,
 				    PIN_21,
 				    GPIO_FUNC_OUT,

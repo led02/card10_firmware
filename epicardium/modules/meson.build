@@ -23,4 +23,5 @@ module_sources = files(
   'watchdog.c',
   'usb.c',
   'config.c',
+  'ws2812.c'
 )
