@@ -46,7 +46,7 @@ static mp_obj_t mp_bme680_get_data()
 static MP_DEFINE_CONST_FUN_OBJ_0(bme680_get_data_obj, mp_bme680_get_data);
 
 static const mp_rom_map_elem_t bme680_module_globals_table[] = {
-	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_bme680) },
+	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_sys_bme680) },
 	{ MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&bme680_init_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_deinit), MP_ROM_PTR(&bme680_deinit_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_get_data), MP_ROM_PTR(&bme680_get_data_obj) },
@@ -59,4 +59,4 @@ const mp_obj_module_t bme680_module = {
 };
 
 /* Register the module to make it available in Python */
-MP_REGISTER_MODULE(MP_QSTR_bme680, bme680_module, MODULE_BME680_ENABLED);
+MP_REGISTER_MODULE(MP_QSTR_sys_bme680, bme680_module, MODULE_BME680_ENABLED);
