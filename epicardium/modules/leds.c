@@ -112,6 +112,18 @@ void epic_leds_set_rocket(int led, uint8_t value)
 	pmic_set_led(led, value);
 }
 
+int epic_leds_get_rocket(int led)
+{
+	int ret = 0;
+	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+		vTaskDelay(pdMS_TO_TICKS(1));
+	}
+
+	ret = pmic_get_led(led);
+	hwlock_release(HWLOCK_I2C);
+	return ret;
+}
+
 void epic_set_flashlight(bool power)
 {
 	leds_flashlight(power);

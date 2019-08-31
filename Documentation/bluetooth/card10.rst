@@ -28,7 +28,7 @@ The current draft uses following service specification:
 - Rockets characteristic:
 
   UUID: ``42230210-2342-2342-2342-234223422342``
-  write no response
+  read and write no response
 
 - Background LED Bottom Left characteristic:
 
@@ -104,6 +104,9 @@ Rockets characteristic
 
 The Rockets characteristic makes it possible to address every three rockets.
 Just write there three byte array, one for evey rocket.
+On read you get the current value of all three rockets.
+Range is between 0 and 31 (``0x1f`) if send higher value it will set to max of 31.
+
 
 Dataformat:
 
@@ -113,8 +116,8 @@ Dataformat:
 Rocket0 Rocket1 Rocket2
 ======= ======= =======
 
-- Enable only Rocket0:  ``0xff0000``
-- Enable all rockets with 50% brightness: ``0x7f7f7f``
+- Enable only Rocket0:  ``0x1f0000``
+- Enable all rockets with 50% brightness: ``0x0f0f0f``
 
 Background LED <Position> characteristic
 ----------------------------------------

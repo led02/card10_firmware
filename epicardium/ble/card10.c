@@ -114,7 +114,7 @@ static const uint8_t UUID_attChar_vibra[] = {
 
 /* BLE UUID for card10 char rockets */
 static const uint8_t UUID_char_rockets[] = {
-	ATT_PROP_WRITE_NO_RSP,
+	ATT_PROP_READ | ATT_PROP_WRITE_NO_RSP,
 	UINT16_TO_BYTES(CARD10_ROCKETS_VAL_HDL),
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
@@ -122,6 +122,9 @@ static const uint8_t UUID_char_rockets[] = {
 static const uint8_t UUID_attChar_rockets[] = {
 	CARD10_UUID_SUFFIX, 0x10, CARD10_UUID_PREFIX
 };
+
+static uint8_t rocketsValue[] = { 0, 0, 0 };
+static uint16_t rocketsLen = sizeof(rocketsValue);
 
 /* BLE UUID for card10 led background bottom left */
 static const uint8_t UUID_char_led_bg_bottom_left[] = {
@@ -338,11 +341,13 @@ static const attsAttr_t card10SvcAttrList[] = {
 	},
 	{
 		.pUuid       = UUID_attChar_rockets,
-		.pValue      = NULL,
+		.pValue      = rocketsValue,
+		.pLen        = &rocketsLen,
 		.maxLen      = 3 * sizeof(uint8_t),
-		.settings    = ATTS_SET_WRITE_CBACK,
+		.settings    = ATTS_SET_WRITE_CBACK | ATTS_SET_READ_CBACK,
 		.permissions = ATTS_PERMIT_WRITE | ATTS_PERMIT_WRITE_ENC |
-			       ATTS_PERMIT_WRITE_AUTH,
+			       ATTS_PERMIT_WRITE_AUTH | ATTS_PERMIT_READ |
+			       ATTS_PERMIT_READ_ENC | ATTS_PERMIT_READ_AUTH,
 	},
 
 	// BG LED Bottom left
@@ -819,6 +824,17 @@ static uint8_t readCard10CB(
 		memcpy(pAttr->pValue, &time, sizeof(time));
 
 		APP_TRACE_INFO0("ble-card10: read time\n");
+		return ATT_SUCCESS;
+	case CARD10_ROCKETS_VAL_HDL:
+		pAttr->pValue[0] = epic_leds_get_rocket(0);
+		pAttr->pValue[1] = epic_leds_get_rocket(1);
+		pAttr->pValue[2] = epic_leds_get_rocket(2);
+		APP_TRACE_INFO3(
+			"ble-card10: get rockets 0:%d, 1:%d, 2:%d\n",
+			pAttr->pValue[0],
+			pAttr->pValue[1],
+			pAttr->pValue[2]
+		);
 		return ATT_SUCCESS;
 	// background leds
 	case CARD10_LED_BG_BOTTOM_LEFT_VAL_HDL:

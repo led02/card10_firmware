@@ -200,6 +200,19 @@ static mp_obj_t mp_leds_set_rocket(mp_obj_t led_in, mp_obj_t value_in)
 }
 static MP_DEFINE_CONST_FUN_OBJ_2(leds_set_rocket_obj, mp_leds_set_rocket);
 
+static mp_obj_t mp_leds_get_rocket(mp_obj_t led_in)
+{
+	int led     = mp_obj_get_int(led_in);
+	uint8_t ret = epic_leds_get_rocket(led);
+	if (ret == -EINVAL) {
+		mp_raise_ValueError(
+			"invalid value: maybe the led does not exists"
+		);
+	}
+	return MP_OBJ_NEW_SMALL_INT(ret);
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(leds_get_rocket_obj, mp_leds_get_rocket);
+
 static mp_obj_t mp_leds_dim_top(mp_obj_t dim_in)
 {
 	int dim = mp_obj_get_int(dim_in);
@@ -269,6 +282,7 @@ static const mp_rom_map_elem_t leds_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_set_all), MP_ROM_PTR(&leds_set_all_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_all_hsv), MP_ROM_PTR(&leds_set_all_hsv_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_rocket), MP_ROM_PTR(&leds_set_rocket_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_get_rocket), MP_ROM_PTR(&leds_get_rocket_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_set_flashlight),
 	  MP_ROM_PTR(&leds_set_flashlight_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_update), MP_ROM_PTR(&leds_update_obj) },

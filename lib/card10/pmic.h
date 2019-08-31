@@ -21,6 +21,7 @@
 
 void pmic_init(void);
 void pmic_set_led(uint8_t led, uint8_t val);
+int pmic_get_led(uint8_t led);
 void pmic_poll(void);
 
 /* weak, so it can be overwritten by applications */
