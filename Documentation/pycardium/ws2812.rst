@@ -1,0 +1,30 @@
+.. py:module:: ws2812
+
+``ws2812`` - Neopixel LEDs
+==========================
+The ``ws2812`` module controls LEDs of the WS2812 type. Just as the ``leds`` module, it exposes a function :py:func:`ws2812.set_all`, which works a similar fashion.
+
+.. py:function:: set_all(pin, colors)
+
+   Set multiple of the LEDs to RGB values.
+
+   Filling starts at the LED connected to the specified gpio pin.
+
+   :param int pin: ID of the pin to use for sending the data.
+   :param colors: List of RGB triplets.
+
+   **Example**
+
+   .. code-block:: python
+
+      import color, utime, ws2812, gpio
+
+      i = 0
+      while True:
+          col1 = color.from_hsv(i % 360, 1.0, 0.1)
+          col2 = color.from_hsv((i + 20) % 360, 1.0, 0.1)
+          col3 = color.from_hsv((i + 40) % 360, 1.0, 0.1)
+          ws2812.set_all(gpio.WRISTBAND_2, [col1, col2, col3])
+          i += 1
+          utime.sleep_ms(10)
+

@@ -38,6 +38,7 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    pycardium/simple_menu
    pycardium/utime
    pycardium/vibra
+   pycardium/ws2812
 
 .. toctree::
    :maxdepth: 1
