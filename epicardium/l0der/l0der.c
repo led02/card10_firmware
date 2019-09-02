@@ -545,7 +545,8 @@ _load_pie(int fd, int size, Elf32_Ehdr *hdr, struct l0dable_info *info)
 
 		if (phdr.p_type == PT_LOAD) {
 			// Check alignment request.
-			if ((phdr.p_vaddr % phdr.p_align) != 0) {
+			if ((phdr.p_offset % phdr.p_align) !=
+			    (phdr.p_vaddr % phdr.p_align)) {
 				LOG_ERR("l0der",
 					"_load_pie: phdr %d alignment too strict",
 					i);
