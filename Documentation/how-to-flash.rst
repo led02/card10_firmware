@@ -5,27 +5,14 @@ method of flashing:
 
 Flash Without Debugger
 ----------------------
+
 If you do not have a debugger, you have to update the firmware using our
-bootloader.  To do so, you need to reboot card10 while keeping the buttom on
-the bottom right pressed.  Rebooting is done by either short pressing the power
-button (top left) while you have a working firmware, or turning the card10 off
-completely (by pressing the power button for 8 seconds) and then starting it again.
+bootloader by going into :ref:`usb_file_transfer`.
 
-.. image:: static/bootloader-buttons.png
-
-If you did everything correctly, the bootloader will display:
-
-.. code-block:: text
-
-   Bootloader
-   Jul 28 2019
-   USB activated.
-   Ready.
-
-On your host, you should now see an 8MB flash-device appear.  You can now drop
-the firmware's ``.bin`` (from ``build/pycardium/pycardium_epicardium.bin`` in
-most cases) into this flash-storage.  You **must** call the file ``card10.bin``
-for the bootloader to use it.
+After you get your badge into :ref:`usb_file_transfer`, you can drop the firmware's
+``.bin`` (from ``build/pycardium/pycardium_epicardium.bin`` in most cases) into
+this flash-storage.  You **must** call the file ``card10.bin`` for the
+bootloader to use it.
 
 The bootloader will then display ``Writing.`` in red while it is actually
 writing the file to external flash.  Please wait until it displays ``Ready.``

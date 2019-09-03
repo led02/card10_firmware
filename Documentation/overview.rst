@@ -55,25 +55,28 @@ you should probably read the :ref:`epicardium_api_guide` guide.
 
 Pycardium
 ---------
+
 Pycardium is our MicroPython fork.  Its purpose is to make it as easy as
 possible to interact with card10.  If you are interested in working on
 Pycardium, take a look at the :ref:`pycardium_guide` guide.
 
-L0dables
+.. _l0dables:
+
+l0dables
 --------
+
 Next to Pycardium, other bare-metal code can also run on core 1.  For example,
 a `Rustcardium`_ or C-cardium.  These l0dables must be compiled using our special
 linker script and should link against the api-caller library so they can
 interface with the :ref:`epicardium_api`.
-Note: this feature is disabled by default and has to be enabled at build time.
-To do this, run ``bootstrap.sh`` with the option ``-Djailbreak_card10=true``
-and rebuild the firmware as described in :ref:`how_to_build`.
+
+Note: this feature is disabled by default and has to be enabled in :ref:`card10_cfg`. A :ref:`card10_cfg` file dropped into the :ref:`usb_file_transfer` of the badge containing ``execute_elf = true`` is enough.
+
+l0dables are currently built within the source tree of the main repository. See ``l0dables/blinky`` for an example of a hello-world-like program. Within those programs, you can access the :ref:`epicardium_api` to control the hardware and behaviour of the badge.
+
+Once you have a built ELF file, you can drop it into the FAT filesystem of the flash (eg. via :ref:`usb_file_transfer`) and it will be available from the menu program of the badge.
 
 .. _Rustcardium: https://git.card10.badge.events.ccc.de/astro/rust-card10
-
-.. todo::
-
-   Provide more details how this works
 
 Program Flow Diagram
 --------------------

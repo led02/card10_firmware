@@ -45,6 +45,8 @@ Last but not least, if you want to start hacking the lower-level firmware, the
    :caption: Firmware
 
    overview
+   card10-cfg
+   usb-file-transfer
    how-to-build
    how-to-flash
    debugger
