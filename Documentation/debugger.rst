@@ -115,6 +115,12 @@ command to soft-reset card10.
    ...
    (gdb)
 
+.. note::
+   You will also find the following self-describing gdb files in the firmware
+   root directory, which do not require additional arguments:
+   ``flash-all.gdb,  flash-bootloader.gdb,  
+   flash-both.gdb,  flash-epicardium.gdb,  flash-pycardium.gdb``
+
 .. warning::
    If you are used to use ``mon reset halt``, be aware that the card10 prototypes
    do not connect the reset line to the debugger. OpenOCD is configured to only do
