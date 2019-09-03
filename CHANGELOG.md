@@ -11,16 +11,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - High-pass filter and pulse detection in default ECG app.
 - `leds.get_rgb()`: Get the current color of an LED.
 - `leds.get_rocket()`: Get the current brightness of one of the rockets.
+- Actually added `uuid` module - it was not built into the firmware before,
+  by accident.
 
 ### Changed
 - **Pycardium**: Switched from `long-long` to `mpz` integer representation.
   This should resolve any issues with large numbers which had popped up so far.
+- Made OpenOCD scripts work with more debuggers out of the box.
+- Refactored BME680 sensor interface.
 
 ### Fixed
 - Backlight and Vibration motor were not reset when switching apps.
 - Mismatch in default settings of the *Card10 Nickname* app.
 - Fixed the PMIC ADC muxer not being properly reset to neutral after a
   measurement.
+- Fixed wrong timezone offset calculation in `utime.time_ms()`.
+- Fixed bug where `\` characters were not parsed as path separators.
 
 
 ## [v1.9] - 2019-08-28 23:23 - [IcebergLettuce]
