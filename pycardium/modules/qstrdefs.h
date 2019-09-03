@@ -104,7 +104,7 @@ Q(stop)
 Q(read)
 
 /* bme680 */
-Q(bme680)
+Q(sys_bme680)
 Q(init)
 Q(deinit)
 Q(get_data)
