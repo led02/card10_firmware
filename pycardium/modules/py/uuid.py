@@ -20,7 +20,7 @@ class UUID:
             if len(bytes) != 16:
                 raise ValueError("bytes is not a 16-char string")
             assert isinstance(bytes, bytes_), repr(bytes)
-            int = int_.from_bytes(bytes, byteorder="big")
+            int = int_.from_bytes(bytes, "big")
         if int is not None:
             if not 0 <= int < 1 << 128:
                 raise ValueError("int is out of range (need a 128-bit value)")
@@ -33,7 +33,8 @@ class UUID:
             # Set the version number.
             int &= ~(0xF000 << 64)
             int |= version << 76
-        self.__dict__["int"] = int
+
+        setattr(self, "int", int)
 
     def __eq__(self, other):
         if isinstance(other, UUID):
