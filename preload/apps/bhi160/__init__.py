@@ -10,6 +10,7 @@ sensors = [
     {"sensor": bhi160.BHI160Orientation(), "name": "Orientation"},
     {"sensor": bhi160.BHI160Accelerometer(), "name": "Accelerometer"},
     {"sensor": bhi160.BHI160Gyroscope(), "name": "Gyroscope"},
+    {"sensor": bhi160.BHI160Magnetometer(), "name": "Magnetometer"},
 ]
 
 while True:

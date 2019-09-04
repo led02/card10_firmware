@@ -188,17 +188,19 @@ API(API_INTERRUPT_DISABLE, int epic_interrupt_disable(api_int_id_t int_id));
 #define EPIC_INT_UART_RX                2
 /** RTC Alarm interrupt.  See :c:func:`epic_isr_rtc_alarm`. */
 #define EPIC_INT_RTC_ALARM              3
-/** BHI180 Accelerometer.  See :c:func:`epic_isr_bhi160_accelerometer`. */
+/** BHI160 Accelerometer.  See :c:func:`epic_isr_bhi160_accelerometer`. */
 #define EPIC_INT_BHI160_ACCELEROMETER   4
-/** BHI180 Orientation Sensor.  See :c:func:`epic_isr_bhi160_orientation`. */
+/** BHI160 Orientation Sensor.  See :c:func:`epic_isr_bhi160_orientation`. */
 #define EPIC_INT_BHI160_ORIENTATION     5
-/** BHI180 Gyroscope.  See :c:func:`epic_isr_bhi160_gyroscope`. */
+/** BHI160 Gyroscope.  See :c:func:`epic_isr_bhi160_gyroscope`. */
 #define EPIC_INT_BHI160_GYROSCOPE       6
 /** MAX30001 ECG.  See :c:func:`epic_isr_max30001_ecg`. */
 #define EPIC_INT_MAX30001_ECG           7
+/** BHI160 Magnetometer.  See :c:func:`epic_isr_bhi160_magnetometer`. */
+#define EPIC_INT_BHI160_MAGNETOMETER    8
 
 /* Number of defined interrupts. */
-#define EPIC_INT_NUM                    8
+#define EPIC_INT_NUM                    9
 /* clang-format on */
 
 /*
@@ -1045,7 +1047,12 @@ enum bhi160_sensor_type {
 	 * - Dynamic range: g's (1x Earth Gravity, ~9.81m*s^-2)
 	 */
 	BHI160_ACCELEROMETER               = 0,
-	/** Magnetometer (**Unimplemented**) */
+	/**
+	 * Magnetometer
+	 *
+	 * - Data type: :c:type:`bhi160_data_vector`
+	 * - Dynamic range: -1000 to 1000 microtesla
+	 */
 	BHI160_MAGNETOMETER                = 1,
 	/** Orientation */
 	BHI160_ORIENTATION                 = 2,
@@ -1176,6 +1183,14 @@ API(API_BHI160_DISABLE_ALL, void epic_bhi160_disable_all_sensors());
  * accelerometer has new data available.
  */
 API_ISR(EPIC_INT_BHI160_ACCELEROMETER, epic_isr_bhi160_accelerometer);
+
+/**
+ * **Interrupt Service Routine** for :c:data:`EPIC_INT_BHI160_MAGNETOMETER`
+ *
+ * :c:func:`epic_isr_bhi160_magnetometer` is called whenever the BHI160
+ * magnetometer has new data available.
+ */
+API_ISR(EPIC_INT_BHI160_MAGNETOMETER, epic_isr_bhi160_magnetometer);
 
 /**
  * **Interrupt Service Routine** for :c:data:`EPIC_INT_BHI160_ORIENTATION`

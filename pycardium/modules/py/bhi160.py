@@ -127,3 +127,23 @@ class BHI160Orientation(BHI160):
 
     def convert(self, sample):
         return self.convert_data_vector(sample)
+
+
+class BHI160Magnetometer(BHI160):
+    def __init__(
+        self, sample_rate=4, dynamic_range=1, callback=None, sample_buffer_len=200
+    ):
+        self.sample_rate = sample_rate
+        self.dynamic_range = dynamic_range
+        self.callback = callback
+        self.sample_buffer_len = sample_buffer_len
+        self.sensor_id = 1
+        self.interrupt_id = interrupt.BHI160_MAGNETOMETER
+        self._callback = callback
+        self.enable_sensor()
+
+    def convert_single(self, value):
+        return 1000 * value / 32768.0
+
+    def convert(self, sample):
+        return self.convert_data_vector(sample)
