@@ -7,18 +7,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - **ws2812**: Connect Neopixels to the wristband GPIOs and make your card10
   even more colorful!
-- `micropython.mem_use()` function.
+- DigiClk is now in the default prelude!
 - High-pass filter and pulse detection in default ECG app.
-- `leds.get_rgb()`: Get the current color of an LED.
-- `leds.get_rocket()`: Get the current brightness of one of the rockets.
 - Actually added `uuid` module - it was not built into the firmware before,
   by accident.
+- `leds.get_rgb()`: Get the current color of an LED.
+- `leds.get_rocket()`: Get the current brightness of one of the rockets.
+- `micropython.mem_use()` function.
+- The analog-clock can now also set the time using the buttons.
 
 ### Changed
 - **Pycardium**: Switched from `long-long` to `mpz` integer representation.
   This should resolve any issues with large numbers which had popped up so far.
-- Made OpenOCD scripts work with more debuggers out of the box.
 - Refactored BME680 sensor interface.
+- Made OpenOCD scripts work with more debuggers out of the box.
+- Internal changes in preparation for button-interrupts.
 
 ### Fixed
 - Backlight and Vibration motor were not reset when switching apps.
@@ -27,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   measurement.
 - Fixed wrong timezone offset calculation in `utime.time_ms()`.
 - Fixed bug where `\` characters were not parsed as path separators.
+- Fixed the alignment request check in our ELF l0der.
+- Fixed a buffer-overflow in the config-parser.
 
 
 ## [v1.9] - 2019-08-28 23:23 - [IcebergLettuce]
