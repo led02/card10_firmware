@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+
+## [v1.10] - 2019-09-05 21:42 - [JerusalemArtichoke]
+[JerusalemArtichoke]: https://card10.badge.events.ccc.de/release/card10-v1.10-JerusalemArtichoke.zip
+
 ### Added
 - **ws2812**: Connect Neopixels to the wristband GPIOs and make your card10
   even more colorful!
@@ -235,7 +240,8 @@ fbf7c8c0 fix(menu.py) Refactored menu.py based on !138
 ## [v1.0] - 2019-08-21 00:50
 Initial release.
 
-[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.9...master
+[Unreleased]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.10...master
+[v1.10]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.9...v1.10
 [v1.9]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.8...v1.9
 [v1.8]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.7...v1.8
 [v1.7]: https://git.card10.badge.events.ccc.de/card10/firmware/compare/v1.6...v1.7
