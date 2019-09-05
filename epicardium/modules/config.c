@@ -270,17 +270,17 @@ void load_config(void)
 		);
 		return;
 	}
-	char buf[CONFIG_MAX_LINE_LENGTH];
+	char buf[CONFIG_MAX_LINE_LENGTH + 1];
 	int lineNumber = 0;
 	int nread;
 	do {
-		//zero-terminate in case file is empty
-		buf[0] = '\0';
-		nread  = epic_file_read(fd, buf, sizeof(buf));
-		if (nread < sizeof(buf)) {
+		nread = epic_file_read(fd, buf, CONFIG_MAX_LINE_LENGTH);
+		if (nread < CONFIG_MAX_LINE_LENGTH) {
 			//add fake EOL to ensure termination
-			buf[nread] = '\n';
+			buf[nread++] = '\n';
 		}
+		//zero-terminate buffer
+		buf[nread]   = '\0';
 		char *line   = buf;
 		char *eol    = NULL;
 		int last_eol = 0;
@@ -344,4 +344,5 @@ void load_config(void)
 			}
 		}
 	} while (nread == sizeof(buf));
+	epic_file_close(fd);
 }
