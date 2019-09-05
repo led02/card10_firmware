@@ -11,28 +11,6 @@ import os
 CONFIG_NAME = "clock.json"
 
 
-class Time:
-    def __init__(self, start=0):
-        self.time = start
-        self.wait_time = 0.95
-
-    def tick(self):
-        sleep(self.wait_time)
-        self.time += 1
-
-    @property
-    def second(self):
-        return self.time % 60
-
-    @property
-    def minute(self):
-        return (self.time / 60) % 60
-
-    @property
-    def hour(self):
-        return (self.time / 3600) % 24
-
-
 class Clock:
     def __init__(
         self,
@@ -60,7 +38,6 @@ class Clock:
         )
         self.run_once = run_once
         self.offsetx = offsetx
-        self.time = Time()
         self.theme = 0
         self.default_themes = [
             {
@@ -181,46 +158,36 @@ class Clock:
         colored = False
         try:
             with display.open() as disp:
-                button_pressed = False
                 while True:
-                    self.updateClock(disp)
+                    localtime = utime.localtime()
+                    self.updateClock(disp, localtime)
                     if self.run_once:
                         break
 
                     # check for button presses
-                    v = buttons.read(buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT)
-                    if v == 0:
-                        button_pressed = False
+                    v = buttons.read(
+                        buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT
+                    )
+                    button_pressed = v != 0
 
-                    if not button_pressed and v & buttons.BOTTOM_LEFT != 0:
-                        button_pressed = True
+                    if button_pressed and v & buttons.BOTTOM_LEFT != 0:
                         self.setTheme(self.theme - 1)
                         self.writeConfig()
-                    elif not button_pressed and v & buttons.BOTTOM_RIGHT != 0:
-                        button_pressed = True
+                    elif button_pressed and v & buttons.BOTTOM_RIGHT != 0:
                         self.setTheme(self.theme + 1)
                         self.writeConfig()
+                    elif button_pressed and v & buttons.TOP_RIGHT != 0:
+                        self.setTime(disp, localtime)
+
+                    utime.sleep_ms(23)
 
         except KeyboardInterrupt:
             for i in range(11):
                 leds.set(i, (0, 0, 0))
             return
 
-    def drawImage(self, image):
-        with display.open() as d:
-            d.clear()
-            for x in range(len(image)):
-                for y in range(len(image[x])):
-                    d.pixel(
-                        x + self.offsetx,
-                        y,
-                        col=(255, 255, 255) if image[x][y] else (0, 0, 0),
-                    )
-            d.update()
-
-    def updateClock(self, disp):
+    def updateClock(self, disp, localtime):
         disp.clear(self.background_col)
-        localtime = utime.localtime()
 
         disp.pixel(self.center[0] + self.offsetx, self.center[1], col=self.center_col)
         hour_coords = self.circlePoint(
@@ -283,6 +250,49 @@ class Clock:
                 print(line)
 
         disp.update()
+
+    def setTime(self, disp, localtime):
+        accepted = False
+        previously_pressed_button = buttons.TOP_RIGHT
+        button_repeat_counter = 0
+        set_seconds = utime.mktime(localtime)
+
+        while not accepted:
+            v = buttons.read(
+                buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT
+            )
+            button_pressed = v != 0
+
+            if button_pressed:
+                if v & previously_pressed_button != 0:
+                    button_repeat_counter += 1
+                else:
+                    if v & buttons.BOTTOM_LEFT != 0:
+                        previously_pressed_button = buttons.BOTTOM_LEFT
+                    elif v & buttons.BOTTOM_RIGHT != 0:
+                        previously_pressed_button = buttons.BOTTOM_RIGHT
+                    elif (
+                        v & buttons.TOP_RIGHT != 0
+                        and previously_pressed_button != buttons.TOP_RIGHT
+                    ):
+                        accepted = True
+                    else:
+                        previously_pressed_button = 0
+            else:
+                previously_pressed_button = 0
+                button_repeat_counter = 0
+
+            seconds_change = int(min(1.1 ** button_repeat_counter, 60 * 23 + 1))
+            if previously_pressed_button == buttons.BOTTOM_LEFT:
+                set_seconds -= seconds_change
+            elif previously_pressed_button == buttons.BOTTOM_RIGHT:
+                set_seconds += seconds_change
+
+            self.updateClock(disp, utime.localtime(set_seconds))
+            utime.sleep_ms(23)
+
+        utime.set_time(int(set_seconds))
+        utime.sleep_ms(123)
 
     def circlePoint(self, t):
         return (
