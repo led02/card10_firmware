@@ -4,6 +4,8 @@
 ==========================
 The ``ws2812`` module controls LEDs of the WS2812 type. Just as the ``leds`` module, it exposes a function :py:func:`ws2812.set_all`, which works a similar fashion.
 
+.. versionadded:: 1.10
+
 .. py:function:: set_all(pin, colors)
 
    Set multiple of the LEDs to RGB values.
@@ -28,3 +30,4 @@ The ``ws2812`` module controls LEDs of the WS2812 type. Just as the ``leds`` mod
           i += 1
           utime.sleep_ms(10)
 
+   .. versionadded:: 1.10

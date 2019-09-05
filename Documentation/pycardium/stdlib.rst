@@ -201,6 +201,8 @@ Struct module.
       UUID(bytes='\x12\x34\x56\x78' * 4)
       UUID(int=0x12345678123456781234567812345678)
 
+   .. versionadded:: 1.10
+
    .. py:attribute:: bytes
 
       UUID as ``bytes()`` object
@@ -221,7 +223,4 @@ Struct module.
 
    Generate a new UUID version 4 (random UUID).
 
-   .. todo::
-
-      This function is not yet usable because we don't have
-      :py:func:`os.urandom` yet.
+   .. versionadded:: 1.10

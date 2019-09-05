@@ -604,6 +604,8 @@ API(API_LEDS_SET, void epic_leds_set(int led, uint8_t r, uint8_t g, uint8_t b));
  *    are the 4 "ambient" LEDs.
  * :param uint8_t * rgb:  need tree byte array to get the value of red, green and blue.
  * :returns: ``0`` on success or ``-EPERM`` if the LED is blocked by personal-state.
+ *
+ * .. versionadded:: 1.10
  */
 API(API_LEDS_GET, int epic_leds_get_rgb(int led, uint8_t * rgb));
 
@@ -755,6 +757,8 @@ API(API_LEDS_SET_ROCKET, void epic_leds_set_rocket(int led, uint8_t value));
  *    | ``2`` | Green  | Right    |
  *    +-------+--------+----------+
  * :returns value:  Brightness of LED (value between 0 and 31)  or ``-EINVAL`` if the LED/rocket does not exists.
+ *
+ * .. versionadded:: 1.10
  */
 API(API_LEDS_GET_ROCKET, int epic_leds_get_rocket(int led));
 
@@ -1876,6 +1880,8 @@ API(API_USB_CDCACM, int epic_usb_cdcacm(void));
  * :param uint8_t pin: The gpio pin to be used for data.
  * :param uint8_t * pixels: The buffer, in which the pixel data is stored.
  * :param uint32_t n_bytes: The size of the buffer.
+ *
+ * .. versionadded:: 1.10
  */
 API(API_WS2812_WRITE, void epic_ws2812_write(uint8_t pin, uint8_t *pixels, uint32_t n_bytes));
 

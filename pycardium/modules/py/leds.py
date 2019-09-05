@@ -89,6 +89,8 @@ def get_rocket(led):
        +-------+--------+----------+
     :rtype: int
     :returns: Brightness of LED (value between 0 and 31).
+
+    .. versionadded:: 1.10
     """
     return sys_leds.get_rocket(led)
 
@@ -159,6 +161,8 @@ def get_rgb(led):
     :param int led: Which LED to set. 0-10 are the LEDs on the top and 11-14
        are the 4 "ambient" LEDs
     :return [r,g,b] color: RGB triplet
+
+    .. versionadded:: 1.10
     """
     return sys_leds.get_rgb(led)
 
