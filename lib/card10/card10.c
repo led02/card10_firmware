@@ -215,6 +215,7 @@ void core1_stop(void)
 void card10_poll(void)
 {
 	pmic_poll();
+	portexpander_poll();
 }
 
 void card10_reset(void)

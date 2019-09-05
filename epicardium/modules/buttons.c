@@ -26,7 +26,7 @@ uint8_t epic_buttons_read(uint8_t mask)
 		 * Not using PB_Get() here as that performs one I2C transcation
 		 * per button.
 		 */
-		uint8_t pin_status = ~portexpander_get();
+		uint8_t pin_status = ~portexpander_in_get(0xFF);
 
 		hwlock_release(HWLOCK_I2C);
 

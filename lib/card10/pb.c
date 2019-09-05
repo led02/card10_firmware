@@ -40,6 +40,10 @@
 #include "portexpander.h"
 #include "MAX77650-Arduino-Library.h"
 #include <stddef.h>
+
+static const uint8_t expander_pins[] = { 5, 0x0, 3, 6 };
+static pb_callback pb_callbacks[4]   = { NULL };
+
 /******************************************************************************/
 int PB_Init(void)
 {
@@ -59,24 +63,71 @@ int PB_Init(void)
 	return retval;
 }
 
+static void pe_pb_callback(gpio_int_pol_t edge_type, void *cbdata)
+{
+	unsigned int pb = (unsigned int)cbdata;
+	if (pb_callbacks[pb - 1]) {
+		pb_callbacks[pb - 1](pb, edge_type == GPIO_INT_FALLING);
+	}
+}
+
+static void gpio_pb_callback(void *cbdata)
+{
+	unsigned int pb = (unsigned int)cbdata;
+	if (pb_callbacks[pb - 1]) {
+		int level = GPIO_InGet(&pb_pin[pb - 1]);
+		pb_callbacks[pb - 1](pb, !level);
+	}
+}
+
 /******************************************************************************/
 int PB_RegisterCallback(unsigned int pb, pb_callback callback)
 {
-	MXC_ASSERT(pb < num_pbs);
+	MXC_ASSERT((pb > 0) && (pb <= num_pbs));
 
-	// TODO: portexpander support
+	if (pb == 2) {
+		return E_INVALID;
+	}
+
+	pb_callbacks[pb - 1] = callback;
+
+	uint8_t mask = (1 << expander_pins[pb - 1]);
+
 	if (callback) {
-		// Register callback
-		GPIO_RegisterCallback(&pb_pin[pb], callback, (void *)pb);
+		if (portexpander_detected()) {
+			// Register callback
+			portexpander_register_callback(
+				mask, pe_pb_callback, (void *)pb
+			);
 
-		// Configure and enable interrupt
-		GPIO_IntConfig(&pb_pin[pb], GPIO_INT_EDGE, GPIO_INT_FALLING);
-		GPIO_IntEnable(&pb_pin[pb]);
-		NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pb_pin[pb].port));
+			// Configure and enable interrupt
+			portexpander_int_config(mask, GPIO_INT_BOTH);
+			portexpander_int_enable(mask);
+		} else {
+			// Register callback
+			GPIO_RegisterCallback(
+				&pb_pin[pb - 1], gpio_pb_callback, (void *)pb
+			);
+
+			// Configure and enable interrupt
+			GPIO_IntConfig(
+				&pb_pin[pb - 1], GPIO_INT_EDGE, GPIO_INT_BOTH
+			);
+			GPIO_IntEnable(&pb_pin[pb - 1]);
+			NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(
+				pb_pin[pb - 1].port)
+			);
+		}
 	} else {
-		// Disable interrupt and clear callback
-		GPIO_IntDisable(&pb_pin[pb]);
-		GPIO_RegisterCallback(&pb_pin[pb], NULL, NULL);
+		if (portexpander_detected()) {
+			// Disable interrupt and clear callback
+			portexpander_int_disable(mask);
+			portexpander_register_callback(mask, NULL, NULL);
+		} else {
+			// Disable interrupt and clear callback
+			GPIO_IntDisable(&pb_pin[pb - 1]);
+			GPIO_RegisterCallback(&pb_pin[pb - 1], NULL, NULL);
+		}
 	}
 
 	return E_NO_ERROR;
@@ -85,25 +136,46 @@ int PB_RegisterCallback(unsigned int pb, pb_callback callback)
 //******************************************************************************
 void PB_IntEnable(unsigned int pb)
 {
-	// TODO: portexpander support
-	MXC_ASSERT(pb < num_pbs);
-	GPIO_IntEnable(&pb_pin[pb]);
+	MXC_ASSERT((pb > 0) && (pb <= num_pbs));
+	if (pb == 2) {
+		return;
+	}
+
+	if (portexpander_detected()) {
+		portexpander_int_enable((1 << expander_pins[pb - 1]));
+	} else {
+		GPIO_IntEnable(&pb_pin[pb - 1]);
+	}
 }
 
 //******************************************************************************
 void PB_IntDisable(unsigned int pb)
 {
-	// TODO: portexpander support
-	MXC_ASSERT(pb < num_pbs);
-	GPIO_IntDisable(&pb_pin[pb]);
+	MXC_ASSERT((pb > 0) && (pb <= num_pbs));
+	if (pb == 2) {
+		return;
+	}
+
+	if (portexpander_detected()) {
+		portexpander_int_disable((1 << expander_pins[pb - 1]));
+	} else {
+		GPIO_IntDisable(&pb_pin[pb - 1]);
+	}
 }
 
 //******************************************************************************
 void PB_IntClear(unsigned int pb)
 {
-	// TODO: portexpander support
-	MXC_ASSERT(pb < num_pbs);
-	GPIO_IntClr(&pb_pin[pb]);
+	MXC_ASSERT((pb > 0) && (pb <= num_pbs));
+	if (pb == 2) {
+		return;
+	}
+
+	if (portexpander_detected()) {
+		portexpander_int_clr((1 << expander_pins[pb - 1]));
+	} else {
+		GPIO_IntClr(&pb_pin[pb - 1]);
+	}
 }
 
 //******************************************************************************
@@ -116,8 +188,8 @@ int PB_Get(unsigned int pb)
 	case 3:
 	case 4:
 		if (portexpander_detected()) {
-			uint8_t port = portexpander_get();
-			return (port & (1 << expander_pins[pb - 1])) == 0;
+			return portexpander_in_get(
+				       (1 << expander_pins[pb - 1])) == 0;
 		} else {
 			return GPIO_InGet(&pb_pin[pb - 1]) == 0;
 		}

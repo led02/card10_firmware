@@ -285,10 +285,7 @@ static uint8_t power_pin_conversion(uint8_t group)
 
 static void power_all(void)
 {
-	for (int i = 0; i < 3; i++) {
-		portexpander_prep(i, 0);
-	}
-	portexpander_update();
+	portexpander_out_clr(PIN_0 | PIN_1 | PIN_2);
 }
 
 void leds_update_power(void)
@@ -301,14 +298,14 @@ void leds_update_power(void)
 	if (new_groups == active_groups) {
 		return;
 	}
-	for (int i = 0; i < 3; i++) {
-		if (i < new_groups) {
-			portexpander_prep(power_pin_conversion(i), 0);
-		} else {
-			portexpander_prep(power_pin_conversion(i), 1);
-		}
+
+	uint8_t out_val = 0;
+	for (int i = new_groups; i < 3; ++i) {
+		out_val |= (1 << power_pin_conversion(i));
 	}
-	portexpander_update();
+
+	portexpander_out_put(PIN_0 | PIN_1 | PIN_2, out_val);
+
 	if (active_groups < new_groups) {
 		for (int i = 0; i < powerup_wait_cycles; i++) {
 			__NOP();
@@ -343,7 +340,7 @@ void leds_update(void)
 
 void leds_flashlight(bool power)
 {
-	portexpander_set(7, (power) ? 0 : 1);
+	portexpander_out_put(PIN_7, (power) ? 0 : 1);
 }
 
 void leds_set_gamma_table(uint8_t rgb_channel, uint8_t table[256])
