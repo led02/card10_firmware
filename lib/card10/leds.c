@@ -340,7 +340,7 @@ void leds_update(void)
 
 void leds_flashlight(bool power)
 {
-	portexpander_out_put(PIN_7, (power) ? 0 : 1);
+	portexpander_out_put(PIN_7, (power) ? 0 : 0xFF);
 }
 
 void leds_set_gamma_table(uint8_t rgb_channel, uint8_t table[256])
