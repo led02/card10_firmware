@@ -74,7 +74,7 @@ class Display:
 
         :param text: Text to print
         :param fg: Foreground color (expects RGB triple)
-        :param bg: Background color (expects RGB triple)
+        :param bg: Background color (expects RGB triple) or None for transparent background
         :param posx: X-Position of the first character, 0 <= posx <= 159
         :param posy: Y-Position of the first character, 0 <= posy <= 79
         :param font: 0 <= font <= 4 (currently) selects a font
@@ -97,7 +97,7 @@ class Display:
                 d.update()
         """
         fg = fg or color.WHITE
-        bg = bg or color.BLACK
+        bg = bg or fg
 
         sys_display.print_adv(text, posx, posy, fg, bg, font)
         return self
