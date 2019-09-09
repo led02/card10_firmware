@@ -111,4 +111,7 @@ void max30001_mutex_init(void);
 #define MAX30001_MUTEX_WAIT_MS          50
 extern gpio_cfg_t gpio_configs[];
 
+
+/* ---------- Sleep -------------------------------------------------------- */
+void sleep_deepsleep(void);
 #endif /* MODULES_H */

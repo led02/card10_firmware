@@ -54,6 +54,13 @@ int hardware_early_init(void)
 	 */
 	GPIO_Init();
 
+	/* Set the power hold pin, so the PMIC does not turn off again */
+	const gpio_cfg_t pwr_hold_pin = {
+		PORT_0, PIN_30, GPIO_FUNC_OUT, GPIO_PAD_NONE
+	};
+	GPIO_Config(&pwr_hold_pin);
+	GPIO_OutSet(&pwr_hold_pin);
+
 	/*
 	 * PMIC (MAX77650)
 	 */

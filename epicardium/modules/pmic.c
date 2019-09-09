@@ -136,37 +136,22 @@ done:
  * Read the interrupt flag register and handle all interrupts which the PMIC has
  * sent.  In most cases this will be the buttons.
  */
-static void
-pmic_poll_interrupts(TickType_t *button_start_tick, TickType_t duration)
+static uint8_t pmic_poll_interrupts(void)
 {
 	while (hwlock_acquire(HWLOCK_I2C, LOCK_WAIT) < 0) {
 		LOG_WARN("pmic", "Failed to acquire I2C. Retrying ...");
-		xTaskNotify(pmic_task_id, PMIC_NOTIFY_IRQ, eSetBits);
-		return;
+		vTaskDelay(pdMS_TO_TICKS(100));
 	}
 
 	uint8_t int_flag = MAX77650_getINT_GLBL();
 	hwlock_release(HWLOCK_I2C);
 
-	if (int_flag & MAX77650_INT_nEN_F) {
-		/* Button was pressed */
-		*button_start_tick = xTaskGetTickCount();
-	}
-	if (int_flag & MAX77650_INT_nEN_R) {
-		/* Button was released */
-		*button_start_tick = 0;
-		if (duration < pdMS_TO_TICKS(400)) {
-			return_to_menu();
-		} else {
-			LOG_WARN("pmic", "Resetting ...");
-			card10_reset();
-		}
-	}
-
 	/* TODO: Remove when all interrupts are handled */
 	if (int_flag & ~(MAX77650_INT_nEN_F | MAX77650_INT_nEN_R)) {
 		LOG_WARN("pmic", "Unhandled PMIC Interrupt: %x", int_flag);
 	}
+
+	return int_flag;
 }
 
 __attribute__((noreturn)) static void pmic_die(float u_batt)
@@ -192,11 +177,15 @@ __attribute__((noreturn)) static void pmic_die(float u_batt)
 	for (int i = 0; i < 50000000; i++)
 		__NOP();
 
-	LOG_WARN("pmic", "Poweroff");
-	MAX77650_setSFT_RST(0x2);
+	/* We have some of headroom to keep the RTC going.
+	 * The battery protection circuit will shut down
+	 * the system at 3.0 V */
 
+	/* TODO: Wake-up when USB is attached again */
+	sleep_deepsleep();
+	card10_reset();
 	while (1)
-		__WFI();
+		;
 }
 
 /*
@@ -291,7 +280,9 @@ static void vPmicTimerCb(TimerHandle_t xTimer)
 
 void vPmicTask(void *pvParameters)
 {
-	pmic_task_id = xTaskGetCurrentTaskHandle();
+	pmic_task_id       = xTaskGetCurrentTaskHandle();
+	uint8_t interrupts = 0;
+	uint32_t reason    = 0;
 
 	ADC_Init(0x9, NULL);
 	GPIO_Config(&gpio_cfg_adc0);
@@ -314,33 +305,107 @@ void vPmicTask(void *pvParameters)
 	}
 	xTimerStart(pmic_timer, 0);
 
-	/*
-	 * Poll once before going to sleep in case the PMIC had triggered an
-	 * interrupt already.  This can occur, for example, if the user presses
-	 * the power-button during the version splash-screen.
-	 */
-	pmic_poll_interrupts(&button_start_tick, 0);
+	/* Clear all pending interrupts. */
+	pmic_poll_interrupts();
 
 	while (1) {
-		uint32_t reason;
-		if (button_start_tick == 0) {
-			reason = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-		} else {
-			reason = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+		interrupts |= pmic_poll_interrupts();
+		if (interrupts == 0) {
+			reason |= ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		}
 
-		TickType_t duration = xTaskGetTickCount() - button_start_tick;
-
-		if (button_start_tick != 0 && duration > pdMS_TO_TICKS(1000)) {
-			LOG_WARN("pmic", "Poweroff");
-			MAX77650_setSFT_RST(0x2);
-		}
-
+		/* New interrupts */
 		if (reason & PMIC_NOTIFY_IRQ) {
-			pmic_poll_interrupts(&button_start_tick, duration);
+			reason ^= PMIC_NOTIFY_IRQ;
+			interrupts |= pmic_poll_interrupts();
+		}
+
+		if (interrupts & MAX77650_INT_nEN_R) {
+			/* Ignored in this state */
+			/* This can happen if the button is pressed
+			 * during boot and released now. */
+			interrupts ^= MAX77650_INT_nEN_R; /* Mark as handled. */
+		}
+
+		if (interrupts & MAX77650_INT_nEN_F) {
+			/* Button was pressed */
+			interrupts ^= MAX77650_INT_nEN_F; /* Mark as handled. */
+
+			button_start_tick = xTaskGetTickCount();
+			while (true) {
+				TickType_t duration =
+					xTaskGetTickCount() - button_start_tick;
+
+				if (duration > 1000) {
+					disp_forcelock();
+					epic_disp_clear(0x0000);
+
+					char buf[20];
+					sprintf(buf,
+						"Off in %d",
+						7 - (int)(duration + 500) /
+								1000);
+					epic_disp_print(
+						0,
+						0,
+						"Sleep zZz..",
+						0xffff,
+						0x0000
+					);
+					epic_disp_print(
+						0, 25, buf, 0xf000, 0x0000
+					);
+					epic_disp_print(
+						0,
+						50,
+						"   Reset ->",
+						0xffff,
+						0x0000
+					);
+					epic_disp_update();
+				}
+
+				if (duration >= pdMS_TO_TICKS(1000)) {
+					if (epic_buttons_read(
+						    BUTTON_RIGHT_TOP)) {
+						LOG_WARN(
+							"pmic",
+							"Resetting ..."
+						);
+						card10_reset();
+					}
+				}
+
+				if (interrupts & MAX77650_INT_nEN_R) {
+					/* Button is released */
+					interrupts ^=
+						MAX77650_INT_nEN_R; /* Mark as handled. */
+
+					if (duration < pdMS_TO_TICKS(1000)) {
+						return_to_menu();
+					}
+
+					if (duration > pdMS_TO_TICKS(1000)) {
+						LOG_WARN("pmic", "Poweroff");
+						sleep_deepsleep();
+						card10_reset();
+					}
+					break;
+				}
+
+				reason |= ulTaskNotifyTake(
+					pdTRUE, pdMS_TO_TICKS(200)
+				);
+				if (reason & PMIC_NOTIFY_IRQ) {
+					/* New interrupts */
+					reason ^= PMIC_NOTIFY_IRQ;
+					interrupts |= pmic_poll_interrupts();
+				}
+			}
 		}
 
 		if (reason & PMIC_NOTIFY_MONITOR) {
+			reason ^= PMIC_NOTIFY_MONITOR;
 			pmic_check_battery();
 		}
 	}

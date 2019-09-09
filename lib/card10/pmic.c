@@ -1,5 +1,6 @@
 #include "i2c.h"
 #include "pmic.h"
+#include "lp.h"
 #include "MAX77650-Arduino-Library.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -45,7 +46,7 @@ void pmic_init(void)
 	//MAX77650_setTV_SBB2(0b110100); //Set output Voltage of SBB2 to 5.0V
 	MAX77650_setTV_SBB2(0b010010); //Set output Voltage of SBB2 to 3.3V
 #endif
-	MAX77650_setADE_SBB2(0b0); //Disable Active Discharge at SBB2 Output
+	MAX77650_setADE_SBB2(0b1); //Enable Active Discharge at SBB2 Output
 	MAX77650_setEN_SBB2(
 		0b110); //Enable SBB2 is on irrespective of FPS whenever the on/off controller is in its "On via Software" or "On via On/Off Controller" states
 
@@ -90,6 +91,8 @@ void pmic_init(void)
 	);
 	NVIC_EnableIRQ((IRQn_Type)MXC_GPIO_GET_IRQ(pmic_interrupt_pin.port));
 
+	/* Allow the PMIC to interrupt us in deepsleep */
+	LP_EnableGPIOWakeup((gpio_cfg_t *)&pmic_interrupt_pin);
 	/* Setup power button interrupt */
 	MAX77650_setINT_M_GLBL(~(MAX77650_INT_nEN_R | MAX77650_INT_nEN_F));
 	/* Clear existing interrupts */
