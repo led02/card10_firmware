@@ -184,7 +184,8 @@ DefaultHandler:
 		b .
 
 		.macro    def_irq_handler    handler_name
-		.weakref \handler_name, DefaultHandler
+		.weak \handler_name
+		\handler_name : b .
 		.endm
 
 		/*
