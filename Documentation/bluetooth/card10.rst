@@ -105,7 +105,7 @@ Rockets characteristic
 The Rockets characteristic makes it possible to address every three rockets.
 Just write there three byte array, one for evey rocket.
 On read you get the current value of all three rockets.
-Range is between 0 and 31 (``0x1f`) if send higher value it will set to max of 31.
+Range is between 0 and 31 (``0x1f``) if send higher value it will set to max of 31.
 
 
 Dataformat:
