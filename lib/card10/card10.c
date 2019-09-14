@@ -29,6 +29,10 @@ const gpio_cfg_t bhi_interrupt_pin = {
 	PORT_0, PIN_13, GPIO_FUNC_IN, GPIO_PAD_PULL_UP
 };
 
+static const gpio_cfg_t pwr_hold_pin = {
+	PORT_0, PIN_30, GPIO_FUNC_OUT, GPIO_PAD_NONE
+};
+
 void card10_init(void)
 {
 	printf("card10 init...\n");
@@ -41,6 +45,8 @@ void card10_init(void)
 	I2C_Init(MXC_I2C1_BUS0, I2C_FAST_MODE, NULL);
 
 	GPIO_Init();
+	GPIO_Config(&pwr_hold_pin);
+	GPIO_OutSet(&pwr_hold_pin);
 
 	pmic_init();
 	pmic_set_led(0, 0);

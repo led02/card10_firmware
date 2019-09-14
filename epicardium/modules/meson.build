@@ -17,6 +17,7 @@ module_sources = files(
   'pmic.c',
   'rtc.c',
   'serial.c',
+  'sleep.c',
   'stream.c',
   'trng.c',
   'vibra.c',
