@@ -244,10 +244,18 @@ void vBleTask(void *pvParameters)
 	vTaskDelay(pdMS_TO_TICKS(500));
 
 	WsfInit();
+	taskENTER_CRITICAL();
+	/* Critical section to prevent a loop in iq_capture2 / meas_freq in
+	 * /home/maxim/Documents/src/BLE/mcbusw/Hardware/Micro/ME14/Firmware/trunk/NDALibraries/BTLE/phy/dbb/prot/ble/pan2g5/afe/max32665/board_config.c:275
+	 * if BHI160 and -Ddebug_prints=true is enabled*/
 	StackInit();
+	taskEXIT_CRITICAL();
 	BbBleDrvSetTxPower(0);
 	setAddress();
 
+	/* We are going to execute FreeRTOS functions from callbacks
+	 * coming from these interrupts. Their priority needs to be
+	 * reduced to allow this. */
 	NVIC_SetPriority(BTLE_SFD_TO_IRQn, 2);
 	NVIC_SetPriority(BTLE_TX_DONE_IRQn, 2);
 	NVIC_SetPriority(BTLE_RX_RCVD_IRQn, 2);
