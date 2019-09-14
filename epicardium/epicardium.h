@@ -1347,7 +1347,7 @@ enum disp_font_name {
  * :param posy: y position to print to. 0 <= y <= 80
  * :param pString: string to print
  * :param fg: foreground color in rgb565
- * :param bg: background color in rgb565
+ * :param bg: background color in rgb565, no background is drawn if bg==fg
  * :return: ``0`` on success or a negative value in case of an error:
  *
  *    - ``-EBUSY``: Display was already locked from another task.
