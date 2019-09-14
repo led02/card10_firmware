@@ -460,6 +460,11 @@ void vBhi160Task(void *pvParameters)
 	}
 
 	/* Remap axes to match card10 layout */
+	/* Due to a known issue (#133) the first call to
+	 * bhy_mapping_matrix_set might fail. */
+	bhy_mapping_matrix_set(
+		PHYSICAL_SENSOR_INDEX_ACC, bhi160_mapping_matrix
+	);
 	bhy_mapping_matrix_set(
 		PHYSICAL_SENSOR_INDEX_ACC, bhi160_mapping_matrix
 	);
