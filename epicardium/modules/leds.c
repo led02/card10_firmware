@@ -95,21 +95,41 @@ void epic_leds_set_all_hsv(float *pattern_ptr, uint8_t len)
 void epic_leds_dim_top(uint8_t value)
 {
 	leds_set_dim_top(value);
-	if (personal_state_enabled() == 0)
+	if (personal_state_enabled() == 0) {
+		while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+			vTaskDelay(pdMS_TO_TICKS(1));
+		}
+
 		leds_update();
+
+		hwlock_release(HWLOCK_I2C);
+	}
 }
 
 void epic_leds_dim_bottom(uint8_t value)
 {
 	leds_set_dim_bottom(value);
-	if (personal_state_enabled() == 0)
+	if (personal_state_enabled() == 0) {
+		while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+			vTaskDelay(pdMS_TO_TICKS(1));
+		}
+
 		leds_update();
+
+		hwlock_release(HWLOCK_I2C);
+	}
 }
 
 void epic_leds_set_rocket(int led, uint8_t value)
 {
+	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+		vTaskDelay(pdMS_TO_TICKS(1));
+	}
+
 	value = value > 31 ? 31 : value;
 	pmic_set_led(led, value);
+
+	hwlock_release(HWLOCK_I2C);
 }
 
 int epic_leds_get_rocket(int led)
@@ -126,7 +146,13 @@ int epic_leds_get_rocket(int led)
 
 void epic_set_flashlight(bool power)
 {
+	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+		vTaskDelay(pdMS_TO_TICKS(1));
+	}
+
 	leds_flashlight(power);
+
+	hwlock_release(HWLOCK_I2C);
 }
 
 void epic_leds_update(void)
@@ -136,7 +162,13 @@ void epic_leds_update(void)
 
 void epic_leds_set_powersave(bool eco)
 {
+	while (hwlock_acquire(HWLOCK_I2C, pdMS_TO_TICKS(1)) < 0) {
+		vTaskDelay(pdMS_TO_TICKS(1));
+	}
+
 	leds_powersave(eco);
+
+	hwlock_release(HWLOCK_I2C);
 }
 
 void epic_leds_set_gamma_table(uint8_t rgb_channel, uint8_t gamma_table[256])
