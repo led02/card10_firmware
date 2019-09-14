@@ -314,6 +314,13 @@ void vPmicTask(void *pvParameters)
 	}
 	xTimerStart(pmic_timer, 0);
 
+	/*
+	 * Poll once before going to sleep in case the PMIC had triggered an
+	 * interrupt already.  This can occur, for example, if the user presses
+	 * the power-button during the version splash-screen.
+	 */
+	pmic_poll_interrupts(&button_start_tick, 0);
+
 	while (1) {
 		uint32_t reason;
 		if (button_start_tick == 0) {
