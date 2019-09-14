@@ -6,7 +6,7 @@ static const gpio_cfg_t motor_pin = {
 	PORT_0, PIN_8, GPIO_FUNC_OUT, GPIO_PAD_NONE
 };
 
-static TimerHandle_t vibra_timer;
+static TimerHandle_t vibra_timer = NULL;
 
 void epic_vibra_set(int status)
 {
@@ -25,8 +25,14 @@ void vTimerCallback()
 void epic_vibra_vibrate(int millis)
 {
 	int ticks = millis * (configTICK_RATE_HZ / 1000);
-	epic_vibra_set(1);
-	vibra_timer =
-		xTimerCreate("vibratimer", ticks, pdFALSE, 0, vTimerCallback);
-	xTimerStart(vibra_timer, 0);
+
+	if (vibra_timer == NULL) {
+		vibra_timer = xTimerCreate(
+			"vibratimer", ticks, pdFALSE, 0, vTimerCallback
+		);
+	}
+	if (vibra_timer != NULL) {
+		epic_vibra_set(1);
+		xTimerChangePeriod(vibra_timer, ticks, 0);
+	}
 }
