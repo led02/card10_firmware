@@ -282,6 +282,8 @@ class Menu:
                     self.idx = (self.idx + 1) % len(self.entries)
                     try:
                         self.on_scroll(self.entries[self.idx], self.idx)
+                    except _ExitMenuException:
+                        raise
                     except Exception as e:
                         print("Exception during menu.on_scroll():")
                         sys.print_exception(e)
@@ -291,6 +293,8 @@ class Menu:
                     self.idx = (self.idx + len(self.entries) - 1) % len(self.entries)
                     try:
                         self.on_scroll(self.entries[self.idx], self.idx)
+                    except _ExitMenuException:
+                        raise
                     except Exception as e:
                         print("Exception during menu.on_scroll():")
                         sys.print_exception(e)
@@ -298,6 +302,8 @@ class Menu:
                     try:
                         self.on_select(self.entries[self.idx], self.idx)
                         self.select_time = utime.time_ms()
+                    except _ExitMenuException:
+                        raise
                     except Exception as e:
                         print("Menu crashed!")
                         sys.print_exception(e)
