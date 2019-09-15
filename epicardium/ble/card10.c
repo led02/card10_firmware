@@ -776,25 +776,20 @@ static uint8_t writeCard10CB(
 		}
 	// leds above
 	case CARD10_LEDS_ABOVE_VAL_HDL:
+		APP_TRACE_INFO0("ble-card10: update LEDs above");
+
 		for (ui16 = 0; ui16 < 11; ui16++) {
-			epic_leds_set(
-				ui16,
-				pValue[ui16 * 3],
-				pValue[ui16 * 3 + 1],
-				pValue[ui16 * 3 + 2]
-			);
-			APP_TRACE_INFO4(
-				"ble-card10: set led %ld above to #%02x%02x%02x\n",
+			epic_leds_prep(
 				ui16,
 				pValue[ui16 * 3],
 				pValue[ui16 * 3 + 1],
 				pValue[ui16 * 3 + 2]
 			);
 		}
+		epic_leds_update();
+		return ATT_SUCCESS;
 	default:
-		APP_TRACE_INFO1(
-			"ble-card10: unsupported characteristic: %c\n", handle
-		);
+		APP_TRACE_INFO1("ble-card10: unsupported handle: %x\n", handle);
 		return ATT_ERR_HANDLE;
 	}
 }

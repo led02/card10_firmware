@@ -119,7 +119,7 @@ int main(void)
 			    (const char *)"BLE",
 			    configMINIMAL_STACK_SIZE * 10,
 			    NULL,
-			    tskIDLE_PRIORITY + 1,
+			    tskIDLE_PRIORITY + 3,
 			    NULL) != pdPASS) {
 			LOG_CRIT("startup", "Failed to create %s task!", "BLE");
 			abort();

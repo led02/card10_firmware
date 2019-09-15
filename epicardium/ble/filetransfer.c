@@ -396,9 +396,7 @@ static uint8_t writeCallback(
 			connId, handle, operation, offset, len, pValue, pAttr
 		);
 	default:
-		LOG_ERR("filetrans",
-			"unsupported characteristic: %c\n",
-			handle);
+		LOG_ERR("filetrans", "unsupported handle: %x\n", handle);
 		return ATT_ERR_HANDLE;
 	}
 }
