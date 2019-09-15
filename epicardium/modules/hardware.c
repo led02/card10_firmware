@@ -194,6 +194,9 @@ int hardware_early_init(void)
 	 */
 	max30001_mutex_init();
 
+	/* Allow user space to trigger interrupts.
+	 * Used for BLE, not sure if needed. */
+	SCB->CCR |= SCB_CCR_USERSETMPEND_Msk;
 	return 0;
 }
 
