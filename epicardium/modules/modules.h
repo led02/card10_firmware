@@ -29,6 +29,7 @@ void return_to_menu(void);
 void serial_init();
 void vSerialTask(void *pvParameters);
 void serial_enqueue_char(char chr);
+void serial_flush(void);
 extern TaskHandle_t serial_task_id;
 
 // For the eSetBit xTaskNotify task semaphore trigger

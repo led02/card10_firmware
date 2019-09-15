@@ -121,6 +121,92 @@ void epic_uart_write_str(const char *str, intptr_t length)
 	}
 }
 
+static void serial_flush_from_isr(void)
+{
+	uint8_t rx_data[32];
+	size_t received_bytes;
+
+	BaseType_t resched = pdFALSE;
+	BaseType_t woken   = pdFALSE;
+
+	uint32_t basepri = __get_BASEPRI();
+	taskENTER_CRITICAL_FROM_ISR();
+
+	do {
+		received_bytes = xStreamBufferReceiveFromISR(
+			write_stream_buffer,
+			(void *)rx_data,
+			sizeof(rx_data),
+			&woken
+		);
+		resched |= woken;
+
+		if (received_bytes == 0) {
+			break;
+		}
+
+		/*
+		 * The SDK-driver for UART is not reentrant
+		 * which means we need to perform UART writes
+		 * in a critical section.
+		 */
+
+		UART_Write(ConsoleUart, (uint8_t *)&rx_data, received_bytes);
+	} while (received_bytes > 0);
+
+	taskEXIT_CRITICAL_FROM_ISR(basepri);
+
+	portYIELD_FROM_ISR(&resched);
+}
+
+static void serial_flush_from_thread(void)
+{
+	uint8_t rx_data[32];
+	size_t received_bytes;
+
+	do {
+		taskENTER_CRITICAL();
+		received_bytes = xStreamBufferReceive(
+			write_stream_buffer,
+			(void *)rx_data,
+			sizeof(rx_data),
+			0
+		);
+		taskEXIT_CRITICAL();
+
+		if (received_bytes == 0) {
+			break;
+		}
+
+		/*
+		 * The SDK-driver for UART is not reentrant
+		 * which means we need to perform UART writes
+		 * in a critical section.
+		 */
+		taskENTER_CRITICAL();
+		UART_Write(ConsoleUart, (uint8_t *)&rx_data, received_bytes);
+		taskEXIT_CRITICAL();
+
+		cdcacm_write((uint8_t *)&rx_data, received_bytes);
+		ble_uart_write((uint8_t *)&rx_data, received_bytes);
+	} while (received_bytes > 0);
+}
+
+/*
+ * Flush all characters which are currently waiting to be printed.
+ *
+ * If this function is called from an ISR, it will only flush to hardware UART
+ * while a call from thread mode will flush to UART, CDC-ACM, and BLE Serial.
+ */
+void serial_flush(void)
+{
+	if (xPortIsInsideInterrupt()) {
+		serial_flush_from_isr();
+	} else {
+		serial_flush_from_thread();
+	}
+}
+
 /*
  * API-call to read a character from the queue.
  */
@@ -217,9 +303,6 @@ void vSerialTask(void *pvParameters)
 		.callback = uart_callback,
 	};
 
-	uint8_t rx_data[20];
-	size_t received_bytes;
-
 	while (1) {
 		int ret = UART_ReadAsync(ConsoleUart, &read_req);
 		if (ret != E_NO_ERROR && ret != E_BUSY) {
@@ -230,38 +313,7 @@ void vSerialTask(void *pvParameters)
 		ret = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
 		if (ret & SERIAL_WRITE_NOTIFY) {
-			do {
-				received_bytes = xStreamBufferReceive(
-					write_stream_buffer,
-					(void *)rx_data,
-					sizeof(rx_data),
-					0
-				);
-
-				if (received_bytes == 0) {
-					break;
-				}
-
-				/*
-				 * The SDK-driver for UART is not reentrant
-				 * which means we need to perform UART writes
-				 * in a critical section.
-				 */
-				taskENTER_CRITICAL();
-				UART_Write(
-					ConsoleUart,
-					(uint8_t *)&rx_data,
-					received_bytes
-				);
-				taskEXIT_CRITICAL();
-
-				cdcacm_write(
-					(uint8_t *)&rx_data, received_bytes
-				);
-				ble_uart_write(
-					(uint8_t *)&rx_data, received_bytes
-				);
-			} while (received_bytes > 0);
+			serial_flush_from_thread();
 		}
 
 		if (ret & SERIAL_READ_NOTIFY) {
