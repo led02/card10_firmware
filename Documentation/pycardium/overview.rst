@@ -62,7 +62,6 @@ and power it on::
 
 REPL modes
 ^^^^^^^^^^
-
 MicroPython supports a different REPL modes over the serial console. The modes
 can be changed on every new line.
 
@@ -87,5 +86,3 @@ or give you tracebacks if an error occured.
 
 You can use **pycard10** (tools/pycard10.py) to execute python files from your
 PC directly on the card10.
-
-
