@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- **Support for sleep-mode instead of full power-off.  This means the RTC now
+  retains its state!**
+- For debugger users: A GDB macro `task_backtrace` which allows to view
+  backtraces of tasks which are currently swapped out.  Use like
+  ```text
+  (gdb) task_backtrace serial_task_id
+  ...
+  (gdb) task_backtrace dispatcher_task_id
+  ...
+  (gdb) task_backtrace ble_task_id
+  ```
+
+### Changed
+- `Display.print()` uses a transparent background when printing with `bg == fg`.
+
+### Fixed
+- Fixed a regression which made it impossible to turn off the flashlight.
+- Fixed CRT for l0dables not allowing to overwrite interrupt handlers.
+- Fixed ECG App not closing the sensor on `KeyboardInterrupt`.
+- Fixed a bug which made the power-button unresponsive when pressed during boot
+  (Interrupts were getting ignored).
+- Fixed `simple_menu.Menu.exit()` not actually working.
+- Added a few missing locks in `leds` module.
+- Added a workaround for BHI160 axis mapping not being applied in some cases.
+- Added a critical-section in BLE stack initialization to prevent weird lock-ups.
+- Fixed vibra module crashing when calling `vibra.vibrate()` while already running.
 
 
 ## [v1.10] - 2019-09-05 21:42 - [JerusalemArtichoke]
