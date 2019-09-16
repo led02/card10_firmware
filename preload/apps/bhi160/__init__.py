@@ -1,47 +1,49 @@
 import bhi160
-import display
-import utime
 import buttons
+import color
+import contextlib
+import display
+import itertools
+import simple_menu
 
-disp = display.open()
-sensor = 0
-
-sensors = [
-    {"sensor": bhi160.BHI160Orientation(), "name": "Orientation"},
-    {"sensor": bhi160.BHI160Accelerometer(), "name": "Accelerometer"},
-    {"sensor": bhi160.BHI160Gyroscope(), "name": "Gyroscope"},
-    {"sensor": bhi160.BHI160Magnetometer(), "name": "Magnetometer"},
+STATUS_COLORS = [
+    color.RED,
+    # Orange
+    color.RED * 0.5 + color.YELLOW * 0.5,
+    color.YELLOW,
+    color.GREEN,
 ]
 
-while True:
-    # Read and print sample
-    samples = sensors[sensor]["sensor"].read()
-    if len(samples) > 0:
+with contextlib.ExitStack() as cx:
+    disp = cx.enter_context(display.open())
+
+    args = {"sample_rate": 10, "sample_buffer_len": 20}
+
+    sensor_iter = itertools.cycle(
+        [
+            (cx.enter_context(bhi160.BHI160Orientation(**args)), "Orientation"),
+            (cx.enter_context(bhi160.BHI160Accelerometer(**args)), "Accel"),
+            (cx.enter_context(bhi160.BHI160Gyroscope(**args)), "Gyro"),
+            (cx.enter_context(bhi160.BHI160Magnetometer(**args)), "Magnetic"),
+        ]
+    )
+    sensor, sensor_name = next(sensor_iter)
+
+    for ev in simple_menu.button_events(timeout=0.1):
+        # Pressing the bottom right button cycles through sensors
+        if ev == buttons.BOTTOM_RIGHT:
+            sensor, sensor_name = next(sensor_iter)
+
+        samples = sensor.read()
+        if not samples:
+            continue
+
+        sample = samples[-1]
+        col = STATUS_COLORS[sample.status]
+
         disp.clear()
-        sample = samples[0]
-
-        color = [255, 0, 0]
-        if sample.status == 1:
-            color = [255, 128, 0]
-        elif sample.status == 2:
-            color = [255, 255, 0]
-        elif sample.status == 3:
-            color = [0, 200, 0]
-
-        disp.print(sensors[sensor]["name"], posy=0)
-        disp.print("X: %f" % sample.x, posy=20, fg=color)
-        disp.print("Y: %f" % sample.y, posy=40, fg=color)
-        disp.print("Z: %f" % sample.z, posy=60, fg=color)
-
+        disp.print("{:^11s}".format(sensor_name), posy=0, posx=3)
+        disp.print("X:{: 9.4f}".format(sample.x), posy=20, fg=col)
+        disp.print("Y:{: 9.4f}".format(sample.y), posy=40, fg=col)
+        disp.print("Z:{: 9.4f}".format(sample.z), posy=60, fg=col)
         disp.update()
-
-    # Read button
-    v = buttons.read(buttons.BOTTOM_RIGHT)
-    if v == 0:
-        button_pressed = False
-
-    if not button_pressed and v & buttons.BOTTOM_RIGHT != 0:
-        button_pressed = True
-        sensor = (sensor + 1) % len(sensors)
-
-    utime.sleep(0.1)
