@@ -141,6 +141,10 @@ Q(mkdir)
 Q(rename)
 Q(read_battery)
 Q(urandom)
+Q(usbconfig)
+Q(USB_FLASH)
+Q(USB_SERIAL)
+Q(USB_NONE)
 
 /* gpio */
 Q(gpio)
