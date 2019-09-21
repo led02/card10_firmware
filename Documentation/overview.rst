@@ -14,23 +14,37 @@ Epicardium
 Epicardium is based on `FreeRTOS <https://www.freertos.org/>`_.  There are a
 number of tasks that will have been keeping card10 running.  These are:
 
-* **Dispatcher**:  The dispatcher task handles API calls from core 1.
-* **PMIC**:  The power manager task checks the battery level and other interesting
-  statistics that can be gathered from our power manager IC (MAX77650).
-* **Serial**:  Handles serial communication via *UART*, *CDC ACM* and possibly
-  Bluetooth.
-* **BHI160**: Housekeeping task for interaction with the `BHI160`_.
++-------------------+-------------------------------+----------+-------------------------------------------+
+| Name              | ID Global                     | Priority | Description                               |
++===================+===============================+==========+===========================================+
+| `vPmicTask`_      | ``pmic_task_id`` (static)     | +4       | Power Management (and Reset Button)       |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vLifecycleTask`_ | ``lifecycle_task`` (static)   | +3       | Control of the payload running on core 1. |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vBleTask`_       | ``ble_task_id`` (static)      | +3       | Bluetooth Low Energy Stack                |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vSerialTask`_    | ``serial_task_id``            | +3       | Serial Output via UART/CDC-ACM/BLE        |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vApiDispatcher`_ | ``dispatcher_task_id``        | +2       | Epicardium API dispatcher                 |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vLedTask`_       | -/-                           | +1       | LED Animations                            |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vMAX30001Task`_  | ``max30001_task_id`` (static) | +1       | `MAX30001`_ ECG driver                    |
++-------------------+-------------------------------+----------+-------------------------------------------+
+| `vBhi160Task`_    | ``bhi160_task_id`` (static)   | +1       | `BHI160`_ sensor fusion driver            |
++-------------------+-------------------------------+----------+-------------------------------------------+
 
+.. _vPmicTask: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/pmic.c#L281
+.. _vLifecycleTask: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/lifecycle.c#L361
+.. _vBleTask: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/ble/ble.c#L237
+.. _vSerialTask: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/serial.c#L289
+.. _vApiDispatcher: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/dispatcher.c#L25
+.. _vLedTask: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/personal_state.c#L58
+.. _vMAX30001Task: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/max30001.c#L378
+.. _vBhi160Task: https://git.card10.badge.events.ccc.de/card10/firmware/blob/master/epicardium/modules/bhi.c#L419
+
+.. _MAX30001: https://www.maximintegrated.com/en/products/analog/data-converters/analog-front-end-ics/MAX30001.html
 .. _BHI160: https://www.bosch-sensortec.com/bst/products/all_products/bhi160
-
-.. todo::
-
-   The following tasks have not yet been implemented/are currently in the works:
-
-   - **Bluetooth**: The bluetooth stack (`#23`_)
-   - **Payload Controller**: Control what is running on core 1
-
-   .. _#23: https://git.card10.badge.events.ccc.de/card10/firmware/issues/23
 
 Epicardium API
 --------------
