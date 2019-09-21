@@ -81,6 +81,8 @@ typedef _Bool bool;
 #define API_RTC_SCHEDULE_ALARM     0x51
 #define API_RTC_SET_MILLISECONDS   0x52
 #define API_RTC_GET_MILLISECONDS   0x53
+#define API_RTC_GET_MONOTONIC_SECONDS      0x54
+#define API_RTC_GET_MONOTONIC_MILLISECONDS 0x55
 
 #define API_LEDS_SET               0x60
 #define API_LEDS_SET_HSV           0x61
@@ -1732,6 +1734,24 @@ API(API_FILE_MKDIR, int epic_file_mkdir(const char *dirname));
  * RTC
  * ===
  */
+
+/**
+ * Get the monotonic time in seconds.
+ *
+ * :return: monotonic time in seconds
+ */
+API(API_RTC_GET_MONOTONIC_SECONDS,
+	uint32_t epic_rtc_get_monotonic_seconds(void)
+);
+
+/**
+ * Get the monotonic time in ms.
+ *
+ * :return: monotonic time in milliseconds
+ */
+API(API_RTC_GET_MONOTONIC_MILLISECONDS,
+	uint64_t epic_rtc_get_monotonic_milliseconds(void)
+);
 
 /**
  * Read the current RTC value.

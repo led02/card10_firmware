@@ -9,6 +9,18 @@
 
 #include <stdint.h>
 
+uint64_t monotonic_offset = 0;
+
+uint32_t epic_rtc_get_monotonic_seconds(void)
+{
+	return epic_rtc_get_seconds() + monotonic_offset / 1000ULL;
+}
+
+uint64_t epic_rtc_get_monotonic_milliseconds(void)
+{
+	return epic_rtc_get_milliseconds() + monotonic_offset;
+}
+
 uint32_t epic_rtc_get_seconds(void)
 {
 	uint32_t sec, subsec;
@@ -32,12 +44,31 @@ uint64_t epic_rtc_get_milliseconds(void)
 	while (RTC_GetTime(&sec, &subsec) == E_BUSY) {
 		vTaskDelay(pdMS_TO_TICKS(4));
 	}
-	return subsec * 1000ULL / 4096 + sec * 1000ULL;
+
+	// Without the bias of 999 (0.24 milliseconds), this decoding function is
+	// numerically unstable:
+	//
+	// Encoding 5 milliseconds into 20 subsecs (using the encoding function in
+	// epic_rtc_set_milliseconds) and decoding it without the bias of 999 yields
+	// 4 milliseconds.
+	//
+	// The following invariants should hold when encoding / decoding from and to
+	// milliseconds / subseconds:
+	//
+	// - 0 <= encode(ms) < 4096 for 0 <= ms < 1000
+	// - decode(encode(ms)) == ms for 0 <= ms < 1000
+	// - 0 <= decode(subsec) < 1000 for 0 <= subsec < 4096
+	//
+	// These invariants were proven experimentally.
+	return (subsec * 1000ULL + 999ULL) / 4096 + sec * 1000ULL;
 }
 
 void epic_rtc_set_milliseconds(uint64_t milliseconds)
 {
 	uint32_t sec, subsec;
+	uint64_t old_milliseconds, diff;
+
+	old_milliseconds = epic_rtc_get_milliseconds();
 
 	sec    = milliseconds / 1000;
 	subsec = (milliseconds % 1000);
@@ -48,6 +79,9 @@ void epic_rtc_set_milliseconds(uint64_t milliseconds)
 		;
 	while (RTC_EnableRTCE(MXC_RTC) == E_BUSY)
 		;
+
+	diff = old_milliseconds - milliseconds;
+	monotonic_offset += diff;
 }
 
 void RTC_IRQHandler(void)
