@@ -155,13 +155,10 @@ static void max30001_handle_samples(int16_t *sensor_data, int16_t n)
 
 	while (n--) {
 		uint16_t data = -*sensor_data++;
-		if (xQueueSend(
-			    max30001_stream.queue,
-			    &data,
-			    MAX30001_MUTEX_WAIT_MS) != pdTRUE) {
-			LOG_WARN(
-				"max30001",
-				"queue full"); // TODO; handle queue full
+
+		/* Discard overflow.  See discussion in !316. */
+		if (xQueueSend(max30001_stream.queue, &data, 0) != pdTRUE) {
+			LOG_WARN("max30001", "queue full");
 		}
 	}
 	api_interrupt_trigger(EPIC_INT_MAX30001_ECG);
