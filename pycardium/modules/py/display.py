@@ -95,6 +95,10 @@ class Display:
                 d.clear()
                 d.print('Hello Earth!', font=display.FONT24)
                 d.update()
+
+        .. versionchanged:: 1.11
+
+            Added transparent background printing.
         """
         fg = fg or color.WHITE
         bg = bg or fg

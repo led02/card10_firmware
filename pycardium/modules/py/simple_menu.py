@@ -159,6 +159,9 @@ class Menu:
         Exit the event-loop.  This should be called from inside an ``on_*`` hook.
 
         .. versionadded:: 1.9
+        .. versionchanged:: 1.11
+
+            Fixed this function not working properly.
         """
         raise _ExitMenuException()
 

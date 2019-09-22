@@ -12,7 +12,7 @@ Supports the BHI160 sensor on the card10 for accelerometer, gyroscope...
 
    import bhi160
    import utime
-   
+
    bhi = bhi160.BHI160Orientation()
 
     while True:
@@ -47,7 +47,7 @@ Supports the BHI160 sensor on the card10 for accelerometer, gyroscope...
 
    Close the connection to the sensor
 
-   
+
 .. class:: bhi160.BHI160Accelerometer
 
     Accelerometer of the BHI160
@@ -115,6 +115,8 @@ Supports the BHI160 sensor on the card10 for accelerometer, gyroscope...
             .. todo:: The callback functionality is untested, so do not be confused if it does not work.
         sample_buffer_len: int, optional
             Length of sample buffer (default is 200)
+
+   .. versionadded:: 1.11
 
    .. py:method:: read():
 

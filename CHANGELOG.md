@@ -16,9 +16,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ...
   (gdb) task_backtrace ble_task_id
   ```
+- BHI160 magnetometer sensor
+- ESB API in Pycardium.
+- Monotonic clock API
 
 ### Changed
 - `Display.print()` uses a transparent background when printing with `bg == fg`.
+- Try different crc16 module during build because different environments might
+  have different ones installed.
+- Refactored BHI160 app
 
 ### Fixed
 - Fixed a regression which made it impossible to turn off the flashlight.
@@ -31,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added a workaround for BHI160 axis mapping not being applied in some cases.
 - Added a critical-section in BLE stack initialization to prevent weird lock-ups.
 - Fixed vibra module crashing when calling `vibra.vibrate()` while already running.
+- Fixed sensor-sample overflow leading to I2C bus lockup.
 
 
 ## [v1.10] - 2019-09-05 21:42 - [JerusalemArtichoke]

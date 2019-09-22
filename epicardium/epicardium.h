@@ -1739,6 +1739,8 @@ API(API_FILE_MKDIR, int epic_file_mkdir(const char *dirname));
  * Get the monotonic time in seconds.
  *
  * :return: monotonic time in seconds
+ *
+ * .. versionadded:: 1.11
  */
 API(API_RTC_GET_MONOTONIC_SECONDS,
 	uint32_t epic_rtc_get_monotonic_seconds(void)
@@ -1748,6 +1750,8 @@ API(API_RTC_GET_MONOTONIC_SECONDS,
  * Get the monotonic time in ms.
  *
  * :return: monotonic time in milliseconds
+ *
+ * .. versionadded:: 1.11
  */
 API(API_RTC_GET_MONOTONIC_MILLISECONDS,
 	uint64_t epic_rtc_get_monotonic_milliseconds(void)

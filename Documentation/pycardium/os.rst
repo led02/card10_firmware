@@ -86,6 +86,8 @@ Card10-Specific
       values are :py:data:`os.USB_SERIAL`, :py:data:`os.USB_FLASH`,
       or :py:data:`os.USB_NONE`.
 
+   .. versionadded:: 1.11
+
 .. py:data:: USB_NONE
 
    No USB device active.
