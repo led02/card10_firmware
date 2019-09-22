@@ -6,6 +6,7 @@ import buttons
 import max30001
 import math
 import struct
+import itertools
 
 WIDTH = 160
 HEIGHT = 80
@@ -26,6 +27,15 @@ COLOR_WRITE_FG = [255, 255, 255]
 COLOR_WRITE_BG = [255, 0, 0]
 
 current_mode = MODE_FINGER
+modes = itertools.cycle(
+    [
+        ({"bar", "pulse"}, {"text": "Top + Pulse", "posx": 0}),
+        ({}, {"text": "off", "posx": 55}),
+        ({"bar"}, {"text": "Top Only", "posx": 25}),
+        ({"pulse"}, {"text": "Pulse Only", "posx": 5}),
+    ]
+)
+led_mode = next(modes)[0]
 history = []
 filebuffer = bytearray()
 write = 0
@@ -36,6 +46,7 @@ pause_histogram = False
 histogram_offset = 0
 sensor = 0
 disp = display.open()
+last_sample_count = 1
 
 leds.dim_top(1)
 COLORS = [((23 + (15 * i)) % 360, 1.0, 1.0) for i in range(11)]
@@ -48,7 +59,8 @@ beta = 3
 
 
 def update_history(datasets):
-    global history, moving_average, alpha, beta
+    global history, moving_average, alpha, beta, last_sample_count
+    last_sample_count = len(datasets)
     for val in datasets:
         history.append(val - moving_average)
         moving_average = (alpha * moving_average + beta * val) / (alpha + beta)
@@ -60,6 +72,7 @@ def update_history(datasets):
 # variables for pulse detection
 pulse = -1
 samples_since_last_pulse = 0
+last_pulse_blink = 0
 q_threshold = -1
 r_threshold = 1
 q_spike = -ECG_RATE
@@ -177,14 +190,28 @@ def close_sensor():
 
 
 def toggle_mode():
-    global current_mode
+    global current_mode, disp, pause_screen
+    if write > 0:
+        pause_screen = utime.time_ms() + 500
+        disp.clear(COLOR_BACKGROUND)
+        disp.print("Locked", posx=30, posy=30, fg=COLOR_TEXT)
+        disp.update()
+        return
+
     close_sensor()
     current_mode = MODE_USB if current_mode == MODE_FINGER else MODE_FINGER
     open_sensor()
 
 
 def toggle_bias():
-    global bias
+    global bias, disp, pause_screen
+    if write > 0:
+        pause_screen = utime.time_ms() + 500
+        disp.clear(COLOR_BACKGROUND)
+        disp.print("Locked", posx=30, posy=30, fg=COLOR_TEXT)
+        disp.update()
+        return
+
     close_sensor()
     bias = not bias
     open_sensor()
@@ -209,19 +236,61 @@ def toggle_write():
 
 
 def toggle_pause():
-    global pause_histogram, histogram_offset, history
+    global pause_histogram, histogram_offset, history, leds
     if pause_histogram:
         pause_histogram = False
         history = []
     else:
         pause_histogram = True
     histogram_offset = 0
+    leds.clear()
 
 
-def draw_leds(val):
-    # val should be in [0, 11]
-    for i in range(11):
-        leds.prep_hsv(10 - i, COLORS[10 - i] if i < val else (0, 0, 0))
+def toggle_leds():
+    global led_mode, disp, pause_screen, leds, modes
+    led_mode, display_args = next(modes)
+
+    pause_screen = utime.time_ms() + 250
+    disp.clear(COLOR_BACKGROUND)
+    disp.print("LEDs", posx=50, posy=20, fg=COLOR_TEXT)
+    disp.print(**display_args, posy=40, fg=COLOR_TEXT)
+    disp.update()
+    leds.clear()
+
+
+def draw_leds(vmin, vmax):
+    # vmin should be in [0, -1]
+    # vmax should be in [0, 1]
+    global pulse, samples_since_last_pulse, last_pulse_blink
+
+    # stop blinking
+    if not bool(led_mode):
+        return
+
+    # update led bar
+    if "bar" in led_mode:
+        for i in reversed(range(6)):
+            leds.prep_hsv(
+                5 + i, COLORS[5 + i] if vmin <= 0 and i <= vmin * -6 else (0, 0, 0)
+            )
+        for i in reversed(range(6)):
+            leds.prep_hsv(
+                i, COLORS[i] if vmax >= 0 and 5 - i <= vmax * 6 else (0, 0, 0)
+            )
+
+    # blink red on pulse
+    if (
+        "pulse" in led_mode
+        and pulse > 0
+        and samples_since_last_pulse < last_pulse_blink
+    ):
+        for i in range(4):
+            leds.prep(11 + i, (255, 0, 0))
+    elif "pulse" in led_mode:
+        for i in range(4):
+            leds.prep(11 + i, (0, 0, 0))
+    last_pulse_blink = samples_since_last_pulse
+
     leds.update()
 
 
@@ -273,7 +342,10 @@ def draw_histogram():
             fg=COLOR_TEXT,
         )
     else:
-        draw_leds((max(history[-5:]) * scale + SCALE_FACTOR) * 11 / (SCALE_FACTOR * 2))
+        led_range = last_sample_count if last_sample_count > 5 else 5
+        draw_leds(
+            min(history[-led_range:]) / value_max, max(history[-led_range:]) / value_max
+        )
         if pulse < 0:
             disp.print(
                 current_mode + ("+Bias" if bias else ""),
@@ -308,10 +380,17 @@ def main():
 
     # show button layout
     disp.clear(COLOR_BACKGROUND)
-    disp.print("  BUTTONS  ", posx=0, posy=0, fg=COLOR_TEXT)
-    disp.print("Finger/USB>", posx=0, posy=20, fg=COLOR_MODE_FINGER)
-    disp.print("     Bias >", posx=0, posy=40, fg=COLOR_MODE_USB)
-    disp.print("< Write Log", posx=0, posy=60, fg=COLOR_WRITE_BG)
+    disp.print("  BUTTONS ", posx=0, posy=0, fg=COLOR_TEXT, font=display.FONT20)
+    disp.line(0, 20, 159, 20, col=COLOR_LINE)
+    disp.print(
+        "       Pause >", posx=0, posy=28, fg=COLOR_MODE_FINGER, font=display.FONT16
+    )
+    disp.print(
+        "   Mode/Bias >", posx=0, posy=44, fg=COLOR_MODE_USB, font=display.FONT16
+    )
+    disp.print(
+        "< LED/WriteLog", posx=0, posy=64, fg=COLOR_WRITE_BG, font=display.FONT16
+    )
     disp.update()
     utime.sleep(3)
 
@@ -324,61 +403,89 @@ def main():
                 buttons.BOTTOM_LEFT | buttons.BOTTOM_RIGHT | buttons.TOP_RIGHT
             )
 
-            # BOTTOM LEFT
+            # TOP RIGHT
 
-            if button_pressed["BOTTOM_LEFT"] == 0 and v & buttons.BOTTOM_LEFT != 0:
-                button_pressed["BOTTOM_LEFT"] = utime.time_ms()
-                if not pause_histogram:
+            # down
+            if button_pressed["TOP_RIGHT"] == 0 and v & buttons.TOP_RIGHT != 0:
+                button_pressed["TOP_RIGHT"] = utime.time_ms()
+                toggle_pause()
+
+            # up
+            if button_pressed["TOP_RIGHT"] > 0 and v & buttons.TOP_RIGHT == 0:
+                duration = utime.time_ms() - button_pressed["TOP_RIGHT"]
+                button_pressed["TOP_RIGHT"] = 0
+
+            # BOTTOM LEFT
+            #
+            # on pause = shift view left
+            # long = toggle write
+            # short = toggle leds
+
+            # down, and still pressed
+            if (
+                button_pressed["BOTTOM_LEFT"] > 0
+                and v & buttons.BOTTOM_LEFT != 0
+                and not pause_histogram
+            ):
+                duration = utime.time_ms() - button_pressed["BOTTOM_LEFT"]
+                if duration > 1000:
+                    button_pressed["BOTTOM_LEFT"] = -1
                     toggle_write()
+
+            # register down event
+            elif button_pressed["BOTTOM_LEFT"] == 0 and v & buttons.BOTTOM_LEFT != 0:
+                button_pressed["BOTTOM_LEFT"] = utime.time_ms()
+
+            # register up event but event already called
+            if button_pressed["BOTTOM_LEFT"] == -1 and v & buttons.BOTTOM_LEFT == 0:
+                button_pressed["BOTTOM_LEFT"] = 0
+
+            # register normal up event
+            elif button_pressed["BOTTOM_LEFT"] > 0 and v & buttons.BOTTOM_LEFT == 0:
+                duration = utime.time_ms() - button_pressed["BOTTOM_LEFT"]
+                button_pressed["BOTTOM_LEFT"] = 0
+                if not pause_histogram:
+                    toggle_leds()
                 else:
                     l = len(history)
                     histogram_offset += ECG_RATE / 2
                     if l - histogram_offset < WIDTH:
                         histogram_offset = l - WIDTH
 
-            if button_pressed["BOTTOM_LEFT"] > 0 and v & buttons.BOTTOM_LEFT == 0:
-                duration = utime.time_ms() - button_pressed["BOTTOM_LEFT"]
-                button_pressed["BOTTOM_LEFT"] = 0
-
             # BOTTOM RIGHT
+            #
+            # on pause = shift view right
+            # long = toggle bias
+            # short = toggle mode (finger/usb)
 
-            if button_pressed["BOTTOM_RIGHT"] == 0 and v & buttons.BOTTOM_RIGHT != 0:
-                button_pressed["BOTTOM_RIGHT"] = utime.time_ms()
-                if not pause_histogram:
+            # down, and still pressed
+            if (
+                button_pressed["BOTTOM_RIGHT"] > 0
+                and v & buttons.BOTTOM_RIGHT != 0
+                and not pause_histogram
+            ):
+                duration = utime.time_ms() - button_pressed["BOTTOM_RIGHT"]
+                if duration > 1000:
+                    button_pressed["BOTTOM_RIGHT"] = -1
                     toggle_bias()
-                else:
+
+            # register down event
+            elif button_pressed["BOTTOM_RIGHT"] == 0 and v & buttons.BOTTOM_RIGHT != 0:
+                button_pressed["BOTTOM_RIGHT"] = utime.time_ms()
+
+            # register up event but event already called
+            if button_pressed["BOTTOM_RIGHT"] == -1 and v & buttons.BOTTOM_RIGHT == 0:
+                button_pressed["BOTTOM_RIGHT"] = 0
+
+            # register normal up event
+            elif button_pressed["BOTTOM_RIGHT"] > 0 and v & buttons.BOTTOM_RIGHT == 0:
+                duration = utime.time_ms() - button_pressed["BOTTOM_RIGHT"]
+                button_pressed["BOTTOM_RIGHT"] = 0
+                if pause_histogram:
                     histogram_offset -= ECG_RATE / 2
                     histogram_offset -= histogram_offset % (ECG_RATE / 2)
                     if histogram_offset < 0:
                         histogram_offset = 0
-
-            if button_pressed["BOTTOM_RIGHT"] > 0 and v & buttons.BOTTOM_RIGHT == 0:
-                duration = utime.time_ms() - button_pressed["BOTTOM_RIGHT"]
-                button_pressed["BOTTOM_RIGHT"] = 0
-
-            # TOP RIGHT
-
-            # down, and still pressed
-            if button_pressed["TOP_RIGHT"] > 0 and v & buttons.TOP_RIGHT != 0:
-                duration = utime.time_ms() - button_pressed["TOP_RIGHT"]
-                if duration > 1000:
-                    button_pressed["TOP_RIGHT"] = -1
-                    toggle_pause()
-
-            # register down event
-            elif button_pressed["TOP_RIGHT"] == 0 and v & buttons.TOP_RIGHT != 0:
-                button_pressed["TOP_RIGHT"] = utime.time_ms()
-
-            # register up event but event already called
-            if button_pressed["TOP_RIGHT"] == -1 and v & buttons.TOP_RIGHT == 0:
-                button_pressed["TOP_RIGHT"] = 0
-
-            # register normal up event
-            elif button_pressed["TOP_RIGHT"] > 0 and v & buttons.TOP_RIGHT == 0:
-                duration = utime.time_ms() - button_pressed["TOP_RIGHT"]
-                button_pressed["TOP_RIGHT"] = 0
-                if pause_histogram:
-                    toggle_pause()
                 else:
                     toggle_mode()
 
