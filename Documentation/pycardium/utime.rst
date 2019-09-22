@@ -33,6 +33,18 @@ alarm.
    Return the current timestamp in milliseconds since 2000-01-01 00:00 in
    the local timezone.
 
+.. py:function:: monotonic()
+
+   Return a monotonically increasing timestamp.
+
+   .. versionadded:: 1.11
+
+.. py:function:: monotonic_ms()
+
+   Return a monotonically increasing timestamp in milliseconds.
+
+   .. versionadded:: 1.11
+
 .. py:function:: set_time(secs)
 
    Sets the time to ``secs`` seconds since 2000-01-01 00:00 in the local
