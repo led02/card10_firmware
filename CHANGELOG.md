@@ -19,12 +19,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - BHI160 magnetometer sensor
 - ESB API in Pycardium.
 - Monotonic clock API
+- New FOSS font ...
 
 ### Changed
 - `Display.print()` uses a transparent background when printing with `bg == fg`.
 - Try different crc16 module during build because different environments might
   have different ones installed.
-- Refactored BHI160 app
+- Improved ECG app, it can now blink on pulse and more!
+- Improved BHI160 and BME680 apps.
 
 ### Fixed
 - Fixed a regression which made it impossible to turn off the flashlight.
