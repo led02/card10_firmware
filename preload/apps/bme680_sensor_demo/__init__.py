@@ -20,10 +20,10 @@ def main():
     while True:
         sensor_data = bme680.get_data()
         disp.clear()
-        disp.print("BME680 Sensor")
-        disp.print("{} C".format(str(sensor_data[0])), posy=20)
-        disp.print("{} rh".format(str(sensor_data[1])), posy=40)
-        disp.print("{} hPa".format(str(sensor_data[2])), posy=60)
+        disp.print("BME680", posx=38)
+        disp.print("{:7.2f} C".format(sensor_data[0]), posy=20)
+        disp.print("{:7.2f} rh".format(sensor_data[1]), posy=40)
+        disp.print("{:7.2f} hPa".format(sensor_data[2]), posy=60)
         disp.update()
         utime.sleep(10)
 
