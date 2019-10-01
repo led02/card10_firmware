@@ -217,6 +217,15 @@ void lctrConnStatelessEventHandler(lctrConnCtx_t *pCtx, uint8_t event)
   {
     case LCTR_CONN_TERMINATED:
       LL_TRACE_INFO2("lctrConnStatelessEventHandler: handle=%u, state=%u, event=TERMINATED", LCTR_GET_CONN_HANDLE(pCtx), pCtx->state);
+
+	  /* card10 HACK:
+	   * After an encrypted connection is closed, the stack does not instruct the radio to turn off encryption again.
+	   * There is no direct interface to this either. lctrCalcSessionKey() does transfer the flag though. */
+      lctrDisableTxDataEnc(pCtx);
+      lctrDisableRxDataEnc(pCtx);
+      lctrCalcSessionKey(pCtx);
+	  /*END card10 HACK */
+
       lctrNotifyHostDisconnectInd(pCtx);
       lctrFreeConnCtx(pCtx);
       break;
