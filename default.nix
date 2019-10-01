@@ -18,6 +18,7 @@ in stdenv.mkDerivation rec {
     bash
     crc16
     gcc-arm-embedded
+    git
     meson
     ninja
     py
