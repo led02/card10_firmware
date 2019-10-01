@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define FACTOR  2
+#define FACTOR 2
 #define WSF_BUF_POOLS 6
 #define WSF_BUF_SIZE (0x1048 * FACTOR)
 
