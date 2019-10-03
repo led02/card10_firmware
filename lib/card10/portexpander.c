@@ -102,9 +102,8 @@ int portexpander_init(void)
 	// Enable outputs for the transistors, the LED and the LCD reset
 	for (int i = 0; i < sizeof(pe_pin_config) / sizeof(pe_pin_config[0]);
 	     i++) {
-		MXC_ASSERT(
-			portexpander_config(&pe_pin_config[i]) == E_NO_ERROR
-		);
+		ret = portexpander_config(&pe_pin_config[i]);
+		MXC_ASSERT(ret == E_NO_ERROR);
 	}
 
 	// Latch inputs so we can figure out whether an interrupt was caused by a rising or falling edge
@@ -161,7 +160,7 @@ int portexpander_config(const portexpander_cfg_t *cfg)
 		return E_BAD_PARAM;
 	}
 
-	portexpander_write(PE_C_PULL_ENABLE, pull_selection_state);
+	portexpander_write(PE_C_PULL_SEL, pull_selection_state);
 	portexpander_write(PE_C_PULL_ENABLE, pull_enable_state);
 
 	return E_NO_ERROR;
