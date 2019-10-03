@@ -37,22 +37,24 @@ int main(void)
 	gfx_line(&display_screen, 100, 10, 70, 40, 2, yellow);
 	gfx_circle(&display_screen, 85, 25, 22, 2, green);
 
-	gfx_copy_region_raw(
+	gfx_copy_region(
 		&display_screen,
 		120,
 		0,
 		40,
 		40,
-		2,
+		GFX_RAW,
+		40 * 40 * 2,
 		(const void *)(gImage_40X40)
 	);
-	gfx_copy_region_raw(
+	gfx_copy_region(
 		&display_screen,
 		0,
 		0,
 		160,
 		80,
-		2,
+		GFX_RAW,
+		160 * 80 * 2,
 		(const void *)(gImage_160X80)
 	);
 	gfx_update(&display_screen);

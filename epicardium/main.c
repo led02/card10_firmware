@@ -34,8 +34,15 @@ int main(void)
 	mxc_delay(500000);
 	epic_disp_clear(0x0000);
 	if (strcmp(CARD10_VERSION, "v1.11") == 0) {
-		gfx_copy_region_raw(
-			&display_screen, 0, 0, 160, 80, 2, version_splash
+		gfx_copy_region(
+			&display_screen,
+			0,
+			0,
+			160,
+			80,
+			GFX_RAW,
+			sizeof(version_splash),
+			version_splash
 		);
 	} else {
 		const int off = (160 - (int)strlen(version_buf) * 14) / 2;

@@ -43,6 +43,12 @@ enum gfx_color {
 	COLORS
 };
 
+enum gfx_encoding {
+	GFX_RAW,
+	GFX_MONO,
+	GFX_RLE_MONO
+};
+
 struct gfx_color_rgb {
 	uint8_t r;
 	uint8_t g;
@@ -51,8 +57,9 @@ struct gfx_color_rgb {
 
 Color gfx_color(struct gfx_region *reg, enum gfx_color color);
 
-void gfx_copy_region_raw(struct gfx_region *reg, int x, int y, int w, int h,
-					         size_t bpp, const void *p);
+void gfx_copy_region(struct gfx_region *reg, int x, int y, int w, int h,
+				enum gfx_encoding encoding, size_t size,
+							 const void *p);
 void gfx_copy_raw(struct gfx_region *reg, const void *p, size_t size);
 
 #endif

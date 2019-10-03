@@ -273,15 +273,17 @@ Color gfx_color(struct gfx_region *reg, enum gfx_color color)
 	return gfx_color_rgb(reg, c->r, c->g, c->b);
 }
 
-void gfx_copy_region_raw(
+static void gfx_copy_region_raw(
 	struct gfx_region *reg,
 	int x,
 	int y,
 	int w,
 	int h,
-	size_t bpp,
+	size_t size,
 	const void *p
 ) {
+	size_t bpp = size / (w * h);
+
 	for (int y_ = 0; y_ < h; y_++) {
 		for (int x_ = 0; x_ < w; x_++) {
 			Color c;
@@ -296,6 +298,96 @@ void gfx_copy_region_raw(
 			gfx_setpixel(reg, x + x_, y + y_, c);
 			p += bpp;
 		}
+	}
+}
+
+static void gfx_copy_region_mono(
+	struct gfx_region *reg,
+	int x,
+	int y,
+	int w,
+	int h,
+	size_t size,
+	const void *p
+) {
+	const char *bp = p;
+	int bit        = 0;
+	Color white    = gfx_color(reg, WHITE);
+	Color black    = gfx_color(reg, BLACK);
+
+	for (int y_ = 0; y_ < h; y_++) {
+		for (int x_ = 0; x_ < w; x_++) {
+			int value = *bp & (1 << bit);
+			if (++bit >= 8) {
+				bp++;
+				bit %= 8;
+
+				if ((const void *)(bp) >= (p + size))
+					return;
+			}
+
+			Color c = value ? white : black;
+			gfx_setpixel(reg, x + x_, y + y_, c);
+		}
+	}
+}
+
+/*
+ * "Decompress" the image.  The algorithm works as follows:
+ *
+ * Each byte encodes up to 127 pixels in either white or black.  The most
+ * significant bit determines the color, the remaining 7 bits determine the
+ * amount.
+ */
+static void gfx_copy_region_rle_mono(
+	struct gfx_region *reg,
+	int x,
+	int y,
+	int w,
+	int h,
+	size_t size,
+	const void *p
+) {
+	const char *data = p;
+	int idx          = 0;
+	Color white      = gfx_color(reg, WHITE);
+	Color black      = gfx_color(reg, BLACK);
+
+	for (int i = 0; i < size; i++) {
+		Color color    = (data[i] & 0x80) ? white : black;
+		uint8_t length = data[i] & 0x7f;
+
+		for (int j = 0; j < length; j++) {
+			uint16_t x = idx % w;
+			uint16_t y = idx / w;
+			gfx_setpixel(reg, x, y, color);
+			idx++;
+		}
+	}
+}
+
+void gfx_copy_region(
+	struct gfx_region *reg,
+	int x,
+	int y,
+	int w,
+	int h,
+	enum gfx_encoding encoding,
+	size_t size,
+	const void *p
+) {
+	switch (encoding) {
+	case GFX_RAW:
+		gfx_copy_region_raw(reg, x, y, w, h, size, p);
+		break;
+	case GFX_MONO:
+		gfx_copy_region_mono(reg, x, y, w, h, size, p);
+		break;
+	case GFX_RLE_MONO:
+		gfx_copy_region_rle_mono(reg, x, y, w, h, size, p);
+		break;
+	default:
+		break;
 	}
 }
 
