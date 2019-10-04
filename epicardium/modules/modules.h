@@ -31,6 +31,8 @@ void vSerialTask(void *pvParameters);
 void serial_enqueue_char(char chr);
 void serial_flush(void);
 extern TaskHandle_t serial_task_id;
+/* Turn off the print queue and do prints synchroneous from now on. */
+void serial_return_to_synchronous();
 
 // For the eSetBit xTaskNotify task semaphore trigger
 enum serial_notify{

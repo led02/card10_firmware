@@ -46,6 +46,11 @@ void serial_init()
 	);
 }
 
+void serial_return_to_synchronous()
+{
+	write_stream_buffer = NULL;
+}
+
 /*
  * API-call to write a string.  Output goes to both CDCACM and UART
  */
