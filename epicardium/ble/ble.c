@@ -161,12 +161,17 @@ void WsfTimerNotify(void)
 	//printf("WsfTimerNotify\n");
 	// TODO: Can we do this without waking up the task?
 	// xTimerChangePeriodFromISR exists
-	notify();
+	NVIC->STIR = RSV11_IRQn;
 }
 /*************************************************************************************************/
 void wsf_ble_signal_event(void)
 {
 	//printf("wsf_ble_signal_event\n");
+	NVIC->STIR = RSV11_IRQn;
+}
+/*************************************************************************************************/
+void RSV11_IRQHandler(void)
+{
 	notify();
 }
 /*************************************************************************************************/
@@ -243,6 +248,12 @@ void vBleTask(void *pvParameters)
 	 */
 	vTaskDelay(pdMS_TO_TICKS(500));
 
+	/* We are going to execute FreeRTOS functions from callbacks
+	 * coming from this interrupt. Its priority needs to be
+	 * reduced to allow this. */
+	NVIC_SetPriority(RSV11_IRQn, 2);
+	NVIC_EnableIRQ(RSV11_IRQn);
+
 	WsfInit();
 	taskENTER_CRITICAL();
 	/* Critical section to prevent a loop in iq_capture2 / meas_freq in
@@ -253,12 +264,6 @@ void vBleTask(void *pvParameters)
 	BbBleDrvSetTxPower(0);
 	setAddress();
 
-	/* We are going to execute FreeRTOS functions from callbacks
-	 * coming from these interrupts. Their priority needs to be
-	 * reduced to allow this. */
-	NVIC_SetPriority(BTLE_SFD_TO_IRQn, 2);
-	NVIC_SetPriority(BTLE_TX_DONE_IRQn, 2);
-	NVIC_SetPriority(BTLE_RX_RCVD_IRQn, 2);
 	AppInit();
 	BleStart();
 	AttsDynInit();
