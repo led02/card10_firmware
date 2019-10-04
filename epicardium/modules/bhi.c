@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -259,14 +260,14 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 		wakeup = true;
 		/* fall through */
 	case VS_ID_TIMESTAMP_MSW:
-		MXC_ASSERT(data_type == BHY_DATA_TYPE_SCALAR_U16);
+		assert(data_type == BHY_DATA_TYPE_SCALAR_U16);
 		timestamp = sensor_data->data_scalar_u16.data << 16;
 		break;
 	case VS_ID_TIMESTAMP_LSW_WAKEUP:
 		wakeup = true;
 		/* fall through */
 	case VS_ID_TIMESTAMP_LSW:
-		MXC_ASSERT(data_type == BHY_DATA_TYPE_SCALAR_U16);
+		assert(data_type == BHY_DATA_TYPE_SCALAR_U16);
 		timestamp = (timestamp & 0xFFFF0000) |
 			    sensor_data->data_scalar_u16.data;
 		break;
@@ -303,7 +304,7 @@ bhi160_handle_packet(bhy_data_type_t data_type, bhy_data_generic_t *sensor_data)
 			break;
 		}
 
-		MXC_ASSERT(data_type == BHY_DATA_TYPE_VECTOR);
+		assert(data_type == BHY_DATA_TYPE_VECTOR);
 		if (bhi160_streams[sensor_type].queue == NULL) {
 			break;
 		}

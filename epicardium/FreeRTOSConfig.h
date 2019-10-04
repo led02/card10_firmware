@@ -1,10 +1,9 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#define  MXC_ASSERT_ENABLE
-#include "mxc_assert.h"
-
 #include "max32665.h"
+
+#include <assert.h>
 
 /* CMSIS keeps a global updated with current system clock in Hz */
 #define configCPU_CLOCK_HZ          ((unsigned long)96000000)
@@ -69,7 +68,7 @@
 #define xPortSysTickHandler   SysTick_Handler
 
 /* Assert */
-#define configASSERT(x)       MXC_ASSERT(x)
+#define configASSERT(x)       assert(x)
 
 /* Tickless idle hooks */
 typedef uint32_t TickType_t;
