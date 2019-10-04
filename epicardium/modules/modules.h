@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* ---------- Panic -------------------------------------------------------- */
+void panic(const char *format, ...)
+	__attribute__((noreturn, format(printf, 1, 2)));
+
 /* ---------- Dispatcher --------------------------------------------------- */
 void vApiDispatcher(void *pvParameters);
 void dispatcher_mutex_init(void);
