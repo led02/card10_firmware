@@ -2,6 +2,7 @@ module_sources = files(
   'bhi.c',
   'bme680.c',
   'buttons.c',
+  'config.c',
   'dispatcher.c',
   'display.c',
   'fileops.c',
@@ -20,9 +21,8 @@ module_sources = files(
   'sleep.c',
   'stream.c',
   'trng.c',
+  'usb.c',
   'vibra.c',
   'watchdog.c',
-  'usb.c',
-  'config.c',
   'ws2812.c'
 )

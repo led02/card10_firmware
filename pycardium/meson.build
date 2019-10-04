@@ -7,16 +7,16 @@ modsrc = files(
   'modules/fat_reader_import.c',
   'modules/gpio.c',
   'modules/interrupt.c',
-  'modules/sys_leds.c',
   'modules/light_sensor.c',
   'modules/max30001-sys.c',
   'modules/os.c',
   'modules/personal_state.c',
   'modules/power.c',
+  'modules/sys_bme680.c',
   'modules/sys_display.c',
+  'modules/sys_leds.c',
   'modules/utime.c',
   'modules/vibra.c',
-  'modules/sys_bme680.c',
   'modules/ws2812.c'
 )
 

@@ -2,12 +2,12 @@ python_modules = files(
   'bhi160.py',
   'bme680.py',
   'color.py',
-  'htmlcolor.py',
   'display.py',
+  'htmlcolor.py',
+  'ledfx.py',
   'leds.py',
   'max30001.py',
   'pride.py',
-  'ledfx.py',
   'simple_menu.py',
 
   # MicroPython Standard-Library
