@@ -11,8 +11,6 @@ shift 5
 
 OUTPUT_DIR="$(dirname "$OUTPUT")"
 
-mkdir -p "$OUTPUT_DIR/genhdr"
-ln -sf "$(realpath --relative-to="$OUTPUT_DIR/genhdr" "$OUTPUT")" "$OUTPUT_DIR/genhdr/$(basename "$OUTPUT")"
 
 # call gcc -E to generate qstr.i.last
 gcc -E -DNO_QSTR -I"$SOURCE_DIR/micropython" -I"$PROJECT_SRC" -I"$OUTPUT_DIR" "$@" >"$OUTPUT_DIR/qstr.i.last"
