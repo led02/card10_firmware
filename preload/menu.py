@@ -87,9 +87,12 @@ def no_apps_message():
 
 
 if __name__ == "__main__":
-    apps = list(enumerate_apps())
+    try:
+        apps = list(enumerate_apps())
+    except OSError:
+        apps = []
 
-    if apps == []:
+    if not apps:
         no_apps_message()
 
     MainMenu(apps).run()
