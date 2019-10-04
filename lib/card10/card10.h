@@ -15,5 +15,5 @@ void core1_start(void *isr);
 void core1_stop(void);
 
 void card10_poll(void);
-void card10_reset(void);
+void card10_reset(void) __attribute__((noreturn));
 #endif
