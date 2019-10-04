@@ -43,6 +43,7 @@ qstr_h = custom_target(
   input: [
     'modules/qstrdefs.h',
     'mpconfigport.h',
+    modules_h,
     micropython_sources,
     micropython_extmod_sources,
   ],
@@ -50,7 +51,9 @@ qstr_h = custom_target(
   command: [micropython_gen_qstr, meson.current_source_dir(), '@OUTPUT@', '@INPUT@'],
 )
 
-mp_headers = [version_h, modules_h, qstr_h]
+subdir('./genhdr')
+
+mp_headers = [version_h, modules_h, qstr_h, qstr_genhdr_h]
 
 #################################
 #    Python Frozen Modules      #
