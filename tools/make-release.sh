@@ -52,11 +52,11 @@ fi
 release_dir="release-$version"
 mkdir "$release_dir"
 
-message "Building (non-jailbreak) release version ..."
+message "Building release version ..."
 ./bootstrap.sh
 ninja -C build/
 
-message "Creating (non-jailbreak) release archive ..."
+message "Creating release archive ..."
 mkdir "$release_dir/$release_name"
 cp -r -t "$release_dir/$release_name" preload/*
 cp build/pycardium/pycardium_epicardium.bin "$release_dir/$release_name/card10.bin"
@@ -66,20 +66,5 @@ cp build/pycardium/pycardium_epicardium.bin "$release_dir/$release_name/card10.b
 mkdir "$release_dir/elfs"
 cp -t "$release_dir/elfs" build/epicardium/epicardium.elf build/pycardium/pycardium.elf build/bootloader/bootloader.elf
 
-message "Building (jailbreak) release version ..."
-./bootstrap.sh -Djailbreak_card10=true
-ninja -C build/
-
-message "Creating (jailbreak) release archive ..."
-mkdir "$release_dir/$release_name-jailbreak"
-cp -r -t "$release_dir/$release_name-jailbreak" preload/*
-cp build/pycardium/pycardium_epicardium.bin "$release_dir/$release_name-jailbreak/card10.bin"
-( cd "$release_dir"; zip -r "$release_name-jailbreak"{.zip,}; )
-
-# Copy ELFs
-mkdir "$release_dir/elfs-jailbreak"
-cp -t "$release_dir/elfs-jailbreak" build/epicardium/epicardium.elf build/pycardium/pycardium.elf
-
 message "Done!"
-echo "Archive (non-jailbreak): $release_dir/$release_name.zip"
-echo "Archive (jailbreak):     $release_dir/$release_name-jailbreak.zip"
+echo "Archive: $release_dir/$release_name.zip"

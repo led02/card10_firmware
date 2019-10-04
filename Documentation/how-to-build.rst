@@ -107,7 +107,6 @@ firmware features:
   info related to BLE.
 - ``-Ddebug_core1=true``: Enable the core 1 SWD lines which are exposed on the
   SAO connector.  Only use this if you have a debugger which is modified for core 1.
-- ``-Djailbreak_card10=true``: Enable execution of .elf l0dables on core 1.
 
 .. warning::
 
