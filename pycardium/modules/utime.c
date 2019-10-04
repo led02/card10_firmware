@@ -51,6 +51,20 @@ static mp_obj_t time_time_ms(void)
 }
 MP_DEFINE_CONST_FUN_OBJ_0(time_time_ms_obj, time_time_ms);
 
+static mp_obj_t time_unix_time(void)
+{
+	mp_int_t seconds = epic_rtc_get_seconds();
+	return mp_obj_new_int(seconds);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(time_unix_time_obj, time_unix_time);
+
+static mp_obj_t time_unix_time_ms(void)
+{
+	uint64_t milliseconds = epic_rtc_get_milliseconds();
+	return mp_obj_new_int_from_ull(milliseconds);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(time_unix_time_ms_obj, time_unix_time_ms);
+
 static mp_obj_t time_monotonic(void)
 {
 	mp_int_t seconds;
@@ -146,6 +160,9 @@ static const mp_rom_map_elem_t time_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_utime) },
 	{ MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&time_time_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_time_ms), MP_ROM_PTR(&time_time_ms_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_unix_time), MP_ROM_PTR(&time_unix_time_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_unix_time_ms),
+	  MP_ROM_PTR(&time_unix_time_ms_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_monotonic), MP_ROM_PTR(&time_monotonic_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_monotonic_ms),
 	  MP_ROM_PTR(&time_monotonic_ms_obj) },
