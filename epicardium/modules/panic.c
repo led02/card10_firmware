@@ -61,3 +61,16 @@ void __attribute__((noreturn)) panic(const char *format, ...)
 
 	card10_reset();
 }
+
+void __attribute__((noreturn)) __assert_func(
+	const char *file, int line, const char *func, const char *failedexpr
+) {
+	panic("Assertion failure:\n"
+	      "       \"%s\"\n"
+	      "       failed in \"%s:%d\",\n"
+	      "       function: %s()",
+	      failedexpr,
+	      file,
+	      line,
+	      func);
+}
