@@ -39,11 +39,11 @@ static mp_obj_t mp_display_print(size_t n_args, const mp_obj_t *args)
 		mp_raise_TypeError("input text must be a string");
 	}
 	GET_STR_DATA_LEN(args[0], print, print_len);
-	uint32_t posx = mp_obj_get_int(args[1]);
-	uint32_t posy = mp_obj_get_int(args[2]);
-	uint32_t fg   = get_color(args[3]);
-	uint32_t bg   = get_color(args[4]);
-	int res = epic_disp_print(posx, posy, (const char *)print, fg, bg);
+	int32_t posx = mp_obj_get_int(args[1]);
+	int32_t posy = mp_obj_get_int(args[2]);
+	uint32_t fg  = get_color(args[3]);
+	uint32_t bg  = get_color(args[4]);
+	int res      = epic_disp_print(posx, posy, (const char *)print, fg, bg);
 	if (res < 0) {
 		mp_raise_OSError(-res);
 	}
@@ -60,8 +60,8 @@ static mp_obj_t mp_display_print_adv(size_t n_args, const mp_obj_t *args)
 		mp_raise_TypeError("input text must be a string");
 	}
 	GET_STR_DATA_LEN(args[0], print, print_len);
-	uint32_t posx    = mp_obj_get_int(args[1]);
-	uint32_t posy    = mp_obj_get_int(args[2]);
+	int32_t posx     = mp_obj_get_int(args[1]);
+	int32_t posy     = mp_obj_get_int(args[2]);
 	uint32_t fg      = get_color(args[3]);
 	uint32_t bg      = get_color(args[4]);
 	uint8_t fontName = mp_obj_get_int(args[5]);
@@ -80,8 +80,8 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 /* draw pixel on the display */
 static mp_obj_t mp_display_pixel(size_t n_args, const mp_obj_t *args)
 {
-	uint16_t x   = mp_obj_get_int(args[0]);
-	uint16_t y   = mp_obj_get_int(args[1]);
+	int16_t x    = mp_obj_get_int(args[0]);
+	int16_t y    = mp_obj_get_int(args[1]);
 	uint16_t col = get_color(args[2]);
 
 	//TODO: Move sanity checks to epicardium
@@ -121,10 +121,10 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 /* draw line on the display */
 static mp_obj_t mp_display_line(size_t n_args, const mp_obj_t *args)
 {
-	uint16_t xs  = mp_obj_get_int(args[0]);
-	uint16_t ys  = mp_obj_get_int(args[1]);
-	uint16_t xe  = mp_obj_get_int(args[2]);
-	uint16_t ye  = mp_obj_get_int(args[3]);
+	int16_t xs   = mp_obj_get_int(args[0]);
+	int16_t ys   = mp_obj_get_int(args[1]);
+	int16_t xe   = mp_obj_get_int(args[2]);
+	int16_t ye   = mp_obj_get_int(args[3]);
 	uint16_t col = get_color(args[4]);
 	uint16_t ls  = mp_obj_get_int(args[5]);
 	uint16_t ps  = mp_obj_get_int(args[6]);
@@ -155,10 +155,10 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 /* draw rectangle on the display */
 static mp_obj_t mp_display_rect(size_t n_args, const mp_obj_t *args)
 {
-	uint16_t xs  = mp_obj_get_int(args[0]);
-	uint16_t ys  = mp_obj_get_int(args[1]);
-	uint16_t xe  = mp_obj_get_int(args[2]);
-	uint16_t ye  = mp_obj_get_int(args[3]);
+	int16_t xs   = mp_obj_get_int(args[0]);
+	int16_t ys   = mp_obj_get_int(args[1]);
+	int16_t xe   = mp_obj_get_int(args[2]);
+	int16_t ye   = mp_obj_get_int(args[3]);
 	uint16_t col = get_color(args[4]);
 	uint16_t fs  = mp_obj_get_int(args[5]);
 	uint16_t ps  = mp_obj_get_int(args[6]);
@@ -189,8 +189,8 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 /* draw rectangle on the display */
 static mp_obj_t mp_display_circ(size_t n_args, const mp_obj_t *args)
 {
-	uint16_t x   = mp_obj_get_int(args[0]);
-	uint16_t y   = mp_obj_get_int(args[1]);
+	int16_t x    = mp_obj_get_int(args[0]);
+	int16_t y    = mp_obj_get_int(args[1]);
 	uint16_t rad = mp_obj_get_int(args[2]);
 	uint16_t col = get_color(args[3]);
 	uint16_t fs  = mp_obj_get_int(args[4]);

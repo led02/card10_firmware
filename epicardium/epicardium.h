@@ -1327,8 +1327,8 @@ API(API_DISP_UPDATE, int epic_disp_update());
 /**
  * Prints a string into the display framebuffer
  *
- * :param posx: x position to print to. 0 <= x <= 160
- * :param posy: y position to print to. 0 <= y <= 80
+ * :param posx: x position to print to.
+ * :param posy: y position to print to.
  * :param pString: string to print
  * :param fg: foreground color in rgb565
  * :param bg: background color in rgb565
@@ -1338,8 +1338,8 @@ API(API_DISP_UPDATE, int epic_disp_update());
  */
 API(API_DISP_PRINT,
     int epic_disp_print(
-	    uint16_t posx,
-	    uint16_t posy,
+	    int16_t posx,
+	    int16_t posy,
 	    const char *pString,
 	    uint16_t fg,
 	    uint16_t bg)
@@ -1360,8 +1360,8 @@ enum disp_font_name {
  * Prints a string into the display framebuffer with font type selectable
  *
  * :param fontName: number of font, use FontName enum
- * :param posx: x position to print to. 0 <= x <= 160
- * :param posy: y position to print to. 0 <= y <= 80
+ * :param posx: x position to print to.
+ * :param posy: y position to print to.
  * :param pString: string to print
  * :param fg: foreground color in rgb565
  * :param bg: background color in rgb565, no background is drawn if bg==fg
@@ -1371,8 +1371,8 @@ enum disp_font_name {
  */
 API(API_DISP_PRINT_ADV, int epic_disp_print_adv(
 	uint8_t font,
-	uint16_t posx,
-	uint16_t posy,
+	int16_t posx,
+	int16_t posy,
 	const char *pString,
 	uint16_t fg,
 	uint16_t bg
@@ -1391,24 +1391,24 @@ API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
 /**
  * Draws a pixel on the display
  *
- * :param x: x position; 0 <= x <= 160
- * :param y: y position; 0 <= y <= 80
+ * :param x: x position;
+ * :param y: y position;
  * :param color: pixel color in rgb565
  * :return: ``0`` on success or a negative value in case of an error:
  *
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_PIXEL, int epic_disp_pixel(
-	uint16_t x, uint16_t y, uint16_t color
+	int16_t x, int16_t y, uint16_t color
 ));
 
 /**
  * Draws a line on the display
  *
- * :param xstart: x starting position; 0 <= x <= 160
- * :param ystart: y starting position; 0 <= y <= 80
- * :param xend: x ending position; 0 <= x <= 160
- * :param yend: y ending position; 0 <= y <= 80
+ * :param xstart: x starting position
+ * :param ystart: y starting position
+ * :param xend: x ending position
+ * :param yend: y ending position
  * :param color: line color in rgb565
  * :param linestyle: 0 for solid, 1 for dottet (almost no visual difference)
  * :param pixelsize: thickness of the line; 1 <= pixelsize <= 8
@@ -1417,10 +1417,10 @@ API(API_DISP_PIXEL, int epic_disp_pixel(
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_LINE, int epic_disp_line(
-	uint16_t xstart,
-	uint16_t ystart,
-	uint16_t xend,
-	uint16_t yend,
+	int16_t xstart,
+	int16_t ystart,
+	int16_t xend,
+	int16_t yend,
 	uint16_t color,
 	enum disp_linestyle linestyle,
 	uint16_t pixelsize
@@ -1429,10 +1429,10 @@ API(API_DISP_LINE, int epic_disp_line(
 /**
  * Draws a rectangle on the display
  *
- * :param xstart: x coordinate of top left corner; 0 <= x <= 160
- * :param ystart: y coordinate of top left corner; 0 <= y <= 80
- * :param xend: x coordinate of bottom right corner; 0 <= x <= 160
- * :param yend: y coordinate of bottom right corner; 0 <= y <= 80
+ * :param xstart: x coordinate of top left corner
+ * :param ystart: y coordinate of top left corner
+ * :param xend: x coordinate of bottom right corner
+ * :param yend: y coordinate of bottom right corner
  * :param color: line color in rgb565
  * :param fillstyle: 0 for empty, 1 for filled
  * :param pixelsize: thickness of the rectangle outline; 1 <= pixelsize <= 8
@@ -1441,10 +1441,10 @@ API(API_DISP_LINE, int epic_disp_line(
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_RECT, int epic_disp_rect(
-	uint16_t xstart,
-	uint16_t ystart,
-	uint16_t xend,
-	uint16_t yend,
+	int16_t xstart,
+	int16_t ystart,
+	int16_t xend,
+	int16_t yend,
 	uint16_t color,
 	enum disp_fillstyle fillstyle,
 	uint16_t pixelsize
@@ -1464,8 +1464,8 @@ API(API_DISP_RECT, int epic_disp_rect(
  *    - ``-EBUSY``: Display was already locked from another task.
  */
 API(API_DISP_CIRC, int epic_disp_circ(
-	uint16_t x,
-	uint16_t y,
+	int16_t x,
+	int16_t y,
 	uint16_t rad,
 	uint16_t color,
 	enum disp_fillstyle fillstyle,

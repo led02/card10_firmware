@@ -22,8 +22,8 @@ static int check_lock()
 }
 
 int epic_disp_print(
-	uint16_t posx,
-	uint16_t posy,
+	int16_t posx,
+	int16_t posy,
 	const char *pString,
 	uint16_t fg,
 	uint16_t bg
@@ -39,8 +39,8 @@ static const sFONT *font_map[] = {
 
 int epic_disp_print_adv(
 	uint8_t font,
-	uint16_t posx,
-	uint16_t posy,
+	int16_t posx,
+	int16_t posy,
 	const char *pString,
 	uint16_t fg,
 	uint16_t bg
@@ -76,7 +76,7 @@ int epic_disp_clear(uint16_t color)
 	}
 }
 
-int epic_disp_pixel(uint16_t x, uint16_t y, uint16_t color)
+int epic_disp_pixel(int16_t x, int16_t y, uint16_t color)
 {
 	int cl = check_lock();
 	if (cl < 0) {
@@ -88,10 +88,10 @@ int epic_disp_pixel(uint16_t x, uint16_t y, uint16_t color)
 }
 
 int epic_disp_line(
-	uint16_t xstart,
-	uint16_t ystart,
-	uint16_t xend,
-	uint16_t yend,
+	int16_t xstart,
+	int16_t ystart,
+	int16_t xend,
+	int16_t yend,
 	uint16_t color,
 	enum disp_linestyle linestyle,
 	uint16_t pixelsize
@@ -115,10 +115,10 @@ int epic_disp_line(
 }
 
 int epic_disp_rect(
-	uint16_t xstart,
-	uint16_t ystart,
-	uint16_t xend,
-	uint16_t yend,
+	int16_t xstart,
+	int16_t ystart,
+	int16_t xend,
+	int16_t yend,
 	uint16_t color,
 	enum disp_fillstyle fillstyle,
 	uint16_t pixelsize
@@ -154,8 +154,8 @@ int epic_disp_rect(
 }
 
 int epic_disp_circ(
-	uint16_t x,
-	uint16_t y,
+	int16_t x,
+	int16_t y,
 	uint16_t rad,
 	uint16_t color,
 	enum disp_fillstyle fillstyle,

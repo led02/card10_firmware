@@ -95,9 +95,6 @@ void gfx_puts(
 			x = 0;
 			y += font->Height;
 		}
-		// if the line is outside the display we return
-		if (y >= r->height)
-			return;
 
 		// now print the character
 		gfx_putchar(font, r, x, y, *str, fg, bg);
