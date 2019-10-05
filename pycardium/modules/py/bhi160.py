@@ -37,6 +37,9 @@ class BHI160:
         self.close()
 
     def close(self):
+        """
+        Close the connection to the sensor
+        """
         if self.active:
             self.active = False
             ret = sys_bhi160.disable_sensor(self.sensor_id)
@@ -48,6 +51,18 @@ class BHI160:
             interrupt.set_callback(self.interrupt_id, None)
 
     def read(self):
+        """
+        Read sensor values
+
+        :returns: The recent collected sensor values as a list. If no data is
+            available the list contains no elements. Maximum length of the list
+            is ``sample_buffer_len``. The last element contains the most recent
+            data. The elements contains a sensor specific named tuple. See the
+            documentation of the sensor class for more information.
+
+        .. warning::
+            Weird behaviour ahead: If the internal buffer overflows, the new samples will be dropped.
+        """
         result = []
         if self.active:
             for sample in sys_bhi160.read_sensor(self.stream_id):
@@ -70,6 +85,28 @@ class BHI160:
 
 
 class BHI160Accelerometer(BHI160):
+    """
+    Accelerometer of the BHI160.
+
+    This sensors sample data named tuple contains the following fields:
+
+    - ``x``: Acceleration along the x axis
+    - ``y``: Acceleration along the y axis
+    - ``z``: Acceleration along the z axis
+    - ``status``: accuracy / "confidence" value of the sensor (0 being worst and 3 being best)
+
+    .. todo::
+        These values are not scaled correctly
+
+    :param int sample_rate: Sample rate (optional, default is 4, range is 1 - 200 in *Hz*)
+    :param int dynamic_range: Dynamic range (optional, default is 2)
+    :param callback: Call this callback when enough data is collected (optional, default is None)
+
+            .. todo::
+               The callback functionality is untested, so do not be confused if it does not work.
+    :param int sample_buffer_len: Length of sample buffer (optional, default is 200)
+    """
+
     def __init__(
         self, sample_rate=4, dynamic_range=2, callback=None, sample_buffer_len=200
     ):
@@ -90,6 +127,28 @@ class BHI160Accelerometer(BHI160):
 
 
 class BHI160Gyroscope(BHI160):
+    """
+    Gyroscope of the BHI160.
+
+    This sensors sample data named tuple contains the following fields:
+
+    - ``x``: Rotation around the x axis
+    - ``y``: Rotation around the y axis
+    - ``z``: Rotation around the z axis
+    - ``status``: accuracy / "confidence" value of the sensor (0 being worst and 3 being best)
+
+    .. todo::
+        These values are not scaled correctly
+
+    :param int sample_rate: Sample rate (optional, default is 4, range is 1 - 200 in *Hz*)
+    :param int dynamic_range: Dynamic range (optional, default is 2)
+    :param callback: Call this callback when enough data is collected (optional, default is None)
+
+            .. todo::
+               The callback functionality is untested, so do not be confused if it does not work.
+    :param int sample_buffer_len: Length of sample buffer (optional, default is 200)
+    """
+
     def __init__(
         self, sample_rate=4, dynamic_range=2, callback=None, sample_buffer_len=200
     ):
@@ -110,6 +169,30 @@ class BHI160Gyroscope(BHI160):
 
 
 class BHI160Orientation(BHI160):
+    """
+    Orientation of the BHI160. Orientation is a virtual sensor that combines
+    Accelerometer, Magnetometer and Gyroscope using the IMU Algorithm to
+    calculate an absolute orientation.
+
+    This sensors sample data named tuple contains the following fields:
+
+    - ``x``: azimuth
+    - ``y``: pitch
+    - ``z``: roll
+    - ``status``: accuracy / "confidence" value of the sensor (0 being worst and 3 being best)
+
+    .. todo::
+        These values are not scaled correctly
+
+    :param int sample_rate: Sample rate (optional, default is 4, range is 1 - 200 in *Hz*)
+    :param int dynamic_range: This parameter is unused for the Orientation.
+    :param callback: Call this callback when enough data is collected (optional, default is None)
+
+            .. todo::
+               The callback functionality is untested, so do not be confused if it does not work.
+    :param int sample_buffer_len: Length of sample buffer (optional, default is 200)
+    """
+
     def __init__(
         self, sample_rate=4, dynamic_range=2, callback=None, sample_buffer_len=200
     ):
@@ -130,6 +213,30 @@ class BHI160Orientation(BHI160):
 
 
 class BHI160Magnetometer(BHI160):
+    """
+    Magnetometer of the BHI160
+
+    This sensors sample data named tuple contains the following fields:
+
+    - ``x``: Magnetic field along the x axis
+    - ``y``: Magnetic field along the y axis
+    - ``z``: Magnetic field along the z axis
+    - ``status``: accuracy / "confidence" value of the sensor (0 being worst and 3 being best)
+
+    .. todo::
+        These values are not scaled correctly
+
+    :param int sample_rate: Sample rate (optional, default is 4, range is 1 - 200 in *Hz*)
+    :param int dynamic_range: Dynamic range (optional, default is 1)
+    :param callback: Call this callback when enough data is collected (optional, default is None)
+
+            .. todo::
+               The callback functionality is untested, so do not be confused if it does not work.
+    :param int sample_buffer_len: Length of sample buffer (optional, default is 200)
+
+   .. versionadded:: 1.11
+    """
+
     def __init__(
         self, sample_rate=4, dynamic_range=1, callback=None, sample_buffer_len=200
     ):
