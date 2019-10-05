@@ -14,6 +14,7 @@ module_sources = files(
   'light_sensor.c',
   'log.c',
   'max30001.c',
+  'panic.c',
   'personal_state.c',
   'pmic.c',
   'rtc.c',

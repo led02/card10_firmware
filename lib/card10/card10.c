@@ -224,7 +224,7 @@ void card10_poll(void)
 	portexpander_poll();
 }
 
-void card10_reset(void)
+void __attribute__((noreturn)) card10_reset(void)
 {
 	printf("Resetting ...\n");
 	/*
@@ -235,6 +235,9 @@ void card10_reset(void)
 		__asm volatile("nop");
 	}
 	MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
+
+	while (1)
+		__WFI();
 }
 
 void GPIO0_IRQHandler(void)

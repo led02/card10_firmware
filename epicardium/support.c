@@ -117,5 +117,5 @@ void vApplicationGetTimerTaskMemory(
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 {
-	LOG_CRIT("rtos", "Task \"%s\" overflowed stack!", pcTaskName);
+	panic("Task \"%s\" overflowed stack!", pcTaskName);
 }
