@@ -4,14 +4,15 @@
 #include <stdint.h>
 
 #ifndef __SPHINX_DOC
-/* stddef.h is not recognized by hawkmoth for some odd reason */
+/* Some headers are not recognized by hawkmoth for some odd reason */
 #include <stddef.h>
-#else
-typedef unsigned int size_t;
-#endif /* __SPHINX_DOC */
 
 #include "FreeRTOS.h"
 #include "queue.h"
+#else
+typedef unsigned int size_t;
+typedef void *QueueHandle_t;
+#endif /* __SPHINX_DOC */
 
 /* Time to wait for the descriptor table lock to become available */
 #define STREAM_MUTEX_WAIT pdMS_TO_TICKS(100)
