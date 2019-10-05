@@ -184,8 +184,6 @@ __attribute__((noreturn)) static void pmic_die(float u_batt)
 	/* TODO: Wake-up when USB is attached again */
 	sleep_deepsleep();
 	card10_reset();
-	while (1)
-		;
 }
 
 /*
@@ -368,6 +366,7 @@ void vPmicTask(void *pvParameters)
 				if (duration >= pdMS_TO_TICKS(1000)) {
 					if (epic_buttons_read(
 						    BUTTON_RIGHT_TOP)) {
+						serial_return_to_synchronous();
 						LOG_WARN(
 							"pmic",
 							"Resetting ..."
@@ -386,6 +385,7 @@ void vPmicTask(void *pvParameters)
 					}
 
 					if (duration > pdMS_TO_TICKS(1000)) {
+						serial_return_to_synchronous();
 						LOG_WARN("pmic", "Poweroff");
 						sleep_deepsleep();
 						card10_reset();
