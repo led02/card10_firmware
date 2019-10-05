@@ -364,10 +364,7 @@ void vLifecycleTask(void *pvParameters)
 	core1_mutex    = xSemaphoreCreateMutexStatic(&core1_mutex_data);
 
 	if (xSemaphoreTake(core1_mutex, 0) != pdTRUE) {
-		LOG_CRIT(
-			"lifecycle", "Failed to acquire mutex after creation."
-		);
-		vTaskDelay(portMAX_DELAY);
+		panic("lifecycle: Failed to acquire mutex after creation.");
 	}
 
 	LOG_DEBUG("lifecycle", "Booting core 1 ...");

@@ -64,8 +64,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 3,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "Serial");
-		abort();
+		panic("Failed to create %s task!", "Serial");
 	}
 
 	/* PMIC */
@@ -76,8 +75,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 4,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "PMIC");
-		abort();
+		panic("Failed to create %s task!", "PMIC");
 	}
 
 	/* BHI160 */
@@ -88,8 +86,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "BHI160");
-		abort();
+		panic("Failed to create %s task!", "BHI160");
 	}
 
 	/* MAX30001 */
@@ -100,8 +97,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "MAX30001");
-		abort();
+		panic("Failed to create %s task!", "MAX30001");
 	}
 	/* API */
 	if (xTaskCreate(
@@ -111,12 +107,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 2,
 		    &dispatcher_task_id) != pdPASS) {
-		LOG_CRIT(
-			"startup",
-			"Failed to create %s task!",
-			"API Dispatcher"
-		);
-		abort();
+		panic("Failed to create %s task!", "API Dispatcher");
 	}
 
 	/* BLE */
@@ -128,8 +119,7 @@ int main(void)
 			    NULL,
 			    tskIDLE_PRIORITY + 3,
 			    NULL) != pdPASS) {
-			LOG_CRIT("startup", "Failed to create %s task!", "BLE");
-			abort();
+			panic("Failed to create %s task!", "BLE");
 		}
 	}
 
@@ -141,8 +131,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 1,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "LED");
-		abort();
+		panic("Failed to create %s task!", "LED");
 	}
 
 	/* Lifecycle */
@@ -153,8 +142,7 @@ int main(void)
 		    NULL,
 		    tskIDLE_PRIORITY + 3,
 		    NULL) != pdPASS) {
-		LOG_CRIT("startup", "Failed to create %s task!", "Lifecycle");
-		abort();
+		panic("Failed to create %s task!", "Lifecycle");
 	}
 
 	/*
@@ -165,6 +153,5 @@ int main(void)
 	LOG_DEBUG("startup", "Starting FreeRTOS ...");
 	vTaskStartScheduler();
 
-	LOG_CRIT("startup", "FreeRTOS did not start due to unknown error!");
-	abort();
+	panic("FreeRTOS did not start due to unknown error!");
 }
