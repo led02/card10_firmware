@@ -91,6 +91,7 @@ autodoc_mock_imports = [
     "buttons",
     "interrupt",
     "sys_bme680",
+    "sys_bhi160",
     "sys_display",
     "sys_leds",
     "sys_max30001",
