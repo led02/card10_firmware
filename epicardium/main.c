@@ -6,6 +6,7 @@
 
 #include "gfx.h"
 #include "display.h"
+#include "leds.h"
 #include "version-splash.h"
 
 #include "FreeRTOS.h"
@@ -31,8 +32,21 @@ int main(void)
 	 * Version Splash
 	 */
 	const char *version_buf = CARD10_VERSION;
-	mxc_delay(500000);
+
+	//LED feedback in case of dead display
+	epic_leds_set(11, 0, 0, 1);
+	epic_leds_set(12, 0, 0, 1);
+	epic_leds_set(13, 0, 0, 1);
+	epic_leds_set(14, 0, 0, 1);
+	for (int i = 0; i < 3; i++) {
+		epic_leds_set_rocket(i, 31);
+		mxc_delay(166666);
+		epic_leds_set_rocket(i, 0);
+	}
+	epic_leds_clear_all(0, 0, 0);
+
 	epic_disp_clear(0x0000);
+
 	if (strcmp(CARD10_VERSION, "v1.11") == 0) {
 		gfx_copy_region(
 			&display_screen,
