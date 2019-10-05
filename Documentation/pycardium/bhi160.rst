@@ -5,7 +5,15 @@
 
 .. versionadded:: 1.4
 
-Supports the BHI160 sensor on the card10 for accelerometer, gyroscope, magnetometer and orientation.
+Supports the BHI160 sensor on the card10 for accelerometer, gyroscope,
+magnetometer and orientation.
+
+The coordinate system of the BHI160 sensor data looks like this:
+
+.. image:: ../static/bhi160-coordinates.png
+
+All angles and angular velocities (like gyroscope, orientation) rotate counter
+clockwise around their respective axis.
 
 **Example**:
 
