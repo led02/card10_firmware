@@ -75,8 +75,8 @@ class Display:
         :param text: Text to print
         :param fg: Foreground color (expects RGB triple)
         :param bg: Background color (expects RGB triple) or None for transparent background
-        :param posx: X-Position of the first character, 0 <= posx <= 159
-        :param posy: Y-Position of the first character, 0 <= posy <= 79
+        :param posx: X-Position of the first character
+        :param posy: Y-Position of the first character
         :param font: 0 <= font <= 4 (currently) selects a font
 
         Avaiable Fonts:
@@ -110,8 +110,8 @@ class Display:
         """
         Draws a pixel on the display
 
-        :param x: X coordinate, 0<= x <= 159
-        :param y: Y coordinate, 0<= y <= 79
+        :param x: X coordinate
+        :param y: Y coordinate
         :param col: color of the pixel (expects RGB tripple)
         """
 
@@ -134,10 +134,10 @@ class Display:
         """
         Draws a line on the display.
 
-        :param xs: X start coordinate, 0 <= xs <= 159
-        :param ys: Y start coordinate, 0 <= ys <= 79
-        :param xe: X end coordinate, 0 <= xe <= 159
-        :param ye: Y end coordinate, 0 <= ye <= 79
+        :param xs: X start coordinate
+        :param ys: Y start coordinate
+        :param xe: X end coordinate
+        :param ye: Y end coordinate
         :param col: color of the line (expects RGB triple)
         :param dotted: whether the line should be dotted or not
            (questionable implementation: draws every other pixel white, draws
@@ -154,10 +154,10 @@ class Display:
         """
         Draws a rectangle on the display.
 
-        :param xs: X start coordinate, 0 <= xs <= 159
-        :param ys: Y start coordinate, 0 <= ys <= 79
-        :param xe: X end coordinate, 0 <= xe <= 159
-        :param ye: Y end coordinate, 0 <= ye <= 79
+        :param xs: X start coordinate
+        :param ys: Y start coordinate
+        :param xe: X end coordinate
+        :param ye: Y end coordinate
         :param col: color of the outline and fill (expects RGB triple)
         :param filled: whether the rectangle should be filled or not
         :param size: size of the individual pixels, ranges from 1 to 8
@@ -172,8 +172,8 @@ class Display:
         """
         Draws a circle on the display.
 
-        :param x: center x coordinate, 0 <= x <= 159
-        :param y: center y coordinate, 0 <= y <= 79
+        :param x: center x coordinate
+        :param y: center y coordinate
         :param rad: radius
         :param col: color of the outline and fill (expects RGB triple)
         :param filled: whether the rectangle should be filled or not
