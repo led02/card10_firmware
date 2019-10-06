@@ -214,6 +214,11 @@ def main():
     )
     cmd_parser.add_argument("-c", "--command", help="program passed in as string")
     cmd_parser.add_argument(
+        "--set-time",
+        action="store_true",
+        help="Set card10 system time to this host's time",
+    )
+    cmd_parser.add_argument(
         "-w",
         "--wait",
         default=0,
@@ -241,7 +246,7 @@ def main():
     if args.reset:
         card10.soft_reset()
 
-    elif args.command is not None or len(args.files):
+    elif args.set_time or args.command is not None or len(args.files):
         # we must enter raw-REPL mode to execute commands
         # this will do a soft-reset of the board
         try:
@@ -267,6 +272,16 @@ def main():
                 card10.close()
                 stdout_write_bytes(ret_err)
                 sys.exit(1)
+
+        # Set card10 system time
+        if args.set_time:
+            now = round(time.time())
+            code = """\
+import utime
+utime.set_unix_time({time})
+print("Time was set to {time}!")
+"""
+            execbuffer(code.format(time=now))
 
         # run the command, if given
         if args.command is not None:
