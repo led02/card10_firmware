@@ -103,6 +103,57 @@ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
 	display_pixel_obj, 3, 3, mp_display_pixel
 );
 
+/* blit image to display */
+static mp_obj_t mp_display_blit(size_t n_args, const mp_obj_t *args)
+{
+	/* Required arguments: posx, posy (on display),
+	                       width, height (of image),
+						   buffer (rgb data of image) */
+	int16_t posx = mp_obj_get_int(args[0]);
+	int16_t posy = mp_obj_get_int(args[1]);
+	int16_t width = mp_obj_get_int(args[2]);
+	int16_t height = mp_obj_get_int(args[3]);
+	mp_buffer_info_t buffer;
+
+	/* Helper variables:
+	   - offsetx, offsety (inside image)
+	   - countx, county (number of pixels to blit) */
+	int16_t offsetx = (posx < 0) ? -posx : 0;
+	int16_t offsety = (posy < 0) ? -posy : 0;
+	int16_t countx = (posx + offsetx > 160)
+		? (posx + offsetx - 160)
+		: (width - ((posx < 0) ? offsetx : 0));
+	int16_t county = (posy + offsety > 80)
+		? (posy + offsety - 80)
+		: (height - ((posy < 0) ? offsety : 0));
+
+	/* Load buffer and ensure it contains enough data */
+	if (!mp_get_buffer(args[4], &buffer, MP_BUFFER_READ)) {
+		mp_raise_TypeError("Expected buffer as argument 5");
+	}
+	if (buffer.len < width * height * 3) {
+		mp_raise_ValueError("Not enough data in buffer.");
+	}
+
+	/* Draw pixels */
+	for (int16_t currenty = offsety; currenty < offsety + county; currenty++) {
+		for (int16_t currentx = offsetx; currentx < offsetx + countx; currentx++) {
+			int16_t index = currenty * width + currentx;
+			int16_t color = rgb888_to_rgb565(buffer.buf + (index * 3));
+
+			int res = epic_disp_pixel(posx + currentx, posy + currenty, color);
+			if (res < 0) {
+				mp_raise_OSError(-res);
+			}
+		}
+	}
+
+	return mp_const_none;
+}
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(
+	display_blit_obj, 5, 7, mp_display_blit
+);
+
 /* set display backlight brightness */
 static mp_obj_t mp_display_backlight(size_t n_args, const mp_obj_t *args)
 {
@@ -260,6 +311,7 @@ static const mp_rom_map_elem_t display_module_globals_table[] = {
 	{ MP_ROM_QSTR(MP_QSTR_print), MP_ROM_PTR(&display_print_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_print_adv), MP_ROM_PTR(&display_print_adv_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&display_pixel_obj) },
+	{ MP_ROM_QSTR(MP_QSTR_blit), MP_ROM_PTR(&display_blit_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_backlight), MP_ROM_PTR(&display_backlight_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_line), MP_ROM_PTR(&display_line_obj) },
 	{ MP_ROM_QSTR(MP_QSTR_rect), MP_ROM_PTR(&display_rect_obj) },

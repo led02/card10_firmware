@@ -120,6 +120,20 @@ class Display:
         sys_display.pixel(x, y, col)
         return self
 
+    def blit(self, x, y, w, h, img):
+        """
+        Blit an image to the display
+
+        :param x: top left X coordinate
+        :param y: top left Y coordinate
+        :param w: image width
+        :param h: image height
+        :param img: a byte buffer with pixel data (tree bytes for each pixel)
+        """
+
+        sys_display.blit(x, y, w, h, img)
+        return self
+
     def backlight(self, brightness):
         """
         Set display backlight brightness
