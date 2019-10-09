@@ -109,43 +109,41 @@ static mp_obj_t mp_display_blit(size_t n_args, const mp_obj_t *args)
 	/* Required arguments: posx, posy (on display),
 	                       width, height (of image),
 						   buffer (rgb data of image) */
-	int16_t posx = mp_obj_get_int(args[0]);
-	int16_t posy = mp_obj_get_int(args[1]);
+	int16_t pos_x = mp_obj_get_int(args[0]);
+	int16_t pos_y = mp_obj_get_int(args[1]);
 	int16_t width = mp_obj_get_int(args[2]);
 	int16_t height = mp_obj_get_int(args[3]);
-	mp_buffer_info_t buffer;
+	mp_buffer_info_t img;
 
-	/* Helper variables:
-	   - offsetx, offsety (inside image)
-	   - countx, county (number of pixels to blit) */
-	int16_t offsetx = (posx < 0) ? -posx : 0;
-	int16_t offsety = (posy < 0) ? -posy : 0;
-	int16_t countx = (posx + offsetx > 160)
-		? (posx + offsetx - 160)
-		: (width - ((posx < 0) ? offsetx : 0));
-	int16_t county = (posy + offsety > 80)
-		? (posy + offsety - 80)
-		: (height - ((posy < 0) ? offsety : 0));
+	int res = 0;
 
 	/* Load buffer and ensure it contains enough data */
-	if (!mp_get_buffer(args[4], &buffer, MP_BUFFER_READ)) {
-		mp_raise_TypeError("Expected buffer as argument 5");
+	if (!mp_get_buffer(args[4], &img, MP_BUFFER_READ)) {
+		mp_raise_TypeError("'img' does not support buffer protocol.");
 	}
-	if (buffer.len < width * height * 3) {
-		mp_raise_ValueError("Not enough data in buffer.");
+	if (img.len < width * height * 2) {
+		mp_raise_ValueError("'img' is too small.");
 	}
 
-	/* Draw pixels */
-	for (int16_t currenty = offsety; currenty < offsety + county; currenty++) {
-		for (int16_t currentx = offsetx; currentx < offsetx + countx; currentx++) {
-			int16_t index = currenty * width + currentx;
-			int16_t color = rgb888_to_rgb565(buffer.buf + (index * 3));
-
-			int res = epic_disp_pixel(posx + currentx, posy + currenty, color);
-			if (res < 0) {
-				mp_raise_OSError(-res);
-			}
+	if (n_args > 6) {
+		uint16_t bg = mp_obj_get_int(args[5]);
+		mp_buffer_info_t alpha;
+	
+		/* Load alpha buffer and check size */
+		if (!mp_get_buffer(args[6], &alpha, MP_BUFFER_READ)) {
+			mp_raise_TypeError("'alpha' does not support buffer protocol.");
 		}
+		if (alpha.len < width * height) {
+			mp_raise_ValueError("'alpha' is too small.");
+		}
+
+		res = epic_disp_blit(pos_x, pos_y, width, height, img.len, (uint16_t *)img.buf, bg, (uint8_t *)alpha.buf);
+	} else {
+		res = epic_disp_blit(pos_x, pos_y, width, height, img.len, (uint16_t *)img.buf, 0, NULL);
+	}
+
+	if (res < 0) {
+		mp_raise_OSError(-res);
 	}
 
 	return mp_const_none;

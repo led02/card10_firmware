@@ -55,6 +55,8 @@ typedef _Bool bool;
 #define API_DISP_FRAMEBUFFER       0x29
 #define API_DISP_BACKLIGHT         0x2a
 #define API_DISP_PRINT_ADV         0x2b
+//      API_DISP_PIXELS            0x2c
+#define API_DISP_BLIT              0x2d
 
 /* API_BATTERY_VOLTAGE              0x30 */
 #define API_BATTERY_CURRENT        0x31
@@ -1400,6 +1402,26 @@ API(API_DISP_CLEAR, int epic_disp_clear(uint16_t color));
  */
 API(API_DISP_PIXEL, int epic_disp_pixel(
 	int16_t x, int16_t y, uint16_t color
+));
+
+/**
+ * Blit an image buffer to display
+ * 
+ * :param x: x position
+ * :param y: y position
+ * :param w: image width
+ * :param h: image height
+ * :param img: image data (rgb565)
+ */
+API(API_DISP_BLIT, int epic_disp_blit(
+	int16_t x,
+	int16_t y,
+	int16_t w,
+	int16_t h,
+	size_t size,
+	uint16_t *img,
+	uint16_t bg,
+	uint8_t *alpha
 ));
 
 /**

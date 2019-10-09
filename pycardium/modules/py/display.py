@@ -120,7 +120,7 @@ class Display:
         sys_display.pixel(x, y, col)
         return self
 
-    def blit(self, x, y, w, h, img):
+    def blit(self, x, y, w, h, img, bg=None, alpha=None):
         """
         Blit an image to the display
 
@@ -128,10 +128,16 @@ class Display:
         :param y: top left Y coordinate
         :param w: image width
         :param h: image height
-        :param img: a byte buffer with pixel data (tree bytes for each pixel)
+        :param img: a byte buffer with pixel data (rgb565)
+        :param bg: background color
+        :param alpha: alpha mask for `img`
         """
 
-        sys_display.blit(x, y, w, h, img)
+        if alpha is None:
+            sys_display.blit(x, y, w, h, img)
+        else:
+            sys_display.blit(x, y, w, h, img, bg, alpha)
+
         return self
 
     def backlight(self, brightness):
